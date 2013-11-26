@@ -8,7 +8,9 @@ if (Echo.App.isDefined("Echo.Apps.Conversations")) return;
 var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 
 conversations.config = {
-	"targetURL": ""
+	"appkey": "",
+	"targetURL": "",
+	"submitFormPosition": "top"
 };
 
 conversations.dependencies = [{
@@ -19,11 +21,24 @@ conversations.dependencies = [{
 	}
 }];
 
-conversations.templates.main =
+conversations.templates.topSubmitFormPosition =
 	'<div class="{class:container}">' +
 		'<div class="{class:submit}"></div>' +
 		'<div class="{class:stream}"></div>' +
 	'</div>';
+
+conversations.templates.bottomSubmitFormPosition =
+	'<div class="{class:container}">' +
+		'<div class="{class:stream}"></div>' +
+		'<div class="{class:submit}"></div>' +
+	'</div>';
+
+conversations.methods.template = function() {
+	return this.templates[
+		this.config.get("submitFormPosition") + "SubmitFormPosition"
+	];
+};
+
 
 conversations.renderers.submit = function(element) {
 	this.initComponent({
