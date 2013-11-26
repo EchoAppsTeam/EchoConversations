@@ -1,0 +1,25 @@
+{
+	"id": "echo-conversations",
+	"name": "Echo Conversations (Reference)",
+	"description": "Echo conversations reference app",
+	"app_version": "1.0.0",
+	"cloudapp_protocol_version": "1.0.0",
+	"developer": {
+		"id": "echo",
+		"name": "Echo",
+		"url": "http://www.aboutecho.com",
+		"email": "solutions@aboutecho.com",
+		"icon": "http://cdn.echoenabled.com/images/echo.png"
+	},
+	"dashboards": [{
+		"id": "instances",
+		"title": "Instances",
+		"script": "http://echoplatform.com/sandbox/apps/echo/conversations/dashboard.js",
+		"component": "Echo.Apps.Conversations.Dashboard",
+		"type": "instances"
+	}],
+	"client_widget": {
+		"component": "Echo.Apps.Conversations",
+		"script": "http://echoplatform.com/sandbox/apps/echo/conversations/app.js"
+	}
+}
