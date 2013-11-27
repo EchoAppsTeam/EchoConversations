@@ -49,8 +49,7 @@ plugin.css =
 	'.{plugin.class:date} { color: #d3d3d3; float: left; margin-left: 5px; }' +
 	'.{plugin.class} .{class:avatar} { border-radius: 50%; }' +
 	'.{plugin.class} .{class:avatar} img { height: 48px; width: 48px; }' +
-	'.{plugin.class} .{class:buttons} { display: none; }' +
-	'.{plugin.class} .{class:body} { padding-top: 0px; }' +
+	'.{plugin.class} .{class:body} { padding-top: 0px; margin: 10px 0px; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 13px; }' +
 	'.{plugin.class} .{class:footer} { margin-top: 5px; }' +
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 50px; }' +
