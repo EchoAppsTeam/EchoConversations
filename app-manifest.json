@@ -1,6 +1,6 @@
 {
-	"id": "echo-conversations",
-	"name": "Echo Conversations (Reference)",
+	"id": "{%=manifest.id%}",
+	"name": "{%=manifest.name%}",
 	"description": "Echo conversations reference app",
 	"app_version": "1.0.0",
 	"cloudapp_protocol_version": "1.0.0",
@@ -14,12 +14,12 @@
 	"dashboards": [{
 		"id": "instances",
 		"title": "Instances",
-		"script": "http://echoplatform.com/sandbox/apps/echo/conversations/dashboard.js",
+		"script": "{%=baseURL%}/dashboard.js",
 		"component": "Echo.Apps.Conversations.Dashboard",
 		"type": "instances"
 	}],
 	"client_widget": {
 		"component": "Echo.Apps.Conversations",
-		"script": "http://echoplatform.com/sandbox/apps/echo/conversations/app.js"
+		"script": "{%=baseURL%}/app.js"
 	}
 }
