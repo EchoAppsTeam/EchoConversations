@@ -172,7 +172,11 @@ conversations.renderers.stream = function(element) {
 conversations.methods._buildSearchQuery = function() {
 	// TODO: think about more scalable approach to override query predicates...
 	var states = "state:" + this.config.get("itemStates");
-	return "childrenof:" + this.config.get("conversationID") +
+	var conversationId = this.config.get("conversationID")
+		|| $("link[rel='canonical']").attr('href')
+		|| document.location.href.split("#")[0];
+
+	return "childrenof:" + conversationId +
 		" type:comment " + states +
 		" children:2 " + states;
 };
