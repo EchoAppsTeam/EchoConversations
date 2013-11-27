@@ -10,7 +10,7 @@ var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stre
 plugin.css =
 	'.{plugin.class} .{class:header} { display: none; }' +
 	'.{plugin.class} .{class:item} { margin: 10px 0px; padding: 5px 0px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }' +
-	'.{plugin.class} .{class:item-children} > .echo-streamserver-controls-stream-item { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; }';
+	'.{plugin.class} .{class:item-children} > .{class:item} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; }';
 
 Echo.Plugin.create(plugin);
 
@@ -198,6 +198,14 @@ conversations.config = {
 	"itemStates": "Untouched,ModeratorApproved"
 };
 
+conversations.config.normalizer = {
+	"conversationID": function(value) {
+		return value
+			|| $("link[rel='canonical']").attr('href')
+			|| document.location.href.split("#")[0];
+	}
+};
+
 conversations.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js",
 	"control": "Echo.StreamServer.Controls.Stream"
@@ -265,11 +273,7 @@ conversations.renderers.stream = function(element) {
 conversations.methods._buildSearchQuery = function() {
 	// TODO: think about more scalable approach to override query predicates...
 	var states = "state:" + this.config.get("itemStates");
-	var conversationId = this.config.get("conversationID")
-		|| $("link[rel='canonical']").attr('href')
-		|| document.location.href.split("#")[0];
-
-	return "childrenof:" + conversationId +
+	return "childrenof:" + this.config.get("conversationID") +
 		" type:comment " + states +
 		" children:2 " + states;
 };
