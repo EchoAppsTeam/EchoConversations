@@ -25,8 +25,39 @@ Echo.Plugin.create(plugin);
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream.Item");
 
+plugin.init = function() {
+	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
+	this.extendTemplate("remove", "date");
+};
+
+plugin.templates.date =
+	'<div class="{plugin.class:date}"></div>';
+
+plugin.renderers.date = function(element) {
+	// TODO: use parentRenderer here
+	this.age = this.component.getRelativeTime(this.component.timestamp);
+	return element.html(this.age);
+};
+
+var itemDepthRules = [];
+// 100 is a maximum level of children in query, but we can apply styles for ~20
+for (var i = 0; i <= 20; i++) {
+	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: ' + (i ? 10 + (i - 1) * 7 : 0) + 'px; }');
+}
+
 plugin.css =
-	'.{plugin.class} .{class:avatar} { border-radius: 50%; }';
+	'.{plugin.class:date} { color: #d3d3d3; float: left; margin-left: 5px; }' +
+	'.{plugin.class} .{class:avatar} { border-radius: 50%; }' +
+	'.{plugin.class} .{class:avatar} img { height: 48px; width: 48px; }' +
+	'.{plugin.class} .{class:buttons} { display: none; }' +
+	'.{plugin.class} .{class:body} { padding-top: 0px; }' +
+	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 13px; }' +
+	'.{plugin.class} .{class:footer} { margin-top: 5px; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 50px; }' +
+	'.{plugin.class} .{class:depth-0} .{class:authorName} { color: #595959; font-weight: normal; line-height: 48px; font-size: 17px; margin-left: 60px;}' +
+	'.{plugin.class} .{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
+	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
+	itemDepthRules.join("\n");
 
 Echo.Plugin.create(plugin);
 
