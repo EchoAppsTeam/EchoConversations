@@ -8,6 +8,15 @@ var dashboard = Echo.AppServer.Dashboard.manifest("Echo.Apps.Conversations.Dashb
 
 dashboard.inherits = Echo.Utils.getComponent("Echo.AppServer.Dashboards.AppSettings");
 
+dashboard.mappings = {
+	"appkey": {
+		"key": "dependencies.StreamServer.appkey"
+	},
+	"auth.janrainapp": {
+		"key": "dependencies.Janrain.appId"
+	}
+};
+
 dashboard.config = {
 	"ecl": [{
 		"component": "Select",
@@ -19,7 +28,7 @@ dashboard.config = {
 			"options": []
 		}
 	}, {
-		"component": "Echo.Apps.RTBComments.Dashboard.TargetSelector",
+		"component": "Echo.Apps.Conversations.Dashboard.TargetSelector",
 		"name": "conversationID",
 		"type": "string",
 		"default": "",
@@ -46,41 +55,117 @@ dashboard.config = {
 				"value": "bottom"
 			}]
 		}
+	}, {
+		"component": "Group",
+		"name": "auth",
+		"type": "object",
+		"config": {
+			"title": "Auth"
+		},
+		"items": [{
+			"component": "Checkbox",
+			"name": "enableAnonymousComments",
+			"type": "boolean",
+			"config": {
+				"title": "Enable anonymous comments"
+			}
+		}, {
+			"component": "Select",
+			"name": "janrainapp",
+			"type": "string",
+			"config": {
+				"title": "Janrain App",
+				"validators": ["required"],
+				"options": []
+			}
+		}]
 	}]
 };
 
+
 dashboard.init = function() {
 	var self = this, parent = $.proxy(this.parent, this);
-
-	var request = this.config.get("request");
-	var customerId = this.config.get("data.customer.id");
-	request({
-		"endpoint": "customer/" + customerId + "/appkeys",
-		"success": function(appkeys) {
-			self._setAppkeys(appkeys);
-			self.set("appkeys", appkeys);
-			parent();
-		}
+	this._requestData(function() {
+		parent();
 	});
 };
 
 dashboard.methods.declareInitialConfig = function() {
 	var keys = this.get("appkeys", []);
+	var apps = this.get("janrainapps", []);
 	return {
-		"appkey": keys.length ? keys[0].key : undefined
+		"dependencies": {
+			"Janrain": {
+				"appId": apps.length ? apps[0].name : undefined
+			},
+			"StreamServer": {
+				"appkey": keys.length ? keys[0].key : undefined,
+			}
+		}
 	};
 };
 
-dashboard.methods._setAppkeys = function(appkeys) {
-	appkeys = appkeys || [];
-	this.set("appkeys", appkeys);
+dashboard.methods.initConfigurator = function() {
+	function findKey(key, ecl) {
+		var found;
+		$.each(ecl, function(k, item) {
+			if (item.name === key) {
+				found = item;
+				return false;
+			} else if (item.type === "object") {
+				found = findKey(key, item.items);
+				if (found) return false;
+			}
+		});
+		return found;
+	}
+
 	var ecl = this.config.get("ecl");
-	ecl[0].config.options = $.map(appkeys, function(appkey) {
+
+	// populate appkey selectbox
+	var appkey = findKey("appkey", ecl);
+	appkey.config.options = $.map(this.get("appkeys", []), function(appkey) {
 		return {
 			"title": appkey.key,
 			"value": appkey.key
 		};
 	});
+
+	// populate janrainapp selectbox
+	var janrainapp = findKey("janrainapp", ecl);
+	janrainapp.config.options = $.map(this.get("janrainapps", []), function(app) {
+		return {
+			"title": app.name,
+			"value": app.name
+		};
+	});
+	this.parent.apply(this, arguments);
+};
+
+dashboard.methods._requestData = function(callback) {
+	var self = this;
+	var customerId = this.config.get("data.customer.id");
+	var deferreds = [];
+	var request = this.config.get("request");
+
+	var requests = [{
+		"name": "appkeys",
+		"endpoint": "customer/" + customerId + "/appkeys"
+	}, {
+		"name": "janrainapps",
+		"endpoint": "customer/" + customerId + "/janrainapps"
+	}];
+	$.map(requests, function(req) {
+		var deferredId = deferreds.push($.Deferred()) - 1;
+		request({
+			"endpoint": req.endpoint,
+			"success": function(response) {
+				self.set(req.name, response);
+				deferreds[deferredId].resolve();
+			}
+		});
+	});
+	$.when.apply($, deferreds).done(callback);
 };
 
 Echo.AppServer.Dashboard.create(dashboard);
@@ -93,9 +178,9 @@ Echo.AppServer.Dashboard.create(dashboard);
 var $ = jQuery;
 
 // TODO rename class
-if (Echo.Control.isDefined("Echo.Apps.RTBComments.Dashboard.TargetSelector")) return;
+if (Echo.Control.isDefined("Echo.Apps.Conversations.Dashboard.TargetSelector")) return;
 
-var component = Echo.Control.manifest("Echo.Apps.RTBComments.Dashboard.TargetSelector");
+var component = Echo.Control.manifest("Echo.Apps.Conversations.Dashboard.TargetSelector");
 
 component.inherits = Echo.Utils.getComponent("Echo.AppServer.Controls.Configurator.Items.RadioGroup");
 
