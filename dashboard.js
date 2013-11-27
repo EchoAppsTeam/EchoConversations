@@ -1,4 +1,5 @@
 (function(jQuery) {
+"use strict";
 
 var $ = jQuery;
 
@@ -84,7 +85,7 @@ dashboard.config = {
 
 
 dashboard.init = function() {
-	var self = this, parent = $.proxy(this.parent, this);
+	var parent = $.proxy(this.parent, this);
 	this._requestData(function() {
 		parent();
 	});
@@ -99,7 +100,7 @@ dashboard.methods.declareInitialConfig = function() {
 				"appId": apps.length ? apps[0].name : undefined
 			},
 			"StreamServer": {
-				"appkey": keys.length ? keys[0].key : undefined,
+				"appkey": keys.length ? keys[0].key : undefined
 			}
 		}
 	};

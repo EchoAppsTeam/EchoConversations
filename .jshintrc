@@ -13,11 +13,14 @@
 	"sub": true,
 	"trailing": true,
 	"undef": true,
-	"unused": true,
+	"unused": "vars",
 	"browser": true,
 	"scripturl": true,
 	"jquery": true,
 	"devel": true,
 	"laxbreak": true,
-	"node": true
+	"node": true,
+	"globals": {
+		"Echo": false
+	}
 }

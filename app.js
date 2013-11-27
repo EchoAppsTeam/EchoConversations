@@ -120,7 +120,7 @@ plugin.css =
 	'.{plugin.class} .{class:content} textarea.{class:textArea} { height: 75px; }' +
 	'.{plugin.class} .{class:controls} { margin: 0px; padding: 7px; border: 1px solid #D2D2D2; border-top: 0px; }' +
 	'.{plugin.class} .{class:container} { padding: 15px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }' +
-	'.{plugin.class:attach} { margin: 5px; float: left; }'; 
+	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
 Echo.Plugin.create(plugin);
 

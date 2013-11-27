@@ -55,11 +55,12 @@ component.vars = {
 };
 
 component.renderers.valueContainer = function(element) {
-	var self = this, view = this.view.fork();
+	var self = this;
 	element.empty();
 	$.map(this.config.get("options") || [], function(option) {
 		self._renderOption(option);
 		if (option.section === "custom") {
+			/* jshint nonew:false */
 			new Echo.AppServer.Controls.Configurator.Items.Input({
 				"target": $(self.substitute({"template": '<div class="{class:input-container}"></div>'}))
 					.appendTo(element)[self._isChecked(option) ? "show" : "hide"](),
@@ -70,12 +71,13 @@ component.renderers.valueContainer = function(element) {
 					return {
 						"correct": /^https?:\/\/[a-z0-9_\-\.]+\.(?:[a-z0-9_\-]+\.)*[a-z]+(\/|$)/i.test(value),
 						"message": self.labels.get("validateError")
-					}
+					};
 				}],
 				"ready": function() {
 					self.input = this;
 				}
 			});
+			/* jshint nonew:true */
 		}
 	});
 	this.set("currentSection", this.section());
