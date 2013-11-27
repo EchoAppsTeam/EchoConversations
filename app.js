@@ -75,6 +75,13 @@ Echo.Plugin.create(plugin);
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Submit");
 
+//FIXME: utilise relative path
+plugin.templates.attach = '<div class="{plugin.class:attach}"><img class="{plugin.class:attachPic}" src="http://conversations.leon.ul.js-kit.com/images/attach.png" /></div>';
+
+plugin.init = function (){
+	this.extendTemplate("insertAsFirstChild", "controls", plugin.templates.attach);
+};
+
 plugin.css =
 	'.{plugin.class} .{class:header} { display: none; }' +
 	'.{plugin.class} .{class:postButton} { color: #006DCC !important; font-weight: bold; }' +
@@ -82,7 +89,8 @@ plugin.css =
 	'.{plugin.class} .{class:markersContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:content} textarea.{class:textArea} { height: 75px; }' +
 	'.{plugin.class} .{class:controls} { margin: 0px; padding: 7px; border: 1px solid #D2D2D2; border-top: 0px; }' +
-	'.{plugin.class} .{class:container} { padding: 15px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }';
+	'.{plugin.class} .{class:container} { padding: 15px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }' +
+	'.{plugin.class:attach} { margin: 5px; float: left; }'; 
 
 Echo.Plugin.create(plugin);
 
