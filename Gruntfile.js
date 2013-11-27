@@ -18,7 +18,8 @@ module.exports = function(grunt) {
 		"js": [
 			"app.js",
 			"plugins/*.js",
-			"dashboard.js"
+			"dashboard.js",
+			"dashboard/*.js"
 		],
 		"images": [
 			"images/**"
@@ -99,6 +100,13 @@ module.exports = function(grunt) {
 			"options": {
 				"stripBanners": true,
 				"banner": "<%= banner %>"
+			},
+			"dashboard": {
+				"src": [
+					"<%= dirs.build %>/dashboard.js",
+					"<%= dirs.build%>/dashboard/*.js"
+				],
+				"dest": "<%= dirs.build %>/dashboard.js"
 			},
 			"app": {
 				"src": [
