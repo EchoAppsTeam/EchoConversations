@@ -25,6 +25,26 @@ Echo.Plugin.create(plugin);
 "use strict";
 
 /**
+ * @class Echo.StreamServer.Controls.Stream.Item.Plugins.ItemCardUIShim
+ * Extends Item control to look like Card-based app.
+ */
+var plugin = Echo.Plugin.manifest("ItemCardUIShim", "Echo.StreamServer.Controls.Stream.Item");
+
+var getClass = function(name) {
+	return ".echo-streamserver-controls-stream-item-plugin-ItemCardUIShim" +
+		".echo-streamserver-controls-item-" + name + " ";
+};
+
+plugin.css = '';
+
+Echo.Plugin.create(plugin);
+
+})(Echo.jQuery);
+
+(function($) {
+"use strict";
+
+/**
  * @class Echo.IdentityServer.Controls.Auth.Plugins.AuthCardUIShim
  * Extends Auth control to look like Card-based app.
  */
@@ -150,6 +170,8 @@ conversations.renderers.stream = function(element) {
 			},
 			"plugins": [{
 				"name": "StreamCardUIShim"
+			}, {
+				"name": "ItemCardUIShim"
 			}, {
 				"name": "Reply",
 				"nestedPlugins": [{
