@@ -7,15 +7,10 @@
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream");
 
-var getClass = function(name) {
-	return ".echo-streamserver-controls-stream-plugin-CardUIShim " +
-		".echo-streamserver-controls-stream-" + name + " ";
-};
-
 plugin.css =
-	getClass("header") + "{ display: none; }" +
-	getClass("item") + "{ margin: 10px 0px; padding: 5px 0px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }" +
-	getClass("item-children > .echo-streamserver-controls-stream-item") + "{ margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; }";
+	'.{plugin.class} .{class:header} { display: none; }' +
+	'.{plugin.class} .{class:item} { margin: 10px 0px; padding: 5px 0px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }' +
+	'.{plugin.class} .{class:item-children} > .echo-streamserver-controls-stream-item { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; }';
 
 Echo.Plugin.create(plugin);
 
@@ -30,12 +25,8 @@ Echo.Plugin.create(plugin);
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream.Item");
 
-var getClass = function(name) {
-	return ".echo-streamserver-controls-stream-item-plugin-CardUIShim" +
-		".echo-streamserver-controls-item-" + name + " ";
-};
-
-plugin.css = '';
+plugin.css =
+	'.{plugin.class} .{class:avatar} { border-radius: 50%; }';
 
 Echo.Plugin.create(plugin);
 
@@ -63,18 +54,13 @@ plugin.component.renderers.name = function(element) {
 	return element;
 };
 
-var getClass = function(name) {
-	return ".echo-identityserver-controls-auth-plugin-CardUIShim " +
-		".echo-identityserver-controls-auth-" + name + " ";
-};
-
 plugin.css =
-	".{plugin.class:via} { color: #C6C6C6; line-height: 18px; font-size: 12px; }" +
-	getClass("avatar img") + "{ border-radius: 50%; }" +
-	getClass("userAnonymous") + "{ margin-bottom: 7px; text-align: left; font-family: Arial; font-weight: bold; }" +
-	getClass("userLogged") + "{ margin: 0px 0px 5px 3px; }" +
-	getClass("name") + "{ margin: 3px 0px 0px 15px; font-family: Arial; font-weight: normal; }" +
-	getClass("avatar") + "{ width: 48px !important; height: 48px !important; border-radius: 50%; }";
+	'.{plugin.class:via} { color: #C6C6C6; line-height: 18px; font-size: 12px; }' +
+	'.{plugin.class} .{class:avatar} img { border-radius: 50%; }' +
+	'.{plugin.class} .{class:userAnonymous} { margin-bottom: 7px; text-align: left; font-family: Arial; font-weight: bold; }' +
+	'.{plugin.class} .{class:userLogged} { margin: 0px 0px 5px 3px; }' +
+	'.{plugin.class} .{class:name} { margin: 3px 0px 0px 15px; font-family: Arial; font-weight: normal; }' +
+	'.{plugin.class} .{class:avatar} { width: 48px; height: 48px; border-radius: 50%; }';
 
 Echo.Plugin.create(plugin);
 
@@ -89,19 +75,14 @@ Echo.Plugin.create(plugin);
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Submit");
 
-var getClass = function(name) {
-	return ".echo-streamserver-controls-submit-plugin-CardUIShim " +
-		".echo-streamserver-controls-submit-" + name + " ";
-};
-
 plugin.css =
-	getClass("header") + "{ display: none; }" +
-	getClass("postButton") + "{ color: #006DCC !important; font-weight: bold; }" +
-	getClass("tagsContainer") + "{ display: none !important; }" +
-	getClass("markersContainer") + "{ display: none !important; }" +
-	getClass("content textarea.echo-streamserver-controls-submit-textArea") + "{ height: 75px; }" +
-	getClass("controls") + "{ margin: 0px; padding: 7px; border: 1px solid #D2D2D2; border-top: 0px; }" +
-	getClass("container") + "{ padding: 15px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }";
+	'.{plugin.class} .{class:header} { display: none; }' +
+	'.{plugin.class} .{class:postButton} { color: #006DCC !important; font-weight: bold; }' +
+	'.{plugin.class} .{class:tagsContainer} { display: none !important; }' +
+	'.{plugin.class} .{class:markersContainer} { display: none !important; }' +
+	'.{plugin.class} .{class:content} textarea.{class:textArea} { height: 75px; }' +
+	'.{plugin.class} .{class:controls} { margin: 0px; padding: 7px; border: 1px solid #D2D2D2; border-top: 0px; }' +
+	'.{plugin.class} .{class:container} { padding: 15px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }';
 
 Echo.Plugin.create(plugin);
 
