@@ -1,30 +1,32 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
-    <title>EchoCanvases Demo</title>
-  </head>
-  <script type="text/javascript" src="http://cdn.echoenabled.com/sdk/v3/loader.js"></script>
-  <script type="text/javascript" src="http://cdn.echoenabled.com/sdk/v3/third-party/jquery.pack.js"></script>
+	<title>Echo Conversation v1.0 Demo</title>
+</head>
+
 <body>
-<hr>
-<div id="container" style=""></div>
+
+<script type="text/javascript" src="http://cdn.echoenabled.com/sdk/v3/loader.js"></script>
+
+<div id="container"></div>
 
 <script type="text/javascript">
-  Echo.Loader.initApplication({
-      "script": "http://echoplatform.com/sandbox/apps/echo/conversations/app.js",
-      "component": "Echo.Apps.Conversations",
-      "backplane": {
-        "serverBaseURL": "https://api.Echoenabled.com/v1",
-        "busName": "jskit"
-      },
-      "config": {
-        "target": document.getElementById("container"),
-        "appkey": "echo.jssdk.demo.aboutecho.com",
-        "apiBaseURL": "//api.echoenabled.com/v1/",
-        "submissionProxyURL": "https://apps.echoenabled.com/v2/esp/activity",
-        "targetURL": "http://echoplatform.com/test/conversations"
-    }
-  });
+	Echo.Loader.initApplication({
+		"script": "http://echoplatform.com/sandbox/apps/echo/conversations/app.js",
+		"component": "Echo.Apps.Conversations",
+		"backplane": {
+			"serverBaseURL": "https://api.echoenabled.com/v1",
+			"busName": "jskit"
+		},
+		"config": {
+			"target": document.getElementById("container"),
+			"dependencies": {
+				"Janrain": {"appId": "echo"},
+				"StreamServer": {"appkey": "echo.jssdk.demo.aboutecho.com"}
+			},
+			"conversationID": "http://echoplatform.com/test/conversations"
+		}
+	});
 </script>
 
 </body>
