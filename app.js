@@ -2,13 +2,13 @@
 "use strict";
 
 /**
- * @class Echo.StreamServer.Controls.Stream.Plugins.StreamCardUIShim
+ * @class Echo.StreamServer.Controls.Stream.Plugins.CardUIShim
  * Extends Auth control to look like Card-based app.
  */
-var plugin = Echo.Plugin.manifest("StreamCardUIShim", "Echo.StreamServer.Controls.Stream");
+var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream");
 
 var getClass = function(name) {
-	return ".echo-streamserver-controls-stream-plugin-StreamCardUIShim " +
+	return ".echo-streamserver-controls-stream-plugin-CardUIShim " +
 		".echo-streamserver-controls-stream-" + name + " ";
 };
 
@@ -25,13 +25,13 @@ Echo.Plugin.create(plugin);
 "use strict";
 
 /**
- * @class Echo.StreamServer.Controls.Stream.Item.Plugins.ItemCardUIShim
+ * @class Echo.StreamServer.Controls.Stream.Item.Plugins.CardUIShim
  * Extends Item control to look like Card-based app.
  */
-var plugin = Echo.Plugin.manifest("ItemCardUIShim", "Echo.StreamServer.Controls.Stream.Item");
+var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream.Item");
 
 var getClass = function(name) {
-	return ".echo-streamserver-controls-stream-item-plugin-ItemCardUIShim" +
+	return ".echo-streamserver-controls-stream-item-plugin-CardUIShim" +
 		".echo-streamserver-controls-item-" + name + " ";
 };
 
@@ -45,10 +45,10 @@ Echo.Plugin.create(plugin);
 "use strict";
 
 /**
- * @class Echo.IdentityServer.Controls.Auth.Plugins.AuthCardUIShim
+ * @class Echo.IdentityServer.Controls.Auth.Plugins.CardUIShim
  * Extends Auth control to look like Card-based app.
  */
-var plugin = Echo.Plugin.manifest("AuthCardUIShim", "Echo.IdentityServer.Controls.Auth");
+var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.IdentityServer.Controls.Auth");
 
 plugin.component.renderers.login = function(element) {
 	element.addClass("btn");
@@ -64,7 +64,7 @@ plugin.component.renderers.name = function(element) {
 };
 
 var getClass = function(name) {
-	return ".echo-identityserver-controls-auth-plugin-AuthCardUIShim " +
+	return ".echo-identityserver-controls-auth-plugin-CardUIShim " +
 		".echo-identityserver-controls-auth-" + name + " ";
 };
 
@@ -84,13 +84,13 @@ Echo.Plugin.create(plugin);
 "use strict";
 
 /**
- * @class Echo.StreamServer.Controls.Submit.Plugins.SubmitCardUIShim
+ * @class Echo.StreamServer.Controls.Submit.Plugins.CardUIShim
  * Extends Submit control to look like Card-based app.
  */
-var plugin = Echo.Plugin.manifest("SubmitCardUIShim", "Echo.StreamServer.Controls.Submit");
+var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Submit");
 
 var getClass = function(name) {
-	return ".echo-streamserver-controls-submit-plugin-SubmitCardUIShim " +
+	return ".echo-streamserver-controls-submit-plugin-CardUIShim " +
 		".echo-streamserver-controls-submit-" + name + " ";
 };
 
@@ -145,12 +145,12 @@ conversations.renderers.submit = function(element) {
 			"targetURL": this.config.get("conversationID"),
 			"infoMessages": {"enabled": false},
 			"plugins": [{
-				"name": "SubmitCardUIShim"
+				"name": "CardUIShim"
 			}, {
 				"name": "JanrainAuth",
 				"appId": this.config.get("dependencies.Janrain.appId"),
 				"nestedPlugins": [{
-					"name": "AuthCardUIShim"
+					"name": "CardUIShim"
 				}]
 			}]
 		}
@@ -169,18 +169,16 @@ conversations.renderers.stream = function(element) {
 				"reTag": false
 			},
 			"plugins": [{
-				"name": "StreamCardUIShim"
-			}, {
-				"name": "ItemCardUIShim"
+				"name": "CardUIShim"
 			}, {
 				"name": "Reply",
 				"nestedPlugins": [{
-					"name": "SubmitCardUIShim"
+					"name": "CardUIShim"
 				}, {
 					"name": "JanrainAuth",
 					"appId": this.config.get("dependencies.Janrain.appId"),
 					"nestedPlugins": [{
-						"name": "AuthCardUIShim"
+						"name": "CardUIShim"
 					}]
 				}]
 			}, {
