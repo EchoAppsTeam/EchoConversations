@@ -277,7 +277,6 @@ if (Echo.App.isDefined("Echo.Apps.Conversations")) return;
 var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 
 conversations.config = {
-	// TODO: add WebSockets config, make WS on by default
 	"auth":{
 		// TODO: rename to "allowAnonymousSubmission"
 		"enableAnonymousComments": false
@@ -286,8 +285,11 @@ conversations.config = {
 		"Janrain": {"appId": undefined},
 		"StreamServer": {"appkey": undefined}
 	},
-	"conversationID": "", // TODO: make auto-detectable by default
-	"itemStates": "Untouched,ModeratorApproved"
+	"conversationID": "",
+	"itemStates": "Untouched,ModeratorApproved",
+	"liveUpdates": {
+		"transport": "websockets"
+	}
 };
 
 conversations.config.normalizer = {
@@ -319,6 +321,7 @@ conversations.renderers.submit = function(element) {
 			"target": element,
 			"targetURL": this.config.get("conversationID"),
 			"infoMessages": {"enabled": false},
+			"liveUpdates": this.config.get("liveUpdates"),
 			"plugins": [{
 				"name": "JanrainAuth",
 				"appId": this.config.get("dependencies.Janrain.appId"),
