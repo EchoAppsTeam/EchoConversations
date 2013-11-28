@@ -127,36 +127,71 @@ Echo.Plugin.create(plugin);
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.IdentityServer.Controls.Auth");
 
 plugin.labels = {
-	"via": "via"
+	"via": "via",
+	"logout": "Logout",
+	"switchIdentity": "Switch Identity"
 };
 
-plugin.templates.via = '<div class="{plugin.class:via}">{plugin.label:via} {data:label}</div>';
+plugin.templates.name =
+	'<div class="{plugin.class:container}">' +
+		'<div class="{class:name}"></div>' +
+		'<div class="{plugin.class:via}">{plugin.label:via} {plugin.data:via}</div>' +
+	'</div>';
+
+plugin.init = function() {
+	this.set("data.via", this._detectAuthProvider());
+	this.extendTemplate("remove", "logout");
+	this.extendTemplate("replace", "name", plugin.templates.name);
+};
 
 plugin.component.renderers.name = function(element) {
-	this.parentRenderer("name", arguments);
-	// TODO: provide an ability to override this list via config
+	var auth = this.component, isSwitchAssembled = false;
+	new Echo.GUI.Dropdown({
+		"target": element,
+		"title": auth.user.get("name", ""),
+		"extraClass": "nav",
+		"entries": [{
+			"title": this.labels.get("switchIdentity"),
+			"handler": function() {
+				if (!isSwitchAssembled) {
+					var target = $(this);
+					auth._assembleIdentityControl("login", target);
+					isSwitchAssembled = true;
+					target.click();
+				}
+			}
+		}, {
+			"title": this.labels.get("logout"),
+			"handler": function() {
+				auth.user.logout();
+			}
+		}]
+	});
+	return element;
+};
+
+plugin.methods._detectAuthProvider = function() {
+	// TODO: provide an ability to update this list via plugin config
 	var providers = {
 		"twitter.com": "Twitter",
 		"facebook.com": "Facebook",
 		"google.com": "Google"
 	};
-	var domain = Echo.Utils.parseURL(this.component.user.get("identityUrl", "")).domain;
-	if (domain) {
-		element.append(this.substitute({
-			"template": plugin.templates.via,
-			"data": {"label": providers[domain] || domain}
-		}));
-	}
-	return element;
+	var id = this.component.user.get("identityUrl", "");
+	var domain = Echo.Utils.parseURL(id).domain;
+	return providers[domain] || domain || id;
 };
 
 plugin.css =
-	'.{plugin.class:via} { color: #C6C6C6; line-height: 18px; font-size: 12px; }' +
+	'.{plugin.class:via} { margin-left: 15px; color: #C6C6C6; line-height: 18px; font-size: 12px; }' +
+	'.{class:name} ul.nav { margin-bottom: 3px; }' +
+	'.{class:name} ul.nav .dropdown-menu li > a { font-size: 14px; }' +
 	'.{plugin.class} .{class:avatar} img { border-radius: 50%; }' +
 	'.{plugin.class} .{class:login}, .{plugin.class} .{class:signup} { color: #006DCC; }' +
 	'.{plugin.class} .{class:userAnonymous} { margin: 0px 0px 7px 2px; text-align: left; font-family: Arial; }' +
 	'.{plugin.class} .{class:userLogged} { margin: 0px 0px 5px 3px; }' +
-	'.{plugin.class} .{class:name} { margin: 3px 0px 0px 15px; font-family: Arial; font-weight: normal; }' +
+	'.{plugin.class} .{class:name} { float: none; margin: 3px 0px 0px 15px; font-family: Arial; font-weight: normal; }' +
+	'.{plugin.class:container} { float: left; }' +
 	'.{plugin.class} .{class:avatar} { width: 48px; height: 48px; border-radius: 50%; }';
 
 Echo.Plugin.create(plugin);
@@ -226,7 +261,7 @@ plugin.css =
 	'.{plugin.class} .{class:markersContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:content} textarea.{class:textArea} { height: 75px; }' +
 	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #D2D2D2; border-top: 0px; }' +
-	'.{plugin.class} .{class:container} { padding: 15px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }' +
+	'.{plugin.class} .{class:container} { padding: 10px 15px 15px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }' +
 	'.{plugin.class:loginRequirementNotice} { display: none; float: right; margin: 5px; margin: 8px 10px 0 0; color: red; font-weight: bold; font-family: Arial; font-size: 14px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
