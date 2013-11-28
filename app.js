@@ -126,11 +126,27 @@ Echo.Plugin.create(plugin);
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.IdentityServer.Controls.Auth");
 
+plugin.labels = {
+	"via": "via"
+};
+
+plugin.templates.via = '<div class="{plugin.class:via}">{plugin.label:via} {data:label}</div>';
+
 plugin.component.renderers.name = function(element) {
 	this.parentRenderer("name", arguments);
-	// TODO: get social provider name from identityURL...
-	var template = '<div class="{plugin.class:via}">via Twitter</div>';
-	element.append(this.substitute({"template": template}));
+	// TODO: provide an ability to override this list via config
+	var providers = {
+		"twitter.com": "Twitter",
+		"facebook.com": "Facebook",
+		"google.com": "Google"
+	};
+	var domain = Echo.Utils.parseURL(this.component.user.get("identityUrl", "")).domain;
+	if (domain) {
+		element.append(this.substitute({
+			"template": plugin.templates.via,
+			"data": {"label": providers[domain] || domain}
+		}));
+	}
 	return element;
 };
 
