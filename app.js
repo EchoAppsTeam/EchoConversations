@@ -69,7 +69,6 @@ plugin.component.renderers.buttons = function(element) {
 plugin.renderers.buttonIcon = function(element, extra) {
 	// TODO: get rid of hardcoded URLs
 	return element
-		.empty()
 		.append($(this.substitute({
 			"template": plugin.templates.buttonIcon,
 			"data": {
@@ -97,7 +96,7 @@ plugin.css =
 	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 13px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 17px; line-height: 19px; }' +
 
-	'.{plugin.class} .{class:depth-0} .{plugin.class:buttonIcon} { margin-right: 5px; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:buttonIcon} { margin: 0px 5px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { height: 30px; }' +
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 50px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; line-height: 48px; margin-left: 60px;}' +
@@ -345,10 +344,6 @@ conversations.renderers.stream = function(element) {
 			"plugins": [{
 				"name": "CardUIShim"
 			}, {
-				"name": "ModerationCardUI"
-			}, {
-				"name": "Like"
-			}, {
 				"name": "ReplyCardUI",
 				"nestedPlugins": [{
 					"name": "JanrainAuth",
@@ -363,6 +358,10 @@ conversations.renderers.stream = function(element) {
 				}, {
 					"name": "CardUIShim"
 				}]
+			}, {
+				"name": "LikeCardUI"
+			}, {
+				"name": "ModerationCardUI"
 			}]
 		}
 	});
