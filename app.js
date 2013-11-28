@@ -43,47 +43,39 @@ plugin.renderers.date = function(element) {
 };
 
 plugin.component.renderers.buttons = function(element) {
-	var self = this, item = this.component;
-
-	item._assembleButtons();
-	item._sortButtons();
-
-	element.empty();
-	$.map(item.buttonsOrder, function(name) {
-		var data = item.get("buttons." + name);
-		if (!data || !data.name || !data.visible()) {
-			return;
-		}
-		self.view.render({
-			"name": "buttonIcon",
-			"target": element,
+        var self = this, item = this.component;
+        item._assembleButtons();
+        item._sortButtons();
+        element.empty();
+        $.map(item.buttonsOrder, function(name) {
+                var data = item.get("buttons." + name);
+                if (!data || !data.name || !data.visible()) {
+                        return;
+                }
+                self.view.render({
+                        "name": "buttonIcon",
+                        "target": element,
 			"extra": data
-		});
-		item.view.render({
-			"name": "_button",
-			"target": element,
-			"extra": data
-		});
-	});
+                });
+                item.view.render({
+                        "name": "_button",
+                        "target": element,
+                        "extra": data
+                });
+        });
         return element;
 };
 
 plugin.renderers.buttonIcon = function(element, extra) {
 	// TODO: get rid of hardcoded URLs
-	var iconSrc = {
-		"like": "//ec.dbragin.ul.js-kit.com/images/like.png",
-		"reply": "//ec.dbragin.ul.js-kit.com/images/comment.png",
-		"moderation": "//ec.dbragin.ul.js-kit.com/images/moderate.png"
-	}[extra.name.toLowerCase()];
-
-	return iconSrc
-		? element.append(this.substitute({
+	return element
+		.empty()
+		.append($(this.substitute({
 			"template": plugin.templates.buttonIcon,
 			"data": {
-				"source": iconSrc
+				"source": extra.icon || "/ec.dbragin.ul.js-kit.com/images/comment.png"
 			}
-		}))
-		: element;
+		})));
 };
 
 
@@ -100,11 +92,12 @@ plugin.css =
 	'.{plugin.class} .{class:avatar} { border-radius: 50%; }' +
 	'.{plugin.class} .{class:avatar} img { height: 48px; width: 48px; }' +
 
+	'.{plugin.class} .{class:button} { line-height: 30px; }' +
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin: 10px 0px; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 13px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 17px; line-height: 19px; }' +
 
-	'.{plugin.class} .{class:depth-0} .{plugin.class:buttonIcon} { margin-top: 5px; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:buttonIcon} { margin-right: 5px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { height: 30px; }' +
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 50px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; line-height: 48px; margin-left: 60px;}' +
@@ -354,7 +347,9 @@ conversations.renderers.stream = function(element) {
 			}, {
 				"name": "ModerationCardUI"
 			}, {
-				"name": "Reply",
+				"name": "Like"
+			}, {
+				"name": "ReplyCardUI",
 				"nestedPlugins": [{
 					"name": "JanrainAuth",
 					"appId": this.config.get("dependencies.Janrain.appId"),
@@ -368,8 +363,6 @@ conversations.renderers.stream = function(element) {
 				}, {
 					"name": "CardUIShim"
 				}]
-			}, {
-				"name": "Like"
 			}]
 		}
 	});
