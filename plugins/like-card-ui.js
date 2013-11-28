@@ -29,7 +29,7 @@ var plugin = Echo.Plugin.manifest("LikeCardUI", "Echo.StreamServer.Controls.Stre
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	this.extendTemplate("insertAsLastChild", "data", plugin.templates.main);
+	this.extendTemplate("insertAsFirstChild", "footer", plugin.templates.main);
 	this.component.addButtonSpec("LikeCardUI", this._assembleButton("Like"));
 	this.component.addButtonSpec("LikeCardUI", this._assembleButton("Unlike"));
 };
@@ -84,7 +84,13 @@ plugin.events = {
 /**
  * @echo_template
  */
-plugin.templates.main = '<div class="{plugin.class:likedBy}"></div>';
+plugin.templates.main =
+	'<div class="{plugin.class:likesArea}">' +
+		'<div class="{plugin.class:likeIcon}"></div>' +
+		'<div class="{plugin.class:likedBy}"></div>' +
+		'<div class="{plugin.class:likers}"></div>' +
+		'<div class="echo-clear"></div>' +
+	'</div>';
 
 /**
  * @echo_renderer
@@ -128,6 +134,11 @@ plugin.renderers.likedBy = function(element) {
 		this._initFacePile(config);
 	}
 	return element.show();
+};
+
+plugin.renderers.likers = function(element) {
+	return element
+		.append(this.component.get("data.object.accumulators.likesCount"));
 };
 
 plugin.methods._initFacePile = function(config) {
@@ -233,8 +244,15 @@ plugin.methods._assembleButton = function(name) {
 };
 
 plugin.css =
-	'.{plugin.class:likedBy} { background: url({config:cdnBaseURL.sdk-assets}/images/likes.png) no-repeat 0px 4px; padding: 0px 0px 4px 21px; }' +
-	'.{plugin.class:highlight} { line-height: 23px; }';
+	'.{plugin.class:likesArea} { float: right; }' +
+	'.{plugin.class:likeIcon} { float: left; height: 20px; width: 20px; background: url(//ec.dbragin.ul.js-kit.com/images/like.png) no-repeat; }' +
+	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 5px; vertical-align: text-top;}' +
+	'.{plugin.class:likers} { float: left; border: 1px solid #808080; border-radius: 50%; color: #808080; display: inline-block; font-size: 10px; height: 20px; line-height: 22px; text-align: center; vertical-align: text-top; width: 20px;}' +
+	'.{plugin.class:highlight} { line-height: 23px; }' +
+	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-item-avatar { border-radius: 50%; }' +
+	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-item-avatar img { border-radius: 50%; height: 20px; width: 20px; }' +
+	'.{plugin.class:likedBy} echo-streamserver-controls-facepile-and { display: none; }' +
+	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-more { display: none !important; }';
 
 Echo.Plugin.create(plugin);
 
