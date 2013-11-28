@@ -126,11 +126,6 @@ Echo.Plugin.create(plugin);
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.IdentityServer.Controls.Auth");
 
-plugin.component.renderers.login = function(element) {
-	element.addClass("btn");
-	return this.parentRenderer("login", arguments);
-};
-
 plugin.component.renderers.name = function(element) {
 	this.parentRenderer("name", arguments);
 	// TODO: get social provider name from identityURL...
@@ -142,7 +137,8 @@ plugin.component.renderers.name = function(element) {
 plugin.css =
 	'.{plugin.class:via} { color: #C6C6C6; line-height: 18px; font-size: 12px; }' +
 	'.{plugin.class} .{class:avatar} img { border-radius: 50%; }' +
-	'.{plugin.class} .{class:userAnonymous} { margin-bottom: 7px; text-align: left; font-family: Arial; font-weight: bold; }' +
+	'.{plugin.class} .{class:login}, .{plugin.class} .{class:signup} { color: #006DCC; }' +
+	'.{plugin.class} .{class:userAnonymous} { margin: 0px 0px 7px 2px; text-align: left; font-family: Arial; }' +
 	'.{plugin.class} .{class:userLogged} { margin: 0px 0px 5px 3px; }' +
 	'.{plugin.class} .{class:name} { margin: 3px 0px 0px 15px; font-family: Arial; font-weight: normal; }' +
 	'.{plugin.class} .{class:avatar} { width: 48px; height: 48px; border-radius: 50%; }';
@@ -160,11 +156,51 @@ Echo.Plugin.create(plugin);
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Submit");
 
+plugin.labels = {
+	"youMustBeLoggedIn": "You must be logged in to comment"
+};
+
 //FIXME: utilise relative path
 plugin.templates.attach = '<div class="{plugin.class:attach}"><img class="{plugin.class:attachPic}" src="http://conversations.leon.ul.js-kit.com/images/attach.png" /></div>';
 
-plugin.init = function (){
-	this.extendTemplate("insertAsFirstChild", "controls", plugin.templates.attach);
+plugin.templates.loginRequirementNotice = '<div class="{plugin.class:loginRequirementNotice}">{plugin.label:youMustBeLoggedIn}</div>';
+
+plugin.init = function() {
+	var self = this, submit = this.component;
+
+	this.extendTemplate("insertAfter", "postContainer",
+				plugin.templates.loginRequirementNotice);
+
+	// drop all validators
+	submit.validators = [];
+
+	submit.addPostValidator(function() {
+		var textarea = submit.view.get("text");
+		var text = textarea.val();
+		if (!text) {
+			textarea.focus();
+			submit.highlightMandatory(textarea);
+			setTimeout(function() {
+				submit.view.get("content")
+					.removeClass("echo-streamserver-controls-submit-mandatory");
+			}, 3 * 1000); // keep fixed for now, to be revisited later
+			return false;
+		}
+		if (!submit.user.is("logged")) {
+			var notice = self.view.get("loginRequirementNotice");
+			notice.show();
+			setTimeout(function() {
+				notice.hide();
+			}, 5 * 1000); // keep fixed for now, to be revisited later
+			return false;
+		}
+		return true;
+	});
+
+// 	Note: let's keep the "attach" icon hidden for now,
+//		as there is no functionality associated with it..
+//
+//	this.extendTemplate("insertAsFirstChild", "controls", plugin.templates.attach);
 };
 
 plugin.css =
@@ -173,8 +209,9 @@ plugin.css =
 	'.{plugin.class} .{class:tagsContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:markersContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:content} textarea.{class:textArea} { height: 75px; }' +
-	'.{plugin.class} .{class:controls} { margin: 0px; padding: 7px; border: 1px solid #D2D2D2; border-top: 0px; }' +
+	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #D2D2D2; border-top: 0px; }' +
 	'.{plugin.class} .{class:container} { padding: 15px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }' +
+	'.{plugin.class:loginRequirementNotice} { display: none; float: right; margin: 5px; margin: 8px 10px 0 0; color: red; font-weight: bold; font-family: Arial; font-size: 14px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
 Echo.Plugin.create(plugin);
@@ -190,6 +227,10 @@ var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 
 conversations.config = {
 	// TODO: add WebSockets config, make WS on by default
+	"auth":{
+		// TODO: rename to "allowAnonymousSubmission"
+		"enableAnonymousComments": false
+	},
 	"dependencies": {
 		"Janrain": {"appId": undefined},
 		"StreamServer": {"appkey": undefined}
@@ -218,6 +259,7 @@ conversations.templates.main =
 	'</div>';
 
 conversations.renderers.submit = function(element) {
+	var allowGuest = this.config.get("auth.enableAnonymousComments");
 	this.initComponent({
 		"id": "stream",
 		"component": "Echo.StreamServer.Controls.Submit",
@@ -227,19 +269,22 @@ conversations.renderers.submit = function(element) {
 			"targetURL": this.config.get("conversationID"),
 			"infoMessages": {"enabled": false},
 			"plugins": [{
-				"name": "CardUIShim"
-			}, {
 				"name": "JanrainAuth",
 				"appId": this.config.get("dependencies.Janrain.appId"),
+				"submitPermissions": allowGuest ? "allowGuest" : "forceLogin",
+				"buttons": ["login", "signup"],
 				"nestedPlugins": [{
 					"name": "CardUIShim"
 				}]
+			}, {
+				"name": "CardUIShim"
 			}]
 		}
 	});
 };
 
 conversations.renderers.stream = function(element) {
+	var replyPermissions = this.config.get("auth.enableAnonymousComments");
 	this.initComponent({
 		"id": "Stream",
 		"component": "Echo.StreamServer.Controls.Stream",
@@ -255,13 +300,17 @@ conversations.renderers.stream = function(element) {
 			}, {
 				"name": "Reply",
 				"nestedPlugins": [{
-					"name": "CardUIShim"
-				}, {
 					"name": "JanrainAuth",
 					"appId": this.config.get("dependencies.Janrain.appId"),
+					"submitPermissions": replyPermissions
+						? "allowGuest"
+						: "forceLogin",
+					"buttons": ["login", "signup"],
 					"nestedPlugins": [{
 						"name": "CardUIShim"
 					}]
+				}, {
+					"name": "CardUIShim"
 				}]
 			}, {
 				"name": "Like"
