@@ -56,13 +56,13 @@ module.exports = function(grunt) {
 			" */\n",
 		"clean": {
 			"build": [
-				"<%= dirs.build %>"
+				"<%= dirs.build %>/*"
 			],
 			"plugins": [
 				"<%= dirs.build %>/plugins"
 			],
 			"all": [
-				"<%= dirs.dist %>",
+				"<%= dirs.dist %>/*",
 				"<%= clean.build %>"
 			]
 		},
