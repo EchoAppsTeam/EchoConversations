@@ -187,7 +187,7 @@ plugin.methods._hideSubmit = function() {
 	}
 	this.set("expanded", false);
 	this._itemCSS("remove", item, this.view.get("submitForm"));
-	this.view.get("submitForm").empty();
+	this.view.get("submitForm").empty().hide();
 	this.view.render({"name": "avatar"});
 	this.view.render({"name": "compactForm"});
 	item.view.render({"name": "container"});
@@ -267,14 +267,16 @@ plugin.methods._getSubmitData = function() {
 };
 
 plugin.css =
-	".{plugin.class:replyForm} { padding-top: 15px; }" +
-	".{plugin.class:compactContent} { padding: 5px 5px 5px 6px; background-color: #fff; }" +
-	".{plugin.class:avatar} { width: 26px; height: 26px; border-radius: 50%; margin-left: 10px; }" +
+	".{plugin.class} .{plugin.class:compactForm} { margin-top: 15px; }" +
+	".{plugin.class} .{plugin.class:submitForm} { margin-top: 15px; }" +
+	".{plugin.class:compactContent} { padding: 5px 5px 5px 6px; background-color: #fff; height: 26px; line-height: 26px; }" +
+	".{plugin.class:avatar} { width: 26px; height: 26px; border-radius: 50%; margin: 5px 0px 0px 10px; }" +
+	".{plugin.class} .{plugin.class:avatar} > img { width: 26px; height: 26px; }" +
 	".{plugin.class:submitForm} > div { margin-left: 30px; }" +
 	".{plugin.class:compactBorder} { margin-left: 30px; border: 1px solid #d2d2d2; }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-secondaryColor { color: #C6C6C6 }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-primaryFont { font-size: 12px; line-height: 16px; }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'] { width: 100%; height: 16px; border: none; margin: 0px; padding: 0px; box-shadow: none; vertical-align: middle; }" +
+	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-primaryFont { font-size: 16px; line-height: 26px; }" +
+	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'] { width: 100%; height: 26px; border: none; margin: 0px; padding: 0px; box-shadow: none; vertical-align: middle; }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text']:focus { outline: 0; box-shadow: none; }";
 
 Echo.Plugin.create(plugin);
@@ -330,6 +332,9 @@ $.map(["onRender", "onRerender"], function(topic) {
 		submit.view.get("text").focus();
 	};
 });
+
+plugin.css =
+	'.{plugin.class} .{class:container} { padding-top: 5px; }';
 
 Echo.Plugin.create(plugin);
 

@@ -201,7 +201,8 @@ plugin.css =
 	'.{plugin.class} .{class:userLogged} { margin: 0px 0px 5px 3px; }' +
 	'.{plugin.class} .{class:name} { float: none; margin: 3px 0px 0px 15px; font-family: Arial; font-weight: normal; }' +
 	'.{plugin.class:container} { float: left; }' +
-	'.{plugin.class} .{class:avatar} { width: 48px; height: 48px; border-radius: 50%; }';
+	'.{plugin.class} .{class:avatar} { width: 48px; height: 48px; border-radius: 50%; }' +
+	'.{plugin.class} .{class:avatar} > img { width: 48px; height: 48px; }';
 
 Echo.Plugin.create(plugin);
 
