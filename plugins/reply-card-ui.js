@@ -87,9 +87,6 @@ plugin.component.renderers.children = function(element) {
 };
 
 plugin.renderers.submitForm = function(element) {
-	element.click(function(event) {
-		event.stopPropagation();
-	});
 	return this.get("expanded") ? element.show() : element.empty().hide();
 };
 
