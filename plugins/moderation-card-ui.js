@@ -155,7 +155,7 @@ plugin.methods._assembleModerationButton = function() {
 		return {
 			"name": "moderation",
 			"label": self.labels.get("moderateButton"),
-			"icon": "//ec.dbragin.ul.js-kit.com/images/moderate.png",
+			"icon": "{%= baseURL %}/images/moderate.png",
 			"visible": item.get("data.object.status") !== "ModeratorApproved" && item.user.is("admin"),
 			"callback": callback
 		};

@@ -234,7 +234,7 @@ plugin.methods._assembleButton = function(name) {
 			})).length > 0 ? "Unlike" : "Like";
 		return {
 			"name": name,
-			"icon": "//ec.dbragin.ul.js-kit.com/images/like.png",
+			"icon": "{%= baseURL %}/images/like.png",
 			"label": plugin.labels.get(name.toLowerCase() + "Control"),
 			"visible": item.user.is("logged") && action === name,
 			"once": true,
@@ -245,7 +245,7 @@ plugin.methods._assembleButton = function(name) {
 
 plugin.css =
 	'.{plugin.class:likesArea} { float: right; }' +
-	'.{plugin.class:likeIcon} { float: left; height: 20px; width: 20px; background: url(//ec.dbragin.ul.js-kit.com/images/like.png) no-repeat; }' +
+	'.{plugin.class:likeIcon} { float: left; height: 20px; width: 20px; background: url({%= baseURL %}/images/like.png) no-repeat; }' +
 	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 5px; vertical-align: text-top;}' +
 	'.{plugin.class:likers} { float: left; border: 1px solid #808080; border-radius: 50%; color: #808080; display: inline-block; font-size: 10px; height: 20px; line-height: 22px; text-align: center; vertical-align: text-top; width: 20px;}' +
 	'.{plugin.class:highlight} { line-height: 23px; }' +

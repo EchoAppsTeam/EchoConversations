@@ -72,7 +72,7 @@ plugin.renderers.buttonIcon = function(element, extra) {
 		.append($(this.substitute({
 			"template": plugin.templates.buttonIcon,
 			"data": {
-				"source": extra.icon || "/ec.dbragin.ul.js-kit.com/images/comment.png"
+				"source": extra.icon || "{%= baseURL %}/images/comment.png"
 			}
 		})));
 };
@@ -210,7 +210,7 @@ plugin.labels = {
 };
 
 //FIXME: utilise relative path
-plugin.templates.attach = '<div class="{plugin.class:attach}"><img class="{plugin.class:attachPic}" src="http://conversations.leon.ul.js-kit.com/images/attach.png" /></div>';
+plugin.templates.attach = '<div class="{plugin.class:attach}"><img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" /></div>';
 
 plugin.templates.loginRequirementNotice = '<div class="{plugin.class:loginRequirementNotice}">{plugin.label:youMustBeLoggedIn}</div>';
 

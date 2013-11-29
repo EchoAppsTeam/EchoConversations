@@ -207,7 +207,7 @@ plugin.methods._assembleButton = function() {
 		var item = this;
 		return {
 			"name": "ReplyCardUI",
-			"icon": "//ec.dbragin.ul.js-kit.com/images/comment.png",
+			"icon": "{%= baseURL %}/images/comment.png",
 			"label": plugin.labels.get("replyControl"),
 			"visible": item.get("depth") < item.config.get("parent.children.maxDepth"),
 			"callback": callback
