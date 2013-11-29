@@ -81,15 +81,15 @@ plugin.component.renderers._button = function(element, extra) {
 var itemDepthRules = [];
 // 100 is a maximum level of children in query, but we can apply styles for ~20
 for (var i = 0; i <= 20; i++) {
-	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 10 + (i - 1) * 7 : 10) + 'px; }');
+	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 10 + (i - 1) * 12 : 10) + 'px; }');
 }
 
 plugin.css =
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #ffffff; }' +
 	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
 
-	'.{plugin.class} .{class:avatar} { height: 24px; width: 24px; margin-left: 3px; }' +
-	'.{plugin.class} .{class:avatar} img { height: 24px; width: 24px; border-radius: 50%;}' +
+	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
+	'.{plugin.class} .{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
 
 	'.{plugin.class} .{class:footer} { padding-right: 10px; height: 30px; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
@@ -101,7 +101,7 @@ plugin.css =
 	'.{plugin.class} .{class:buttons} a.{class:button}:hover { opacity: 1}' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { margin-right: 0px; padding-right: 0px; }' +
 
-	'.{plugin.class} .{class:button} { margin-right: 10px; opacity: 0.7;}' +
+	'.{plugin.class} .{class:button} { margin-right: 10px; opacity: 0.8;}' +
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
 	'.{plugin.class} .{class:buttonIcon} { margin-right: 4px; }' +
 	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
@@ -358,6 +358,8 @@ conversations.renderers.stream = function(element) {
 			"plugins": [{
 				"name": "CardUIShim"
 			}, {
+				"name": "LikeCardUI"
+			}, {
 				"name": "ReplyCardUI",
 				"nestedPlugins": [{
 					"name": "JanrainAuth",
@@ -372,8 +374,6 @@ conversations.renderers.stream = function(element) {
 				}, {
 					"name": "CardUIShim"
 				}]
-			}, {
-				"name": "LikeCardUI"
 			}, {
 				"name": "ModerationCardUI"
 			}]
