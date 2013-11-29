@@ -215,7 +215,8 @@ plugin.methods._getClickHandler = function() {
 	var plugin = this;
 	return function() {
 	    var submit = plugin.get("submit");
-	    if (plugin.get("expanded") && submit && !submit.view.get("text").val()) {
+			var isClickedInSubmitForm = plugin.view.get("submitForm").find(event.target).length;
+	    if (plugin.get("expanded") && submit && !submit.view.get("text").val() && !isClickedInSubmitForm) {
 		    plugin._hideSubmit();
 	    }
 	};
