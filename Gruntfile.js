@@ -142,7 +142,7 @@ module.exports = function(grunt) {
 				"configFile": "config/release.json",
 				"location": shared.config("env") === "staging" ? "sandbox" : "cdn",
 				"remoteRoot": shared.config("env") === "staging" ? "/staging" : "",
-				"purgeTitle": "<%= pkg.id %>",
+				"purgeTitle": "<%= pkg.name %>",
 				"purgePaths": [
 					"/apps/echo/conversations/"
 				]
