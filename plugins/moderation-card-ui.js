@@ -412,10 +412,10 @@ plugin.methods._getNextRole = function(role) {
 
 plugin.css =
 		// item statuses
-		'.{plugin.class:status-Untouched} { border-left: 10px solid #3498db; }' +
-		'.{plugin.class:status-ModeratorApproved} { border-left: 10px solid #15c177; }' +
-		'.{plugin.class:status-ModeratorDeleted} { border-left: 10px solid #bf383a; }' +
-		'.{plugin.class:status-SystemFlagged}, .{plugin.class:status-CommunityFlagged}, .{plugin.class:status-ModeratorFlagged} { border-left: 10px solid #ff9e00; }' +
+		'.{plugin.class:status-Untouched} { border-left: 7px solid #3498db; }' +
+		'.{plugin.class:status-ModeratorApproved} { border-left: 7px solid #15c177; }' +
+		'.{plugin.class:status-ModeratorDeleted} { border-left: 7px solid #bf383a; }' +
+		'.{plugin.class:status-SystemFlagged}, .{plugin.class:status-CommunityFlagged}, .{plugin.class:status-ModeratorFlagged} { border-left: 7px solid #ff9e00; }' +
 
 		// actor statuses
 		($.map({
