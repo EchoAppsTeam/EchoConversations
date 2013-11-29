@@ -41,22 +41,6 @@ dashboard.config = {
 			"customValueTitle": "Use this URL"
 		}
 	}, {
-		"component": "Select",
-		"name": "submitFormPosition",
-		"type": "string",
-		"default": "top",
-		"config": {
-			"title": "Submit position",
-			"desc": "Specifies the position of submit form",
-			"options": [{
-				"title": "Top",
-				"value": "top"
-			}, {
-				"title": "Bottom",
-				"value": "bottom"
-			}]
-		}
-	}, {
 		"component": "Group",
 		"name": "auth",
 		"type": "object",
