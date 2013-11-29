@@ -250,7 +250,6 @@ plugin.methods._assembleButton = function(name) {
 	return function() {
 		var item = this;
 		var status = getStatus(item);
-console.log( self.labels.get(name.toLowerCase() + "Button") );
 		return {
 			"name": name,
 			"label": self.labels.get(name.toLowerCase() + "Button"),

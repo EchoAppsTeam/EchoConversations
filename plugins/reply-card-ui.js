@@ -20,7 +20,7 @@ plugin.init = function() {
 };
 
 plugin.config = {
-	"actionString": "Write a reply..."
+	"actionString": "Add a comment..."
 };
 
 plugin.labels = {
@@ -40,10 +40,10 @@ plugin.events = {
 			this._hideSubmit();
 		}
 	},
-	"Echo.StreamServer.Controls.Submit.onPostComplete": function(topic, args) {
+	"Echo.StreamServer.Controls.Submit.onPostComplete": function() {
 		this._hideSubmit();
 	},
-	"Echo.StreamServer.Controls.Stream.Item.onRender": function(topic, args) {
+	"Echo.StreamServer.Controls.Stream.Item.onRender": function() {
 		if (this.get("expanded")) {
 			this._showSubmit();
 		}
@@ -52,6 +52,7 @@ plugin.events = {
 
 plugin.templates.form =
 	'<div class="{plugin.class:replyForm}">' +
+		'<div class="pull-left {plugin.class:avatar}"></div>' +
 		'<div class="{plugin.class:submitForm}"></div>' +
 		'<div class="{plugin.class:compactForm}">' +
 			'<div class="{plugin.class:compactContent} {plugin.class:compactBorder}">' +
@@ -90,6 +91,21 @@ plugin.renderers.submitForm = function(element) {
 		event.stopPropagation();
 	});
 	return this.get("expanded") ? element.show() : element.empty().hide();
+};
+
+plugin.renderers.avatar =function(element) {
+	var item = this.component;
+	item.placeImage({
+		"container": element,
+		"image": item.user.get("avatar"),
+		"defaultImage": item.config.get("defaultAvatar")
+	});
+	if (item.get("depth") && !this.get("expanded")) {
+		element.hide();
+	} else {
+		element.show();
+	}
+	return element;
 };
 
 plugin.renderers.compactForm = function(element) {
@@ -148,9 +164,19 @@ plugin.methods._showSubmit = function() {
 		return target;
 	}
 	var config = this._submitConfig(target);
+	// add plugin for submit
 	config.plugins.push({
 		"name": "ReplyCardUI",
 		"inReplyTo": item.get("data")
+	});
+	// add plugin for auth
+	$.map(config.plugins, function(plugin) {
+		if (plugin.name === "JanrainAuth") {
+			plugin.nestedPlugins = plugin.nestedPlugins || [];
+			plugin.nestedPlugins.push({
+				"name": "ReplyCardUI"
+			});
+		}
 	});
 	new Echo.StreamServer.Controls.Submit(config);
 	return target;
@@ -240,8 +266,11 @@ plugin.methods._getSubmitData = function() {
 };
 
 plugin.css =
+	".{plugin.class:replyForm} { padding-top: 15px; }" +
 	".{plugin.class:compactContent} { padding: 5px 5px 5px 6px; background-color: #fff; }" +
-	".{plugin.class:compactBorder} { border: 1px solid #d2d2d2; }" +
+	".{plugin.class:avatar} { width: 26px; height: 26px; border-radius: 50%; margin-left: 10px; }" +
+	".{plugin.class:submitForm} > div { margin-left: 30px; }" +
+	".{plugin.class:compactBorder} { margin-left: 30px; border: 1px solid #d2d2d2; }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-secondaryColor { color: #C6C6C6 }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-primaryFont { font-size: 12px; line-height: 16px; }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'] { width: 100%; height: 16px; border: none; margin: 0px; padding: 0px; box-shadow: none; vertical-align: middle; }" +
@@ -285,6 +314,7 @@ if (Echo.Plugin.isDefined(plugin)) return;
 plugin.init = function() {
 	var plugin = this, submit = plugin.component;
 	var _prepareEventParams = submit._prepareEventParams;
+
 	submit._prepareEventParams = function(params) {
 		var _params = _prepareEventParams.call(submit, params);
 		_params.inReplyTo = plugin.config.get("inReplyTo");
@@ -299,6 +329,25 @@ $.map(["onRender", "onRerender"], function(topic) {
 		submit.view.get("text").focus();
 	};
 });
+
+Echo.Plugin.create(plugin);
+
+})(Echo.jQuery);
+
+(function(jQuery) {
+"use strict";
+
+var plugin = Echo.Plugin.manifest("ReplyCardUI", "Echo.IdentityServer.Controls.Auth");
+
+if (Echo.Plugin.isDefined(plugin)) return;
+
+plugin.init = function() {
+	this.extendTemplate("remove", "avatar");
+};
+
+plugin.css =
+	// TODO we shouldn't use foreign plugin class here.
+	'.{plugin.class} .echo-identityserver-controls-auth-plugin-CardUIShim-container > div { display: inline-block; }';
 
 Echo.Plugin.create(plugin);
 
