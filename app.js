@@ -81,25 +81,24 @@ plugin.component.renderers._button = function(element, extra) {
 var itemDepthRules = [];
 // 100 is a maximum level of children in query, but we can apply styles for ~20
 for (var i = 0; i <= 20; i++) {
-	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 10 + (i - 1) * 12 : 10) + 'px; }');
+	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 10 + (i - 1) * 25 : 10) + 'px; }');
 }
 
 plugin.css =
-	'.{plugin.class} .{class:content} { padding-right: 10px; }' +
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #ffffff; }' +
 	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
 
 	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
 	'.{plugin.class} .{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
 
+	'.{plugin.class} .{class:buttons} { margin-left: 0px; }' +
 	'.{plugin.class} .{class:footer} { padding-right: 10px; height: 30px; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:content} { padding-top: 15px; }' +
-	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
+	'.{plugin.class} .{class:body} { padding-top: 0px; padding-right: 10px; margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 12px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 1i6px; }' +
-	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #c6c6c6; text-decoration: none; }' +
-	'.{plugin.class} .{class:buttons} a.{class:button}:hover { opacity: 1}' +
+	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #262626; text-decoration: none; opacity: 1; }' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { margin-right: 0px; padding-right: 0px; }' +
 
 	'.{plugin.class} .{class:button} { margin-right: 10px; opacity: 0.8;}' +
@@ -107,6 +106,9 @@ plugin.css =
 	'.{plugin.class} .{class:buttonIcon} { margin-right: 4px; }' +
 	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
 	'.{plugin.class} .{class:container-child} { padding: 0px; margin: 0px; }' +
+	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
+	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
+	'.{plugin.class} .{class:children} .{class:data} { margin-top: 2px; }' +
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { padding-top: 8px; height: 28px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; margin: 8px 0px; }' +
