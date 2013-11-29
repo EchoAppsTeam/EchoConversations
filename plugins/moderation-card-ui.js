@@ -25,7 +25,6 @@ plugin.init = function() {
 			item.addButtonSpec("Moderation", self._assembleButton(Echo.Utils.capitalize(action)));
 		}
 	});
-
 };
 
 plugin.config = {
@@ -123,6 +122,10 @@ plugin.statuses = [
 	"ModeratorFlagged",
 	"SystemFlagged"
 ];
+
+plugin.button2icon = {
+	"Approve": "{%= baseURL %}/images/moderate.png"
+};
 
 plugin.button2status = {
 	"Spam": "ModeratorFlagged",
@@ -253,6 +256,7 @@ plugin.methods._assembleButton = function(name) {
 		return {
 			"name": name,
 			"label": self.labels.get(name.toLowerCase() + "Button"),
+			"icon": plugin.button2icon[name],
 			"visible": item.get("data.object.status") !== status &&
 					(item.user.is("admin") || status === "UserDeleted"),
 			"callback": callback
