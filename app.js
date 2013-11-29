@@ -33,8 +33,11 @@ plugin.init = function() {
 plugin.templates.date =
 	'<div class="{plugin.class:date}"></div>';
 
-plugin.templates.buttonIcon =
-	'<img class="{plugin.class:buttonIcon}" src="{data:source}">';
+plugin.templates.button =
+	'<a class="{class:button} {class:button}-{data:name}">' +
+		'<img class="{class:buttonIcon}" src="{data:icon}">' +
+		'<span class="{class:buttonCaption}">{data:label}</span>' +
+	'</a>';
 
 plugin.renderers.date = function(element) {
 	// TODO: use parentRenderer here
@@ -42,39 +45,37 @@ plugin.renderers.date = function(element) {
 	return element.html(this.age);
 };
 
-plugin.component.renderers.buttons = function(element) {
-        var self = this, item = this.component;
-        item._assembleButtons();
-        item._sortButtons();
-        element.empty();
-        $.map(item.buttonsOrder, function(name) {
-                var data = item.get("buttons." + name);
-                if (!data || !data.name || !data.visible()) {
-                        return;
-                }
-                self.view.render({
-                        "name": "buttonIcon",
-                        "target": element,
-			"extra": data
-                });
-                item.view.render({
-                        "name": "_button",
-                        "target": element,
-                        "extra": data
-                });
-        });
-        return element;
-};
+plugin.component.renderers._button = function(element, extra) {
+	var template = extra.template || plugin.templates.button;
 
-plugin.renderers.buttonIcon = function(element, extra) {
-	// TODO: get rid of hardcoded URLs
-	return element
-		.append($(this.substitute({
-			"template": plugin.templates.buttonIcon,
-			"data": {
-				"source": extra.icon || "{%= baseURL %}/images/comment.png"
-			}
-		})));
+	var data = {
+		"label": extra.label || "",
+		"name": extra.name,
+		"icon": extra.icon || "{%= baseURL %}/images/comment.png"
+	};
+	var button = $(this.substitute({"template": template, "data": data}));
+	if (!extra.clickable) return element.append(button);
+	var clickables = $(".echo-clickable", button);
+	if (!clickables.length) {
+		clickables = button;
+		button.addClass("echo-clickable");
+	}
+	clickables[extra.once ? "one" : "on"]({
+		"click": function(event) {
+			event.stopPropagation();
+			if (extra.callback) extra.callback();
+		}
+	});
+
+	var _data = this.component.get("buttons." + extra.plugin + "." + extra.name);
+	_data.element = button;
+	_data.clickableElements = clickables;
+	/*
+	// TODO: do we need it ?
+	if (Echo.Utils.isMobileDevice()) {
+		clickables.addClass("echo-linkColor");
+	}*/
+        return element.append(button);
 };
 
 var itemDepthRules = [];
@@ -94,9 +95,13 @@ plugin.css =
 	'.{plugin.class} .{class:content} { padding-top: 15px; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 12px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 1i6px; }' +
+	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #c6c6c6; text-decoration: none; }' +
+	'.{plugin.class} .{class:buttons} a.{class:button}:hover { opacity: 1}' +
 
-	'.{plugin.class} .{class:button} { margin-right: 10px; }' +
-	'.{plugin.class} .{plugin.class:buttonIcon} { margin-right: 4px;}' +
+	'.{plugin.class} .{class:button} { margin-right: 10px; opacity: 0.7;}' +
+	'.{plugin.class} .{class:button-delim} { display: none; }' +
+	'.{plugin.class} .{class:buttonIcon} { margin-right: 4px; }' +
+	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
 	'.{plugin.class} .{class:container-child} { padding: 0px; margin: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { padding-top: 8px; height: 28px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; margin: 8px 0px; }' +
