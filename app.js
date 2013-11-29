@@ -86,30 +86,33 @@ for (var i = 0; i <= 20; i++) {
 
 plugin.css =
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #ffffff; }' +
-	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 22px; }' +
+	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
 
 	'.{plugin.class} .{class:avatar} { height: 24px; width: 24px; margin-left: 3px; }' +
 	'.{plugin.class} .{class:avatar} img { height: 24px; width: 24px; border-radius: 50%;}' +
 
-	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
+	'.{plugin.class} .{class:footer} { padding-right: 10px; height: 30px; }' +
+	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:content} { padding-top: 15px; }' +
+	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 12px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 1i6px; }' +
 	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #c6c6c6; text-decoration: none; }' +
 	'.{plugin.class} .{class:buttons} a.{class:button}:hover { opacity: 1}' +
+	'.{plugin.class} .{class:content} .{class:container-child-thread} { margin-right: 0px; padding-right: 0px; }' +
 
 	'.{plugin.class} .{class:button} { margin-right: 10px; opacity: 0.7;}' +
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
 	'.{plugin.class} .{class:buttonIcon} { margin-right: 4px; }' +
 	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
 	'.{plugin.class} .{class:container-child} { padding: 0px; margin: 0px; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { padding-top: 8px; height: 28px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; margin: 8px 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} .{class:text} { font-size: 13px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} img { height: 36px; width: 36px; border-radius: 50%;}' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { border-bottom: 1px solid #e5e5e5; border-top: 1px solid #e5e5e5; }' +
-	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 38px; margin-left: 45px;}' +
 	'.{plugin.class} .{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +

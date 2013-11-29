@@ -92,6 +92,9 @@ plugin.templates.main =
 		'<div class="echo-clear"></div>' +
 	'</div>';
 
+plugin.templates.processing =
+	'<span class="{plugin.class:processing}">{data:label}</span>';
+
 /**
  * @echo_renderer
  */
@@ -122,7 +125,10 @@ plugin.renderers.likedBy = function(element) {
 		},
 		"initialUsersCount": visibleUsersCount,
 		"totalUsersCount": item.get("data.object.accumulators.likesCount"),
-		"suffixText": plugin.labels.get(users.length > 1 || youLike ? "likeThis" : "likesThis")
+		"item": {
+			"avatar": true,
+			"text": false
+		}
 	});
 	config.plugins.push({"name": "LikeCardUI"});
 	if (item.user.is("admin")) {
@@ -218,13 +224,18 @@ plugin.methods._publishEventComplete = function(args) {
 };
 
 plugin.methods._assembleButton = function(name) {
-	var plugin = this;
+	var self = this;
 	var callback = function() {
 		var item = this;
-		item.get("buttons." + plugin.name + "." + name + ".element")
+		item.get("buttons." + self.name + "." + name + ".element")
 			.empty()
-			.append(plugin.labels.get(name.toLowerCase() + "Processing"));
-		plugin._sendActivity(name, item);
+			.append(self.substitute({
+				"template": plugin.templates.processing,
+				"data": {
+					"label": self.labels.get(name.toLowerCase() + "Processing")
+				}
+			}));
+		self._sendActivity(name, item);
 	};
 	return function() {
 		var item = this;
@@ -235,7 +246,7 @@ plugin.methods._assembleButton = function(name) {
 		return {
 			"name": name,
 			"icon": "{%= baseURL %}/images/like.png",
-			"label": plugin.labels.get(name.toLowerCase() + "Control"),
+			"label": self.labels.get(name.toLowerCase() + "Control"),
 			"visible": item.user.is("logged") && action === name,
 			"once": true,
 			"callback": callback
@@ -248,11 +259,11 @@ plugin.css =
 	'.{plugin.class:likeIcon} { float: left; height: 20px; width: 20px; background: url({%= baseURL %}/images/like.png) no-repeat; }' +
 	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 5px; vertical-align: text-top;}' +
 	'.{plugin.class:likers} { float: left; border: 1px solid #808080; border-radius: 50%; color: #808080; display: inline-block; font-size: 10px; height: 20px; line-height: 22px; text-align: center; vertical-align: text-top; width: 20px;}' +
+	'.{plugin.class:processing} { vertical-align: middle; font-size: 12px; }' +
 	'.{plugin.class:highlight} { line-height: 23px; }' +
 	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-item-avatar { border-radius: 50%; }' +
 	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-item-avatar img { border-radius: 50%; height: 20px; width: 20px; }' +
-	'.{plugin.class:likedBy} echo-streamserver-controls-facepile-and { display: none; }' +
-	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-more { display: none !important; }';
+	'.{plugin.class:likedBy} echo-streamserver-controls-facepile-and { display: none; }';
 
 Echo.Plugin.create(plugin);
 
