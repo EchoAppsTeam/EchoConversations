@@ -12,7 +12,7 @@ plugin.init = function() {
 	this.extendTemplate("insertAsLastChild", "content", plugin.templates.form);
 	var form = Echo.Utils.get(Echo.Variables, this._getSubmitKey());
 	$.each(form || {}, function(key, value) {
-	    self.set(key, value);
+		self.set(key, value);
 	});
 	item.addButtonSpec("ReplyCardUI", this._assembleButton());
 	this.set("documentClickHandler", this._getClickHandler());
@@ -188,6 +188,7 @@ plugin.methods._hideSubmit = function() {
 	this.set("expanded", false);
 	this._itemCSS("remove", item, this.view.get("submitForm"));
 	this.view.get("submitForm").empty();
+	this.view.render({"name": "avatar"});
 	this.view.render({"name": "compactForm"});
 	item.view.render({"name": "container"});
 	
@@ -201,6 +202,7 @@ plugin.methods._expand = function() {
 	this.set("expanded", true);
 	this.view.render({"name": "submitForm"});
 	this.view.render({"name": "compactForm"});
+	this.view.render({"name": "avatar"});
 	
 	this.events.publish({
 		"topic": "onExpand",
@@ -213,12 +215,13 @@ plugin.methods._expand = function() {
 
 plugin.methods._getClickHandler = function() {
 	var plugin = this;
-	return function() {
-	    var submit = plugin.get("submit");
-			var isClickedInSubmitForm = plugin.view.get("submitForm").find(event.target).length;
-	    if (plugin.get("expanded") && submit && !submit.view.get("text").val() && !isClickedInSubmitForm) {
-		    plugin._hideSubmit();
-	    }
+	return function(event) {
+		var submit = plugin.get("submit");
+		var submitForm = plugin.view.get("submitForm");
+		var isClickedInSubmitForm = submitForm && submitForm.find(event.target).length;
+		if (plugin.get("expanded") && submit && !submit.view.get("text").val() && !isClickedInSubmitForm) {
+			plugin._hideSubmit();
+		}
 	};
 };
 
@@ -290,7 +293,7 @@ plugin.events = {
 		this.events.publish({
 			"topic": "onFormExpand",
 			"data": {
-			    "context": args.context
+				"context": args.context
 			}
 		});
 	}
@@ -345,7 +348,10 @@ plugin.init = function() {
 
 plugin.css =
 	// TODO we shouldn't use foreign plugin class here.
-	'.{plugin.class} .echo-identityserver-controls-auth-plugin-CardUIShim-container > div { display: inline-block; }';
+	'.{plugin.class} .echo-identityserver-controls-auth-plugin-CardUIShim-container > div { display: inline-block; }' +
+	'.{plugin.class} .echo-identityserver-controls-auth-plugin-CardUIShim-via { margin-left: 5px; }' +
+	'.{plugin.class} .{class:userLogged} { margin-left: 0px; }' +
+	'.{plugin.class} .{class:name} { margin-left: 0px; }';
 
 Echo.Plugin.create(plugin);
 

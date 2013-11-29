@@ -85,6 +85,7 @@ for (var i = 0; i <= 20; i++) {
 }
 
 plugin.css =
+	'.{plugin.class} .{class:content} { padding-right: 10px; }' +
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #ffffff; }' +
 	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
 
