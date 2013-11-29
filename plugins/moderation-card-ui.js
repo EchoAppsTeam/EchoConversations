@@ -418,10 +418,17 @@ plugin.css =
 		'.{plugin.class:status-SystemFlagged}, .{plugin.class:status-CommunityFlagged}, .{plugin.class:status-ModeratorFlagged} { border-left: 10px solid #ff9e00; }' +
 
 		// actor statuses
-		'.{plugin.class:actorStatus-Untouched} { border: 2px solid #3498db; }' +
-		'.{plugin.class:actorStatus-ModeratorApproved} { border: 2px solid #15c177; }' +
-		'.{plugin.class:actorStatus-ModeratorBanned} { border: 2px solid #bf383a; }' +
-		'.{plugin.class:actorStatus-ModeratorDeleted} { border: 2px solid #bf383a; }';
+		($.map({
+			"Untouched": "#3498db",
+			"ModeratorApproved": "#15c177",
+			"ModeratorBanned": "#bf383a",
+			"ModeratorDeleted": "#bf383a"
+		}, function(color, status) {
+			return [
+				'.{plugin.class} .{class:avatar}.{plugin.class:actorStatus-' + status + '} > img { border: 2px solid ' + color + '; width: 20px; height: 20px; }',
+				'.{plugin.class} .{class:depth-0} .{class:avatar}.{plugin.class:actorStatus-' + status + '} img { height: 32px; width: 32px; border-radius: 50%;}'
+			].join("");
+		})).join("");
 
 Echo.Plugin.create(plugin);
 
