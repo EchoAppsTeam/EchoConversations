@@ -48,13 +48,6 @@ dashboard.config = {
 			"title": "Auth"
 		},
 		"items": [{
-			"component": "Checkbox",
-			"name": "enableAnonymousComments",
-			"type": "boolean",
-			"config": {
-				"title": "Enable anonymous comments"
-			}
-		}, {
 			"component": "Select",
 			"name": "janrainapp",
 			"type": "string",
