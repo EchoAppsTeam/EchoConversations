@@ -19,10 +19,10 @@ plugin.init = function() {
 		var buttons = plugin.actionButtons[action];
 		if (buttons && $.isArray(buttons)) {
 			$.each(buttons, function(j, button) {
-				item.addButtonSpec("Moderation", self["_assemble" + Echo.Utils.capitalize(action) + "Button"](button));
+				item.addButtonSpec("ModerationCardUI", self["_assemble" + Echo.Utils.capitalize(action) + "Button"](button));
 			});
 		} else {
-			item.addButtonSpec("Moderation", self._assembleButton(Echo.Utils.capitalize(action)));
+			item.addButtonSpec("ModerationCardUI", self._assembleButton(Echo.Utils.capitalize(action)));
 		}
 	});
 };
@@ -78,8 +78,8 @@ plugin.events = {
 
 plugin.templates.buttonLabels = {
 	"banned": '<span class="{plugin.class:button-state} {plugin.class:button-state-banned}">{plugin.label:userBanned}</span>' +
-		'(<span class="echo-clickable">{plugin.label:unbanUser}</span>)',
-	"unbanned": '<span class="echo-clickable">{plugin.label:banUser}</span>'
+		'(<span>{plugin.label:unbanUser}</span>)',
+	"unbanned": '<span>{plugin.label:banUser}</span>'
 };
 
 /**
@@ -355,8 +355,8 @@ plugin.methods._assemblePermissionsButton = function(action) {
 		var role = self._getRole();
 		var template = role
 			? '<span class="{plugin.class:button-role} {plugin.class:button-role}-{data:role}">{data:label}</span>' +
-				'(<span class="echo-clickable">{data:button}</span>)'
-			: '<span class="echo-clickable">{data:button}</span>';
+				'(<span>{data:button}</span>)'
+			: '<span>{data:button}</span>';
 
 		var label = self.substitute({
 			"template": template,
