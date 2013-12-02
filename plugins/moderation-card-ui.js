@@ -11,30 +11,22 @@ var plugin = Echo.Plugin.manifest("ModerationCardUI", "Echo.StreamServer.Control
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	var self = this;
 	var item = this.component;
-	var actions = this.config.get("itemActions").concat(this.config.get("userActions"));
 	this.extendTemplate("insertAfter", "avatar", plugin.templates.status);
-	$.each(actions, function(i, action) {
-		var buttons = plugin.actionButtons[action];
-		if (buttons && $.isArray(buttons)) {
-			$.each(buttons, function(j, button) {
-				item.addButtonSpec("ModerationCardUI", self["_assemble" + Echo.Utils.capitalize(action) + "Button"](button));
-			});
-		} else {
-			item.addButtonSpec("ModerationCardUI", self._assembleButton(Echo.Utils.capitalize(action)));
-		}
-	});
+
+	this.extendTemplate("insertAfter", "modeSwitch", plugin.templates.advancedIntents);
+
+	item.addButtonSpec("ModerationCardUI", this._assembleApproveButton());
 };
 
 plugin.config = {
 	"removePersonalItemsAllowed": false,
 	"userActions": ["ban", "permissions"],
-	"itemActions": ["approve", "spam", "delete"]
+	"itemActions": ["spam", "delete"]
 };
 
 plugin.labels = {
-	"approveButton": "Approve",
+	"approveButton": "Moderate",
 	"deleteButton": "Delete",
 	"spamButton": "Spam",
 	"untouchButton": "Untouch",
@@ -51,7 +43,7 @@ plugin.labels = {
 	"statusModeratorFlagged": "Flagged by Moderator",
 	"statusSystemFlagged": "Flagged by System",
 	"banUser": "Ban User",
-	"unbanUser": "Unban",
+	"unbanUser": "Unban User",
 	"userBanned": "Banned User",
 	"processingAction": "Setting up '{state}' user state...",
 	"moderatorRole": "Moderator",
@@ -91,7 +83,36 @@ plugin.templates.status =
 		'<div class="echo-clear"></div>' +
 	'</div>';
 
+plugin.templates.advancedIntents =
+	'<div class="pull-right {plugin.class:advancedIntents}"></div>';
 
+plugin.renderers.advancedIntents = function(element) {
+	var self = this;
+	var actions = this.config.get("itemActions").concat(this.config.get("userActions"));
+
+	var entries = [];
+	$.each(actions, function(i, action) {
+		var buttons = plugin.actionButtons[action];
+		var entry = buttons && $.isArray(buttons)
+			? self["_assemble" + Echo.Utils.capitalize(action) + "Button"].call(self)
+			: self._assembleButton(Echo.Utils.capitalize(action));
+		if (entry) {
+			entries.push(entry);
+		}
+	});
+
+	new Echo.GUI.Dropdown({
+		"target": element,
+		"extraClass": "nav",
+		"entries": entries
+	});
+	if (Echo.Utils.isMobileDevice()) {
+		element.show();
+	} else {
+		element.hide();
+	}
+	return element;
+};
 
 plugin.component.renderers.avatar = function(element) {
 	var item = this.component;
@@ -109,6 +130,17 @@ plugin.component.renderers.container = function(element) {
 	if (item.user.is("admin")) {
 		var status = item.get("data.object.status") || "Untouched";
 		element.addClass(this.cssPrefix + "status-" + status);
+
+		if (!Echo.Utils.isMobileDevice()) {
+			var advancedIntents = this.view.get("advancedIntents");
+			element
+				.off(["mouseleave", "mouseenter"])
+				.hover(function() {
+					advancedIntents.show();
+				}, function() {
+					advancedIntents.hide();
+				});
+		}
 	}
 	return this.parentRenderer("container", arguments);
 };
@@ -205,6 +237,8 @@ plugin.methods._sendUserUpdate = function(config) {
 
 plugin.methods._assembleButton = function(name) {
 	var self = this;
+	var item = this.component;
+
 	var getStatus = function(item) {
 		var status = plugin.button2status[name];
 		if (!item.user.is("admin") &&
@@ -216,9 +250,55 @@ plugin.methods._assembleButton = function(name) {
 		}
 		return status;
 	};
+	// do not display button if item already has new status
+	if (item.get("data.object.status") === getStatus(item)) {
+		return false;
+	}
+	return {
+		"title": this.labels.get(name.toLowerCase() + "Button"),
+		"handler": function() {
+			var status = getStatus(item);
+			item.block(self.labels.get("changingStatusTo" + status));
+			var activity = {
+				"verbs": ["http://activitystrea.ms/schema/1.0/update"],
+				"targets": [{"id": item.get("data.object.id")}],
+				"actor": {"title": item.get("data.actor.id")},
+				"object": {
+					"state": status
+				}
+			};
+
+			self._sendRequest({
+				"content": activity,
+				"appkey": item.config.get("appkey"),
+				"sessionID": item.user.get("sessionID"),
+				"target-query": item.config.get("parent.query")
+			}, function(response) {
+				self._publishCompleteActionEvent({
+					"name": name,
+					"state": "Complete",
+					"response": response
+				});
+				self._changeItemStatus(status);
+				item.unblock();
+				self.requestDataRefresh();
+			}, function(response) {
+				self._publishCompleteActionEvent({
+					"name": name,
+					"state": "Error",
+					"response": response
+				});
+				item.unblock();
+			});
+		}
+	};
+};
+
+plugin.methods._assembleApproveButton = function() {
+	var self = this;
 	var callback = function() {
 		var item = this;
-		var status = getStatus(item);
+		var status = "ModeratorApproved";
 		item.block(self.labels.get("changingStatusTo" + status));
 		var activity = {
 			"verbs": ["http://activitystrea.ms/schema/1.0/update"],
@@ -235,7 +315,7 @@ plugin.methods._assembleButton = function(name) {
 			"target-query": item.config.get("parent.query")
 		}, function(response) {
 			self._publishCompleteActionEvent({
-				"name": name,
+				"name": "Approve",
 				"state": "Complete",
 				"response": response
 			});
@@ -243,7 +323,7 @@ plugin.methods._assembleButton = function(name) {
 			self.requestDataRefresh();
 		}, function(response) {
 			self._publishCompleteActionEvent({
-				"name": name,
+				"name": "Approve",
 				"state": "Error",
 				"response": response
 			});
@@ -252,11 +332,11 @@ plugin.methods._assembleButton = function(name) {
 	};
 	return function() {
 		var item = this;
-		var status = getStatus(item);
+		var status = "ModeratorApproved";
 		return {
-			"name": name,
-			"label": self.labels.get(name.toLowerCase() + "Button"),
-			"icon": plugin.button2icon[name],
+			"name": "Approve",
+			"label": self.labels.get("approveButton"),
+			"icon": plugin.button2icon["Approve"],
 			"visible": item.get("data.object.status") !== status &&
 					(item.user.is("admin") || status === "UserDeleted"),
 			"callback": callback
@@ -264,116 +344,81 @@ plugin.methods._assembleButton = function(name) {
 	};
 };
 
-plugin.methods._assembleBanButton = function(action) {
+plugin.methods._assembleBanButton = function() {
 	var self = this;
-	var callback = function() {
-		var item = this;
-		var newState = action === "Ban" ? "ModeratorBanned" : "Untouched";
-		item.get("buttons." + plugin.name + "." + action + ".element")
-			.empty()
-			.append(self.labels.get("processingAction", {"state": newState}));
-		self._sendUserUpdate({
-			"field": "state",
-			"value": newState,
-			"onData": function(response) {
-				self._publishCompleteActionEvent({
-					"name": action,
-					"state": "Complete",
-					"response": response
-				});
-				self._publishUserUpdateEvent({
-					"item": item,
-					"field": "state",
-					"value": newState
-				});
-			},
-			"onError": function(response) {
-				self._publishCompleteActionEvent({
-					"name": action,
-					"state": "Error",
-					"response": response
-				});
-			}
-		});
-	};
-	return function() {
-		var item = this;
-		var isBanned = self._isUserBanned();
-		var visible = item.get("data.actor.id") !== item.user.config.get("fakeIdentityURL") &&
-			isBanned ^ (action === "Ban");
-		return {
-			"name": action,
-			"label": self.substitute({"template": plugin.templates.buttonLabels[isBanned ? "banned" : "unbanned"]}),
-			"visible": visible && item.user.is("admin"),
-			"callback": callback,
-			"once": true
-		};
+	var isBanned = this._isUserBanned();
+	var item = this.component;
+	// TODO handle anonymous(fake) users
+	return {
+		"title": this.labels.get(isBanned ? "unbanUser" : "banUser"),
+		"handler": function() {
+			var newState = isBanned ? "Untouched" : "ModeratorBanned";
+			var action = isBanned ? "UnBan" : "Ban";
+			self._sendUserUpdate({
+				"field": "state",
+				"value": newState,
+				"onData": function(response) {
+					self._publishCompleteActionEvent({
+						"name": action,
+						"state": "Complete",
+						"response": response
+					});
+					self._publishUserUpdateEvent({
+						"item": item,
+						"field": "state",
+						"value": newState
+					});
+				},
+				"onError": function(response) {
+					self._publishCompleteActionEvent({
+						"name": action,
+						"state": "Error",
+						"response": response
+					});
+				}
+			});
+		}
 	};
 };
 
-plugin.methods._assemblePermissionsButton = function(action) {
+plugin.methods._assemblePermissionsButton = function() {
 	var self = this;
-	var callback = function() {
-		var item = this;
-		var role = self._getRole();
-		var next = self._getNextRole(role);
-		var roles = next !== ""
-			? (item.get("data.actor.roles") || []).concat(next)
-			: Echo.Utils.foldl([], item.get("data.actor.roles") || [], function(_role, acc) {
-				if ($.inArray(_role, plugin.roles) < 0) acc.push(_role);
-			});
-		var label = next === "" ? "unset" : "set";
-		item.get("buttons." + plugin.name + "." + action + ".element")
-			.empty()
-			.append(self.labels.get(label + "RoleAction", {"role": next || role}));
-		self._sendUserUpdate({
-			"field": "roles",
-			"value": roles.length ? roles.join(",") : "-",
-			"onData": function(response) {
-				self._publishCompleteActionEvent({
-					"name": action,
-					"state": "Complete",
-					"response": response
+	var item = this.component;
+	var role = this._getRole();
+	var next = this._getNextRole(role);
+	return {
+		"title": this.labels.get((next || "user") + "Button"),
+		"handler": function() {
+			var action = "UserPermissions";
+			var roles = next !== ""
+				? (item.get("data.actor.roles") || []).concat(next)
+				: Echo.Utils.foldl([], item.get("data.actor.roles") || [], function(_role, acc) {
+					if ($.inArray(_role, plugin.roles) < 0) acc.push(_role);
 				});
-				self._publishUserUpdateEvent({
-					"item": item,
+				self._sendUserUpdate({
 					"field": "roles",
-					"value": roles
+					"value": roles.length ? roles.join(",") : "-",
+					"onData": function(response) {
+						self._publishCompleteActionEvent({
+							"name": action,
+							"state": "Complete",
+							"response": response
+						});
+						self._publishUserUpdateEvent({
+							"item": item,
+							"field": "roles",
+							"value": roles
+						});
+					},
+					"onError": function(response) {
+						self._publishCompleteActionEvent({
+							"name": action,
+							"state": "Error",
+							"response": response
+						});
+					}
 				});
-			},
-			"onError": function(response) {
-				self._publishCompleteActionEvent({
-					"name": action,
-					"state": "Error",
-					"response": response
-				});
-			}
-		});
-	};
-	return function() {
-		var item = this;
-		var role = self._getRole();
-		var template = role
-			? '<span class="{plugin.class:button-role} {plugin.class:button-role}-{data:role}">{data:label}</span>' +
-				'(<span>{data:button}</span>)'
-			: '<span>{data:button}</span>';
-
-		var label = self.substitute({
-			"template": template,
-			"data": {
-				"role": role,
-				"label": role ? self.labels.get(role + "Role") : "",
-				"button": self.labels.get((self._getNextRole(role) || "user") + "Button")
-			}
-		});
-		return {
-			"name": action,
-			"label": label,
-			"visible": item.get("data.actor.id") !== item.user.config.get("fakeIdentityURL") &&
-				item.user.any("roles", ["administrator"]),
-			"callback": callback,
-			"once": true
-		};
+		}
 	};
 };
 
@@ -414,24 +459,32 @@ plugin.methods._getNextRole = function(role) {
 
 
 plugin.css =
-		// item statuses
-		'.{plugin.class:status-Untouched} { border-left: 7px solid #3498db; }' +
-		'.{plugin.class:status-ModeratorApproved} { border-left: 7px solid #15c177; }' +
-		'.{plugin.class:status-ModeratorDeleted} { border-left: 7px solid #bf383a; }' +
-		'.{plugin.class:status-SystemFlagged}, .{plugin.class:status-CommunityFlagged}, .{plugin.class:status-ModeratorFlagged} { border-left: 7px solid #ff9e00; }' +
+	// advancedIntents
+	// hide switch for now
+	'.{plugin.class} .{class:modeSwitch} { width: 0px; }' +
+	'.{plugin.class:advancedIntents} { width: 16px; height: 16px; margin-right: 10px; background: url({%= baseURL %}/images/marker.png) no-repeat; }' +
+	'.{plugin.class:advancedIntents} .dropdown-toggle { width: 16px; height: 16px; }' +
+	'.echo-sdk-ui .{plugin.class:advancedIntents} > .nav > li > a:hover, .echo-sdk-ui .{plugin.class:advancedIntents} > .nav > li > a:focus { background-color: transparent; }' +
+	'.echo-sdk-ui .{plugin.class:advancedIntents} .dropdown-menu { right: 0px; left: auto; }' +
 
-		// actor statuses
-		($.map({
-			"Untouched": "#3498db",
-			"ModeratorApproved": "#15c177",
-			"ModeratorBanned": "#bf383a",
-			"ModeratorDeleted": "#bf383a"
-		}, function(color, status) {
-			return [
-				'.{plugin.class} .{class:avatar}.{plugin.class:actorStatus-' + status + '} > img { border: 2px solid ' + color + '; width: 20px; height: 20px; }',
-				'.{plugin.class} .{class:depth-0} .{class:avatar}.{plugin.class:actorStatus-' + status + '} img { height: 32px; width: 32px; border-radius: 50%;}'
-			].join("");
-		})).join("");
+	// item statuses
+	'.{plugin.class:status-Untouched} { border-left: 7px solid #3498db; }' +
+	'.{plugin.class:status-ModeratorApproved} { border-left: 7px solid #15c177; }' +
+	'.{plugin.class:status-ModeratorDeleted} { border-left: 7px solid #bf383a; }' +
+	'.{plugin.class:status-SystemFlagged}, .{plugin.class:status-CommunityFlagged}, .{plugin.class:status-ModeratorFlagged} { border-left: 7px solid #ff9e00; }' +
+
+	// actor statuses
+	($.map({
+		"Untouched": "#3498db",
+		"ModeratorApproved": "#15c177",
+		"ModeratorBanned": "#bf383a",
+		"ModeratorDeleted": "#bf383a"
+	}, function(color, status) {
+		return [
+			'.{plugin.class} .{class:avatar}.{plugin.class:actorStatus-' + status + '} > img { border: 2px solid ' + color + '; width: 20px; height: 20px; }',
+			'.{plugin.class} .{class:depth-0} .{class:avatar}.{plugin.class:actorStatus-' + status + '} img { height: 32px; width: 32px; border-radius: 50%;}'
+		].join("");
+	})).join("");
 
 Echo.Plugin.create(plugin);
 
