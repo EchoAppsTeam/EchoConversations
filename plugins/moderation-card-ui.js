@@ -101,13 +101,14 @@ plugin.renderers.advancedIntents = function(element) {
 		}
 	});
 
-	new Echo.GUI.Dropdown({
-		"target": element,
-		"extraClass": "nav",
-		"entries": entries
-	});
-	if (Echo.Utils.isMobileDevice()) {
-		element.show();
+	if (entries.length) {
+		new Echo.GUI.Dropdown({
+			"target": element,
+			"extraClass": "nav",
+			"entries": entries
+		});
+		if (!Echo.Utils.isMobileDevice()) element.addClass("hide");
+
 	} else {
 		element.hide();
 	}
@@ -130,17 +131,17 @@ plugin.component.renderers.container = function(element) {
 	if (item.user.is("admin")) {
 		var status = item.get("data.object.status") || "Untouched";
 		element.addClass(this.cssPrefix + "status-" + status);
+	}
 
-		if (!Echo.Utils.isMobileDevice()) {
-			var advancedIntents = this.view.get("advancedIntents");
-			element
-				.off(["mouseleave", "mouseenter"])
-				.hover(function() {
-					advancedIntents.show();
-				}, function() {
-					advancedIntents.hide();
-				});
-		}
+	if (!Echo.Utils.isMobileDevice()) {
+		var advancedIntents = this.view.get("advancedIntents");
+		element
+			.off(["mouseleave", "mouseenter"])
+			.hover(function() {
+				advancedIntents.removeClass("hide");
+			}, function() {
+				advancedIntents.addClass("hide");
+			});
 	}
 	return this.parentRenderer("container", arguments);
 };
@@ -238,6 +239,17 @@ plugin.methods._sendUserUpdate = function(config) {
 plugin.methods._assembleButton = function(name) {
 	var self = this;
 	var item = this.component;
+
+	if (
+		!item.user.is("admin")
+		&& (
+			name !== "Delete"
+			|| !item.user.has("identity", item.data.actor.id)
+			|| !this.config.get("removePersonalItemsAllowed")
+		)
+	) {
+		return false;
+	}
 
 	var getStatus = function(item) {
 		var status = plugin.button2status[name];
@@ -348,6 +360,9 @@ plugin.methods._assembleBanButton = function() {
 	var self = this;
 	var isBanned = this._isUserBanned();
 	var item = this.component;
+
+	if (!item.user.is("admin")) return false;
+
 	// TODO handle anonymous(fake) users
 	return {
 		"title": this.labels.get(isBanned ? "unbanUser" : "banUser"),
@@ -386,6 +401,9 @@ plugin.methods._assemblePermissionsButton = function() {
 	var item = this.component;
 	var role = this._getRole();
 	var next = this._getNextRole(role);
+
+	if (!item.user.is("admin")) return false;
+
 	return {
 		"title": this.labels.get((next || "user") + "Button"),
 		"handler": function() {
