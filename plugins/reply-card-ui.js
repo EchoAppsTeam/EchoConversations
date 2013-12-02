@@ -267,9 +267,10 @@ plugin.methods._getSubmitData = function() {
 };
 
 plugin.css =
+	".{plugin.class} .{class:container-root-thread} { padding: 10px 0px 10px 10px; }" +
 	".{plugin.class} .{plugin.class:replyForm} { margin-right: 10px; }" +
-	".{plugin.class} .{plugin.class:compactForm} { margin-top: 15px; }" +
-	".{plugin.class} .{plugin.class:submitForm} { margin-top: 15px; }" +
+	".{plugin.class} .{plugin.class:compactForm} { margin-top: 15px; padding-top: 0px; }" +
+	".{plugin.class} .{plugin.class:submitForm} { margin-top: 15px; padding-top: 0px; }" +
 	".{plugin.class:compactContent} { padding: 5px 5px 5px 6px; background-color: #fff; height: 26px; line-height: 26px; }" +
 	".{plugin.class:avatar} { width: 26px; height: 26px; border-radius: 50%; margin: 5px 0px 0px 10px; }" +
 	".{plugin.class} .{plugin.class:avatar} > img { width: 26px; height: 26px; }" +

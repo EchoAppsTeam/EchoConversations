@@ -105,7 +105,7 @@ plugin.css =
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
 	'.{plugin.class} .{class:buttonIcon} { margin-right: 4px; }' +
 	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
-	'.{plugin.class} .{class:container-child} { padding: 0px; margin: 0px; }' +
+	'.{plugin.class} .{class:container-child} { padding: 10px; margin: 0px; }' +
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:data} { margin-top: 2px; }' +
