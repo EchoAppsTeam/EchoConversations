@@ -17,6 +17,7 @@ module.exports = function(grunt) {
 	var sources = {
 		"js": [
 			"app.js",
+			"app/*.js",
 			"plugins/*.js",
 			"dashboard.js",
 			"dashboard/*.js"
@@ -111,6 +112,7 @@ module.exports = function(grunt) {
 			"app": {
 				"src": [
 					"<%= dirs.build %>/app.js",
+					"<%= dirs.build %>/app/*.js",
 					"<%= dirs.build %>/plugins/*.js"
 				],
 				"dest": "<%= dirs.build %>/app.js"
