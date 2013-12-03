@@ -98,17 +98,19 @@ plugin.css =
 	'.{plugin.class} .{class:body} { padding-top: 0px; padding-right: 10px; margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 12px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 1i6px; }' +
-	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #262626; text-decoration: none; opacity: 1; }' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { margin-right: 0px; padding-right: 0px; }' +
-
-	'.{plugin.class} .{class:button} { margin-right: 10px; opacity: 0.8;}' +
-	'.{plugin.class} .{class:button-delim} { display: none; }' +
-	'.{plugin.class} .{class:buttonIcon} { margin-right: 4px; }' +
-	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
-	'.{plugin.class} .{class:container-child} { padding: 10px; margin: 0px; }' +
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:data} { margin-top: 2px; }' +
+	'.{plugin.class} .{class:container-child} { padding: 10px; margin: 0px; }' +
+
+	'.{plugin.class} .{class:button} { margin-right: 10px; }' +
+	'.{plugin.class} .{class:button-delim} { display: none; }' +
+	'.{plugin.class} .{class:buttonIcon} { margin-right: 4px; opacity: 0.3; }' +
+	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
+	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor { color: #262626; text-decoration: none; }' +
+	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{class:buttonIcon} { opacity: 1; }' +
+
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { padding-top: 8px; height: 28px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; margin: 8px 0px; }' +
