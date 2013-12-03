@@ -1,8 +1,7 @@
 (function($) {
 "use strict";
 
-
-// TODO: move this class into Echo.GUI libraryr
+// TODO: move this class into Echo.GUI library
 Echo.Apps.Conversations.RollingCounter = function(config) {
 	if (!config || !config.target) return;
 	this.config = new Echo.Configuration(config);

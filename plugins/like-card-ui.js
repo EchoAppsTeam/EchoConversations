@@ -72,9 +72,6 @@ plugin.labels = {
 plugin.dependencies = [{
 	"control": "Echo.StreamServer.Controls.FacePile",
 	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js"
-}, {
-	"loaded": function() { return !!Echo.GUI; },
-	"url": "{config:cdnBaseURL.sdk}/gui.pack.js"
 }];
 
 plugin.events = {
