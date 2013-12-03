@@ -72,18 +72,23 @@ plugin.component.renderers.container = function(element) {
 	return element;
 };
 
-plugin.component.renderers.children = function(element) {
+plugin.component.renderers.children = function() {
 	var item = this.component;
 	// perform reply form rerendering *only* when we have exactly 1 item
 	// (the first item is being added or the last one is being deleted)
 	if (item.get("children").length === 1) {
 		var child = item.get("children")[0];
 		if (child.get("added") || child.get("deleted")) {
-			this._itemCSS("remove", item, this.view.get("compactForm"));
 			this.view.render({"name": "compactForm"});
 		}
 	}
 	return item.parentRenderer("children", arguments);
+};
+
+plugin.renderers.replyForm = function(element) {
+	var item = this.component;
+	element.addClass(item.get("cssPrefix") + "depth-" + (item.get("depth") + 1));
+	return element;
 };
 
 plugin.renderers.submitForm = function(element) {
@@ -108,10 +113,8 @@ plugin.renderers.avatar =function(element) {
 plugin.renderers.compactForm = function(element) {
 	var item = this.component;
 	if (!item.get("depth") && !this.get("expanded")) {
-		this._itemCSS("add", item, element);
 		return element.show();
 	}
-	this._itemCSS("remove", item, this.view.get("compactForm"));
 	return element.hide();
 };
 
@@ -152,7 +155,6 @@ plugin.methods._submitConfig = function(target) {
 plugin.methods._showSubmit = function() {
 	var item = this.component;
 	var target = this.view.get("submitForm");
-	this._itemCSS("add", item, this.view.get("submitForm"));
 	var submit = this.get("submit");
 	if (submit) {
 		submit.config.set("target", target);
@@ -186,7 +188,6 @@ plugin.methods._hideSubmit = function() {
 		submit.set("data", undefined);
 	}
 	this.set("expanded", false);
-	this._itemCSS("remove", item, this.view.get("submitForm"));
 	this.view.get("submitForm").empty().hide();
 	this.view.render({"name": "avatar"});
 	this.view.render({"name": "compactForm"});
@@ -242,13 +243,6 @@ plugin.methods._assembleButton = function() {
 	};
 };
 
-plugin.methods._itemCSS = function(action, item, element) {
-	$.each(["container", "container-child", "depth-" + (item.get("depth") + 1)], function(i, css) {
-		element[action + "Class"](item.get("cssPrefix") + css);
-	});
-	element[action + "Class"]('echo-trinaryBackgroundColor');
-};
-
 plugin.methods._getSubmitKey = function() {
 	var item = this.component;
 	var applicationContext = item.config.get("context").split("/")[0];
@@ -272,7 +266,7 @@ plugin.css =
 	".{plugin.class} .{plugin.class:compactForm} { margin-top: 15px; padding-top: 0px; }" +
 	".{plugin.class} .{plugin.class:submitForm} { margin-top: 15px; padding-top: 0px; }" +
 	".{plugin.class:compactContent} { padding: 5px 5px 5px 6px; background-color: #fff; height: 26px; line-height: 26px; }" +
-	".{plugin.class:avatar} { width: 26px; height: 26px; border-radius: 50%; margin: 5px 0px 0px 10px; }" +
+	".{plugin.class:avatar} { width: 26px; height: 26px; border-radius: 50%; margin: 5px 0px 0px 0px; }" +
 	".{plugin.class} .{plugin.class:avatar} > img { width: 26px; height: 26px; }" +
 	".{plugin.class:submitForm} > div { margin-left: 30px; }" +
 	".{plugin.class:compactBorder} { margin-left: 30px; border: 1px solid #d2d2d2; }" +
