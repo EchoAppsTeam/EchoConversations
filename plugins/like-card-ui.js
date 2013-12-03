@@ -92,9 +92,6 @@ plugin.templates.main =
 		'<div class="echo-clear"></div>' +
 	'</div>';
 
-plugin.templates.processing =
-	'<span class="{plugin.class:processing}">{data:label}</span>';
-
 /**
  * @echo_renderer
  */
@@ -236,14 +233,10 @@ plugin.methods._assembleButton = function(name) {
 	var self = this;
 	var callback = function() {
 		var item = this;
-		item.get("buttons." + self.name + "." + name + ".element")
+		var buttonNode = item.get("buttons." + self.name + "." + name + ".element");
+		$("." + item.cssPrefix + "buttonCaption", buttonNode)
 			.empty()
-			.append(self.substitute({
-				"template": plugin.templates.processing,
-				"data": {
-					"label": self.labels.get(name.toLowerCase() + "Processing")
-				}
-			}));
+			.append(self.labels.get(name.toLowerCase() + "Processing"));
 		self._sendActivity(name, item);
 	};
 	return function() {
@@ -268,7 +261,6 @@ plugin.css =
 	'.{plugin.class:likeIcon} { float: left; height: 20px; width: 20px; opacity: 0.8; margin-right: 7px; background: url({%= baseURL %}/images/like.png) no-repeat 0px 1px; }' +
 	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 5px; vertical-align: text-top;}' +
 	'.{plugin.class:likers} { float: left; position: relative; border: 1px solid #808080; border-radius: 50%; color: #808080; display: inline-block; font-size: 10px; height: 20px; line-height: 22px; text-align: center; vertical-align: text-top; width: 20px; overflow: hidden; }' +
-	'.{plugin.class:processing} { vertical-align: middle; font-size: 12px; }' +
 	'.{plugin.class:highlight} { line-height: 23px; }' +
 	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-item-avatar { border-radius: 50%; }' +
 	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-item-avatar img { border-radius: 50%; height: 20px; width: 20px; }' +

@@ -108,8 +108,9 @@ plugin.css =
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
 	'.{plugin.class} .{class:buttonIcon} { margin-right: 4px; opacity: 0.3; }' +
 	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
-	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor { color: #262626; text-decoration: none; }' +
-	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{class:buttonIcon} { opacity: 1; }' +
+	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #262626; text-decoration: none; }' +
+	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{class:buttonIcon},' +
+			'.{class:buttons} a.{class:button}:hover .{class:buttonIcon} { opacity: 1; }' +
 
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { padding-top: 8px; height: 28px; }' +
