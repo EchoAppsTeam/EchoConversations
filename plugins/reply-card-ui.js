@@ -52,9 +52,9 @@ plugin.events = {
 
 plugin.templates.form =
 	'<div class="{plugin.class:replyForm}">' +
-		'<div class="pull-left {plugin.class:avatar}"></div>' +
 		'<div class="{plugin.class:submitForm}"></div>' +
 		'<div class="{plugin.class:compactForm}">' +
+			'<div class="pull-left {plugin.class:avatar}"></div>' +
 			'<div class="{plugin.class:compactContent} {plugin.class:compactBorder}">' +
 				'<input type="text" class="{plugin.class:compactField} echo-primaryFont echo-secondaryColor">' +
 			'</div>' +
@@ -262,14 +262,13 @@ plugin.methods._getSubmitData = function() {
 
 plugin.css =
 	".{plugin.class} .{class:container-root-thread} { padding: 10px 0px 10px 10px; }" +
-	".{plugin.class} .{plugin.class:replyForm} { margin-right: 10px; }" +
+	".{plugin.class} .{plugin.class:replyForm} { apdding-right: 10px; }" +
 	".{plugin.class} .{plugin.class:compactForm} { margin-top: 15px; padding-top: 0px; }" +
 	".{plugin.class} .{plugin.class:submitForm} { margin-top: 15px; padding-top: 0px; }" +
-	".{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 26px; line-height: 26px; }" +
-	".{plugin.class:avatar} { width: 26px; height: 26px; border-radius: 50%; margin: 0px 0px 0px 0px; }" +
-	".{plugin.class} .{plugin.class:avatar} > img { width: 26px; height: 26px; }" +
-	".{plugin.class:submitForm} > div { margin-left: 38px; }" +
-	".{plugin.class:compactBorder} { margin-left: 38px; border: 1px solid #d2d2d2; }" +
+	".{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 28px; line-height: 28px; }" +
+	".{plugin.class:avatar} { width: 28px; height: 28px; border-radius: 50%; margin: 1px 0px 0px 3px; }" +
+	".{plugin.class} .{plugin.class:avatar} > img { width: 28px; height: 28px; }" +
+	".{plugin.class:compactBorder} { margin-left: 39px; border: 1px solid #d2d2d2; }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-secondaryColor { color: #C6C6C6 }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-primaryFont { font-size: 12px; line-height: 24px; }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'] { width: 100%; height: 24px; border: none; margin: 0px; padding: 0px; box-shadow: none; vertical-align: middle; }" +
@@ -331,28 +330,6 @@ $.map(["onRender", "onRerender"], function(topic) {
 
 plugin.css =
 	'.{plugin.class} .{class:container} { padding-top: 5px; border: 0px; box-shadow: none; padding-top: 0px; padding-left: 0px; }';
-
-Echo.Plugin.create(plugin);
-
-})(Echo.jQuery);
-
-(function(jQuery) {
-"use strict";
-
-var plugin = Echo.Plugin.manifest("ReplyCardUI", "Echo.IdentityServer.Controls.Auth");
-
-if (Echo.Plugin.isDefined(plugin)) return;
-
-plugin.init = function() {
-	this.extendTemplate("remove", "avatar");
-};
-
-plugin.css =
-	// TODO we shouldn't use foreign plugin class here.
-	'.{plugin.class} .echo-identityserver-controls-auth-plugin-CardUIShim-container > div { display: inline-block; }' +
-	'.{plugin.class} .echo-identityserver-controls-auth-plugin-CardUIShim-via { margin-left: 5px; }' +
-	'.{plugin.class} .{class:userLogged} { margin-left: 0px; }' +
-	'.{plugin.class} .{class:name} { margin-left: 0px; }';
 
 Echo.Plugin.create(plugin);
 
