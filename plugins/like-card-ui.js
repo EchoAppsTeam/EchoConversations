@@ -140,6 +140,7 @@ plugin.renderers.likedBy = function(element) {
 };
 
 plugin.renderers.likeIcon = function(element) {
+	this.component.set("likeIcon", element);
 	return !!this._getLikesCount()
 		? element : element.hide();
 };
@@ -267,7 +268,7 @@ plugin.methods._assembleButton = function(name) {
 
 plugin.css =
 	'.{plugin.class:likesArea} { float: right; }' +
-	'.{plugin.class:likeIcon} { float: left; height: 20px; width: 20px; opacity: 0.8; margin-right: 7px; background: url({%= baseURL %}/images/like.png) no-repeat 0px 1px; }' +
+	'.{plugin.class:likeIcon} { float: left; height: 20px; width: 20px; opacity: 0.3; margin-right: 7px; background: url({%= baseURL %}/images/like.png) no-repeat 0px 1px; }' +
 	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 5px; vertical-align: text-top;}' +
 	'.{plugin.class:likers} { float: left; position: relative; border: 1px solid #808080; border-radius: 50%; color: #808080; display: inline-block; font-size: 10px; height: 20px; line-height: 22px; text-align: center; vertical-align: text-top; width: 20px; overflow: hidden; }' +
 	'.{plugin.class:highlight} { line-height: 23px; }' +
