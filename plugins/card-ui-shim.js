@@ -217,6 +217,10 @@ Echo.Plugin.create(plugin);
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Submit");
 
+plugin.config = {
+	"submitPermissions": "forceLogin"
+};
+
 plugin.labels = {
 	"youMustBeLoggedIn": "You must be logged in to comment"
 };
@@ -236,18 +240,18 @@ plugin.init = function() {
 	submit.validators = [];
 
 	submit.addPostValidator(function() {
-		var textarea = submit.view.get("text");
-		var text = textarea.val();
-		if (!text) {
-			textarea.focus();
-			submit.highlightMandatory(textarea);
-			setTimeout(function() {
-				submit.view.get("content")
-					.removeClass("echo-streamserver-controls-submit-mandatory");
-			}, 3 * 1000); // keep fixed for now, to be revisited later
-			return false;
-		}
-		if (!submit.user.is("logged")) {
+		var areFieldsValid = true;
+		var isGuestAllowed = self.config.get("submitPermissions") === "allowGuest";
+
+		$.each(isGuestAllowed ? ["name", "text"] : ["text"], function (i, field) {
+			areFieldsValid = !submit.highlightMandatory(submit.view.get(field));
+			return areFieldsValid;
+		});
+
+		// exit in case some required fields are empty
+		if (!areFieldsValid) return false;
+
+		if (!isGuestAllowed && !submit.user.is("logged")) {
 			var notice = self.view.get("loginRequirementNotice");
 			notice.show();
 			setTimeout(function() {
@@ -265,7 +269,12 @@ plugin.init = function() {
 };
 
 plugin.css =
-	'.{plugin.class} .{class:header} { display: none; }' +
+	'.{plugin.class} .{class:urlContainer} { display: none; }' +
+	'.{plugin.class} .{class:avatar} { display: none; }' +
+	'.{plugin.class} .{class:fieldsWrapper} { margin-left: 0px; }' +
+	'.{plugin.class} .{class:plugin-JanrainAuth-forcedLogin} .{class:header} { display: none; }' +
+	'.{plugin.class} .{class:fieldsWrapper} input { font-weight: normal; }' +
+	'.{plugin.class} .{class:nameContainer} { padding: 3px 2px 3px 5px; }' +
 	'.{plugin.class} .{class:postButton} { color: #006DCC !important; font-weight: bold; }' +
 	'.{plugin.class} .{class:tagsContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:markersContainer} { display: none !important; }' +

@@ -41,7 +41,7 @@ conversations.templates.main =
 	'</div>';
 
 conversations.renderers.submit = function(element) {
-	var allowGuest = this.config.get("auth.enableAnonymousComments");
+	var submitPermissions = this._getSubmitPermissions();
 	this.initComponent({
 		"id": "stream",
 		"component": "Echo.StreamServer.Controls.Submit",
@@ -54,20 +54,22 @@ conversations.renderers.submit = function(element) {
 			"plugins": [{
 				"name": "JanrainAuth",
 				"appId": this.config.get("dependencies.Janrain.appId"),
-				"submitPermissions": allowGuest ? "allowGuest" : "forceLogin",
+				"submitPermissions": submitPermissions,
 				"buttons": ["login", "signup"],
 				"nestedPlugins": [{
-					"name": "CardUIShim"
+					"name": "CardUIShim",
+					"submitPermissions": submitPermissions
 				}]
 			}, {
-				"name": "CardUIShim"
+				"name": "CardUIShim",
+				"submitPermissions": submitPermissions
 			}]
 		}
 	});
 };
 
 conversations.renderers.stream = function(element) {
-	var replyPermissions = this.config.get("auth.enableAnonymousComments");
+	var replyPermissions = this._getSubmitPermissions();
 	this.initComponent({
 		"id": "Stream",
 		"component": "Echo.StreamServer.Controls.Stream",
@@ -87,21 +89,25 @@ conversations.renderers.stream = function(element) {
 				"nestedPlugins": [{
 					"name": "JanrainAuth",
 					"appId": this.config.get("dependencies.Janrain.appId"),
-					"submitPermissions": replyPermissions
-						? "allowGuest"
-						: "forceLogin",
+					"submitPermissions": replyPermissions,
 					"buttons": ["login", "signup"],
 					"nestedPlugins": [{
-						"name": "CardUIShim"
+						"name": "CardUIShim",
+						"submitPermissions": replyPermissions
 					}]
 				}, {
-					"name": "CardUIShim"
+					"name": "CardUIShim",
+					"submitPermissions": replyPermissions
 				}]
 			}, {
 				"name": "ModerationCardUI"
 			}]
 		}
 	});
+};
+
+conversations.methods._getSubmitPermissions = function() {
+	return this.config.get("auth.enableAnonymousComments") ? "allowGuest" : "forceLogin";
 };
 
 conversations.methods._buildSearchQuery = function() {
