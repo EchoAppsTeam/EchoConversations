@@ -94,7 +94,7 @@ plugin.css =
 	'.{plugin.class} .{class:buttons} { margin-left: 0px; }' +
 	'.{plugin.class} .{class:footer} { padding-right: 10px; height: 30px; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
-	'.{plugin.class} .{class:content} { padding-top: 15px; }' +
+	'.{plugin.class} .{class:content} { padding-top: 15px; padding-bottom: 15px; }' +
 	'.{plugin.class} .{class:body} { padding-top: 0px; padding-right: 10px; margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 12px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 1i6px; }' +

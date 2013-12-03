@@ -265,14 +265,14 @@ plugin.css =
 	".{plugin.class} .{plugin.class:replyForm} { margin-right: 10px; }" +
 	".{plugin.class} .{plugin.class:compactForm} { margin-top: 15px; padding-top: 0px; }" +
 	".{plugin.class} .{plugin.class:submitForm} { margin-top: 15px; padding-top: 0px; }" +
-	".{plugin.class:compactContent} { padding: 5px 5px 5px 6px; background-color: #fff; height: 26px; line-height: 26px; }" +
-	".{plugin.class:avatar} { width: 26px; height: 26px; border-radius: 50%; margin: 5px 0px 0px 0px; }" +
+	".{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 26px; line-height: 26px; }" +
+	".{plugin.class:avatar} { width: 26px; height: 26px; border-radius: 50%; margin: 0px 0px 0px 0px; }" +
 	".{plugin.class} .{plugin.class:avatar} > img { width: 26px; height: 26px; }" +
-	".{plugin.class:submitForm} > div { margin-left: 30px; }" +
-	".{plugin.class:compactBorder} { margin-left: 30px; border: 1px solid #d2d2d2; }" +
+	".{plugin.class:submitForm} > div { margin-left: 38px; }" +
+	".{plugin.class:compactBorder} { margin-left: 38px; border: 1px solid #d2d2d2; }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-secondaryColor { color: #C6C6C6 }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-primaryFont { font-size: 14px; line-height: 26px; }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'] { width: 100%; height: 26px; border: none; margin: 0px; padding: 0px; box-shadow: none; vertical-align: middle; }" +
+	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-primaryFont { font-size: 12px; line-height: 24px; }" +
+	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'] { width: 100%; height: 24px; border: none; margin: 0px; padding: 0px; box-shadow: none; vertical-align: middle; }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text']:focus { outline: 0; box-shadow: none; }";
 
 Echo.Plugin.create(plugin);
