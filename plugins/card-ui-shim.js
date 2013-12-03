@@ -9,7 +9,7 @@ var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stre
 
 plugin.css =
 	'.{plugin.class} .{class:header} { display: none; }' +
-	'.{plugin.class} .{class:item} { margin: 10px 0px; padding: 0px 0px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }' +
+	'.{plugin.class} .{class:item} { margin: 10px 0px; padding: 0px 0px; box-shadow: 0px 1px 1px #d2d2d2; border: 1px solid #d2d2d2; }' +
 	'.{plugin.class} .{class:body} .echo-control-message { margin: 10px 0px; border: 1px solid #d2d2d2; box-shadow: 1px solid #d2d2d2; }' +
 	'.{plugin.class} .{class:item-children} > .{class:item} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; }';
 
@@ -297,8 +297,9 @@ plugin.css =
 	'.{plugin.class} .{class:tagsContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:markersContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:content} textarea.{class:textArea} { height: 75px; }' +
-	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #D2D2D2; border-top: 0px; }' +
-	'.{plugin.class} .{class:container} { padding: 10px 15px 15px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }' +
+	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d2d2d2; border-top: 0px; border-radius: 3px; }' +
+	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; box-shadow: 0px 1px 1px #d2d2d2; border: 1px solid #d2d2d2; border-radius: 3px; }' +
+	'.{plugin.class} .{class:body} { margin-top: 15px; }' +
 	'.{plugin.class:loginRequirementNotice} { display: none; float: right; margin: 5px; margin: 8px 10px 0 0; color: red; font-weight: bold; font-family: Arial; font-size: 14px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
