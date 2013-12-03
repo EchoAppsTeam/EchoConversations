@@ -9,7 +9,7 @@ var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stre
 
 plugin.css =
 	'.{plugin.class} .{class:header} { display: none; }' +
-	'.{plugin.class} .{class:item} { margin: 10px 0px; padding: 5px 0px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }' +
+	'.{plugin.class} .{class:item} { margin: 10px 0px; padding: 0px 0px; box-shadow: 0px 1px 1px #D2D2D2; border: 1px solid #D2D2D2; }' +
 	'.{plugin.class} .{class:item-children} > .{class:item} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; }';
 
 Echo.Plugin.create(plugin);
@@ -93,7 +93,7 @@ plugin.component.renderers._button = function(element, extra) {
 var itemDepthRules = [];
 // 100 is a maximum level of children in query, but we can apply styles for ~20
 for (var i = 0; i <= 20; i++) {
-	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 10 + (i - 1) * 25 : 10) + 'px; }');
+	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 16 + (i - 1) * 25 : 16) + 'px; }');
 }
 
 plugin.css =
@@ -105,17 +105,16 @@ plugin.css =
 	'.{plugin.class} .{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
 
 	'.{plugin.class} .{class:buttons} { margin-left: 0px; }' +
-	'.{plugin.class} .{class:footer} { padding-right: 10px; height: 30px; }' +
+	'.{plugin.class} .{class:footer} { padding-right: 10px; height: 22px; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
-	'.{plugin.class} .{class:content} { padding-top: 15px; padding-bottom: 15px; }' +
-	'.{plugin.class} .{class:body} { padding-top: 0px; padding-right: 10px; margin-bottom: 8px; }' +
-	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 12px; }' +
-	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 1i6px; }' +
-	'.{plugin.class} .{class:content} .{class:container-child-thread} { margin-right: 0px; padding-right: 0px; }' +
+	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
+	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 13px; line-height: 17px; font-family: Georgia, "Times New Roman", Times, serif; }' +
+	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
+	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 0px 16px 0px 16px; margin-top: 20px; }' +
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
-	'.{plugin.class} .{class:children} .{class:data} { margin-top: 2px; }' +
-	'.{plugin.class} .{class:container-child} { padding: 10px; margin: 0px; }' +
+	'.{plugin.class} .{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
+	'.{plugin.class} .{class:container-child} { padding: 0px 16px 0px 16px; margin-top: 20px; }' +
 
 	'.{plugin.class} .{class:button} { margin-right: 10px; }' +
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
@@ -127,14 +126,17 @@ plugin.css =
 
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { padding-top: 8px; height: 28px; }' +
-	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; margin: 8px 0px; }' +
-	'.{plugin.class} .{class:depth-0} .{class:body} .{class:text} { font-size: 13px; }' +
+	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; }' +
+	'.{plugin.class} .{class:depth-0} .{class:body} .{class:text} { line-height: 18px; font-family: Georgia, "Times New Roman", Times, serif; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} img { height: 36px; width: 36px; border-radius: 50%;}' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { border-bottom: 1px solid #e5e5e5; border-top: 1px solid #e5e5e5; }' +
 	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 38px; margin-left: 45px;}' +
 	'.{plugin.class} .{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
+
+	'.{plugin.class} .{class:data} { padding: 7px 0px 0px 0px; }' +
+	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 16px; padding-bottom: 5px; padding-top: 0px; margin-top: 20px; padding-bottom: 0px; }' +
 
 	itemDepthRules.join("\n");
 

@@ -261,8 +261,8 @@ plugin.methods._getSubmitData = function() {
 };
 
 plugin.css =
-	".{plugin.class} .{class:container-root-thread} { padding: 10px 0px 10px 10px; }" +
-	".{plugin.class} .{plugin.class:replyForm} { apdding-right: 10px; }" +
+	".{plugin.class} .{plugin.class:replyForm}.{class:depth-1} { margin-bottom: 18px; }" +
+	".{plugin.class} .{plugin.class:replyForm} { padding-right: 16px; }" +
 	".{plugin.class} .{plugin.class:compactForm} { margin-top: 15px; padding-top: 0px; }" +
 	".{plugin.class} .{plugin.class:submitForm} { margin-top: 15px; padding-top: 0px; }" +
 	".{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 28px; line-height: 28px; }" +

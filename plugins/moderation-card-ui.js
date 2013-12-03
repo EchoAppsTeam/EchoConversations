@@ -480,16 +480,16 @@ plugin.css =
 	// advancedIntents
 	// hide switch for now
 	'.{plugin.class} .{class:modeSwitch} { width: 0px; }' +
-	'.{plugin.class:advancedIntents} { width: 16px; height: 16px; margin-right: 10px; background: url({%= baseURL %}/images/marker.png) no-repeat; }' +
+	'.{plugin.class:advancedIntents} { width: 16px; height: 16px; background: url({%= baseURL %}/images/marker.png) no-repeat; }' +
 	'.{plugin.class:advancedIntents} .dropdown-toggle { width: 16px; height: 16px; }' +
 	'.echo-sdk-ui .{plugin.class:advancedIntents} > .nav > li > a:hover, .echo-sdk-ui .{plugin.class:advancedIntents} > .nav > li > a:focus { background-color: transparent; }' +
 	'.echo-sdk-ui .{plugin.class:advancedIntents} .dropdown-menu { right: 0px; left: auto; }' +
 
 	// item statuses
-	'.{plugin.class:status-Untouched} { border-left: 7px solid #3498db; }' +
-	'.{plugin.class:status-ModeratorApproved} { border-left: 7px solid #15c177; }' +
-	'.{plugin.class:status-ModeratorDeleted} { border-left: 7px solid #bf383a; }' +
-	'.{plugin.class:status-SystemFlagged}, .{plugin.class:status-CommunityFlagged}, .{plugin.class:status-ModeratorFlagged} { border-left: 7px solid #ff9e00; }' +
+	'.{plugin.class:status-Untouched} { border-left: 8px solid #3498db; }' +
+	'.{plugin.class:status-ModeratorApproved} { border-left: 8px solid #15c177; }' +
+	'.{plugin.class:status-ModeratorDeleted} { border-left: 8px solid #bf383a; }' +
+	'.{plugin.class:status-SystemFlagged}, .{plugin.class:status-CommunityFlagged}, .{plugin.class:status-ModeratorFlagged} { border-left: 8px solid #ff9e00; }' +
 
 	// actor statuses
 	($.map({
