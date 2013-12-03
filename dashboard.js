@@ -48,6 +48,14 @@ dashboard.config = {
 			"title": "Auth"
 		},
 		"items": [{
+			"component": "Checkbox",
+			"name": "allowAnonymousSubmission",
+			"type": "boolean",
+			"config": {
+				"title": "Allow anonymous submission",
+				"desc": "Allow users to post without logging in"
+			}
+		}, {
 			"component": "Select",
 			"name": "janrainapp",
 			"type": "string",

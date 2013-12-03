@@ -7,8 +7,7 @@ var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 
 conversations.config = {
 	"auth":{
-		// TODO: rename to "allowAnonymousSubmission"
-		"enableAnonymousComments": false
+		"allowAnonymousSubmission": false
 	},
 	"dependencies": {
 		"Janrain": {"appId": undefined},
@@ -107,7 +106,7 @@ conversations.renderers.stream = function(element) {
 };
 
 conversations.methods._getSubmitPermissions = function() {
-	return this.config.get("auth.enableAnonymousComments") ? "allowGuest" : "forceLogin";
+	return this.config.get("auth.allowAnonymousSubmission") ? "allowGuest" : "forceLogin";
 };
 
 conversations.methods._buildSearchQuery = function() {
