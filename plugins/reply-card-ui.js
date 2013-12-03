@@ -330,7 +330,7 @@ $.map(["onRender", "onRerender"], function(topic) {
 });
 
 plugin.css =
-	'.{plugin.class} .{class:container} { padding-top: 5px; }';
+	'.{plugin.class} .{class:container} { padding-top: 5px; border: 0px; box-shadow: none; padding-top: 0px; padding-left: 0px; }';
 
 Echo.Plugin.create(plugin);
 
