@@ -139,8 +139,13 @@ plugin.renderers.likedBy = function(element) {
 	return element.show();
 };
 
+plugin.renderers.likeIcon = function(element) {
+	return !!this._getLikesCount()
+		? element : element.hide();
+};
+
 plugin.renderers.likers = function(element) {
-	var likesCount = this.component.get("data.object.accumulators.likesCount");
+	var likesCount = this._getLikesCount();
 	var counter = this.get("counter");
 	if (!counter) {
 		counter = new Echo.Apps.Conversations.RollingCounter({
@@ -151,6 +156,10 @@ plugin.renderers.likers = function(element) {
 	}
 	this.set("counter", counter);
 	return counter.roll(element, likesCount);
+};
+
+plugin.methods._getLikesCount = function() {
+	return this.component.get("data.object.accumulators.likesCount");
 };
 
 plugin.methods._initFacePile = function(config) {
