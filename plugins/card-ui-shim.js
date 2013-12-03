@@ -126,7 +126,7 @@ plugin.css =
 			'.{class:buttons} a.{class:button}:hover .{class:buttonIcon} { opacity: 1; }' +
 
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
-	'.{plugin.class} .{class:depth-0} .{class:footer} { border-bottom: 1px solid #e5e5e5; border-top: 1px solid #e5e5e5; padding-top: 8px; height: 28px; }' +
+	'.{plugin.class} .{class:depth-0} .{class:footer} { border-bottom: 1px solid #e5e5e5; border-top: 1px solid #e5e5e5; padding-top: 8px; height: 30px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} .{class:text} { line-height: 18px; font-family: Georgia, "Times New Roman", Times, serif; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
@@ -136,7 +136,7 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
 
 	'.{plugin.class} .{class:data} { padding: 7px 0px 0px 0px; }' +
-	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 16px; padding-bottom: 5px; padding-top: 0px; margin-top: 20px; padding-bottom: 0px; }' +
+	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 16px; padding-bottom: 5px; padding-top: 0px; margin-top: 16px; padding-bottom: 0px; }' +
 
 	itemDepthRules.join("\n");
 
