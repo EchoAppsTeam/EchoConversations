@@ -299,7 +299,7 @@ plugin.css =
 	'.{plugin.class} .{class:content} textarea.{class:textArea} { height: 75px; }' +
 	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d2d2d2; border-top: 0px; border-radius: 3px; }' +
 	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; box-shadow: 0px 1px 1px #d2d2d2; border: 1px solid #d2d2d2; border-radius: 3px; }' +
-	'.{plugin.class} .{class:body} { margin-top: 15px; }' +
+	'.{plugin.class} .{class:header} { margin-top: 15px; }' +
 	'.{plugin.class:loginRequirementNotice} { display: none; float: right; margin: 5px; margin: 8px 10px 0 0; color: red; font-weight: bold; font-family: Arial; font-size: 14px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
