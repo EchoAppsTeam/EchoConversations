@@ -37,6 +37,11 @@ conversations.config.normalizer = {
 conversations.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js",
 	"control": "Echo.StreamServer.Controls.Stream"
+}, {
+	"loaded": function() { return !!Echo.GUI; },
+	"url": "{config:cdnBaseURL.sdk}/gui.pack.js"
+}, {
+	"url": "{config:cdnBaseURL.sdk}/gui.pack.css"
 }];
 
 conversations.templates.main =
