@@ -173,9 +173,10 @@ plugin.init = function() {
 
 plugin.component.renderers.name = function(element) {
 	var auth = this.component, isSwitchAssembled = false;
+	var template = '<span class="{plugin.class:dropdown}"></span>';
 	new Echo.GUI.Dropdown({
 		"target": element,
-		"title": auth.user.get("name", ""),
+		"title": auth.user.get("name", "") + this.substitute({"template": template}),
 		"extraClass": "nav",
 		"entries": [{
 			"title": this.labels.get("switchIdentity"),
@@ -211,8 +212,9 @@ plugin.methods._detectAuthProvider = function() {
 
 plugin.css =
 	'.{plugin.class:via} { margin-left: 15px; color: #C6C6C6; line-height: 18px; font-size: 12px; }' +
-	'.{class:name} ul.nav { margin-bottom: 3px; }' +
-	'.{class:name} ul.nav .dropdown-menu li > a { font-size: 14px; }' +
+	'.{plugin.class} .{class:name} .{plugin.class:dropdown} { background: url("{%= baseURL %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
+	'.{plugin.class} .{class:name} ul.nav { margin-bottom: 3px; }' +
+	'.{plugin.class} .{class:name} ul.nav .dropdown-menu li > a { font-size: 14px; }' +
 	'.{plugin.class} .{class:avatar} img { border-radius: 50%; }' +
 	'.{plugin.class} .{class:login}, .{plugin.class} .{class:signup} { color: #006DCC; }' +
 	'.{plugin.class} .{class:userAnonymous} { margin: 0px 0px 7px 2px; text-align: left; font-family: Arial; }' +
