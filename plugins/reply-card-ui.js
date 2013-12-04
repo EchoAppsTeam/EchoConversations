@@ -261,10 +261,9 @@ plugin.methods._getSubmitData = function() {
 };
 
 plugin.css =
-	".{plugin.class} .{plugin.class:replyForm}.{class:depth-1} { margin-bottom: 18px; }" +
 	".{plugin.class} .{plugin.class:replyForm} { margin-right: 20px; }" +
-	".{plugin.class} .{plugin.class:compactForm} { margin-top: 15px; padding-top: 0px; }" +
-	".{plugin.class} .{plugin.class:submitForm} { margin-top: 15px; padding-top: 0px; }" +
+	".{plugin.class} .{plugin.class:compactForm} { margin-top: 15px; margin-bottom: 18px; padding-top: 0px; }" +
+	".{plugin.class} .{plugin.class:submitForm} { margin-top: 15px; margin-bottom: 18px; padding-top: 0px; }" +
 	".{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 28px; line-height: 28px; }" +
 	".{plugin.class:avatar} { width: 28px; height: 28px; border-radius: 50%; margin: 1px 0px 0px 3px; }" +
 	".{plugin.class} .{plugin.class:avatar} > img { width: 28px; height: 28px; }" +
@@ -329,7 +328,7 @@ $.map(["onRender", "onRerender"], function(topic) {
 });
 
 plugin.css =
-	'.{plugin.class} .{class:container} { padding-right: 0px; border: 0px; box-shadow: none; padding-top: 0px; padding-left: 0px; }';
+	'.{plugin.class} .{class:container} { padding: 0px; border: 0px; box-shadow: none; }';
 
 Echo.Plugin.create(plugin);
 
