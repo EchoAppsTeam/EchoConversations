@@ -46,20 +46,6 @@ plugin.renderers.date = function(element) {
 	return element.html(this.age);
 };
 
-plugin.component.renderers.container = function() {
-	var self = this, item = this.component;
-	var element  = this.parentRenderer("container", arguments);
-	// TODO: this solution should be replaced by generic one
-	return element.hover(function() {
-		var likeIcon = item.get("likeIcon");
-		likeIcon && likeIcon.addClass(self.cssPrefix + "active");
-	}, function() {
-		var likeIcon = item.get("likeIcon");
-		likeIcon && likeIcon.removeClass(self.cssPrefix + "active");
-	});
-};
-
-
 plugin.component.renderers._button = function(element, extra) {
 	var template = extra.template || plugin.templates.button;
 

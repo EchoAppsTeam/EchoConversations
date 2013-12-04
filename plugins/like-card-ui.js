@@ -86,7 +86,6 @@ plugin.events = {
  */
 plugin.templates.main =
 	'<div class="{plugin.class:likesArea}">' +
-		'<div class="{plugin.class:likeIcon}"></div>' +
 		'<div class="{plugin.class:likedBy}"></div>' +
 		'<div class="{plugin.class:likers}"></div>' +
 		'<div class="echo-clear"></div>' +
@@ -137,12 +136,6 @@ plugin.renderers.likedBy = function(element) {
 		this._initFacePile(config);
 	}
 	return element.show();
-};
-
-plugin.renderers.likeIcon = function(element) {
-	this.component.set("likeIcon", element);
-	return !!this._getLikesCount()
-		? element : element.hide();
 };
 
 plugin.renderers.likers = function(element) {
@@ -268,13 +261,12 @@ plugin.methods._assembleButton = function(name) {
 
 plugin.css =
 	'.{plugin.class:likesArea} { float: right; }' +
-	'.{plugin.class:likeIcon} { float: left; height: 20px; width: 20px; opacity: 0.3; margin-right: 7px; background: url({%= baseURL %}/images/like.png) no-repeat 0px 1px; }' +
-	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 5px; vertical-align: text-top;}' +
-	'.{plugin.class:likers} { float: left; position: relative; border: 1px solid #c6c6c6; border-radius: 50%; color: #c6c6c6; display: inline-block; font-size: 10px; height: 20px; line-height: 22px; text-align: center; vertical-align: text-top; width: 20px; overflow: hidden; }' +
-	'.{plugin.class:highlight} { line-height: 23px; }' +
-	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-item-avatar { border-radius: 50%; }' +
-	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-item-avatar img { border-radius: 50%; height: 20px; width: 20px; }' +
-	'.{plugin.class:likedBy} echo-streamserver-controls-facepile-and { display: none; }';
+	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 3px; line-height: 10px; }' +
+	'.{plugin.class:likers} { float: left; position: relative; border: 1px solid #c6c6c6; border-radius: 50%; color: #c6c6c6; display: inline-block; font-size: 10px; height: 20px; line-height: 22px; text-align: center; width: 20px; overflow: hidden; }' +
+	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-container { line-height: 12px; vertical-align: top; }' +
+	'.{plugin.class} .echo-streamserver-controls-facepile-item-avatar { border-radius: 50%; width: 22px; height: 22px; }' +
+	'.{plugin.class} .echo-streamserver-controls-facepile-item-avatar img { border-radius: 50%; height: 22px; width: 22px; }' +
+	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-and { display: none; }';
 
 Echo.Plugin.create(plugin);
 
