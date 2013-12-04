@@ -128,6 +128,10 @@ conversations.methods._buildSearchQuery = function() {
 		" children:2 " + states;
 };
 
+conversations.css =
+	// set box-sizing property for all nested elements to default (content-box) as its can be overwritten on the page.
+	'.{class:container} * { box-sizing: content-box; -moz-box-sizing: content-box; }';
+
 Echo.App.create(conversations);
 
 })(Echo.jQuery);
