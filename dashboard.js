@@ -40,6 +40,16 @@ dashboard.config = {
 			"defaultValueTitle": "Use Current Page URL",
 			"customValueTitle": "Use this URL"
 		}
+	},{
+		"component": "Input",
+		"name": "generalCollectionQuery",
+		"type": "string",
+		"default": "",
+		"config": {
+			"title": "Override the General Collection Query with the following value",
+			"desc": "enerally used at runtime to override the query used when displaying the general collection of posts",
+			"data": {"sample": "childrenof:{data:conversationID} type:comment state:Untouched,ModeratorApproved children:2"}
+		}
 	}, {
 		"component": "Group",
 		"name": "auth",

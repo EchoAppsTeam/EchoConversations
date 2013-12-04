@@ -14,6 +14,7 @@ conversations.config = {
 		"StreamServer": {"appkey": undefined}
 	},
 	"conversationID": "",
+	"generalCollectionQuery": "",
 	"itemStates": "Untouched,ModeratorApproved",
 	"liveUpdates": {
 		"transport": "websockets"
@@ -121,11 +122,18 @@ conversations.methods._getSubmitPermissions = function() {
 };
 
 conversations.methods._buildSearchQuery = function() {
-	// TODO: think about more scalable approach to override query predicates...
 	var states = "state:" + this.config.get("itemStates");
-	return "childrenof:" + this.config.get("conversationID") +
-		" type:comment " + states +
-		" children:2 " + states;
+	var generalCollectionQuery = this.config.get("generalCollectionQuery")
+		|| "childrenof:{data:conversationID}" +
+			" type:comment " + states +
+			" children:2 " + states;
+
+	return this.substitute({
+		"template": generalCollectionQuery,
+		"data": {
+			"conversationID": this.config.get("conversationID")
+		}
+	});
 };
 
 conversations.css =
