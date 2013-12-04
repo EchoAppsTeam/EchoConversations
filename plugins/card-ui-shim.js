@@ -94,7 +94,7 @@ plugin.css =
 	'.{plugin.class} .{class:footer} { height: 22px; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
-	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 13px; line-height: 1.4; font-family: "Helvetica Neue", arial, sans-serif; }' +
+	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 12px; line-height: 1.5; font-family: "Helvetica Neue", arial, sans-serif; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 0px 0px 0px 16px; margin-top: 20px; }' +
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
