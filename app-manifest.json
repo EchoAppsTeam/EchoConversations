@@ -17,6 +17,13 @@
 		"script": "{%=baseURL%}/dashboard.js",
 		"component": "Echo.Apps.Conversations.Dashboard",
 		"type": "instances"
+	}, {
+		"id": "docs",
+		"type": "external",
+		"title": "Documentation",
+		"config": {
+			"src": "http://emb.echoplatform.com/conversations/docs/overview"
+		}
 	}],
 	"client_widget": {
 		"component": "Echo.Apps.Conversations",
