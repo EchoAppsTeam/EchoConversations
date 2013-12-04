@@ -51,6 +51,14 @@ dashboard.config = {
 			"data": {"sample": "childrenof:{data:conversationID} type:comment state:Untouched,ModeratorApproved children:2"}
 		}
 	}, {
+		"component": "Checkbox",
+		"name": "bozoFilter",
+		"type": "boolean",
+		"config": {
+			"title": "Enable Bozo Filter",
+			"desc": "If enabled, ensures that users see their own post irrespective of the moderation state of that post"
+		}
+	}, {
 		"component": "Group",
 		"name": "auth",
 		"type": "object",

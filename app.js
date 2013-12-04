@@ -15,6 +15,7 @@ conversations.config = {
 	},
 	"conversationID": "",
 	"generalCollectionQuery": "",
+	"bozoFilter": false,
 	"itemStates": "Untouched,ModeratorApproved",
 	"liveUpdates": {
 		"transport": "websockets"
@@ -22,6 +23,10 @@ conversations.config = {
 };
 
 conversations.config.normalizer = {
+	"appkey": function() {
+		// We should move appkey to root level, otherwise user will not be initialized.
+		return this.get("dependencies.StreamServer.appkey");
+	},
 	"conversationID": function(value) {
 		return value
 			|| $("link[rel='canonical']").attr('href')
@@ -122,11 +127,18 @@ conversations.methods._getSubmitPermissions = function() {
 };
 
 conversations.methods._buildSearchQuery = function() {
-	var states = "state:" + this.config.get("itemStates");
-	var generalCollectionQuery = this.config.get("generalCollectionQuery")
-		|| "childrenof:{data:conversationID}" +
-			" type:comment " + states +
-			" children:2 " + states;
+	var generalCollectionQuery = this.config.get("generalCollectionQuery");
+
+	if (!generalCollectionQuery) {
+		var states = this.config.get("itemStates");
+		var userId = this.user && this.user.get("identityUrl");
+		var operators = (this.config.get("bozoFilter") && userId)
+			? "(state:" + states+ " OR user.id:" + userId+ ")"
+			: "state: " + states;
+		generalCollectionQuery = "childrenof:{data:conversationID}" +
+			" type:comment " + operators +
+			" children:2 " + operators;
+	}
 
 	return this.substitute({
 		"template": generalCollectionQuery,
