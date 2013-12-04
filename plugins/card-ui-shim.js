@@ -203,7 +203,8 @@ plugin.methods._detectAuthProvider = function() {
 	var providers = {
 		"twitter.com": "Twitter",
 		"facebook.com": "Facebook",
-		"google.com": "Google"
+		"google.com": "Google",
+		"me.yahoo.com": "Yahoo"
 	};
 	var id = this.component.user.get("identityUrl", "");
 	var domain = Echo.Utils.parseURL(id).domain;
