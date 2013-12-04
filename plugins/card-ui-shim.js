@@ -80,7 +80,7 @@ plugin.component.renderers._button = function(element, extra) {
 var itemDepthRules = [];
 // 100 is a maximum level of children in query, but we can apply styles for ~20
 for (var i = 0; i <= 20; i++) {
-	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 16 + (i - 1) * 25 : 16) + 'px; }');
+	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 16 + (i - 1) * 39 : 16) + 'px; }');
 }
 
 plugin.css =
