@@ -84,7 +84,6 @@ for (var i = 0; i <= 20; i++) {
 }
 
 plugin.css =
-	'.{plugin.class} .{plugin.class:active} { opacity: 1; }' +
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #ffffff; }' +
 	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
 
@@ -95,7 +94,7 @@ plugin.css =
 	'.{plugin.class} .{class:footer} { height: 22px; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
-	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 13px; line-height: 17px; font-family: Georgia, "Times New Roman", Times, serif; }' +
+	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 13px; line-height: 1.4; font-family: "Helvetica Neue", arial, sans-serif; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 0px 0px 0px 16px; margin-top: 20px; }' +
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
@@ -114,7 +113,6 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { border-bottom: 1px solid #e5e5e5; border-top: 1px solid #e5e5e5; padding-top: 8px; height: 30px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; }' +
-	'.{plugin.class} .{class:depth-0} .{class:body} .{class:text} { line-height: 18px; font-family: Georgia, "Times New Roman", Times, serif; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} img { height: 36px; width: 36px; border-radius: 50%;}' +
 	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 38px; margin-left: 45px;}' +
