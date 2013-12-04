@@ -40,6 +40,7 @@ conversations.templates.main =
 	'</div>';
 
 conversations.renderers.submit = function(element) {
+	var targetURL = this.config.get("conversationID");
 	var submitPermissions = this._getSubmitPermissions();
 	this.initComponent({
 		"id": "stream",
@@ -47,7 +48,7 @@ conversations.renderers.submit = function(element) {
 		"config": {
 			"appkey": this.config.get("dependencies.StreamServer.appkey"),
 			"target": element,
-			"targetURL": this.config.get("conversationID"),
+			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
 			"liveUpdates": this.config.get("liveUpdates"),
 			"plugins": [{
@@ -62,7 +63,17 @@ conversations.renderers.submit = function(element) {
 			}, {
 				"name": "CardUIShim",
 				"submitPermissions": submitPermissions
-			}]
+			}],
+			"data": {
+				"object": {
+					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
+				}
+			},
+			"ready": function() {
+				this.view.get("text").on("change", function() {
+					Echo.Utils.set(Echo.Variables, targetURL, $(this).val());
+				});
+			}
 		}
 	});
 };
