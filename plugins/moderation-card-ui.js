@@ -14,19 +14,18 @@ plugin.init = function() {
 	var item = this.component;
 	this.extendTemplate("insertAfter", "avatar", plugin.templates.status);
 
-	this.extendTemplate("insertAfter", "modeSwitch", plugin.templates.advancedIntents);
-
-	item.addButtonSpec("ModerationCardUI", this._assembleApproveButton());
+	item.addButtonSpec("ModerationCardUI", this._assembleModerateButton());
 };
 
 plugin.config = {
 	"removePersonalItemsAllowed": false,
 	"userActions": ["ban", "permissions"],
-	"itemActions": ["spam", "delete"]
+	"itemActions": ["approve", "untouch", "spam", "delete"]
 };
 
 plugin.labels = {
-	"approveButton": "Moderate",
+	"moderateButton": "Moderate",
+	"approveButton": "Approve",
 	"deleteButton": "Delete",
 	"spamButton": "Spam",
 	"untouchButton": "Untouch",
@@ -83,38 +82,6 @@ plugin.templates.status =
 		'<div class="echo-clear"></div>' +
 	'</div>';
 
-plugin.templates.advancedIntents =
-	'<div class="pull-right {plugin.class:advancedIntents}"></div>';
-
-plugin.renderers.advancedIntents = function(element) {
-	var self = this;
-	var actions = this.config.get("itemActions").concat(this.config.get("userActions"));
-
-	var entries = [];
-	$.each(actions, function(i, action) {
-		var buttons = plugin.actionButtons[action];
-		var entry = buttons && $.isArray(buttons)
-			? self["_assemble" + Echo.Utils.capitalize(action) + "Button"].call(self)
-			: self._assembleButton(Echo.Utils.capitalize(action));
-		if (entry) {
-			entries.push(entry);
-		}
-	});
-
-	if (entries.length) {
-		new Echo.GUI.Dropdown({
-			"target": element,
-			"extraClass": "nav",
-			"entries": entries
-		});
-		if (!Echo.Utils.isMobileDevice()) element.addClass("hide");
-
-	} else {
-		element.hide();
-	}
-	return element;
-};
-
 plugin.component.renderers.avatar = function(element) {
 	var item = this.component;
 
@@ -133,16 +100,6 @@ plugin.component.renderers.container = function(element) {
 		element.addClass(this.cssPrefix + "status-" + status);
 	}
 
-	if (!Echo.Utils.isMobileDevice()) {
-		var advancedIntents = this.view.get("advancedIntents");
-		element
-			.off(["mouseleave", "mouseenter"])
-			.hover(function() {
-				advancedIntents.removeClass("hide");
-			}, function() {
-				advancedIntents.addClass("hide");
-			});
-	}
 	return this.parentRenderer("container", arguments);
 };
 
@@ -156,20 +113,11 @@ plugin.statuses = [
 	"SystemFlagged"
 ];
 
-plugin.button2icon = {
-	"Approve": "{%= baseURL %}/images/moderate.png"
-};
-
 plugin.button2status = {
 	"Spam": "ModeratorFlagged",
 	"Delete": "ModeratorDeleted",
 	"Approve": "ModeratorApproved",
 	"Untouch": "Untouched"
-};
-
-plugin.actionButtons = {
-	"ban": ["Ban", "UnBan"],
-	"permissions": ["UserPermissions"]
 };
 
 plugin.roles = ["", "moderator", "administrator"];
@@ -306,52 +254,36 @@ plugin.methods._assembleButton = function(name) {
 	};
 };
 
-plugin.methods._assembleApproveButton = function() {
+plugin.methods._assembleModerateButton = function() {
 	var self = this;
-	var callback = function() {
-		var item = this;
-		var status = "ModeratorApproved";
-		item.block(self.labels.get("changingStatusTo" + status));
-		var activity = {
-			"verbs": ["http://activitystrea.ms/schema/1.0/update"],
-			"targets": [{"id": item.get("data.object.id")}],
-			"actor": {"title": item.get("data.actor.id")},
-			"object": {
-				"state": status
-			}
-		};
-		self._sendRequest({
-			"content": activity,
-			"appkey": item.config.get("appkey"),
-			"sessionID": item.user.get("sessionID"),
-			"target-query": item.config.get("parent.query")
-		}, function(response) {
-			self._publishCompleteActionEvent({
-				"name": "Approve",
-				"state": "Complete",
-				"response": response
-			});
-			self._changeItemStatus(status);
-			self.requestDataRefresh();
-		}, function(response) {
-			self._publishCompleteActionEvent({
-				"name": "Approve",
-				"state": "Error",
-				"response": response
-			});
-			item.unblock();
-		});
-	};
+	var userActions = this.config.get("userActions");
+	var actions = this.config.get("itemActions").concat(userActions);
 	return function() {
-		var item = this;
-		var status = "ModeratorApproved";
+		var entries = [];
+		$.map(actions, function(action) {
+			var button = (~$.inArray(action, userActions))
+				? self["_assemble" + Echo.Utils.capitalize(action) + "Button"]()
+				: self._assembleButton(Echo.Utils.capitalize(action));
+			if (button) entries.push(button);
+		});
+		var element = $("<span>");
+		new Echo.GUI.Dropdown({
+			"target": element,
+			"extraClass": "nav " + self.cssPrefix + "moderateButton",
+			"title": self.labels.get("moderateButton"),
+			"entries": entries
+		});
+
 		return {
-			"name": "Approve",
-			"label": self.labels.get("approveButton"),
-			"icon": plugin.button2icon["Approve"],
-			"visible": item.get("data.object.status") !== status &&
-					(item.user.is("admin") || status === "UserDeleted"),
-			"callback": callback
+			"name": "Moderate",
+			"element": element,
+			"icon": "{%= baseURL %}/images/moderate.png",
+			"visible": this.user.is("admin"),
+			"callback": function() {
+				element.find(".dropdown-toggle")
+					.removeAttr("href")
+					.dropdown("toggle");
+			}
 		};
 	};
 };
@@ -361,7 +293,9 @@ plugin.methods._assembleBanButton = function() {
 	var isBanned = this._isUserBanned();
 	var item = this.component;
 
-	if (!item.user.is("admin")) return false;
+	if (item.get("data.actor.id") === item.user.config.get("fakeIdentityURL")) {
+		return false;
+	}
 
 	// TODO handle anonymous(fake) users
 	return {
@@ -369,6 +303,7 @@ plugin.methods._assembleBanButton = function() {
 		"handler": function() {
 			var newState = isBanned ? "Untouched" : "ModeratorBanned";
 			var action = isBanned ? "UnBan" : "Ban";
+			item.block(self.labels.get("processingAction", {"state": newState}));
 			self._sendUserUpdate({
 				"field": "state",
 				"value": newState,
@@ -383,6 +318,7 @@ plugin.methods._assembleBanButton = function() {
 						"field": "state",
 						"value": newState
 					});
+					item.unblock();
 				},
 				"onError": function(response) {
 					self._publishCompleteActionEvent({
@@ -390,6 +326,7 @@ plugin.methods._assembleBanButton = function() {
 						"state": "Error",
 						"response": response
 					});
+					item.unblock();
 				}
 			});
 		}
@@ -402,7 +339,9 @@ plugin.methods._assemblePermissionsButton = function() {
 	var role = this._getRole();
 	var next = this._getNextRole(role);
 
-	if (!item.user.is("admin")) return false;
+	if (item.get("data.actor.id") === item.user.config.get("fakeIdentityURL")) {
+		return false;
+	}
 
 	return {
 		"title": this.labels.get((next || "user") + "Button"),
@@ -413,6 +352,8 @@ plugin.methods._assemblePermissionsButton = function() {
 				: Echo.Utils.foldl([], item.get("data.actor.roles") || [], function(_role, acc) {
 					if ($.inArray(_role, plugin.roles) < 0) acc.push(_role);
 				});
+				var label = next === "" ? "unset" : "set";
+				item.block(self.labels.get(label + "RoleAction", {"role": next || role}));
 				self._sendUserUpdate({
 					"field": "roles",
 					"value": roles.length ? roles.join(",") : "-",
@@ -427,6 +368,7 @@ plugin.methods._assemblePermissionsButton = function() {
 							"field": "roles",
 							"value": roles
 						});
+						item.unblock();
 					},
 					"onError": function(response) {
 						self._publishCompleteActionEvent({
@@ -434,6 +376,7 @@ plugin.methods._assemblePermissionsButton = function() {
 							"state": "Error",
 							"response": response
 						});
+						item.unblock();
 					}
 				});
 		}
@@ -477,13 +420,17 @@ plugin.methods._getNextRole = function(role) {
 
 
 plugin.css =
-	// advancedIntents
 	// hide switch for now
 	'.{plugin.class} .{class:modeSwitch} { width: 0px; }' +
-	'.{plugin.class:advancedIntents} { width: 16px; height: 16px; background: url({%= baseURL %}/images/marker.png) no-repeat; }' +
-	'.{plugin.class:advancedIntents} .dropdown-toggle { width: 16px; height: 16px; }' +
-	'.echo-sdk-ui .{plugin.class:advancedIntents} > .nav > li > a:hover, .echo-sdk-ui .{plugin.class:advancedIntents} > .nav > li > a:focus { background-color: transparent; }' +
-	'.echo-sdk-ui .{plugin.class:advancedIntents} .dropdown-menu { right: 0px; left: auto; }' +
+
+	// Moderate button
+	'.{plugin.class:moderateButton} { display: inline-block; }' +
+	'.echo-sdk-ui .{plugin.class:moderateButton} .dropdown-toggle { color: inherit; }' +
+
+	'.echo-sdk-ui .{plugin.class:moderateButton}.nav > li > a,' +
+	'.echo-sdk-ui .{plugin.class:moderateButton}.nav > li > a:hover,' +
+	'.echo-sdk-ui .{plugin.class:moderateButton}.nav > li > a:focus' +
+	'  { background-color: transparent; }' +
 
 	// item statuses
 	'.{plugin.class:status-Untouched} { border-left: 8px solid #3498db; }' +
@@ -508,7 +455,7 @@ Echo.Plugin.create(plugin);
 
 })(Echo.jQuery);
 
-(function(jQuery) {
+(function() {
 "use strict";
 
 var plugin = Echo.Plugin.manifest("ModerationCardUI", "Echo.StreamServer.Controls.Stream");

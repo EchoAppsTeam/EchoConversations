@@ -57,6 +57,9 @@ plugin.component.renderers._button = function(element, extra) {
 	var button = $(this.substitute({"template": template, "data": data}));
 	if (!extra.clickable) return element.append(button);
 	var clickables = $(".echo-clickable", button);
+	if (extra.element) {
+		button.find("span").empty().append(extra.element);
+	}
 	if (!clickables.length) {
 		clickables = button;
 		button.addClass("echo-clickable");
@@ -74,7 +77,7 @@ plugin.component.renderers._button = function(element, extra) {
 	if (Echo.Utils.isMobileDevice()) {
 		clickables.addClass("echo-linkColor");
 	}
-        return element.append(button);
+	return element.append(button);
 };
 
 var itemDepthRules = [];
@@ -90,7 +93,7 @@ plugin.css =
 	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
 	'.{plugin.class} .{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
 
-	'.{plugin.class} .{class:buttons} { margin-left: 0px; }' +
+	'.{plugin.class} .{class:buttons} { margin-left: 0px; white-space: nowrap; }' +
 	'.{plugin.class} .{class:footer} { height: 22px; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
