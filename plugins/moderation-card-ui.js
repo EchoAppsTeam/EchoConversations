@@ -433,10 +433,10 @@ plugin.css =
 	'  { background-color: transparent; }' +
 
 	// item statuses
-	'.{plugin.class:status-Untouched} { border-left: 8px solid #3498db; }' +
-	'.{plugin.class:status-ModeratorApproved} { border-left: 8px solid #15c177; }' +
-	'.{plugin.class:status-ModeratorDeleted} { border-left: 8px solid #bf383a; }' +
-	'.{plugin.class:status-SystemFlagged}, .{plugin.class:status-CommunityFlagged}, .{plugin.class:status-ModeratorFlagged} { border-left: 8px solid #ff9e00; }' +
+	'.{plugin.class} .{plugin.class:status-Untouched} { border-left: 8px solid #3498db; }' +
+	'.{plugin.class} .{plugin.class:status-ModeratorApproved} { border-left: 8px solid #15c177; }' +
+	'.{plugin.class} .{plugin.class:status-ModeratorDeleted} { border-left: 8px solid #bf383a; }' +
+	'.{plugin.class} .{plugin.class:status-SystemFlagged}, .{plugin.class:status-CommunityFlagged}, .{plugin.class:status-ModeratorFlagged} { border-left: 8px solid #ff9e00; }' +
 
 	// actor statuses
 	($.map({

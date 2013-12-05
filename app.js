@@ -98,6 +98,7 @@ conversations.renderers.stream = function(element) {
 			"appkey": this.config.get("dependencies.StreamServer.appkey"),
 			"target": element,
 			"query": this._buildSearchQuery(),
+			"fadeTimeout": 0,
 			"item": {
 				"reTag": false
 			},

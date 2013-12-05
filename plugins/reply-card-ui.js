@@ -261,9 +261,9 @@ plugin.methods._getSubmitData = function() {
 };
 
 plugin.css =
-	".{plugin.class} .{plugin.class:replyForm} { margin-right: 20px; }" +
-	".{plugin.class} .{plugin.class:compactForm} { margin-top: 15px; margin-bottom: 18px; padding-top: 0px; }" +
-	".{plugin.class} .{plugin.class:submitForm} { margin-top: 15px; margin-bottom: 18px; padding-top: 0px; }" +
+	".{plugin.class} .{plugin.class:replyForm} { margin-right: 20px; border-left: 8px solid transparent; }" +
+	".{plugin.class} .{plugin.class:compactForm} { margin-top: 20px; margin-bottom: 18px; padding-top: 0px; }" +
+	".{plugin.class} .{plugin.class:submitForm} { margin-top: 20px; margin-bottom: 18px; padding-top: 0px; }" +
 	".{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 28px; line-height: 28px; }" +
 	".{plugin.class:avatar} { width: 28px; height: 28px; border-radius: 50%; margin: 1px 0px 0px 3px; }" +
 	".{plugin.class} .{plugin.class:avatar} > img { width: 28px; height: 28px; }" +
@@ -277,7 +277,7 @@ Echo.Plugin.create(plugin);
 
 })(Echo.jQuery);
 
-(function(jQuery) {
+(function() {
 "use strict";
 
 var plugin = Echo.Plugin.manifest("ReplyCardUI", "Echo.StreamServer.Controls.Stream");

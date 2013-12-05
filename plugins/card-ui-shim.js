@@ -1,4 +1,4 @@
-(function($) {
+(function() {
 "use strict";
 
 /**
@@ -26,7 +26,43 @@ Echo.Plugin.create(plugin);
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream.Item");
 
+plugin.events = {
+	"Echo.StreamServer.Controls.Stream.Item.onReady": function() {
+		if (this.get("isLiveUpdate")) {
+			var self = this;
+			var container = this.component.view.get("container");
+
+			var fade = function() {
+				if ($.inviewport(container, {"threshold": 0})) {
+					self.set("isLiveUpdate", false);
+					if (self._transitionSupported()) {
+						container.removeClass(self.cssPrefix + "liveUpdate");
+					} else {
+						setTimeout(function() {
+							// IE 8-9 doesn't support transition, so we just remove the highlighting.
+							// Maybe we should use jquery.animate (animating colors requires jQuery UI) ?
+							container.removeClass(self.cssPrefix + "liveUpdate");
+						}, self.config.get("fadeTimeout"));
+					}
+					$(document).off("scroll", fade).off("resize", fade);
+					return true;
+				} else {
+					return false;
+				}
+			};
+			if (!fade()) {
+				$(document).on("scroll", fade).on("resize", fade);
+			}
+		}
+	}
+};
+
+plugin.config = {
+	"fadeTimeout": 10000 // 10 seconds
+};
+
 plugin.init = function() {
+	this.set("isLiveUpdate", this.component.config.get("live"));
 	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
 	this.extendTemplate("remove", "date");
 };
@@ -44,6 +80,21 @@ plugin.renderers.date = function(element) {
 	// TODO: use parentRenderer here
 	this.age = this.component.getRelativeTime(this.component.timestamp);
 	return element.html(this.age);
+};
+
+plugin.component.renderers.container = function(element) {
+	if (this.get("isLiveUpdate")) {
+		element.addClass(this.cssPrefix + "liveUpdate");
+		var transition = "border-left " + this.config.get("fadeTimeout") + "ms linear";
+		element.css({
+			"transition": transition,
+			"-o-transition": transition,
+			"-ms-transition": transition,
+			"-moz-transition": transition,
+			"-webkit-transition": transition
+		});
+	}
+	return this.parentRenderer("container", arguments);
 };
 
 plugin.component.renderers._button = function(element, extra) {
@@ -80,13 +131,25 @@ plugin.component.renderers._button = function(element, extra) {
 	return element.append(button);
 };
 
+plugin.methods._transitionSupported = function() {
+	var s = document.createElement('p').style;
+	return 'transition' in s ||
+		'WebkitTransition' in s ||
+		'MozTransition' in s ||
+		'msTransition' in s ||
+		'OTransition' in s;
+};
+
 var itemDepthRules = [];
 // 100 is a maximum level of children in query, but we can apply styles for ~20
 for (var i = 0; i <= 20; i++) {
-	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 16 + (i - 1) * 39 : 16) + 'px; }');
+	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 8 + (i - 1) * 39 : 16) + 'px; }');
 }
 
 plugin.css =
+	'.{plugin.class} .{class:container} { border-left: 8px solid transparent; }' +
+	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} { border-left: 8px solid #f5ba47; }' +
+
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #ffffff; }' +
 	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
 
@@ -99,7 +162,7 @@ plugin.css =
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 12px; line-height: 1.5; font-family: "Helvetica Neue", arial, sans-serif; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
-	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 0px 0px 0px 16px; margin-top: 20px; }' +
+	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 0px 0px 0px 8px; margin-top: 20px; }' +
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
@@ -123,7 +186,7 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
 
 	'.{plugin.class} .{class:data} { padding: 7px 0px 0px 0px; }' +
-	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 16px; padding-bottom: 5px; padding-top: 0px; margin-top: 16px; padding-bottom: 0px; }' +
+	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 0px 16px 0px 8px; margin-top: 16px; }' +
 
 	itemDepthRules.join("\n");
 
