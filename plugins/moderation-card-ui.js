@@ -424,7 +424,7 @@ plugin.css =
 	'.{plugin.class} .{class:modeSwitch} { width: 0px; }' +
 
 	// Moderate button
-	'.{plugin.class:moderateButton} { display: inline-block; }' +
+	'.echo-sdk-ui .{plugin.class:moderateButton} { display: inline-block; margin-bottom: 0px; }' +
 	'.echo-sdk-ui .{plugin.class:moderateButton} .dropdown-toggle { color: inherit; }' +
 
 	'.echo-sdk-ui .{plugin.class:moderateButton}.nav > li > a,' +
