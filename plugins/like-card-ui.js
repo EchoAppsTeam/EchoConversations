@@ -264,6 +264,7 @@ plugin.css =
 	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 3px; line-height: 10px; }' +
 	'.{plugin.class:likers} { float: left; position: relative; border: 1px solid #c6c6c6; border-radius: 50%; color: #c6c6c6; display: inline-block; font-size: 10px; height: 20px; line-height: 22px; text-align: center; width: 20px; overflow: hidden; }' +
 	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-container { line-height: 12px; vertical-align: top; }' +
+	'.{plugin.class} .echo-streamserver-controls-facepile-item-container { position: relative; }' +
 	'.{plugin.class} .echo-streamserver-controls-facepile-item-avatar { border-radius: 50%; width: 22px; height: 22px; }' +
 	'.{plugin.class} .echo-streamserver-controls-facepile-item-avatar img { border-radius: 50%; height: 22px; width: 22px; }' +
 	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-and { display: none; }';
@@ -294,7 +295,7 @@ plugin.labels = {
 	/**
 	 * @echo_label
 	 */
-	"unlikeOnBehalf": "Unlike on behalf of this user"
+	"unlikeOnBehalf": "Unlike on behalf of {data:title}"
 };
 
 /**
@@ -305,11 +306,19 @@ plugin.templates.main = '<img class="{plugin.class:adminUnlike}" src="{config:cd
 /**
  * @echo_renderer
  */
-plugin.component.renderers.container = function(element) {
-	this.parentRenderer("container", arguments);
-	if (this.component.user.is("admin")) {
-		element.addClass(this.cssPrefix + "highlight");
-	}
+plugin.component.renderers.container = function() {
+	var self = this, item = this.component;
+	var element = this.parentRenderer("container", arguments);
+
+	return !item.user.is("admin")
+		? element
+		: element.on("mouseenter", function() {
+			self.view.get("adminUnlike").show();
+			item.view.get("avatar").addClass(self.cssPrefix + "pale");
+		}).on("mouseleave", function() {
+			self.view.get("adminUnlike").hide();
+			item.view.get("avatar").removeClass(self.cssPrefix + "pale");
+		});
 };
 
 /**
@@ -322,7 +331,6 @@ plugin.renderers.adminUnlike = function(element) {
 		return element.remove();
 	}
 	return element.one("click", function() {
-		item.view.get("container").css("opacity", 0.3);
 		/**
 		 * @echo_event Echo.StreamServer.Controls.FacePile.Item.Plugins.Like.onUnlike
 		 * Triggered when the item is "unliked" by admin on behalf of a user.
@@ -336,12 +344,24 @@ plugin.renderers.adminUnlike = function(element) {
 			"global": false,
 			"propagation": false
 		});
-	});
+	}).hide();
+};
+
+/**
+ * @echo_renderer
+ */
+plugin.component.renderers.avatar = function() {
+	var item = this.component;
+	var element = this.parentRenderer("avatar", arguments);
+
+	return !item.user.is("admin")
+		? element
+		: element.removeAttr("title");
 };
 
 plugin.css =
-	'.{plugin.class:adminUnlike} { cursor: pointer; margin-left: 3px; }' +
-	'.{plugin.class:highlight} { display: inline-block; line-height: 16px; background-color: #EEEEEE; padding: 1px 3px; border: 1px solid #D2D2D2; border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; margin: 0px 2px; }';
+	'.{plugin.class:pale} { opacity: 0.2; }' +
+	'.{plugin.class:adminUnlike} { cursor: pointer; position: absolute; top: 6px; left: 6px; }';
 
 Echo.Plugin.create(plugin);
 
