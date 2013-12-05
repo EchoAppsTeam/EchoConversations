@@ -83,7 +83,7 @@ plugin.component.renderers._button = function(element, extra) {
 var itemDepthRules = [];
 // 100 is a maximum level of children in query, but we can apply styles for ~20
 for (var i = 0; i <= 20; i++) {
-	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 16 + (i - 1) * 25 : 16) + 'px; }');
+	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 16 + (i - 1) * 39 : 16) + 'px; }');
 }
 
 plugin.css =
@@ -97,7 +97,7 @@ plugin.css =
 	'.{plugin.class} .{class:footer} { height: 22px; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
-	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 13px; line-height: 1.4; font-family: "Helvetica Neue", arial, sans-serif; }' +
+	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 12px; line-height: 1.5; font-family: "Helvetica Neue", arial, sans-serif; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 0px 0px 0px 16px; margin-top: 20px; }' +
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
@@ -287,7 +287,7 @@ plugin.css =
 	'.{plugin.class} .{class:tagsContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:markersContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:content} textarea.{class:textArea} { height: 75px; }' +
-	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d2d2d2; border-top: 0px; border-radius: 3px; }' +
+	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d2d2d2; border-top: 0px; }' +
 	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; box-shadow: 0px 1px 1px #d2d2d2; border: 1px solid #d2d2d2; border-radius: 3px; }' +
 	'.{plugin.class} .{class:header} { margin-top: 15px; }' +
 	'.{plugin.class:loginRequirementNotice} { display: none; float: right; margin: 5px; margin: 8px 10px 0 0; color: red; font-weight: bold; font-family: Arial; font-size: 14px; }' +
