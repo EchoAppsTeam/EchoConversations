@@ -39,7 +39,8 @@ plugin.config = {
 	 * @cfg {Boolean} asyncFacePileRendering
 	 * This parameter is used to enable FacePile control rendering in async mode.
 	 */
-	"asyncFacePileRendering": false
+	"asyncFacePileRendering": false,
+	"likesPerPage": 5
 };
 
 plugin.labels = {
@@ -87,7 +88,6 @@ plugin.events = {
 plugin.templates.main =
 	'<div class="{plugin.class:likesArea}">' +
 		'<div class="{plugin.class:likedBy}"></div>' +
-		'<div class="{plugin.class:likers}"></div>' +
 		'<div class="echo-clear"></div>' +
 	'</div>';
 
@@ -100,10 +100,7 @@ plugin.renderers.likedBy = function(element) {
 	if (!item.get("data.object.likes").length) {
 		return element.hide();
 	}
-	var likesPerPage = 5;
-	var visibleUsersCount = plugin.get("facePile")
-		? plugin.get("facePile").getVisibleUsersCount()
-		: likesPerPage;
+
 	var youLike = false;
 	var userId = item.user.get("identityUrl");
 	var users = item.get("data.object.likes");
@@ -113,13 +110,14 @@ plugin.renderers.likedBy = function(element) {
 			return false; // break
 		}
 	});
+
 	var config = plugin.config.assemble({
 		"target": element.get(0),
 		"data": {
-			"itemsPerPage": likesPerPage,
+			"itemsPerPage": this.config.get("likesPerPage"),
 			"entries": users
 		},
-		"initialUsersCount": visibleUsersCount,
+		"initialUsersCount": this.config.get("likesPerPage"),
 		"totalUsersCount": item.get("data.object.accumulators.likesCount"),
 		"item": {
 			"avatar": true,
@@ -136,20 +134,6 @@ plugin.renderers.likedBy = function(element) {
 		this._initFacePile(config);
 	}
 	return element.show();
-};
-
-plugin.renderers.likers = function(element) {
-	var likesCount = this._getLikesCount();
-	var counter = this.get("counter");
-	if (!counter) {
-		counter = new Echo.Apps.Conversations.RollingCounter({
-			"target": element,
-			"count": likesCount,
-			"speed": 200
-		});
-	}
-	this.set("counter", counter);
-	return counter.roll(element, likesCount);
 };
 
 plugin.methods._getLikesCount = function() {
@@ -262,12 +246,46 @@ plugin.methods._assembleButton = function(name) {
 plugin.css =
 	'.{plugin.class:likesArea} { float: right; }' +
 	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 3px; line-height: 10px; }' +
-	'.{plugin.class:likers} { float: left; position: relative; border: 1px solid #c6c6c6; border-radius: 50%; color: #c6c6c6; display: inline-block; font-size: 10px; height: 20px; line-height: 22px; text-align: center; width: 20px; overflow: hidden; }' +
 	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-container { line-height: 12px; vertical-align: top; }' +
 	'.{plugin.class} .echo-streamserver-controls-facepile-item-container { position: relative; }' +
 	'.{plugin.class} .echo-streamserver-controls-facepile-item-avatar { border-radius: 50%; width: 22px; height: 22px; }' +
 	'.{plugin.class} .echo-streamserver-controls-facepile-item-avatar img { border-radius: 50%; height: 22px; width: 22px; }' +
-	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-and { display: none; }';
+	'.{plugin.class} .echo-streamserver-controls-facepile-and { display: none; }';
+
+Echo.Plugin.create(plugin);
+
+})(Echo.jQuery);
+
+(function(jQuery) {
+"use strict";
+
+var plugin = Echo.Plugin.manifest("LikeCardUI", "Echo.StreamServer.Controls.FacePile");
+
+if (Echo.Plugin.isDefined(plugin)) return;
+
+plugin.init = function() {
+	this.extendTemplate("replace", "more", plugin.templates.more);
+};
+
+plugin.labels = {
+	"more": "and {count} more"
+};
+
+plugin.templates.more =
+	'<div class="{plugin.class:more}"></div>' +
+	'<div class="echo-clear"></div>';
+
+plugin.renderers.more = function(element) {
+	var pile = this.component;
+	element.empty();
+	return pile._isMoreButtonVisible()
+		? element.show().append(this.labels.get("more", {
+			"count": pile.get("count.total") - pile.get("count.visible")
+		}))
+		: element.hide();
+};
+plugin.css =
+	'.{plugin.class:more} { float: right; font-size: 12px; margin-top: 5px;  white-space: nowrap; }';
 
 Echo.Plugin.create(plugin);
 
