@@ -10,25 +10,19 @@ var dashboard = Echo.AppServer.Dashboard.manifest("Echo.Apps.Conversations.Dashb
 dashboard.inherits = Echo.Utils.getComponent("Echo.AppServer.Dashboards.AppSettings");
 
 dashboard.mappings = {
-	"appkey": {
+	"allowAnonymousSubmission": {
+		"key": "auth.allowAnonymousSubmission"
+	},
+	"dependencies.appkey": {
 		"key": "dependencies.StreamServer.appkey"
 	},
-	"auth.janrainapp": {
+	"dependencies.janrainapp": {
 		"key": "dependencies.Janrain.appId"
 	}
 };
 
 dashboard.config = {
 	"ecl": [{
-		"component": "Select",
-		"name": "appkey",
-		"type": "string",
-		"config": {
-			"title": "Application key",
-			"desc": "Specifies the application key for this instance",
-			"options": []
-		}
-	}, {
 		"component": "Echo.Apps.Conversations.Dashboard.TargetSelector",
 		"name": "conversationID",
 		"type": "string",
@@ -39,6 +33,14 @@ dashboard.config = {
 			"data": {"sample": "http://example.com/conversation"},
 			"defaultValueTitle": "Use Current Page URL",
 			"customValueTitle": "Use this URL"
+		}
+	}, {
+		"component": "Checkbox",
+		"name": "allowAnonymousSubmission",
+		"type": "boolean",
+		"config": {
+			"title": "Allow anonymous submission",
+			"desc": "Allow users to post without logging in"
 		}
 	},{
 		"component": "Input",
@@ -60,18 +62,19 @@ dashboard.config = {
 		}
 	}, {
 		"component": "Group",
-		"name": "auth",
+		"name": "dependencies",
 		"type": "object",
 		"config": {
-			"title": "Auth"
+			"title": "Dependencies"
 		},
 		"items": [{
-			"component": "Checkbox",
-			"name": "allowAnonymousSubmission",
-			"type": "boolean",
+			"component": "Select",
+			"name": "appkey",
+			"type": "string",
 			"config": {
-				"title": "Allow anonymous submission",
-				"desc": "Allow users to post without logging in"
+				"title": "Application key",
+				"desc": "Specifies the application key for this instance",
+				"options": []
 			}
 		}, {
 			"component": "Select",
