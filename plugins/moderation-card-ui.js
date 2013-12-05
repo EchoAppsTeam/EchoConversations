@@ -277,7 +277,7 @@ plugin.methods._assembleModerateButton = function() {
 		return {
 			"name": "Moderate",
 			"element": element,
-			"icon": "{%= baseURL %}/images/moderate.png",
+			"icon": "{%= baseURL %}/images/shield.png",
 			"visible": this.user.is("admin"),
 			"callback": function() {
 				element.find(".dropdown-toggle")
