@@ -181,7 +181,7 @@ plugin.css =
 	'.{plugin.class} .{class:buttons} { margin-left: 0px; white-space: nowrap; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
-	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 12px; line-height: 1.5; font-family: "Helvetica Neue", arial, sans-serif; }' +
+	'.{plugin.class} .{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; font-family: "Helvetica Neue", arial, sans-serif; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
 	'.{plugin.class} .{class:content} .{class:expandChildren} { margin-top: 15px; }' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 0px 0px 0px 8px; margin-top: 20px; }' +
