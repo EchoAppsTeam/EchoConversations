@@ -35,14 +35,14 @@ dashboard.config = {
 			"customValueTitle": "Use this URL"
 		}
 	},{
-		"component": "Input",
+		"component": "Textarea",
 		"name": "allPostsQuery",
 		"type": "string",
 		"default": "",
 		"config": {
 			"title": "All Posts Query override",
 			"desc": "Generally used at runtime to override the query used when displaying the general collection of posts",
-			"data": {"sample": "childrenof:{data:conversationID} type:comment state:Untouched,ModeratorApproved children:2"}
+			"data": {"sample": "childrenof:{data:targetURL} type:comment state:Untouched,ModeratorApproved children:2"}
 		}
 	}, {
 		"component": "Checkbox",
