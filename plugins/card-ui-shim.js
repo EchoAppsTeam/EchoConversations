@@ -19,12 +19,11 @@ plugin.init = function() {
 
 plugin.css =
 	'.{plugin.class} .{class:header} { display: none; }' +
-	'.{plugin.class} .{class:item} { margin: 10px 0px; padding: 0px 0px; box-shadow: 0px 1px 1px #d2d2d2; border: 1px solid #d2d2d2; }' +
 	'.{plugin.class} .{class:body} .echo-control-message { margin: 10px 0px; border: 1px solid #d2d2d2; box-shadow: 0px 1px 1px #d2d2d2; border-radius: 3px; color: #c6c6c6; padding: 30px 0px 30px 50%; text-align: left;}' +
 	'.{plugin.class} .{class:body} .echo-control-message .echo-control-message-info { height: 35px; margin-left: -50%; display: block; font-size: 14px; background-image: url({%= baseURL %}/images/info.png); padding-left: 40px; }' +
 	'.{plugin.class} .echo-control-message-info { background-image: url({%= baseURL %}/images/info.png); }' +
-
-	'.{plugin.class} .{class:item-children} .{class:item} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; }';
+	'.{plugin.class} .{class:item} { margin: 10px 0px; padding: 0px; padding-top: 15px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; background: #ffffff; }' +
+	'.{plugin.class} .{class:item-children} .{class:item} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; background: #f8f8f8; }';
 
 Echo.Plugin.create(plugin);
 
@@ -83,6 +82,9 @@ plugin.init = function() {
 plugin.templates.date =
 	'<div class="{plugin.class:date}"></div>';
 
+plugin.templates.wrapper =
+	'<div class="{plugin.class:wrapper}"></div>';
+
 plugin.templates.button =
 	'<a class="{class:button} {class:button}-{data:name}">' +
 		'<i class="{plugin.class:buttonIcon} {data:icon}"></i>' +
@@ -107,7 +109,12 @@ plugin.component.renderers.container = function(element) {
 			"-webkit-transition": transition
 		});
 	}
-	return this.parentRenderer("container", arguments);
+	element = this.parentRenderer("container", arguments);
+	return this.component.view.rendered()
+		? element
+		: element.wrap(this.substitute({
+			"template": plugin.templates.wrapper
+		}));
 };
 
 plugin.component.renderers._button = function(element, extra) {
@@ -160,24 +167,28 @@ for (var i = 0; i <= 20; i++) {
 }
 
 plugin.css =
-	'.{plugin.class} .{class:container} { border-left: 8px solid transparent; }' +
+	'.{plugin.class} .{plugin.class:wrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; }' +
+	'.{plugin.class} .{class:container} { border-left: 8px solid transparent; background: #ffffff; }' +
 	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} { border-left: 8px solid #f5ba47; }' +
 
-	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #ffffff; }' +
+	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
 	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
 
 	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
 	'.{plugin.class} .{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
 
+	'.{plugin.class} .{class:content} { background: #f8f8f8; }' +
 	'.{plugin.class} .{class:buttons} { margin-left: 0px; white-space: nowrap; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #262626; font-size: 12px; line-height: 1.5; font-family: "Helvetica Neue", arial, sans-serif; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
+	'.{plugin.class} .{class:content} .{class:expandChildren} { margin-top: 15px; }' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 0px 0px 0px 8px; margin-top: 20px; }' +
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
+	'.{plugin.class} .{class:children} .{plugin.class:wrapper} { padding-top: 0px; background: none; border: none; }' +
 	'.{plugin.class} .{class:container-child} { padding: 0px 0px 0px 16px; margin-top: 20px; }' +
 
 	'.{plugin.class} .{class:button} { margin-right: 10px; }' +
@@ -190,7 +201,7 @@ plugin.css =
 			'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
 
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
-	'.{plugin.class} .{class:depth-0} .{class:footer} { border-bottom: 1px solid #e5e5e5; border-top: 1px solid #e5e5e5; padding-top: 8px; height: 30px; }' +
+	'.{plugin.class} .{class:depth-0} .{class:footer} { padding-top: 8px; height: 30px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} img { height: 36px; width: 36px; border-radius: 50%;}' +
@@ -199,7 +210,7 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
 
 	'.{plugin.class} .{class:data} { padding: 7px 0px 0px 0px; }' +
-	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 0px 16px 0px 8px; margin-top: 16px; }' +
+	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 0px 16px 0px 8px; }' +
 
 	itemDepthRules.join("\n");
 
@@ -363,8 +374,8 @@ plugin.css =
 	'.{plugin.class} .{class:tagsContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:markersContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:content} textarea.{class:textArea} { height: 75px; }' +
-	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d2d2d2; border-top: 0px; }' +
-	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; box-shadow: 0px 1px 1px #d2d2d2; border: 1px solid #d2d2d2; border-radius: 3px; }' +
+	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; border-top: 0px; background: #ffffff;}' +
+	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{plugin.class} .{class:header} { margin-top: 15px; }' +
 	'.{plugin.class:loginRequirementNotice} { display: none; float: right; margin: 5px; margin: 8px 10px 0 0; color: red; font-weight: bold; font-family: Arial; font-size: 14px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';

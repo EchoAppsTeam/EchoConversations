@@ -262,12 +262,12 @@ plugin.methods._getSubmitData = function() {
 
 plugin.css =
 	".{plugin.class} .{plugin.class:replyForm} { margin-right: 20px; border-left: 8px solid transparent; }" +
-	".{plugin.class} .{plugin.class:compactForm} { margin-top: 20px; margin-bottom: 18px; padding-top: 0px; }" +
-	".{plugin.class} .{plugin.class:submitForm} { margin-top: 20px; margin-bottom: 18px; padding-top: 0px; }" +
+	".{plugin.class} .{plugin.class:compactForm} { padding-top: 18px; padding-bottom: 18px; }" +
+	".{plugin.class} .{plugin.class:submitForm} { padding-top: 18px; padding-bottom: 18px; }" +
 	".{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 28px; line-height: 28px; }" +
 	".{plugin.class:avatar} { width: 28px; height: 28px; border-radius: 50%; margin: 1px 0px 0px 3px; }" +
 	".{plugin.class} .{plugin.class:avatar} > img { width: 28px; height: 28px; }" +
-	".{plugin.class:compactBorder} { margin-left: 39px; border: 1px solid #d2d2d2; }" +
+	".{plugin.class:compactBorder} { margin-left: 39px; border: 1px solid #d8d8d8; }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-secondaryColor { color: #C6C6C6 }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-primaryFont { font-size: 12px; line-height: 24px; }" +
 	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'] { width: 100%; height: 24px; border: none; margin: 0px; padding: 0px; box-shadow: none; vertical-align: middle; }" +
