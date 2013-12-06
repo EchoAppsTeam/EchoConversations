@@ -19,15 +19,15 @@
 			"busName": "jskit"
 		},
 		"config": {
+			"target": document.getElementById("container"),
+			"targetURL": "http://echoplatform.com/test/conversations",
 			"auth": {
 				"allowAnonymousSubmission": true
 			},
-			"target": document.getElementById("container"),
 			"dependencies": {
 				"Janrain": {"appId": "echo"},
 				"StreamServer": {"appkey": "echo.jssdk.demo.aboutecho.com"}
-			},
-			"conversationID": "http://echoplatform.com/test/conversations"
+			}
 		}
 	});
 </script>

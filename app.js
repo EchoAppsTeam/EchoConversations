@@ -6,16 +6,16 @@ if (Echo.App.isDefined("Echo.Apps.Conversations")) return;
 var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 
 conversations.config = {
+	"targetURL": "",
+	"allPostsQuery": "",
 	"auth":{
 		"allowAnonymousSubmission": false
 	},
+	"bozoFilter": false,
 	"dependencies": {
 		"Janrain": {"appId": undefined},
 		"StreamServer": {"appkey": undefined}
 	},
-	"conversationID": "",
-	"generalCollectionQuery": "",
-	"bozoFilter": false,
 	"itemStates": "Untouched,ModeratorApproved",
 	"liveUpdates": {
 		"transport": "websockets"
@@ -27,7 +27,7 @@ conversations.config.normalizer = {
 		// We should move appkey to root level, otherwise user will not be initialized.
 		return this.get("dependencies.StreamServer.appkey");
 	},
-	"conversationID": function(value) {
+	"targetURL": function(value) {
 		return value
 			|| $("link[rel='canonical']").attr('href')
 			|| document.location.href.split("#")[0];
@@ -51,7 +51,7 @@ conversations.templates.main =
 	'</div>';
 
 conversations.renderers.submit = function(element) {
-	var targetURL = this.config.get("conversationID");
+	var targetURL = this.config.get("targetURL");
 	var submitPermissions = this._getSubmitPermissions();
 	this.initComponent({
 		"id": "stream",
@@ -133,23 +133,23 @@ conversations.methods._getSubmitPermissions = function() {
 };
 
 conversations.methods._buildSearchQuery = function() {
-	var generalCollectionQuery = this.config.get("generalCollectionQuery");
+	var allPostsQuery = this.config.get("allPostsQuery");
 
-	if (!generalCollectionQuery) {
+	if (!allPostsQuery) {
 		var states = this.config.get("itemStates");
 		var userId = this.user && this.user.get("identityUrl");
 		var operators = (this.config.get("bozoFilter") && userId)
 			? "(state:" + states+ " OR user.id:" + userId+ ")"
 			: "state: " + states;
-		generalCollectionQuery = "childrenof:{data:conversationID}" +
+		allPostsQuery = "childrenof:{data:targetURL}" +
 			" type:comment " + operators +
 			" children:2 " + operators;
 	}
 
 	return this.substitute({
-		"template": generalCollectionQuery,
+		"template": allPostsQuery,
 		"data": {
-			"conversationID": this.config.get("conversationID")
+			"targetURL": this.config.get("targetURL")
 		}
 	});
 };

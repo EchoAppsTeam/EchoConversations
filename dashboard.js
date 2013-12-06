@@ -24,15 +24,25 @@ dashboard.mappings = {
 dashboard.config = {
 	"ecl": [{
 		"component": "Echo.Apps.Conversations.Dashboard.TargetSelector",
-		"name": "conversationID",
+		"name": "targetURL",
 		"type": "string",
 		"default": "",
 		"config": {
-			"title": "Conversation ID",
+			"title": "Target URL",
 			"default": "",
 			"data": {"sample": "http://example.com/conversation"},
 			"defaultValueTitle": "Use Current Page URL",
 			"customValueTitle": "Use this URL"
+		}
+	},{
+		"component": "Input",
+		"name": "allPostsQuery",
+		"type": "string",
+		"default": "",
+		"config": {
+			"title": "All Posts Query override",
+			"desc": "Generally used at runtime to override the query used when displaying the general collection of posts",
+			"data": {"sample": "childrenof:{data:conversationID} type:comment state:Untouched,ModeratorApproved children:2"}
 		}
 	}, {
 		"component": "Checkbox",
@@ -41,16 +51,6 @@ dashboard.config = {
 		"config": {
 			"title": "Allow anonymous submission",
 			"desc": "Allow users to post without logging in"
-		}
-	},{
-		"component": "Input",
-		"name": "generalCollectionQuery",
-		"type": "string",
-		"default": "",
-		"config": {
-			"title": "Override the General Collection Query with the following value",
-			"desc": "Generally used at runtime to override the query used when displaying the general collection of posts",
-			"data": {"sample": "childrenof:{data:conversationID} type:comment state:Untouched,ModeratorApproved children:2"}
 		}
 	}, {
 		"component": "Checkbox",
@@ -72,7 +72,7 @@ dashboard.config = {
 			"name": "appkey",
 			"type": "string",
 			"config": {
-				"title": "Application key",
+				"title": "StreamServer application key",
 				"desc": "Specifies the application key for this instance",
 				"options": []
 			}
@@ -81,7 +81,7 @@ dashboard.config = {
 			"name": "janrainapp",
 			"type": "string",
 			"config": {
-				"title": "Janrain App",
+				"title": "Janrain application ID",
 				"validators": ["required"],
 				"options": []
 			}
