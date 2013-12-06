@@ -12,6 +12,7 @@ if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
 	var item = this.component;
+	this.set("itemStatus", item.get("data.object.status"));
 	this.extendTemplate("insertAfter", "avatar", plugin.templates.status);
 
 	item.addButtonSpec("ModerationCardUI", this._assembleModerateButton());
@@ -19,6 +20,7 @@ plugin.init = function() {
 
 plugin.config = {
 	"removePersonalItemsAllowed": false,
+	"statusAnimationTimeout": 1000, // milliseconds
 	"userActions": ["ban", "permissions"],
 	"itemActions": ["approve", "untouch", "spam", "delete"]
 };
@@ -55,8 +57,34 @@ plugin.labels = {
 	"statusUntouched": "New"
 };
 
-
 plugin.events = {
+	"Echo.StreamServer.Controls.Stream.Item.onRerender": function() {
+		var item = this.component;
+		if (item.user.is("admin")) {
+			var element = item.view.get("container");
+			var itemStatus = this.get("itemStatus") || "Untouched";
+			var newStatus = item.get("data.object.status") || "Untouched";
+
+			if (itemStatus !== newStatus) {
+				var transition = "border-left " + this.config.get("statusAnimationTimeout") + "ms linear";
+				element.css({
+					"transition": transition,
+					"-o-transition": transition,
+					"-ms-transition": transition,
+					"-moz-transition": transition,
+					"-webkit-transition": transition
+				});
+
+				// we should trigger some dom event in order to make transition work:
+				// http://stackoverflow.com/questions/12814612/css3-transition-to-highlight-new-elements-created-in-jquery
+				element.focus();
+
+				element.addClass(this.cssPrefix + "status-" + newStatus);
+				element.removeClass(this.cssPrefix + "status-" + itemStatus);
+				this.set("itemStatus", newStatus);
+			}
+		}
+	},
 	"Echo.StreamServer.Controls.Stream.Plugins.ModerationCardUI.onUserUpdate": function(topic, args) {
 		var target = this.component;
 		var source = args.item;
@@ -96,7 +124,7 @@ plugin.component.renderers.container = function(element) {
 	var item = this.component;
 
 	if (item.user.is("admin")) {
-		var status = item.get("data.object.status") || "Untouched";
+		var status = this.get("itemStatus") || "Untouched";
 		element.addClass(this.cssPrefix + "status-" + status);
 	}
 
