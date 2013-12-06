@@ -286,7 +286,7 @@ plugin.methods._detectAuthProvider = function() {
 };
 
 plugin.css =
-	'.{plugin.class:via} { margin-left: 15px; color: #C6C6C6; line-height: 18px; font-size: 12px; }' +
+	'.{plugin.class:via} { margin-left: 15px; color: #D3D3D3; line-height: 18px; font-size: 12px; font-family: Arial; }' +
 	'.{plugin.class} .{class:name} .{plugin.class:dropdown} { background: url("{%= baseURL %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
 	'.{plugin.class} .{class:name} ul.nav { margin-bottom: 3px; }' +
 	'.{plugin.class} .{class:name} ul.nav .dropdown-menu li > a { font-size: 14px; }' +
@@ -376,7 +376,7 @@ plugin.css =
 	'.{plugin.class} .{class:content} textarea.{class:textArea} { height: 75px; }' +
 	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; border-top: 0px; background: #ffffff;}' +
 	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
-	'.{plugin.class} .{class:header} { margin-top: 15px; }' +
+	'.{plugin.class} .{class:header} { margin-top: 10px; }' +
 	'.{plugin.class:loginRequirementNotice} { display: none; float: right; margin: 5px; margin: 8px 10px 0 0; color: red; font-weight: bold; font-family: Arial; font-size: 14px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
