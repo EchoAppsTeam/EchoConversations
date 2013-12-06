@@ -103,6 +103,9 @@ conversations.renderers.stream = function(element) {
 				"reTag": false
 			},
 			"plugins": [{
+				"name": "ItemsRollingWindow",
+				"moreButton": true
+			}, {
 				"name": "CardUIShim"
 			}, {
 				"name": "LikeCardUI"
