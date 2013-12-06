@@ -7,10 +7,23 @@
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream");
 
+plugin.labels = {
+	"emptyStream": "There are no contributions yet.<br>Be first to chime in!"
+};
+
+plugin.init = function() {
+	this.component.labels.set({
+		"emptyStream": this.labels.get("emptyStream")
+	});
+};
+
 plugin.css =
 	'.{plugin.class} .{class:header} { display: none; }' +
 	'.{plugin.class} .{class:item} { margin: 10px 0px; padding: 0px 0px; box-shadow: 0px 1px 1px #d2d2d2; border: 1px solid #d2d2d2; }' +
-	'.{plugin.class} .{class:body} .echo-control-message { margin: 10px 0px; border: 1px solid #d2d2d2; box-shadow: 1px solid #d2d2d2; }' +
+	'.{plugin.class} .{class:body} .echo-control-message { margin: 10px 0px; border: 1px solid #d2d2d2; box-shadow: 0px 1px 1px #d2d2d2; border-radius: 3px; color: #c6c6c6; padding: 30px 0px 30px 50%; text-align: left;}' +
+	'.{plugin.class} .{class:body} .echo-control-message .echo-control-message-info { height: 35px; margin-left: -50%; display: block; font-size: 14px; background-image: url({%= baseURL %}/images/info.png); padding-left: 40px; }' +
+	'.{plugin.class} .echo-control-message-info { background-image: url({%= baseURL %}/images/info.png); }' +
+
 	'.{plugin.class} .{class:item-children} .{class:item} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; }';
 
 Echo.Plugin.create(plugin);
