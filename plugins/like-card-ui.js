@@ -234,7 +234,7 @@ plugin.methods._assembleButton = function(name) {
 			})).length > 0 ? "Unlike" : "Like";
 		return {
 			"name": name,
-			"icon": "{%= baseURL %}/images/like.png",
+			"icon": "icon-heart",
 			"label": self.labels.get(name.toLowerCase() + "Control"),
 			"visible": item.user.is("logged") && action === name,
 			"once": true,
@@ -319,7 +319,7 @@ plugin.labels = {
 /**
  * @echo_template
  */
-plugin.templates.main = '<img class="{plugin.class:adminUnlike}" src="{config:cdnBaseURL.sdk-assets}/images/container/closeWindow.png"" title="{plugin.label:unlikeOnBehalf}" width="10" height="9">';
+plugin.templates.main = '<i class="{plugin.class:adminUnlike} icon-remove" title="{plugin.label:unlikeOnBehalf}"></i>';
 
 /**
  * @echo_renderer
@@ -379,7 +379,7 @@ plugin.component.renderers.avatar = function() {
 
 plugin.css =
 	'.{plugin.class:pale} { opacity: 0.2; }' +
-	'.{plugin.class:adminUnlike} { cursor: pointer; position: absolute; top: 6px; left: 6px; }';
+	'.{plugin.class:adminUnlike} { cursor: pointer; position: absolute; top: 3px; left: 4px; opacity: 0.8; }';
 
 Echo.Plugin.create(plugin);
 

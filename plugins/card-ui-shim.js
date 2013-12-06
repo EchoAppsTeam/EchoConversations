@@ -72,7 +72,7 @@ plugin.templates.date =
 
 plugin.templates.button =
 	'<a class="{class:button} {class:button}-{data:name}">' +
-		'<img class="{class:buttonIcon}" src="{data:icon}">' +
+		'<i class="{plugin.class:buttonIcon} {data:icon}"></i>' +
 		'<span class="{class:buttonCaption}">{data:label}</span>' +
 	'</a>';
 
@@ -103,7 +103,7 @@ plugin.component.renderers._button = function(element, extra) {
 	var data = {
 		"label": extra.label || "",
 		"name": extra.name,
-		"icon": extra.icon || "{%= baseURL %}/images/comment.png"
+		"icon": extra.icon || "icon-comment"
 	};
 	var button = $(this.substitute({"template": template, "data": data}));
 	if (!extra.clickable) return element.append(button);
@@ -169,11 +169,12 @@ plugin.css =
 
 	'.{plugin.class} .{class:button} { margin-right: 10px; }' +
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
-	'.{plugin.class} .{class:buttonIcon} { margin-right: 4px; opacity: 0.3; }' +
+	'.echo-sdk-ui .{plugin.class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
+	'.{plugin.class} .{plugin.class:buttonIcon} { opacity: 0.3; }' +
 	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
 	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #262626; text-decoration: none; }' +
-	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{class:buttonIcon},' +
-			'.{class:buttons} a.{class:button}:hover .{class:buttonIcon} { opacity: 1; }' +
+	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{plugin.class:buttonIcon},' +
+			'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
 
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { border-bottom: 1px solid #e5e5e5; border-top: 1px solid #e5e5e5; padding-top: 8px; height: 30px; }' +
