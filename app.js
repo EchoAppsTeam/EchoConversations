@@ -54,7 +54,7 @@ conversations.renderers.submit = function(element) {
 	var targetURL = this.config.get("targetURL");
 	var submitPermissions = this._getSubmitPermissions();
 	this.initComponent({
-		"id": "stream",
+		"id": "Composer",
 		"component": "Echo.StreamServer.Controls.Submit",
 		"config": {
 			"appkey": this.config.get("dependencies.StreamServer.appkey"),
@@ -92,7 +92,7 @@ conversations.renderers.submit = function(element) {
 conversations.renderers.stream = function(element) {
 	var replyPermissions = this._getSubmitPermissions();
 	this.initComponent({
-		"id": "Stream",
+		"id": "AllPosts",
 		"component": "Echo.StreamServer.Controls.Stream",
 		"config": {
 			"appkey": this.config.get("dependencies.StreamServer.appkey"),
