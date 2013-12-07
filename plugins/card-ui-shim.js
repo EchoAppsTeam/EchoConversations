@@ -76,6 +76,7 @@ plugin.config = {
 plugin.init = function() {
 	this.set("isLiveUpdate", this.component.config.get("live"));
 	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
+	this.extendTemplate("insertAsLastChild", "expandChildren", plugin.templates.chevron);
 	this.extendTemplate("remove", "date");
 };
 
@@ -84,6 +85,9 @@ plugin.templates.date =
 
 plugin.templates.wrapper =
 	'<div class="{plugin.class:wrapper}"></div>';
+
+plugin.templates.chevron =
+	'<span class="{plugin.class:chevron} icon-chevron-down"></span>';
 
 plugin.templates.button =
 	'<a class="{class:button} {class:button}-{data:name}">' +
@@ -201,6 +205,14 @@ plugin.css =
 			'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
 
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
+	'.{plugin.class} .{plugin.class:chevron} { margin-top: 0px !important; }' +
+	'.{plugin.class} .{class:expandChildrenLabel} { margin-right: 5px; }' +
+	'.{plugin.class} .{class:expandChildren} .{class:expandChildrenLabel} { color: #D3D3D3; }' +
+	'.{plugin.class} .{class:expandChildren}:hover .{class:expandChildrenLabel} { color: #262626; }' +
+	'.{plugin.class} .{class:expandChildren} .{plugin.class:chevron} { opacity: 0.3; }' +
+	'.{plugin.class} .{class:expandChildren}:hover .{plugin.class:chevron} { opacity: 0.8; }' +
+	'.{plugin.class} .{class:expandChildren} .echo-message-icon { padding-left: 0px; background: none; }' +
+	'.{plugin.class} .{class:expandChildren} .{class:message-loading} { background: none; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { padding-top: 8px; height: 30px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
