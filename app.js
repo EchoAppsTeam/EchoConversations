@@ -100,7 +100,11 @@ conversations.renderers.stream = function(element) {
 			"query": this._buildSearchQuery(),
 			"fadeTimeout": 0,
 			"item": {
-				"reTag": false
+				"reTag": false,
+				"limits": {
+					// TODO: make configurable in v1.2
+					"maxBodyCharacters": 200
+				}
 			},
 			"plugins": [{
 				"name": "ItemsRollingWindow",
