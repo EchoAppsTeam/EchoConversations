@@ -7,7 +7,32 @@ var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 
 conversations.config = {
 	"targetURL": "",
-	"allPostsQuery": "",
+	"composer": {
+		"visible": true,
+		"displaySharingOnPost": true
+	},
+	"topPosts": {
+		"visible": true,
+		"label": "Top Posts",
+		"queryOverride": undefined,
+		"initialItemsPerPage": 5,
+		"initialSortOrder": "reverseChronological",
+		"itemStates": "Untouched,ModeratorApproved",
+		"itemMarkers": ["Top"],
+		"replyNestingLevels": 2,
+		"displayCounter": true
+	},
+	"allPosts": {
+		"visible": true,
+		"label": "All Posts",
+		"queryOverride": undefined,
+		"initialItemsPerPage": 5,
+		"initialSortOrder": "reverseChronological",
+		"itemStates": "Untouched,ModeratorApproved",
+		"itemMarkers": [],
+		"replyNestingLevels": 2,
+		"displayCounter": true
+	},
 	"auth":{
 		"allowAnonymousSubmission": false
 	},
@@ -16,7 +41,6 @@ conversations.config = {
 		"Janrain": {"appId": undefined},
 		"StreamServer": {"appkey": undefined}
 	},
-	"itemStates": "Untouched,ModeratorApproved",
 	"liveUpdates": {
 		"transport": "websockets"
 	}
@@ -44,18 +68,30 @@ conversations.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.css"
 }];
 
+conversations.init = function() {
+	var app = this;
+	this._retrieveData(function() {
+		app.render();
+		app.ready();
+	});
+};
+
 conversations.templates.main =
 	'<div class="{class:container}">' +
-		'<div class="{class:submit}"></div>' +
+		'<div class="{class:composer}"></div>' +
 		'<div class="{class:topPosts}"></div>' +
 		'<div class="{class:allPosts}"></div>' +
 	'</div>';
 
-conversations.renderers.submit = function(element) {
+conversations.renderers.composer = function(element) {
+	var config = this.config.get("composer");
+	if (!config.visible) {
+		return element;
+	}
 	var targetURL = this.config.get("targetURL");
 	var submitPermissions = this._getSubmitPermissions();
 	this.initComponent({
-		"id": "Composer",
+		"id": "composer",
 		"component": "Echo.StreamServer.Controls.Submit",
 		"config": {
 			"appkey": this.config.get("dependencies.StreamServer.appkey"),
@@ -88,42 +124,45 @@ conversations.renderers.submit = function(element) {
 			}
 		}
 	});
+	return element;
 };
 
 conversations.renderers.topPosts = function(element) {
+	var config = this.config.get("topPosts");
+	if (!config.visible) {
+		return element;
+	}
 	this.initComponent({
-		"id": "TopPosts",
+		"id": "topPosts",
 		"component": "Echo.StreamServer.Controls.Stream",
-		"config": $.extend(true, {}, this._getStreamConfig("topPosts"), {
-			"target": element
-		})
+		"config": this._assembleStreamConfig("topPosts", {"target": element})
 	});
+	return element;
 };
 
 conversations.renderers.allPosts = function(element) {
+	var config = this.config.get("allPosts");
+	if (!config.visible) {
+		return element;
+	}
 	this.initComponent({
-		"id": "AllPosts",
+		"id": "allPosts",
 		"component": "Echo.StreamServer.Controls.Stream",
-		"config": $.extend(true, {}, this._getStreamConfig(), {
-			"target": element
-		})
+		"config": this._assembleStreamConfig("allPosts", {"target": element})
 	});
+	return element;
 };
 
 conversations.methods._getSubmitPermissions = function() {
 	return this.config.get("auth.allowAnonymousSubmission") ? "allowGuest" : "forceLogin";
 };
 
-conversations.methods._getStreamConfig = function(section) {
-	var queryParams = {
-		"topPosts": {
-			"markers": ["Top"]
-		}
-	};
+conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 	var replyPermissions = this._getSubmitPermissions();
-	return {
+	return $.extend(true, {}, {
 		"appkey": this.config.get("dependencies.StreamServer.appkey"),
-		"query": this._buildSearchQuery(queryParams[section] || {}),
+		"query": this._assembleSearchQuery(componentID),
+		"data": this.get("response." + componentID + "-search"),
 		"fadeTimeout": 0,
 			"item": {
 				"reTag": false,
@@ -157,40 +196,79 @@ conversations.methods._getStreamConfig = function(section) {
 			}, {
 				"name": "ModerationCardUI"
 			}]
-	};
+	}, overrides);
 };
 
-conversations.methods._buildSearchQuery = function(query) {
-	var allPostsQuery = this.config.get("allPostsQuery");
-	query = query || {};
+conversations.methods._assembleSearchQuery = function(componentID, overrides) {
+	var config = this.config.get(componentID, {});
+	var query = config.queryOverride;
+	overrides = overrides || {};
 
-	// TODO need more general solution to build query
-	var markers = query.markers
-		? (" markers:" + query.markers.join(","))
-		: "";
-
-	if (!allPostsQuery) {
-		var states = this.config.get("itemStates");
+	if (!query) {
+		var states = config.itemStates;
 		var userId = this.user && this.user.get("identityUrl");
+		var markers = config.itemMarkers.length
+			? "markers:" + config.itemMarkers.join(",")
+			: "";
 		var operators = (this.config.get("bozoFilter") && userId)
-			? "(state:" + states+ " OR user.id:" + userId+ ")"
+			? "(state:" + states + " OR user.id:" + userId + ")"
 			: "state: " + states;
-		allPostsQuery = "childrenof:{data:targetURL}" +
-			markers +
+		query = "childrenof:{data:targetURL} " + markers +
 			" type:comment " + operators +
-			" children:2 " + operators;
+			" children:" + config.replyNestingLevels + " " + operators;
 	}
 
 	return this.substitute({
-		"template": allPostsQuery,
-		"data": {
-			"targetURL": this.config.get("targetURL")
-		}
+		"template": query,
+		"data": {"targetURL": this.config.get("targetURL")}
 	});
 };
 
+conversations.methods._retrieveData = function(callback) {
+	var app = this;
+	var requests = Echo.Utils.foldl([], ["topPosts", "allPosts"], function(name, acc) {
+		if (!app.config.get(name + ".visible")) return;
+		var overrides = name === "topPosts" ? {"markers": ["Top"]} : {};
+		var query = app._assembleSearchQuery(name, overrides);
+		acc.push({
+			"id": name + "-search",
+			"method": "search",
+			"q": query
+		});
+		if (app.config.get(name + ".displayCounter")) {
+			acc.push({
+				"id": name + "-count",
+				"method": "count",
+				"q": query
+			});
+		}
+	});
+
+	// if both Top Posts and All Posts are hidden
+	if (!requests.length) {
+		callback();
+		return;
+	}
+
+	Echo.StreamServer.API.request({
+		"endpoint": "mux",
+		"data": {
+			"requests": requests,
+			"appkey": this.config.get("dependencies.StreamServer.appkey")
+		},
+		"onData": function(response) {
+			app.set("response", response);
+			callback();
+		},
+		"onError": function() {
+			// TODO: need to handle error case...
+		}
+	}).send();
+};
+
 conversations.css =
-	// set box-sizing property for all nested elements to default (content-box) as its can be overwritten on the page.
+	// set box-sizing property for all nested elements to default (content-box)
+	// as its can be overwritten on the page.
 	'.{class:container} * { box-sizing: content-box; -moz-box-sizing: content-box; }';
 
 Echo.App.create(conversations);
