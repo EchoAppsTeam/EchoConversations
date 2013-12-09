@@ -22,10 +22,15 @@ plugin.config = {
 	"removePersonalItemsAllowed": false,
 	"statusAnimationTimeout": 1000, // milliseconds
 	"userActions": ["ban", "permissions"],
+	"markerActions": ["top"],
 	"itemActions": ["approve", "untouch", "spam", "delete"]
 };
 
 plugin.labels = {
+	"addMarkerButton": "Add '{marker}' marker",
+	"removeMarkerButton": "Remove '{marker}' marker",
+	"addingMarker": "Adding '{marker}' marker",
+	"removingMarker": "Removing '{marker}' marker",
 	"moderateButton": "Moderate",
 	"approveButton": "Approve",
 	"deleteButton": "Delete",
@@ -282,16 +287,59 @@ plugin.methods._assembleButton = function(name) {
 	};
 };
 
+plugin.methods._assembleMarkerButton = function(name) {
+	var self = this;
+	var item = this.component;
+
+	var itemMarkers = item.get("data.object.markers", []);
+	var action = ~$.inArray(name, itemMarkers)
+		? "remove"
+		: "add";
+	return {
+		"title": this.labels.get(action + "MarkerButton", {"marker": name}),
+		"handler": function() {
+			item.block(self.labels.get((action === "add") ? "addingMarker" : "removingMarker", {"marker": name}));
+			var activity = {
+				"verbs": ["http://activitystrea.ms/schema/1.0/" + ((action === "add") ? "mark" : "unmark")],
+				"targets": [{"id": item.get("data.object.id")}],
+				"object": {
+					"content": name
+				}
+			};
+
+			self._sendRequest({
+				"content": activity,
+				"appkey": item.config.get("appkey"),
+				"sessionID": item.user.get("sessionID"),
+				"target-query": item.config.get("parent.query")
+			}, function() {
+				// TODO publish some event
+				item.unblock();
+				self.requestDataRefresh();
+			}, function() {
+				// TODO publish some event
+				item.unblock();
+			});
+		}
+	};
+};
+
 plugin.methods._assembleModerateButton = function() {
 	var self = this;
 	var userActions = this.config.get("userActions");
-	var actions = this.config.get("itemActions").concat(userActions);
+	var markerActions = this.config.get("markerActions");
+
+	var actions = this.config.get("itemActions").concat(markerActions).concat(userActions);
 	return function() {
 		var entries = [];
 		$.map(actions, function(action) {
+			var _action = Echo.Utils.capitalize(action);
 			var button = (~$.inArray(action, userActions))
-				? self["_assemble" + Echo.Utils.capitalize(action) + "Button"]()
-				: self._assembleButton(Echo.Utils.capitalize(action));
+				? self["_assemble" + _action + "Button"]()
+				: ~$.inArray(action, markerActions)
+					? self._assembleMarkerButton(_action)
+					: self._assembleButton(_action);
+
 			if (button) entries.push(button);
 		});
 		var element = $("<span>");

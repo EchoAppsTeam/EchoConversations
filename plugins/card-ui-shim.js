@@ -75,6 +75,7 @@ plugin.config = {
 
 plugin.init = function() {
 	this.set("isLiveUpdate", this.component.config.get("live"));
+	this.extendTemplate("insertBefore", "frame", plugin.templates.topPostMarker);
 	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
 	this.extendTemplate("insertAsLastChild", "expandChildren", plugin.templates.chevron);
 	this.extendTemplate("remove", "date");
@@ -95,10 +96,28 @@ plugin.templates.button =
 		'<span class="{class:buttonCaption}">{data:label}</span>' +
 	'</a>';
 
+plugin.templates.topPostMarker =
+	'<i class="icon-bookmark {plugin.class:topPostMarker}"></i>';
+
+plugin.renderers.topPostMarker = function(element) {
+	var itemMarkers = this.component.get("data.object.markers", []);
+	return (~$.inArray("Top", itemMarkers))
+		? element.show()
+		: element.hide();
+};
+
 plugin.renderers.date = function(element) {
 	// TODO: use parentRenderer here
 	this.age = this.component.getRelativeTime(this.component.timestamp);
 	return element.html(this.age);
+};
+
+plugin.component.renderers.tags = function(element) {
+	return element.hide();
+};
+
+plugin.component.renderers.markers = function(element) {
+		return element.hide();
 };
 
 plugin.component.renderers.container = function(element) {
@@ -171,6 +190,7 @@ for (var i = 0; i <= 20; i++) {
 }
 
 plugin.css =
+	'.{plugin.class:topPostMarker} { float: right; position: relative; top: -19px; right: 0px; }' +
 	'.{plugin.class} .{plugin.class:wrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; }' +
 	'.{plugin.class} .{class:container} { border-left: 8px solid transparent; background: #ffffff; }' +
 	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} { border-left: 8px solid #f5ba47; }' +

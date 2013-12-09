@@ -47,7 +47,8 @@ conversations.dependencies = [{
 conversations.templates.main =
 	'<div class="{class:container}">' +
 		'<div class="{class:submit}"></div>' +
-		'<div class="{class:stream}"></div>' +
+		'<div class="{class:topPosts}"></div>' +
+		'<div class="{class:allPosts}"></div>' +
 	'</div>';
 
 conversations.renderers.submit = function(element) {
@@ -89,16 +90,41 @@ conversations.renderers.submit = function(element) {
 	});
 };
 
-conversations.renderers.stream = function(element) {
-	var replyPermissions = this._getSubmitPermissions();
+conversations.renderers.topPosts = function(element) {
+	this.initComponent({
+		"id": "TopPosts",
+		"component": "Echo.StreamServer.Controls.Stream",
+		"config": $.extend(true, {}, this._getStreamConfig("topPosts"), {
+			"target": element
+		})
+	});
+};
+
+conversations.renderers.allPosts = function(element) {
 	this.initComponent({
 		"id": "AllPosts",
 		"component": "Echo.StreamServer.Controls.Stream",
-		"config": {
-			"appkey": this.config.get("dependencies.StreamServer.appkey"),
-			"target": element,
-			"query": this._buildSearchQuery(),
-			"fadeTimeout": 0,
+		"config": $.extend(true, {}, this._getStreamConfig(), {
+			"target": element
+		})
+	});
+};
+
+conversations.methods._getSubmitPermissions = function() {
+	return this.config.get("auth.allowAnonymousSubmission") ? "allowGuest" : "forceLogin";
+};
+
+conversations.methods._getStreamConfig = function(section) {
+	var queryParams = {
+		"topPosts": {
+			"markers": ["Top"]
+		}
+	};
+	var replyPermissions = this._getSubmitPermissions();
+	return {
+		"appkey": this.config.get("dependencies.StreamServer.appkey"),
+		"query": this._buildSearchQuery(queryParams[section] || {}),
+		"fadeTimeout": 0,
 			"item": {
 				"reTag": false,
 				"limits": {
@@ -131,16 +157,17 @@ conversations.renderers.stream = function(element) {
 			}, {
 				"name": "ModerationCardUI"
 			}]
-		}
-	});
+	};
 };
 
-conversations.methods._getSubmitPermissions = function() {
-	return this.config.get("auth.allowAnonymousSubmission") ? "allowGuest" : "forceLogin";
-};
-
-conversations.methods._buildSearchQuery = function() {
+conversations.methods._buildSearchQuery = function(query) {
 	var allPostsQuery = this.config.get("allPostsQuery");
+	query = query || {};
+
+	// TODO need more general solution to build query
+	var markers = query.markers
+		? (" markers:" + query.markers.join(","))
+		: "";
 
 	if (!allPostsQuery) {
 		var states = this.config.get("itemStates");
@@ -149,6 +176,7 @@ conversations.methods._buildSearchQuery = function() {
 			? "(state:" + states+ " OR user.id:" + userId+ ")"
 			: "state: " + states;
 		allPostsQuery = "childrenof:{data:targetURL}" +
+			markers +
 			" type:comment " + operators +
 			" children:2 " + operators;
 	}
