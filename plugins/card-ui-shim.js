@@ -3,7 +3,7 @@
 
 /**
  * @class Echo.StreamServer.Controls.Stream.Plugins.CardUIShim
- * Extends Auth control to look like Card-based app.
+ * Extends Stream control to look like Card-based app.
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream");
 
@@ -353,7 +353,6 @@ plugin.labels = {
 	"youMustBeLoggedIn": "You must be logged in to comment"
 };
 
-//FIXME: utilise relative path
 plugin.templates.attach = '<div class="{plugin.class:attach}"><img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" /></div>';
 
 plugin.templates.loginRequirementNotice = '<div class="{plugin.class:loginRequirementNotice}">{plugin.label:youMustBeLoggedIn}</div>';

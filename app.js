@@ -162,7 +162,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 	return $.extend(true, {}, {
 		"appkey": this.config.get("dependencies.StreamServer.appkey"),
 		"query": this._assembleSearchQuery(componentID),
-		"data": this.get("response." + componentID + "-search"),
+		"data": this.get("data." + componentID + "-search"),
 		"fadeTimeout": 0,
 			"item": {
 				"reTag": false,
@@ -256,8 +256,8 @@ conversations.methods._retrieveData = function(callback) {
 			"requests": requests,
 			"appkey": this.config.get("dependencies.StreamServer.appkey")
 		},
-		"onData": function(response) {
-			app.set("response", response);
+		"onData": function(data) {
+			app.set("data", data);
 			callback();
 		},
 		"onError": function() {
