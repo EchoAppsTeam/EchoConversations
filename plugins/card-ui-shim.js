@@ -20,8 +20,8 @@ plugin.init = function() {
 plugin.css =
 	'.{plugin.class} .{class:header} { display: none; }' +
 	'.{plugin.class} .{class:body} .echo-control-message { margin: 10px 0px; border: 1px solid #d2d2d2; box-shadow: 0px 1px 1px #d2d2d2; border-radius: 3px; color: #c6c6c6; padding: 30px 0px 30px 50%; text-align: left;}' +
-	'.{plugin.class} .{class:body} .echo-control-message .echo-control-message-info { height: 35px; margin-left: -50%; display: block; font-size: 14px; background-image: url({%= baseURL %}/images/info.png); padding-left: 40px; }' +
-	'.{plugin.class} .echo-control-message-info { background-image: url({%= baseURL %}/images/info.png); }' +
+	'.{plugin.class} .{class:body} .echo-control-message .echo-control-message-info { height: 35px; margin-left: -50%; display: block; font-size: 14px; line-height: 16px; font-weight: normal; font-style: normal; background-image: url({%= baseURL %}/images/info.png); padding-left: 40px; }' +
+	'.{plugin.class} .echo-control-message-info { background: url({%= baseURL %}/images/info.png) no-repeat; }' +
 	'.{plugin.class} .{class:item} { margin: 10px 0px; padding: 0px; padding-top: 15px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; background: #ffffff; }' +
 	'.{plugin.class} .{class:item-children} .{class:item} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; background: #f8f8f8; }';
 
