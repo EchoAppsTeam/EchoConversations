@@ -291,6 +291,11 @@ plugin.methods._assembleMarkerButton = function(name) {
 	var self = this;
 	var item = this.component;
 
+	// customer can add/remove markers for root items only
+	if (item.get("depth")) {
+		return false;
+	}
+
 	var itemMarkers = item.get("data.object.markers", []);
 	var action = ~$.inArray(name, itemMarkers)
 		? "remove"

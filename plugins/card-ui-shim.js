@@ -100,8 +100,9 @@ plugin.templates.topPostMarker =
 	'<i class="icon-bookmark {plugin.class:topPostMarker}"></i>';
 
 plugin.renderers.topPostMarker = function(element) {
+	var item = this.component;
 	var itemMarkers = this.component.get("data.object.markers", []);
-	return (~$.inArray("Top", itemMarkers))
+	return (!item.get("depth") && ~$.inArray("Top", itemMarkers))
 		? element.show()
 		: element.hide();
 };
