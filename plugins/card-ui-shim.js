@@ -29,12 +29,13 @@ plugin.events = {
 plugin.init = function() {
 	var item = this.component;
 	if (item.config.get("displayCounter")) {
-		this.set("count", item.config.get("count.count"));
+		this.set("count", this.config.get("counter.data.count"));
 		this._counter = new Echo.StreamServer.Controls.Counter({
 			"target": $("<div>"),
 			"appkey": item.config.get("appkey"),
 			"context": item.config.get("context"),
-			"query": item.config.get("query")
+			"query": this.config.get("counter.query"),
+			"data": this.config.get("counter.data")
 		});
 	}
 

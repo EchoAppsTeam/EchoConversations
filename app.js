@@ -181,6 +181,7 @@ conversations.methods._getSubmitPermissions = function() {
 };
 
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
+	var queryOverrides = componentID === "topPosts" ? {"replyNestingLevels": 0} : {};
 	return $.extend(true, {}, {
 		"appkey": this.config.get("dependencies.StreamServer.appkey"),
 		"query": this._assembleSearchQuery(componentID),
@@ -195,6 +196,10 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		},
 		"plugins": [].concat(this._getPluginList(componentID), [{
 			"name": "CardUIShim",
+			"counter": {
+				"data": this.get("data." + componentID + "-count"),
+				"query": this._assembleSearchQuery(componentID, queryOverrides)
+			},
 			"displayTopPostHighlight": this.config.get(componentID + ".displayTopPostHighlight")
 		}, {
 			"name": "ModerationCardUI"
@@ -252,14 +257,13 @@ conversations.methods._assembleSearchQuery = function(componentID, overrides) {
 			? "(state:" + states + " OR user.id:" + userId + ")"
 			: "state: " + states;
 	}
-
 	return this.substitute({
 		"template": query || conversations.templates.defaultQuery,
 		"data": $.extend({}, config, {
 			"markers": markers || "",
 			"operators": operators || "",
 			"targetURL": this.config.get("targetURL")
-		})
+		}, overrides)
 	});
 };
 
@@ -267,18 +271,18 @@ conversations.methods._retrieveData = function(callback) {
 	var app = this;
 	var requests = Echo.Utils.foldl([], ["topPosts", "allPosts"], function(name, acc) {
 		if (!app.config.get(name + ".visible")) return;
-		var overrides = name === "topPosts" ? {"markers": ["Top"]} : {};
-		var query = app._assembleSearchQuery(name, overrides);
 		acc.push({
 			"id": name + "-search",
 			"method": "search",
-			"q": query
+			"q": app._assembleSearchQuery(name)
 		});
 		if (app.config.get(name + ".displayCounter")) {
+			// for Top Posts we need to count only root items...
+			var overrides = name === "topPosts" ? {"replyNestingLevels": 0} : {};
 			acc.push({
 				"id": name + "-count",
 				"method": "count",
-				"q": query
+				"q": app._assembleSearchQuery(name, overrides)
 			});
 		}
 	});
