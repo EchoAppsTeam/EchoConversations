@@ -171,7 +171,6 @@ conversations.methods._getSubmitPermissions = function() {
 };
 
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
-	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	return $.extend(true, {}, {
 		"appkey": this.config.get("dependencies.StreamServer.appkey"),
 		"query": this._assembleSearchQuery(componentID),
@@ -184,14 +183,24 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			}
 		},
 		"asyncItemsRendering": true,
-		"plugins": [{
-			"name": "ItemsRollingWindow",
-			"moreButton": true
-		}, {
+		"plugins": [].concat(this._getPluginList(componentID), [{
 			"name": "CardUIShim"
 		}, {
-			"name": "LikeCardUI"
+			"name": "ModerationCardUI"
 		}, {
+			"name": "ItemsRollingWindow",
+			"moreButton": true
+		}])
+	}, overrides);
+};
+
+conversations.methods._getPluginList = function(componentID) {
+	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
+	var plugins = {
+		"Like": {
+			"name": "LikeCardUI"
+		},
+		"Reply": {
 			"name": "ReplyCardUI",
 			"nestedPlugins": [{
 				"name": "JanrainBackplaneHandler",
@@ -204,10 +213,16 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 				"buttons": ["login", "signup"],
 				"eventsContext": enableBundledIdentity ? "bundled" : "custom"
 			}]
-		}, {
-			"name": "ModerationCardUI"
-		}]
-	}, overrides);
+		},
+		"Sharing": {} // TODO: add appropriate plugin data
+	};
+
+	var config = this.config.get(componentID, {});
+	return Echo.Utils.foldl([], plugins, function(value, acc, name) {
+		if (!!config["display" + name + "Intent"]) {
+			acc.push(value);
+		}
+	});
 };
 
 conversations.methods._assembleSearchQuery = function(componentID, overrides) {
