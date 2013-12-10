@@ -52,7 +52,7 @@ dashboard.vars = {
 	}, {
 		"component": "Input",
 		"name": "initialItemPerPage",
-		"type": "integer",
+		"type": "number",
 		"default": 15,
 		"config": {
 			"title": "Initial Items Per Page",
@@ -137,7 +137,7 @@ dashboard.vars = {
 	}, {
 		"component": "Select",
 		"name": "replyNestingLevels",
-		"type": "integer",
+		"type": "number",
 		"default": 2,
 		"config": {
 			"title": "Reply Nesting Levels",
