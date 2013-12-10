@@ -7,7 +7,37 @@
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream");
 
+plugin.labels = {
+	"emptyStream": "There are no contributions yet.<br>Be first to chime in!"
+};
+
+plugin.events = {
+	"Echo.StreamServer.Controls.Counter.onUpdate": function(_, data) {
+		this.set("count", Echo.Utils.get(data, "data.count", ""));
+		this.component.view.render({"name": "header"});
+	},
+	"Echo.StreamServer.Controls.Stream.Item.onAdd": function() {
+		this.component.view.render({"name": "container"});
+		this._counter && this._counter.refresh();
+	},
+	"Echo.StreamServer.Controls.Stream.Item.onDelete": function() {
+		this.component.view.render({"name": "container"});
+		this._counter && this._counter.refresh();
+	}
+};
+
 plugin.init = function() {
+	var item = this.component;
+	if (item.config.get("displayCounter")) {
+		this.set("count", item.config.get("count.count"));
+		this._counter = new Echo.StreamServer.Controls.Counter({
+			"target": $("<div>"),
+			"appkey": item.config.get("appkey"),
+			"context": item.config.get("context"),
+			"query": item.config.get("query")
+		});
+	}
+
 	// Stream should trigger 'onActivitiesComplete' event to start items liveUpdate animation
 	this.component._executeNextActivity = function() {
 		var acts = this.activities;
@@ -39,12 +69,35 @@ plugin.init = function() {
 	};
 };
 
+plugin.component.renderers.container = function(element) {
+	var stream = this.component;
+	var items = $.grep(stream.get("threads"), function(item) {
+		return !item.deleted;
+	});
+
+	return (items.length || stream.config.get("infoMessages.enabled"))
+		? element.show()
+		: element.hide();
+};
+
+plugin.component.renderers.header = function(element) {
+	var item = this.component;
+	var label = this.component.config.get("label");
+	if (item.config.get("displayCounter") && this.get("count")) {
+		label += " (" + this.get("count") + ")";
+	}
+
+	return label
+		? element.empty().append(label).show()
+		: element.hide();
+};
+
 plugin.css =
-	'.{plugin.class} .{class:header} { display: none; }' +
+	'.{plugin.class} .{class:header} { padding: 5px 0px 5px 0px; margin: 0px; font-size: 14px; }' +
 	'.{plugin.class} .{class:body} .echo-control-message { margin: 10px 0px; border: 1px solid #d2d2d2; box-shadow: 0px 1px 1px #d2d2d2; border-radius: 3px; color: #c6c6c6; padding: 30px 0px 30px 50%; text-align: left;}' +
 	'.{plugin.class} .{class:body} .echo-control-message .echo-control-message-info { height: 35px; margin-left: -50%; display: block; font-size: 14px; line-height: 16px; font-weight: normal; font-style: normal; background-image: url({%= baseURL %}/images/info.png); padding-left: 40px; }' +
 	'.{plugin.class} .echo-control-message-info { background: url({%= baseURL %}/images/info.png) no-repeat; }' +
-	'.{plugin.class} .{class:item} { margin: 10px 0px; padding: 0px; padding-top: 15px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; background: #ffffff; }' +
+	'.{plugin.class} .{class:item} { margin: 0px 0px 10px 0px; padding: 0px; padding-top: 15px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; background: #ffffff; }' +
 	'.{plugin.class} .{class:item-children} .{class:item} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; background: #f8f8f8; }';
 
 Echo.Plugin.create(plugin);

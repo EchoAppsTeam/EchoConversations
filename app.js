@@ -170,8 +170,7 @@ conversations.renderers.allPosts = function(element) {
 			"target": element,
 			"labels": {
 				"emptyStream": config.noPostsMessage
-			},
-			"ready": function() { window.stream = this; }
+			}
 		})
 	});
 	return element;
@@ -202,7 +201,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"name": "ItemsRollingWindow",
 			"moreButton": true
 		}])
-	}, overrides);
+	}, this.config.get(componentID), overrides);
 };
 
 conversations.methods._getPluginList = function(componentID) {
@@ -323,6 +322,8 @@ conversations.methods._removeUserInvalidationFrom = function() {
 };
 
 conversations.css =
+	'.{class:composer} { margin-bottom: 10px; }' +
+	'.{class:topPosts} > div { margin-bottom: 25px; }' +
 	// set box-sizing property for all nested elements to default (content-box)
 	// as its can be overwritten on the page.
 	'.{class:container} * { box-sizing: content-box; -moz-box-sizing: content-box; }';
