@@ -145,7 +145,8 @@ plugin.events = {
 };
 
 plugin.config = {
-	"fadeTimeout": 10000 // 10 seconds
+	"fadeTimeout": 10000, // 10 seconds
+	"displayTopPostHighlight": true
 };
 
 plugin.init = function() {
@@ -174,10 +175,13 @@ plugin.templates.button =
 plugin.templates.topPostMarker =
 	'<i class="icon-bookmark {plugin.class:topPostMarker}"></i>';
 
+
 plugin.renderers.topPostMarker = function(element) {
 	var item = this.component;
-	var itemMarkers = this.component.get("data.object.markers", []);
-	return (!item.get("depth") && ~$.inArray("Top", itemMarkers))
+	var itemMarkers = item.get("data.object.markers", []);
+	var visible = !!this.config.get("displayTopPostHighlight") && !item.get("depth") && ~$.inArray("Top", itemMarkers);
+
+	return visible
 		? element.show()
 		: element.hide();
 };

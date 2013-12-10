@@ -194,7 +194,8 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			}
 		},
 		"plugins": [].concat(this._getPluginList(componentID), [{
-			"name": "CardUIShim"
+			"name": "CardUIShim",
+			"displayTopPostHighlight": this.config.get(componentID + ".displayTopPostHighlight")
 		}, {
 			"name": "ModerationCardUI"
 		}, {
