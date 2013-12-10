@@ -141,7 +141,7 @@ dashboard.vars = {
 			"desc": "Specifies the depth of replies allowed in the conversation thread",
 			"options": $.map([1,2,3,4,5], function(i) {
 				return {
-					"title": i,
+					"title": i + "",
 					"value": i
 				};
 			})
