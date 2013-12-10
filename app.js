@@ -168,6 +168,9 @@ conversations.renderers.allPosts = function(element) {
 		"component": "Echo.StreamServer.Controls.Stream",
 		"config": this._assembleStreamConfig("allPosts", {
 			"target": element,
+			"labels": {
+				"emptyStream": config.noPostsMessage
+			},
 			"ready": function() { window.stream = this; }
 		})
 	});

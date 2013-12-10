@@ -7,10 +7,6 @@
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream");
 
-plugin.labels = {
-	"emptyStream": "There are no contributions yet.<br>Be first to chime in!"
-};
-
 plugin.init = function() {
 	// Stream should trigger 'onActivitiesComplete' event to start items liveUpdate animation
 	this.component._executeNextActivity = function() {
@@ -41,9 +37,6 @@ plugin.init = function() {
 		this.activities.animations--;
 		this._executeNextActivity();
 	};
-	this.component.labels.set({
-		"emptyStream": this.labels.get("emptyStream")
-	});
 };
 
 plugin.css =
