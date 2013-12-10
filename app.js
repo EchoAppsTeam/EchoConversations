@@ -97,8 +97,9 @@ conversations.templates.main =
 	'</div>';
 
 conversations.templates.defaultQuery =
-	'childrenof:{data:targetURL} itemsPerPage:{data:initialItemsPerPage} {data:markers} ' +
-	'type:comment {data:operators} children:{data:replyNestingLevels} {data:operators}';
+	'childrenof:{data:targetURL} sortOrder:{data:initialSortOrder} ' +
+	'itemsPerPage:{data:initialItemsPerPage} {data:markers} type:comment ' +
+	'{data:operators} children:{data:replyNestingLevels} {data:operators}';
 
 conversations.renderers.composer = function(element) {
 	var config = this.config.get("composer");

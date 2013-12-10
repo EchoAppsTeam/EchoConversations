@@ -59,22 +59,22 @@ dashboard.vars = {
 		"component": "Select",
 		"name": "initialSortOrder",
 		"type": "string",
-		"default": "newest",
+		"default": "reverseChronological",
 		"config": {
 			"title": "Initial Sort Order",
 			"desc": "Specifies the initial ordering of {data:title}",
 			"options": [{
 				"title": "Newest First",
-				"value": "newest"
+				"value": "reverseChronological"
 			}, {
 				"title": "Oldest First",
-				"value": "oldest"
+				"value": "chronological"
 			}, {
 				"title": "Most Popular",
-				"value": "popular"
+				"value": "repliesDescending"
 			}, {
 				"title": "Most Likes",
-				"value": "likes"
+				"value": "likesDescending"
 			}]
 		}
 	}, {
