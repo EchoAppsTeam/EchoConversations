@@ -1,4 +1,4 @@
-(function() {
+(function($) {
 "use strict";
 
 /**
@@ -255,98 +255,15 @@ Echo.Plugin.create(plugin);
 "use strict";
 
 /**
- * @class Echo.IdentityServer.Controls.Auth.Plugins.CardUIShim
- * Extends Auth control to look like Card-based app.
- */
-var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.IdentityServer.Controls.Auth");
-
-plugin.labels = {
-	"via": "via",
-	"logout": "Logout",
-	"switchIdentity": "Switch Identity"
-};
-
-plugin.templates.name =
-	'<div class="{plugin.class:container}">' +
-		'<div class="{class:name}"></div>' +
-		'<div class="{plugin.class:via}">{plugin.label:via} {plugin.data:via}</div>' +
-	'</div>';
-
-plugin.init = function() {
-	this.set("data.via", this._detectAuthProvider());
-	this.extendTemplate("remove", "logout");
-	this.extendTemplate("replace", "name", plugin.templates.name);
-};
-
-plugin.component.renderers.name = function(element) {
-	var auth = this.component, isSwitchAssembled = false;
-	var template = '<span class="{plugin.class:dropdown}"></span>';
-	new Echo.GUI.Dropdown({
-		"target": element,
-		"title": auth.user.get("name", "") + this.substitute({"template": template}),
-		"extraClass": "nav",
-		"entries": [{
-			"title": this.labels.get("switchIdentity"),
-			"handler": function() {
-				if (!isSwitchAssembled) {
-					var target = $(this);
-					auth._assembleIdentityControl("login", target);
-					isSwitchAssembled = true;
-					target.click();
-				}
-			}
-		}, {
-			"title": this.labels.get("logout"),
-			"handler": function() {
-				auth.user.logout();
-			}
-		}]
-	});
-	return element;
-};
-
-plugin.methods._detectAuthProvider = function() {
-	// TODO: provide an ability to update this list via plugin config
-	var providers = {
-		"twitter.com": "Twitter",
-		"facebook.com": "Facebook",
-		"google.com": "Google",
-		"me.yahoo.com": "Yahoo"
-	};
-	var id = this.component.user.get("identityUrl", "");
-	var domain = Echo.Utils.parseURL(id).domain;
-	return providers[domain] || domain || id;
-};
-
-plugin.css =
-	'.{plugin.class:via} { margin-left: 15px; color: #D3D3D3; line-height: 18px; font-size: 12px; font-family: Arial; }' +
-	'.{plugin.class} .{class:name} .{plugin.class:dropdown} { background: url("{%= baseURL %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
-	'.{plugin.class} .{class:name} ul.nav { margin-bottom: 3px; }' +
-	'.{plugin.class} .{class:name} ul.nav .dropdown-menu li > a { font-size: 14px; }' +
-	'.{plugin.class} .{class:avatar} img { border-radius: 50%; }' +
-	'.{plugin.class} .{class:login}, .{plugin.class} .{class:signup} { color: #006DCC; }' +
-	'.{plugin.class} .{class:userAnonymous} { margin: 0px 0px 7px 2px; text-align: left; font-family: Arial; }' +
-	'.{plugin.class} .{class:userLogged} { margin: 0px 0px 5px 3px; }' +
-	'.{plugin.class} .{class:name} { float: none; margin: 3px 0px 0px 15px; font-family: Arial; font-weight: normal; }' +
-	'.{plugin.class:container} { float: left; }' +
-	'.{plugin.class} .{class:avatar} { width: 48px; height: 48px; border-radius: 50%; }' +
-	'.{plugin.class} .{class:avatar} > img { width: 48px; height: 48px; }';
-
-Echo.Plugin.create(plugin);
-
-})(Echo.jQuery);
-
-(function($) {
-"use strict";
-
-/**
  * @class Echo.StreamServer.Controls.Submit.Plugins.CardUIShim
  * Extends Submit control to look like Card-based app.
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Submit");
 
 plugin.config = {
-	"submitPermissions": "forceLogin"
+	"submitPermissions": "forceLogin",
+	"buttons": ["login"],
+	"eventsContext": "bundled"
 };
 
 plugin.labels = {
@@ -357,9 +274,12 @@ plugin.templates.attach = '<div class="{plugin.class:attach}"><img class="{plugi
 
 plugin.templates.loginRequirementNotice = '<div class="{plugin.class:loginRequirementNotice}">{plugin.label:youMustBeLoggedIn}</div>';
 
+plugin.templates.auth = '<div class="{plugin.class:auth}"></div>';
+
 plugin.init = function() {
 	var self = this, submit = this.component;
 
+	this.extendTemplate("insertBefore", "header", plugin.templates.auth);
 	this.extendTemplate("insertAfter", "postContainer",
 				plugin.templates.loginRequirementNotice);
 
@@ -393,6 +313,39 @@ plugin.init = function() {
 //		as there is no functionality associated with it..
 //
 //	this.extendTemplate("insertAsFirstChild", "controls", plugin.templates.attach);
+};
+
+plugin.component.renderers.header = function(element) {
+	var plugin = this;
+	if (plugin._userStatus() === "logged") {
+		return element.empty();
+	}
+	return plugin.parentRenderer("header", arguments);
+};
+
+plugin.component.renderers.container = function(element) {
+	var plugin = this;
+	plugin.parentRenderer("container", arguments);
+	var _class = function(postfix) {
+		return plugin.cssPrefix + postfix;
+	};
+	return element
+		.removeClass($.map(["logged", "anonymous", "forcedLogin"], _class).join(" "))
+		.addClass(_class(plugin._userStatus()));
+};
+
+plugin.renderers.auth = function(element) {
+	var config = this.config.assemble({"target": element});
+        new Echo.StreamServer.Controls.CardUIAuth(config);
+        return element;
+};
+
+plugin.methods._userStatus = function() {
+	return this.component.user.is("logged")
+		? "logged"
+		: this.config.get("submitPermissions") === "forceLogin"
+			? "forcedLogin"
+			: "anonymous";
 };
 
 plugin.css =

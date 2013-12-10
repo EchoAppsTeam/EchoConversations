@@ -33,7 +33,8 @@ conversations.config = {
 		"replyNestingLevels": 2,
 		"displayCounter": true
 	},
-	"auth":{
+	"auth": {
+		"enableBundledIdentity": true,
 		"allowAnonymousSubmission": false
 	},
 	"bozoFilter": false,
@@ -70,6 +71,7 @@ conversations.dependencies = [{
 
 conversations.init = function() {
 	var app = this;
+	this._removeUserInvalidationFrom(this);
 	this._retrieveData(function() {
 		app.render();
 		app.ready();
@@ -89,7 +91,7 @@ conversations.renderers.composer = function(element) {
 		return element;
 	}
 	var targetURL = this.config.get("targetURL");
-	var submitPermissions = this._getSubmitPermissions();
+	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	this.initComponent({
 		"id": "composer",
 		"component": "Echo.StreamServer.Controls.Submit",
@@ -98,19 +100,16 @@ conversations.renderers.composer = function(element) {
 			"target": element,
 			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
-			"liveUpdates": this.config.get("liveUpdates"),
 			"plugins": [{
-				"name": "JanrainAuth",
+				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
-				"submitPermissions": submitPermissions,
-				"buttons": ["login", "signup"],
-				"nestedPlugins": [{
-					"name": "CardUIShim",
-					"submitPermissions": submitPermissions
-				}]
+				"enabled": enableBundledIdentity,
+				"eventsContext": "bundled"
 			}, {
 				"name": "CardUIShim",
-				"submitPermissions": submitPermissions
+				"submitPermissions": this._getSubmitPermissions(),
+				"buttons": ["login", "signup"],
+				"eventsContext": enableBundledIdentity ? "bundled" : "custom"
 			}],
 			"data": {
 				"object": {
@@ -158,7 +157,7 @@ conversations.methods._getSubmitPermissions = function() {
 };
 
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
-	var replyPermissions = this._getSubmitPermissions();
+	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	return $.extend(true, {}, {
 		"appkey": this.config.get("dependencies.StreamServer.appkey"),
 		"query": this._assembleSearchQuery(componentID),
@@ -181,17 +180,15 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			}, {
 				"name": "ReplyCardUI",
 				"nestedPlugins": [{
-					"name": "JanrainAuth",
+					"name": "JanrainBackplaneHandler",
 					"appId": this.config.get("dependencies.Janrain.appId"),
-					"submitPermissions": replyPermissions,
-					"buttons": ["login", "signup"],
-					"nestedPlugins": [{
-						"name": "CardUIShim",
-						"submitPermissions": replyPermissions
-					}]
+					"enabled": enableBundledIdentity,
+					"eventsContext": "bundled"
 				}, {
 					"name": "CardUIShim",
-					"submitPermissions": replyPermissions
+					"submitPermissions": this._getSubmitPermissions(),
+					"buttons": ["login", "signup"],
+					"eventsContext": enableBundledIdentity ? "bundled" : "custom"
 				}]
 			}, {
 				"name": "ModerationCardUI"
@@ -264,6 +261,23 @@ conversations.methods._retrieveData = function(callback) {
 			// TODO: need to handle error case...
 		}
 	}).send();
+};
+
+// removing "Echo.UserSession.onInvalidate" subscription from an app
+// to avoid double-handling of the same evernt (by Canvas and by the widget itself)
+conversations.methods._removeUserInvalidationFrom = function() {
+	var topic = "Echo.UserSession.onInvalidate";
+	$.map(Array.prototype.slice.call(arguments), function(inst) {
+		$.each(inst.subscriptionIDs, function(id) {
+			var obj = $.grep(Echo.Events._subscriptions[topic].global.handlers, function(o) {
+				return o.id === id;
+			})[0];
+			if (obj && obj.id) {
+				Echo.Events.unsubscribe({"handlerId": obj.id});
+				return false;
+			}
+		});
+	});
 };
 
 conversations.css =

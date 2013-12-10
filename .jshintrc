@@ -21,6 +21,7 @@
 	"laxbreak": true,
 	"node": true,
 	"globals": {
-		"Echo": false
+		"Echo": false,
+		"Backplane": false
 	}
 }
