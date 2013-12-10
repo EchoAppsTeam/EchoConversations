@@ -12,6 +12,35 @@ plugin.labels = {
 };
 
 plugin.init = function() {
+	// Stream should trigger 'onActivitiesComplete' event to start items liveUpdate animation
+	this.component._executeNextActivity = function() {
+		var acts = this.activities;
+		if (!acts.queue.length && this.config.get("state.layout") === "full") {
+			acts.state = "paused";
+		}
+
+		if (!acts.queue.length) {
+			this.events.publish({
+				"topic": "onActivitiesComplete"
+			});
+		}
+
+		if (acts.animations > 0 || !this.itemsRenderingComplete ||
+				!acts.queue.length ||
+				this.config.get("liveUpdates.enabled") &&
+				acts.state === "paused" &&
+				acts.queue[0].action !== "replace" &&
+				!acts.queue[0].byCurrentUser) {
+			return;
+		}
+		acts.queue.shift().handler();
+	};
+
+	// disable 'fade' animation
+	this.component._spotUpdates.animate.fade = function(item) {
+		this.activities.animations--;
+		this._executeNextActivity();
+	};
 	this.component.labels.set({
 		"emptyStream": this.labels.get("emptyStream")
 	});
@@ -39,11 +68,10 @@ Echo.Plugin.create(plugin);
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream.Item");
 
 plugin.events = {
-	"Echo.StreamServer.Controls.Stream.Item.onReady": function() {
-		if (this.get("isLiveUpdate")) {
-			var self = this;
-			var container = this.component.view.get("container");
-
+	"Echo.StreamServer.Controls.Stream.onActivitiesComplete": function() {
+		var self = this;
+		var container = this.component.view.get("container");
+		if (this.get("isLiveUpdate") && container) {
 			var fade = function() {
 				if ($.inviewport(container, {"threshold": 0})) {
 					self.set("isLiveUpdate", false);
@@ -58,6 +86,7 @@ plugin.events = {
 					}
 					$(document).off("scroll", fade).off("resize", fade);
 					return true;
+
 				} else {
 					return false;
 				}
@@ -175,13 +204,17 @@ plugin.component.renderers._button = function(element, extra) {
 	return element.append(button);
 };
 
+var cache = {};
 plugin.methods._transitionSupported = function() {
-	var s = document.createElement('p').style;
-	return 'transition' in s ||
-		'WebkitTransition' in s ||
-		'MozTransition' in s ||
-		'msTransition' in s ||
-		'OTransition' in s;
+	if (!cache.transitionSupported) {
+		var s = document.createElement('p').style;
+		cache.transitionSupported = 'transition' in s ||
+			'WebkitTransition' in s ||
+			'MozTransition' in s ||
+			'msTransition' in s ||
+			'OTransition' in s;
+	}
+	return cache.transitionSupported;
 };
 
 var itemDepthRules = [];

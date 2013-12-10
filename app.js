@@ -150,7 +150,7 @@ conversations.renderers.allPosts = function(element) {
 	this.initComponent({
 		"id": "allPosts",
 		"component": "Echo.StreamServer.Controls.Stream",
-		"config": this._assembleStreamConfig("allPosts", {"target": element})
+		"config": this._assembleStreamConfig("allPosts", {"target": element, "ready": function() { window.stream = this; }})
 	});
 	return element;
 };
@@ -165,38 +165,37 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		"appkey": this.config.get("dependencies.StreamServer.appkey"),
 		"query": this._assembleSearchQuery(componentID),
 		"data": this.get("data." + componentID + "-search"),
-		"fadeTimeout": 0,
-			"item": {
-				"reTag": false,
-				"limits": {
-					// TODO: make configurable in v1.2
-					"maxBodyCharacters": 200
-				}
-			},
-			"asyncItemsRendering": true,
-			"plugins": [{
-				"name": "ItemsRollingWindow",
-				"moreButton": true
+		"item": {
+			"reTag": false,
+			"limits": {
+				// TODO: make configurable in v1.2
+				"maxBodyCharacters": 200
+			}
+		},
+		"asyncItemsRendering": true,
+		"plugins": [{
+			"name": "ItemsRollingWindow",
+			"moreButton": true
+		}, {
+			"name": "CardUIShim"
+		}, {
+			"name": "LikeCardUI"
+		}, {
+			"name": "ReplyCardUI",
+			"nestedPlugins": [{
+				"name": "JanrainBackplaneHandler",
+				"appId": this.config.get("dependencies.Janrain.appId"),
+				"enabled": enableBundledIdentity,
+				"eventsContext": "bundled"
 			}, {
-				"name": "CardUIShim"
-			}, {
-				"name": "LikeCardUI"
-			}, {
-				"name": "ReplyCardUI",
-				"nestedPlugins": [{
-					"name": "JanrainBackplaneHandler",
-					"appId": this.config.get("dependencies.Janrain.appId"),
-					"enabled": enableBundledIdentity,
-					"eventsContext": "bundled"
-				}, {
-					"name": "CardUIShim",
-					"submitPermissions": this._getSubmitPermissions(),
-					"buttons": ["login", "signup"],
-					"eventsContext": enableBundledIdentity ? "bundled" : "custom"
-				}]
-			}, {
-				"name": "ModerationCardUI"
+				"name": "CardUIShim",
+				"submitPermissions": this._getSubmitPermissions(),
+				"buttons": ["login", "signup"],
+				"eventsContext": enableBundledIdentity ? "bundled" : "custom"
 			}]
+		}, {
+			"name": "ModerationCardUI"
+		}]
 	}, overrides);
 };
 
