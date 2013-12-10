@@ -10,9 +10,6 @@ var dashboard = Echo.AppServer.Dashboard.manifest("Echo.Apps.Conversations.Dashb
 dashboard.inherits = Echo.Utils.getComponent("Echo.AppServer.Dashboards.AppSettings");
 
 dashboard.mappings = {
-	"allowAnonymousSubmission": {
-		"key": "auth.allowAnonymousSubmission"
-	},
 	"dependencies.appkey": {
 		"key": "dependencies.StreamServer.appkey"
 	},
@@ -173,14 +170,6 @@ dashboard.config = {
 			"defaultValueTitle": "Use Current Page URL",
 			"customValueTitle": "Use this URL"
 		}
-	},{
-		"component": "Checkbox",
-		"name": "allowAnonymousSubmission",
-		"type": "boolean",
-		"config": {
-			"title": "Allow anonymous submission",
-			"desc": "Allow users to post without logging in"
-		}
 	}, {
 		"component": "Checkbox",
 		"name": "bozoFilter",
@@ -189,6 +178,72 @@ dashboard.config = {
 			"title": "Enable Bozo Filter",
 			"desc": "If enabled, ensures that users see their own post irrespective of the moderation state of that post"
 		}
+	}, {
+		"component": "Group",
+		"name": "composer",
+		"type": "object",
+		"config": {
+			"title": "Composer"
+		},
+		"items": [{
+			"component": "Checkbox",
+			"name": "visible",
+			"type": "boolean",
+			"default": true,
+			"config": {
+				"title": "Visible",
+				"desc": "If True, the Post Composer will be displayed to end users"
+			}
+		}, {
+			"component": "Checkbox",
+			"name": "displaySharingOnPost",
+			"type": "boolean",
+			"default": "true",
+			"config": {
+				"title": "Display Sharing on Post",
+				"desc": "If True, users will be given the option to share their Posts on submit"
+			}
+		}]
+	}, {
+		"component": "Group",
+		"name": "topPosts",
+		"type": "object",
+		"config": {
+			"title": "Top Posts"
+		}
+	}, {
+		"component": "Group",
+		"name": "allPosts",
+		"type": "object",
+		"config": {
+			"title": "All Posts"
+		}
+	}, {
+		"component": "Group",
+		"name": "auth",
+		"type": "object",
+		"config": {
+			"title": "Authorization"
+		},
+		"items": [{
+			"component": "Checkbox",
+			"name": "allowAnonymousSubmission",
+			"type": "boolean",
+			"default": false,
+			"config": {
+				"title": "Allow anonymous submission",
+				"desc": "Allow users to post without logging in"
+			}
+		}, {
+			"component": "Checkbox",
+			"name": "enableBundledIdentity",
+			"type": "boolean",
+			"default": true,
+			"config": {
+				"title": "Bundled Login and Sharing",
+				"desc": "If set to false, the bundled Janrain Login and Sharing functionality is disabled along with related identity features"
+			}
+		}]
 	}, {
 		"component": "Group",
 		"name": "dependencies",
@@ -215,20 +270,6 @@ dashboard.config = {
 				"options": []
 			}
 		}]
-	}, {
-		"component": "Group",
-		"name": "topPosts",
-		"type": "object",
-		"config": {
-			"title": "Top Posts"
-		}
-	}, {
-		"component": "Group",
-		"name": "allPosts",
-		"type": "object",
-		"config": {
-			"title": "All Posts"
-		}
 	}]
 };
 
