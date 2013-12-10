@@ -134,7 +134,10 @@ conversations.renderers.topPosts = function(element) {
 	this.initComponent({
 		"id": "topPosts",
 		"component": "Echo.StreamServer.Controls.Stream",
-		"config": this._assembleStreamConfig("topPosts", {"target": element})
+		"config": this._assembleStreamConfig("topPosts", {
+			"target": element,
+			"infoMessages": {"enabled": false}
+		})
 	});
 	return element;
 };
@@ -170,6 +173,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 					"maxBodyCharacters": 200
 				}
 			},
+			"asyncItemsRendering": true,
 			"plugins": [{
 				"name": "ItemsRollingWindow",
 				"moreButton": true
