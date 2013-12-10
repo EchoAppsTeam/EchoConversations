@@ -48,7 +48,7 @@ dashboard.vars = {
 		}
 	}, {
 		"component": "Input",
-		"name": "initialItemPerPage",
+		"name": "initialItemsPerPage",
 		"type": "number",
 		"default": 15,
 		"config": {
