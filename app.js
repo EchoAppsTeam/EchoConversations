@@ -125,7 +125,8 @@ conversations.renderers.composer = function(element) {
 				"name": "CardUIShim",
 				"submitPermissions": this._getSubmitPermissions(),
 				"buttons": ["login", "signup"],
-				"eventsContext": enableBundledIdentity ? "bundled" : "custom"
+				"eventsContext": enableBundledIdentity ? "bundled" : "custom",
+				"displaySharingOnPost": config.displaySharingOnPost
 			}],
 			"data": {
 				"object": {
