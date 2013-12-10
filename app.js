@@ -7,6 +7,7 @@ var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 
 conversations.config = {
 	"targetURL": "",
+	"bozoFilter": false,
 	"composer": {
 		"visible": true,
 		"displaySharingOnPost": true
@@ -14,7 +15,7 @@ conversations.config = {
 	"topPosts": {
 		"visible": true,
 		"label": "Top Posts",
-		"queryOverride": undefined,
+		"queryOverride": "",
 		"initialItemsPerPage": 5,
 		"initialSortOrder": "reverseChronological",
 		"displaySortOrderPulldown": true,
@@ -30,7 +31,7 @@ conversations.config = {
 	"allPosts": {
 		"visible": true,
 		"label": "All Posts",
-		"queryOverride": undefined,
+		"queryOverride": "",
 		"initialItemsPerPage": 15,
 		"initialSortOrder": "reverseChronological",
 		"displaySortOrderPulldown": true,
@@ -48,7 +49,6 @@ conversations.config = {
 		"enableBundledIdentity": true,
 		"allowAnonymousSubmission": false
 	},
-	"bozoFilter": false,
 	"dependencies": {
 		"Janrain": {"appId": undefined},
 		"StreamServer": {"appkey": undefined}
@@ -95,6 +95,10 @@ conversations.templates.main =
 		'<div class="{class:topPosts}"></div>' +
 		'<div class="{class:allPosts}"></div>' +
 	'</div>';
+
+conversations.templates.defaultQuery =
+	'childrenof:{data:targetURL} itemsPerPage:{data:initialItemsPerPage} {data:markers} ' +
+	'type:comment {data:operators} children:{data:replyNestingLevels} {data:operators}';
 
 conversations.renderers.composer = function(element) {
 	var config = this.config.get("composer");
@@ -161,7 +165,10 @@ conversations.renderers.allPosts = function(element) {
 	this.initComponent({
 		"id": "allPosts",
 		"component": "Echo.StreamServer.Controls.Stream",
-		"config": this._assembleStreamConfig("allPosts", {"target": element, "ready": function() { window.stream = this; }})
+		"config": this._assembleStreamConfig("allPosts", {
+			"target": element,
+			"ready": function() { window.stream = this; }
+		})
 	});
 	return element;
 };
@@ -175,6 +182,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		"appkey": this.config.get("dependencies.StreamServer.appkey"),
 		"query": this._assembleSearchQuery(componentID),
 		"data": this.get("data." + componentID + "-search"),
+		"asyncItemsRendering": true,
 		"item": {
 			"reTag": false,
 			"limits": {
@@ -182,7 +190,6 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 				"maxBodyCharacters": 200
 			}
 		},
-		"asyncItemsRendering": true,
 		"plugins": [].concat(this._getPluginList(componentID), [{
 			"name": "CardUIShim"
 		}, {
@@ -226,27 +233,29 @@ conversations.methods._getPluginList = function(componentID) {
 };
 
 conversations.methods._assembleSearchQuery = function(componentID, overrides) {
+	var operators, markers;
 	var config = this.config.get(componentID, {});
 	var query = config.queryOverride;
-	overrides = overrides || {};
 
 	if (!query) {
 		var states = config.itemStates;
 		var userId = this.user && this.user.get("identityUrl");
-		var markers = config.itemMarkers.length
+
+		markers = config.itemMarkers.length
 			? "markers:" + config.itemMarkers.join(",")
 			: "";
-		var operators = (this.config.get("bozoFilter") && userId)
+		operators = (this.config.get("bozoFilter") && userId)
 			? "(state:" + states + " OR user.id:" + userId + ")"
 			: "state: " + states;
-		query = "childrenof:{data:targetURL} " + markers +
-			" type:comment " + operators +
-			" children:" + config.replyNestingLevels + " " + operators;
 	}
 
 	return this.substitute({
-		"template": query,
-		"data": {"targetURL": this.config.get("targetURL")}
+		"template": query || conversations.templates.defaultQuery,
+		"data": $.extend({}, config, {
+			"markers": markers || "",
+			"operators": operators || "",
+			"targetURL": this.config.get("targetURL")
+		})
 	});
 };
 
