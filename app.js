@@ -26,7 +26,8 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"replyNestingLevels": 2,
 		"itemStates": "Untouched,ModeratorApproved",
-		"itemMarkers": ["Top"]
+		"itemMarkers": ["Top"],
+		"maxItemBodyCharacters": 200
 	},
 	"allPosts": {
 		"visible": true,
@@ -43,7 +44,8 @@ conversations.config = {
 		"replyNestingLevels": 2,
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
 		"itemStates": "Untouched,ModeratorApproved",
-		"itemMarkers": []
+		"itemMarkers": [],
+		"maxItemBodyCharacters": 200
 	},
 	"auth": {
 		"enableBundledIdentity": true,
@@ -182,6 +184,7 @@ conversations.methods._getSubmitPermissions = function() {
 };
 
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
+	var config = this.config.get(componentID);
 	var queryOverrides = componentID === "topPosts" ? {"replyNestingLevels": 0} : {};
 	return $.extend(true, {}, {
 		"appkey": this.config.get("dependencies.StreamServer.appkey"),
@@ -191,11 +194,10 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		"item": {
 			"reTag": false,
 			"limits": {
-				// TODO: make configurable in v1.2
-				"maxBodyCharacters": 200
+				"maxBodyCharacters": config.maxItemBodyCharacters
 			}
 		},
-		"plugins": [].concat(this._getPluginList(componentID), [{
+		"plugins": [].concat(this._getConditionalPluginList(componentID), [{
 			"name": "CardUIShim",
 			"counter": {
 				"data": this.get("data." + componentID + "-count"),
@@ -208,10 +210,10 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"name": "ItemsRollingWindow",
 			"moreButton": true
 		}])
-	}, this.config.get(componentID), overrides);
+	}, config, overrides);
 };
 
-conversations.methods._getPluginList = function(componentID) {
+conversations.methods._getConditionalPluginList = function(componentID) {
 	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	var plugins = {
 		"Like": {
