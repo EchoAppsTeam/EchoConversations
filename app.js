@@ -50,8 +50,8 @@ conversations.config = {
 	"auth": {
 		"enableBundledIdentity": true,
 		"allowAnonymousSubmission": false,
-		"authWidgetConfig": {"auth": 1},
-		"sharingWidgetConfig": {"sharing": 2}
+		"authWidgetConfig": {},
+		"sharingWidgetConfig": {}
 	},
 	"dependencies": {
 		"Janrain": {"appId": undefined},
