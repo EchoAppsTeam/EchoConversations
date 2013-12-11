@@ -367,6 +367,18 @@ plugin.config = {
 	"displaySharingOnPost": true
 };
 plugin.events = {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() {
+			if (this.deferredActivity) {
+				this.deferredActivity();
+				delete this.deferredActivity;
+				// clearing up saved text...
+				var targetURL = this.component.config.get("targetURL");
+				Echo.Utils.set(Echo.Variables, targetURL, "");
+			}
+		}
+	},
 	"Echo.StreamServer.Controls.Submit.onSharingOnPostChange": {
 		"context": "global",
 		"handler": function() {
@@ -376,14 +388,11 @@ plugin.events = {
 };
 
 plugin.labels = {
-	"youMustBeLoggedIn": "You must be logged in to comment",
 	"post": "Post",
 	"postAndShare": "Post and Share"
 };
 
 plugin.templates.attach = '<div class="{plugin.class:attach}"><img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" /></div>';
-
-plugin.templates.loginRequirementNotice = '<div class="{plugin.class:loginRequirementNotice}">{plugin.label:youMustBeLoggedIn}</div>';
 
 plugin.templates.auth = '<div class="{plugin.class:auth}"></div>';
 
@@ -405,8 +414,6 @@ plugin.init = function() {
 	this.extendTemplate("insertAsFirstChild", "postContainer", plugin.templates.postButton);
 
 	this.extendTemplate("insertBefore", "header", plugin.templates.auth);
-	this.extendTemplate("insertAfter", "postContainer",
-				plugin.templates.loginRequirementNotice);
 
 	// drop all validators
 	submit.validators = [];
@@ -424,11 +431,10 @@ plugin.init = function() {
 		if (!areFieldsValid) return false;
 
 		if (!isGuestAllowed && !submit.user.is("logged")) {
-			var notice = self.view.get("loginRequirementNotice");
-			notice.show();
-			setTimeout(function() {
-				notice.hide();
-			}, 5 * 1000); // keep fixed for now, to be revisited later
+			self.deferredActivity = function() {
+				self.component.post();
+			};
+			self._requestLoginPrompt();
 			return false;
 		}
 		return true;
@@ -438,6 +444,20 @@ plugin.init = function() {
 //		as there is no functionality associated with it..
 //
 //	this.extendTemplate("insertAsFirstChild", "controls", plugin.templates.attach);
+};
+
+plugin.methods._requestLoginPrompt = function() {
+	Backplane.response([{
+		// IMPORTANT: we use ID of the last received message
+		// from the server-side to avoid same messages re-processing
+		// because of the "since" parameter cleanup...
+		"id": Backplane.since,
+		"channel_name": Backplane.getChannelName(),
+		"message": {
+			"type": "identity/login/request",
+			"payload": this.component.user.data || {}
+		}
+	}]);
 };
 
 plugin.renderers.postButton = function(element) {
@@ -618,7 +638,6 @@ plugin.css =
 	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; border-top: 0px; background: #ffffff;}' +
 	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{plugin.class} .{class:header} { margin-top: 10px; }' +
-	'.{plugin.class:loginRequirementNotice} { display: none; float: right; margin: 5px; margin: 8px 10px 0 0; color: red; font-weight: bold; font-size: 14px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
 Echo.Plugin.create(plugin);
