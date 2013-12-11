@@ -156,8 +156,7 @@ conversations.renderers.topPosts = function(element) {
 		"id": "topPosts",
 		"component": "Echo.StreamServer.Controls.Stream",
 		"config": this._assembleStreamConfig("topPosts", {
-			"target": element,
-			"infoMessages": {"enabled": false}
+			"target": element
 		})
 	});
 	return element;
@@ -205,7 +204,12 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 				"data": this.get("data." + componentID + "-count"),
 				"query": this._assembleSearchQuery(componentID, queryOverrides)
 			},
-			"displayTopPostHighlight": this.config.get(componentID + ".displayTopPostHighlight")
+			"displayEmptyStream": componentID !== "topPosts",
+			"displayTopPostHighlight": config.displayTopPostHighlight
+		}, {
+			"name": "Sorter",
+			"parentID": componentID,
+			"initialValue": config.initialSortOrder
 		}, {
 			"name": "ModerationCardUI"
 		}, {
@@ -269,7 +273,8 @@ conversations.methods._assembleSearchQuery = function(componentID, overrides) {
 		"data": $.extend({}, config, {
 			"markers": markers || "",
 			"operators": operators || "",
-			"targetURL": this.config.get("targetURL")
+			"targetURL": this.config.get("targetURL"),
+			"initialSortOrder": Echo.Cookie.get([componentID, "sortOrder"].join(".")) || config.initialSortOrder
 		}, overrides)
 	});
 };

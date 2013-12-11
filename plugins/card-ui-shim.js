@@ -11,6 +11,10 @@ plugin.labels = {
 	"emptyStream": "There are no contributions yet.<br>Be first to chime in!"
 };
 
+plugin.config = {
+	"displayEmptyStream": true
+};
+
 plugin.events = {
 	"Echo.StreamServer.Controls.Counter.onError": function(_, data) {
 		var count = (data.data.errorCode === "more_than") ? data.data.errorMessage + "+" : "";
@@ -33,6 +37,8 @@ plugin.events = {
 
 plugin.init = function() {
 	var item = this.component;
+	this.extendTemplate("insertBefore", "state", plugin.templates.caption);
+
 	if (item.config.get("displayCounter")) {
 		this.set("count", this.config.get("counter.data.count"));
 		this._counter = new Echo.StreamServer.Controls.Counter({
@@ -75,18 +81,10 @@ plugin.init = function() {
 	};
 };
 
-plugin.component.renderers.container = function(element) {
-	var stream = this.component;
-	var items = $.grep(stream.get("threads"), function(item) {
-		return !item.deleted;
-	});
+plugin.templates.caption =
+	'<span class="{plugin.class:caption}"></span>';
 
-	return (items.length || stream.config.get("infoMessages.enabled"))
-		? element.show()
-		: element.hide();
-};
-
-plugin.component.renderers.header = function(element) {
+plugin.renderers.caption = function(element) {
 	var item = this.component;
 	var label = this.component.config.get("label");
 	if (item.config.get("displayCounter") && this.get("count")) {
@@ -96,6 +94,19 @@ plugin.component.renderers.header = function(element) {
 	return label
 		? element.empty().append(label).show()
 		: element.hide();
+};
+
+plugin.component.renderers.container = function(element) {
+	var items = $.grep(this.component.get("threads"), function(item) {
+		return !item.deleted;
+	});
+	return (items.length || this.config.get("displayEmptyStream"))
+		? element.show()
+		: element.hide();
+};
+
+plugin.component.renderers.state = function(element) {
+	return element.hide();
 };
 
 plugin.css =
@@ -157,6 +168,7 @@ plugin.config = {
 
 plugin.init = function() {
 	this.set("isLiveUpdate", this.component.config.get("live"));
+	this.extendTemplate("replace", "header", plugin.templates.header);
 	this.extendTemplate("insertBefore", "frame", plugin.templates.topPostMarker);
 	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
 	this.extendTemplate("insertAsLastChild", "expandChildren", plugin.templates.chevron);
@@ -203,7 +215,7 @@ plugin.component.renderers.tags = function(element) {
 };
 
 plugin.component.renderers.markers = function(element) {
-		return element.hide();
+	return element.hide();
 };
 
 plugin.component.renderers.container = function(element) {
