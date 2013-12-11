@@ -26,7 +26,7 @@ dashboard.vars = {
 		"default": true,
 		"config": {
 			"title": "Visible",
-			"desc": "If True, a {data:title} stream is displayed above the All Posts stream showing hand curated posts"
+			"desc": "If enabled, a {data:title} stream is displayed above the All Posts stream showing hand curated posts"
 		}
 	}, {
 		"component": "Input",
@@ -84,7 +84,7 @@ dashboard.vars = {
 		"default": true,
 		"config": {
 			"title": "Display Sort Order Pulldown",
-			"desc": "If True, displays a Sort Order pulldown to end-users, allowing them to change the sort order of {data:title}"
+			"desc": "If enabled, displays a Sort Order pulldown to end-users, allowing them to change the sort order of {data:title}"
 		}
 	}, {
 		"component": "Checkbox",
@@ -93,7 +93,7 @@ dashboard.vars = {
 		"default": true,
 		"config": {
 			"title": "Display Counter",
-			"desc": "If True, a count of {data:title} is displayed to users"
+			"desc": "If enabled, a count of {data:title} is displayed to users"
 		}
 	}, {
 		"component": "Checkbox",
@@ -102,7 +102,7 @@ dashboard.vars = {
 		"default": true,
 		"config": {
 			"title": "Display TopPost Highlight",
-			"desc": "If True, a visual indicator is used to indicate a Top Post"
+			"desc": "If enabled, a visual indicator is used to indicate a Top Post"
 		}
 	}, {
 		"component": "Checkbox",
@@ -111,7 +111,7 @@ dashboard.vars = {
 		"default": true,
 		"config": {
 			"title": "Display Sharing Intent",
-			"desc": "If True, users are offered the option to share each post"
+			"desc": "If enabled, users are offered the option to share each post"
 		}
 	}, {
 		"component": "Checkbox",
@@ -120,7 +120,7 @@ dashboard.vars = {
 		"default": true,
 		"config": {
 			"title": "Display Like Intent",
-			"desc": "If True, users are offered the option to like each post"
+			"desc": "If enabled, users are offered the option to like each post"
 		}
 	}, {
 		"component": "Checkbox",
@@ -129,7 +129,7 @@ dashboard.vars = {
 		"default": true,
 		"config": {
 			"title": "Display Reply Intent",
-			"desc": "If True, users are offered the option to reply to each post"
+			"desc": "If enabled, users are offered the option to reply to each post"
 		}
 	}, {
 		"component": "Select",
@@ -192,7 +192,7 @@ dashboard.config = {
 			"default": true,
 			"config": {
 				"title": "Visible",
-				"desc": "If True, the Post Composer will be displayed to end users"
+				"desc": "If enabled, the Post Composer will be displayed to end users"
 			}
 		}, {
 			"component": "Checkbox",
@@ -201,7 +201,7 @@ dashboard.config = {
 			"default": "true",
 			"config": {
 				"title": "Display Sharing on Post",
-				"desc": "If True, users will be given the option to share their Posts on submit"
+				"desc": "If enabled, users will be given the option to share their Posts on submit"
 			}
 		}]
 	}, {
