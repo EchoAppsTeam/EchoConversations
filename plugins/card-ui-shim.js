@@ -12,6 +12,11 @@ plugin.labels = {
 };
 
 plugin.events = {
+	"Echo.StreamServer.Controls.Counter.onError": function(_, data) {
+		var count = (data.data.errorCode === "more_than") ? data.data.errorMessage + "+" : "";
+		this.set("count", count);
+		this.component.view.render({"name": "header"});
+	},
 	"Echo.StreamServer.Controls.Counter.onUpdate": function(_, data) {
 		this.set("count", Echo.Utils.get(data, "data.count", ""));
 		this.component.view.render({"name": "header"});
