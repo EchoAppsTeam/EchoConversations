@@ -640,6 +640,7 @@ plugin.css =
 	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{plugin.class} .{class:header} { margin-top: 10px; }' +
 	'.{plugin.class} .{class:postContainer} .dropdown-menu { min-width: 100px; }' +
+	'.{plugin.class} .btn.{plugin.class:postButton} { padding: 3px 12px 5px 12px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
 Echo.Plugin.create(plugin);
