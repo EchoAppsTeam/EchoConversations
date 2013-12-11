@@ -298,12 +298,12 @@ plugin.css =
 	'.{plugin.class} .{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
 	'.{plugin.class} .{class:content} .{class:expandChildren} { margin-top: 15px; }' +
-	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 0px 0px 0px 8px; margin-top: 20px; }' +
+	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 0px 0px 0px 8px; padding-top: 20px; }' +
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
 	'.{plugin.class} .{class:children} .{plugin.class:wrapper} { padding-top: 0px; background: none; border: none; }' +
-	'.{plugin.class} .{class:container-child} { padding: 0px 0px 0px 16px; margin-top: 20px; }' +
+	'.{plugin.class} .{class:container-child} { padding: 0px 0px 0px 16px; padding-top: 20px; }' +
 
 	'.{plugin.class} .{class:button} { margin-right: 10px; }' +
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
