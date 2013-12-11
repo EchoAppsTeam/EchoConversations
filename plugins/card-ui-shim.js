@@ -354,9 +354,19 @@ plugin.config = {
 	"buttons": ["login"],
 	"displaySharingOnPost": true
 };
+plugin.events = {
+		"Echo.StreamServer.Controls.Submit.onSharingOnPostChange": {
+			"context": "global",
+			"handler": function() {
+				this.view.render({"name": "postButton"});
+			}
+		}
+};
 
 plugin.labels = {
-	"youMustBeLoggedIn": "You must be logged in to comment"
+	"youMustBeLoggedIn": "You must be logged in to comment",
+	"post": "Post",
+	"postAndShare": "Post and Share"
 };
 
 plugin.templates.attach = '<div class="{plugin.class:attach}"><img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" /></div>';
@@ -365,8 +375,22 @@ plugin.templates.loginRequirementNotice = '<div class="{plugin.class:loginRequir
 
 plugin.templates.auth = '<div class="{plugin.class:auth}"></div>';
 
+plugin.templates.postButton =
+	'<div class="btn-group">' +
+		'<button class="btn btn-primary {plugin.class:postButton}"></button>' +
+		'<button class="btn btn-primary dropdown-toggle {plugin.class:switchSharing}" data-toggle="dropdown"><span class="caret"></span></button>' +
+		'<ul class="dropdown-menu">' +
+			'<li><a href="#" class="{plugin.class:switchToPost}">{plugin.label:post}</a></li>' +
+			'<li><a href="#" class="{plugin.class:switchToPostAndShare}">{plugin.label:postAndShare}</a></li>' +
+		'</ul>' +
+	'</div>';
+
+
 plugin.init = function() {
 	var self = this, submit = this.component;
+
+	this.extendTemplate("remove", "postButton");
+	this.extendTemplate("insertAsFirstChild", "postContainer", plugin.templates.postButton);
 
 	this.extendTemplate("insertBefore", "header", plugin.templates.auth);
 	this.extendTemplate("insertAfter", "postContainer",
@@ -404,6 +428,96 @@ plugin.init = function() {
 //	this.extendTemplate("insertAsFirstChild", "controls", plugin.templates.attach);
 };
 
+plugin.renderers.postButton = function(element) {
+	var self = this;
+	var submit = this.component;
+
+	var states = {
+		"normal": {
+			"target": element,
+			"icon": false,
+			"disabled": false,
+			"label": this.labels.get(this._sharingOnPost() ? "postAndShare" : "post")
+		},
+		"posting": {
+			"target": element,
+			"icon": submit.config.get("cdnBaseURL.sdk-assets") + "/images/loading.gif",
+			"disabled": true,
+			"label": submit.labels.get("posting")
+		}
+	};
+
+	var postButton = new Echo.GUI.Button(states.normal);
+	submit.posting = submit.posting || {};
+	submit.posting.subscriptions = submit.posting.subscriptions || [];
+	var subscribe = function(phase, state, callback) {
+		var topic = "Echo.StreamServer.Controls.Submit.onPost" + phase;
+		var subscriptions = submit.posting.subscriptions;
+		if (subscriptions[topic]) {
+			submit.events.unsubscribe({
+				"topic": topic,
+				"handlerId": subscriptions[topic]
+			});
+		}
+		subscriptions[topic] = submit.events.subscribe({
+			"topic": topic,
+			"handler": function(topic, params) {
+				postButton.setState(state);
+				if (callback) callback(params);
+			}
+		});
+	};
+
+	subscribe("Init", states.posting);
+	subscribe("Complete", states.normal, function(data) {
+		if (self._sharingOnPost()) {
+			self._share(data);
+		}
+		submit.view.get("text").val("").trigger("blur");
+		submit.view.render({"name": "tags"});
+		submit.view.render({"name": "markers"});
+	});
+	subscribe("Error", states.normal, function(params) {
+		var request = params.request || {};
+		if (request.state && request.state.critical) {
+			submit._showError(params);
+		}
+	});
+	submit.posting.action = submit.posting.action || function() {
+		if (submit._isPostValid()) {
+			submit.post();
+		}
+	};
+	element.off("click", submit.posting.action).on("click", submit.posting.action);
+
+	return element;
+};
+
+plugin.renderers.switchSharing = function(element) {
+	if (!this.config.get("displaySharingOnPost")) {
+		// it should looks like single button, not buttons group
+		element.parent().removeClass("btn-group");
+		element.hide();
+	}
+	return element;
+};
+
+plugin.renderers.switchToPost = function(element) {
+	var self = this;
+	return element.on("click", function(e) {
+		self._sharingOnPost(false);
+		e.preventDefault();
+	});
+};
+
+plugin.renderers.switchToPostAndShare = function(element) {
+	var self = this;
+	return element.on("click", function(e) {
+		self._sharingOnPost(true);
+		e.preventDefault();
+	});
+};
+
 plugin.component.renderers.header = function(element) {
 	var plugin = this;
 	if (plugin._userStatus() === "logged") {
@@ -425,8 +539,50 @@ plugin.component.renderers.container = function(element) {
 
 plugin.renderers.auth = function(element) {
 	var config = this.config.assemble({"target": element});
-        new Echo.StreamServer.Controls.CardUIAuth(config);
-        return element;
+	new Echo.StreamServer.Controls.CardUIAuth(config);
+	return element;
+};
+
+plugin.methods._share = function(data) {
+	var item = data.postData.content[0];
+	var payload = {
+		"origin": "item",
+		"actor": {
+			"id": this.component.user.get("identityUrl"),
+			"name": item.actor.name,
+			"avatar": item.actor.avatar
+		},
+		"object": {
+			"id": data.request.response.objectID,
+			"content": item.object.content
+		},
+		"source": item.source,
+		"target": item.targets[0].id
+	};
+	Backplane.response([{
+		// IMPORTANT: we use ID of the last received message
+		// from the server-side to avoid same messages re-processing
+		// because of the "since" parameter cleanup...
+		"id": Backplane.since,
+		"channel_name": Backplane.getChannelName(),
+		"message": {
+			"type": "content/share/request",
+			"payload": payload
+		}
+	}]);
+
+};
+
+plugin.methods._sharingOnPost = function(enabled) {
+	if (typeof enabled !== "undefined") {
+		Echo.Cookie.set("sharingOnPost", !!enabled);
+		this.component.events.publish({
+			"topic": "onSharingOnPostChange",
+			"contenxt": "global"
+		});
+	}
+	return this.config.get("displaySharingOnPost")
+		&& Echo.Cookie.get("sharingOnPost") === "true";
 };
 
 plugin.methods._userStatus = function() {
@@ -444,7 +600,6 @@ plugin.css =
 	'.{plugin.class} .{class:plugin-JanrainAuth-forcedLogin} .{class:header} { display: none; }' +
 	'.{plugin.class} .{class:fieldsWrapper} input { font-weight: normal; }' +
 	'.{plugin.class} .{class:nameContainer} { padding: 3px 2px 3px 5px; }' +
-	'.{plugin.class} .{class:postButton} { color: #006DCC !important; font-weight: bold; }' +
 	'.{plugin.class} .{class:tagsContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:markersContainer} { display: none !important; }' +
 	'.{plugin.class} .{class:content} textarea.{class:textArea} { height: 75px; }' +
