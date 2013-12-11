@@ -295,7 +295,7 @@ plugin.css =
 	'.{plugin.class} .{class:buttons} { margin-left: 0px; white-space: nowrap; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
-	'.{plugin.class} .{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; font-family: "Helvetica Neue", arial, sans-serif; }' +
+	'.{plugin.class} .{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
 	'.{plugin.class} .{class:content} .{class:expandChildren} { margin-top: 15px; }' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 0px 0px 0px 8px; margin-top: 20px; }' +
@@ -451,7 +451,7 @@ plugin.css =
 	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; border-top: 0px; background: #ffffff;}' +
 	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{plugin.class} .{class:header} { margin-top: 10px; }' +
-	'.{plugin.class:loginRequirementNotice} { display: none; float: right; margin: 5px; margin: 8px 10px 0 0; color: red; font-weight: bold; font-family: Arial; font-size: 14px; }' +
+	'.{plugin.class:loginRequirementNotice} { display: none; float: right; margin: 5px; margin: 8px 10px 0 0; color: red; font-weight: bold; font-size: 14px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
 Echo.Plugin.create(plugin);

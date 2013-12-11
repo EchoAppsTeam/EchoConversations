@@ -151,16 +151,16 @@ auth.methods._publishBackplaneEvent = function(type, data) {
 
 auth.css =
 	".{class:container} { float: left; }" +
-	'.{class:via} { margin-left: 15px; color: #D3D3D3; line-height: 18px; font-size: 12px; font-family: Arial; }' +
+	'.{class:via} { margin-left: 15px; color: #D3D3D3; line-height: 18px; font-size: 14px; }' +
 	'.{class:name} .{class:dropdown} { background: url("{%= baseURL %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
-	'.{class:name} ul.nav .dropdown .dropdown-toggle { font-size: 18px; }' +
+	'.{class:name} ul.nav .dropdown .dropdown-toggle { font-size: 20px; }' +
 	'.{class:name} ul.nav { margin-bottom: 3px; }' +
 	'.{class:name} ul.nav .dropdown-menu li > a { font-size: 14px; }' +
 	'.{class:avatar} img { border-radius: 50%; }' +
 	'.{class:login}, .{plugin.class} .{class:signup} { color: #006DCC; }' +
-	'.{class:userAnonymous} { margin: 0px 0px 7px 2px; text-align: left; font-family: Arial; }' +
+	'.{class:userAnonymous} { margin: 0px 0px 7px 2px; text-align: left; }' +
 	'.{class:userLogged} { margin: 0px 0px 5px 3px; }' +
-	'.{class:name} { float: none; margin: 3px 0px 0px 15px; font-family: Arial; font-weight: normal; }' +
+	'.{class:name} { float: none; margin: 3px 0px 0px 15px; font-weight: normal; }' +
 	'.class:container} { float: left; }' +
 	'.{class:avatar} { float: left; width: 48px; height: 48px; border-radius: 50%; }' +
 	'.{class:avatar} > img { width: 48px; height: 48px; }';
