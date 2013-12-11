@@ -79,7 +79,16 @@ plugin.events = {
 	"Echo.StreamServer.Controls.FacePile.Item.Plugins.LikeCardUI.onUnlike": function(topic, args) {
 		this._sendActivity("Unlike", this.component, args.actor);
 		return {"stop": ["bubble"]};
-	}
+	},
+        "Echo.UserSession.onInvalidate": {
+                "context": "global",
+                "handler": function() {
+			if (this.deferredActivity) {
+				this.deferredActivity();
+				delete this.deferredActivity;
+			}
+                }
+        }
 };
 
 /**
@@ -216,6 +225,20 @@ plugin.methods._publishEventComplete = function(args) {
 	});
 };
 
+plugin.methods._requestLoginPrompt = function() {
+        Backplane.response([{
+                // IMPORTANT: we use ID of the last received message
+                // from the server-side to avoid same messages re-processing
+                // because of the "since" parameter cleanup...
+                "id": Backplane.since,
+                "channel_name": Backplane.getChannelName(),
+                "message": {
+                        "type": "identity/login/request",
+                        "payload": this.component.user.data || {}
+                }
+        }]);
+};
+
 plugin.methods._assembleButton = function(name) {
 	var self = this;
 	var callback = function() {
@@ -224,7 +247,14 @@ plugin.methods._assembleButton = function(name) {
 		$("." + item.cssPrefix + "buttonCaption", buttonNode)
 			.empty()
 			.append(self.labels.get(name.toLowerCase() + "Processing"));
-		self._sendActivity(name, item);
+		if (!item.user.is("logged")) {
+			self.deferredActivity = function() {
+				self._sendActivity(name, item);
+			};
+			self._requestLoginPrompt();
+		} else {
+			self._sendActivity(name, item);
+		}
 	};
 	return function() {
 		var item = this;
@@ -236,7 +266,7 @@ plugin.methods._assembleButton = function(name) {
 			"name": name,
 			"icon": "icon-heart",
 			"label": self.labels.get(name.toLowerCase() + "Control"),
-			"visible": item.user.is("logged") && action === name,
+			"visible": action === name,
 			"once": true,
 			"callback": callback
 		};
