@@ -352,7 +352,9 @@ conversations.css =
 	'.{class:topPosts} > div { margin-bottom: 25px; }' +
 	// set box-sizing property for all nested elements to default (content-box)
 	// as its can be overwritten on the page.
-	'.{class:container} * { box-sizing: content-box; -moz-box-sizing: content-box; }';
+	// TODO: get rid of these rules at all!
+	'.{class:container} * { box-sizing: content-box !important; -moz-box-sizing: content-box; }' +
+	'.{class:container} ul, .{class:container} li { list-style: inherit; }';
 
 Echo.App.create(conversations);
 
