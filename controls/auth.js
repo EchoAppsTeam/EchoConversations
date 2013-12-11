@@ -102,6 +102,7 @@ auth.renderers.name = function(element) {
 		}, {
 			"title": this.labels.get("logout"),
 			"handler": function() {
+				auth._publishBackplaneEvent("identity/logout/request");
 				auth.user.logout();
 			}
 		}]
@@ -132,25 +133,30 @@ auth.methods._assembleIdentityControl = function(type, element) {
 		return element.hide();
 	}
 	return element.on("click", function() {
-		Backplane.response([{
-			// IMPORTANT: we use ID of the last received message
-			// from the server-side to avoid same messages re-processing
-			// because of the "since" parameter cleanup...
-			"id": Backplane.since,
-			"channel_name": Backplane.getChannelName(),
-			"message": {
-				"type": "identity/login/request",
-				"source": auth.config.get("eventsContext"),
-				"payload": {
-					"data": {},
-					"config": {
-						"eventsContext": auth.config.get("eventsContext"),
-						"authWidgetConfig": auth.config.get("authWidgetConfig")
-					}
+		auth._publishBackplaneEvent("identity/login/request");
+	});
+};
+
+auth.methods._publishBackplaneEvent = function(type, data) {
+	var context = this.config.get("eventsContext");
+	Backplane.response([{
+		// IMPORTANT: we use ID of the last received message
+		// from the server-side to avoid same messages re-processing
+		// because of the "since" parameter cleanup...
+		"id": Backplane.since,
+		"channel_name": Backplane.getChannelName(),
+		"message": {
+			"type": type,
+			"source": context,
+			"payload": {
+				"data": this.user.data || {},
+				"config": {
+					"eventsContext": context,
+					"authWidgetConfig": this.config.get("authWidgetConfig")
 				}
 			}
-		}]);
-	});
+		}
+	}]);
 };
 
 auth.css =
