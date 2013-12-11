@@ -347,7 +347,6 @@ var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Subm
 plugin.config = {
 	"submitPermissions": "forceLogin",
 	"buttons": ["login"],
-	"eventsContext": "bundled",
 	"displaySharingOnPost": true
 };
 

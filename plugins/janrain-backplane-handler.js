@@ -10,7 +10,6 @@ Echo.Variables.JanrainHandler = Echo.Variables.JanrainHandler || {};
 
 plugin.config = {
 	"appId": undefined,
-	"eventsContext": undefined,
 	"authWidgetConfig": {},
 	"sharingWidgetConfig": {}
 };
@@ -25,10 +24,8 @@ plugin.init = function() {
 	global.initialized = true;
 
 	Backplane.subscribe(function(message) {
-		var sourceMatch = message.source === plugin.config.get("eventsContext");
-
 		// if login is requested
-		if (message.type === "identity/login/request" && sourceMatch) {
+		if (message.type === "identity/login/request") {
 			global.modal && global.modal.destroy();
 			global.modal = plugin._openAuthDialog();
 		}
@@ -37,7 +34,7 @@ plugin.init = function() {
 			global.modal && global.modal.destroy();
 		}
 		// if sharing is requested
-		if (message.type === "content/share/request" && sourceMatch) {
+		if (message.type === "content/share/request") {
 			plugin._openSharingDialog(message.payload);
 		}
 	});

@@ -9,10 +9,6 @@ plugin.init = function() {
 	this.component.addButtonSpec("CardUISocialSharing", this._assembleButton("Share"));
 };
 
-plugin.config = {
-	"eventsContext": "bundled"
-};
-
 plugin.labels = {
 	"share": "Share"
 };
@@ -43,7 +39,6 @@ plugin.methods._share = function(data) {
 		"channel_name": Backplane.getChannelName(),
 		"message": {
 			"type": "content/share/request",
-			"source": this.config.get("eventsContext"),
 			"payload": data
 		}
 	}]);

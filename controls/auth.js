@@ -7,7 +7,6 @@ if (Echo.Control.isDefined(auth)) return;
 
 auth.config = {
 	"buttons": ["login", "signup"],
-	"eventsContent": undefined,
 	"infoMessages": {"enabled": false}
 };
 
@@ -137,7 +136,6 @@ auth.methods._assembleIdentityControl = function(type, element) {
 };
 
 auth.methods._publishBackplaneEvent = function(type, data) {
-	var context = this.config.get("eventsContext");
 	Backplane.response([{
 		// IMPORTANT: we use ID of the last received message
 		// from the server-side to avoid same messages re-processing
@@ -146,7 +144,6 @@ auth.methods._publishBackplaneEvent = function(type, data) {
 		"channel_name": Backplane.getChannelName(),
 		"message": {
 			"type": type,
-			"source": context,
 			"payload": this.user.data || {}
 		}
 	}]);
