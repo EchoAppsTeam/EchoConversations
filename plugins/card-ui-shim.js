@@ -367,12 +367,12 @@ plugin.config = {
 	"displaySharingOnPost": true
 };
 plugin.events = {
-		"Echo.StreamServer.Controls.Submit.onSharingOnPostChange": {
-			"context": "global",
-			"handler": function() {
-				this.view.render({"name": "postButton"});
-			}
+	"Echo.StreamServer.Controls.Submit.onSharingOnPostChange": {
+		"context": "global",
+		"handler": function() {
+			this.view.render({"name": "postButton"});
 		}
+	}
 };
 
 plugin.labels = {
@@ -531,8 +531,8 @@ plugin.renderers.switchToPostAndShare = function(element) {
 };
 
 plugin.component.renderers.header = function(element) {
-	var plugin = this;
-	if (plugin._userStatus() === "logged") {
+	var plugin = this, status = plugin._userStatus();
+	if (status === "logged" || status === "forcedLogin") {
 		return element.empty();
 	}
 	return plugin.parentRenderer("header", arguments);
