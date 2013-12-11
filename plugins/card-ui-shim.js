@@ -366,6 +366,7 @@ plugin.config = {
 	"buttons": ["login"],
 	"displaySharingOnPost": true
 };
+
 plugin.events = {
 	"Echo.UserSession.onInvalidate": {
 		"context": "global",
@@ -400,7 +401,7 @@ plugin.templates.postButton =
 	'<div class="btn-group">' +
 		'<button class="btn btn-primary {plugin.class:postButton}"></button>' +
 		'<button class="btn btn-primary dropdown-toggle {plugin.class:switchSharing}" data-toggle="dropdown"><span class="caret"></span></button>' +
-		'<ul class="dropdown-menu">' +
+		'<ul class="dropdown-menu pull-right">' +
 			'<li><a href="#" class="{plugin.class:switchToPost}">{plugin.label:post}</a></li>' +
 			'<li><a href="#" class="{plugin.class:switchToPostAndShare}">{plugin.label:postAndShare}</a></li>' +
 		'</ul>' +
@@ -638,6 +639,7 @@ plugin.css =
 	'.{plugin.class} .{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; border-top: 0px; background: #ffffff;}' +
 	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{plugin.class} .{class:header} { margin-top: 10px; }' +
+	'.{plugin.class} .{class:postContainer} .dropdown-menu { min-width: 100px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
 Echo.Plugin.create(plugin);
