@@ -27,10 +27,10 @@ plugin.config = {
 };
 
 plugin.labels = {
-	"addMarkerButton": "Add '{marker}' marker",
-	"removeMarkerButton": "Remove '{marker}' marker",
-	"addingMarker": "Adding '{marker}' marker",
-	"removingMarker": "Removing '{marker}' marker",
+	"addTopMarkerButton": "Add to Top Posts",
+	"removeTopMarkerButton": "Remove from Top Posts",
+	"addingTopMarker": "Adding to Top Posts",
+	"removingTopMarker": "Removing from Top Posts",
 	"moderateButton": "Moderate",
 	"approveButton": "Approve",
 	"deleteButton": "Delete",
@@ -301,9 +301,11 @@ plugin.methods._assembleMarkerButton = function(name) {
 		? "remove"
 		: "add";
 	return {
-		"title": this.labels.get(action + "MarkerButton", {"marker": name}),
+		"title": this.labels.get(action + name + "MarkerButton"),
 		"handler": function() {
-			item.block(self.labels.get((action === "add") ? "addingMarker" : "removingMarker", {"marker": name}));
+			item.block(self.labels.get(
+				((action === "add") ? "adding" : "removing") + name + "Marker"
+			));
 			var activity = {
 				"verbs": ["http://activitystrea.ms/schema/1.0/" + ((action === "add") ? "mark" : "unmark")],
 				"targets": [{"id": item.get("data.object.id")}],
