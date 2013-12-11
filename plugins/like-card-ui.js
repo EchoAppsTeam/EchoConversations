@@ -80,15 +80,15 @@ plugin.events = {
 		this._sendActivity("Unlike", this.component, args.actor);
 		return {"stop": ["bubble"]};
 	},
-        "Echo.UserSession.onInvalidate": {
-                "context": "global",
-                "handler": function() {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() {
 			if (this.deferredActivity) {
 				this.deferredActivity();
 				delete this.deferredActivity;
 			}
-                }
-        }
+		}
+	}
 };
 
 /**
