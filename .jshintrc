@@ -22,6 +22,7 @@
 	"node": true,
 	"globals": {
 		"Echo": false,
-		"Backplane": false
+		"Backplane": false,
+		"janrain": false
 	}
 }

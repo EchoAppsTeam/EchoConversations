@@ -49,7 +49,9 @@ conversations.config = {
 	},
 	"auth": {
 		"enableBundledIdentity": true,
-		"allowAnonymousSubmission": false
+		"allowAnonymousSubmission": false,
+		"authWidgetConfig": {},
+		"sharingWidgetConfig": {}
 	},
 	"dependencies": {
 		"Janrain": {"appId": undefined},
@@ -128,7 +130,8 @@ conversations.renderers.composer = function(element) {
 				"submitPermissions": this._getSubmitPermissions(),
 				"buttons": ["login", "signup"],
 				"eventsContext": enableBundledIdentity ? "bundled" : "custom",
-				"displaySharingOnPost": config.displaySharingOnPost
+				"displaySharingOnPost": config.displaySharingOnPost,
+				"authWidgetConfig": this.config.get("auth.authWidgetConfig")
 			}],
 			"data": {
 				"object": {
@@ -215,6 +218,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 
 conversations.methods._getConditionalPluginList = function(componentID) {
 	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
+	var eventsContext = enableBundledIdentity ? "bundled" : "custom";
 	var plugins = {
 		"Like": {
 			"name": "LikeCardUI"
@@ -230,10 +234,16 @@ conversations.methods._getConditionalPluginList = function(componentID) {
 				"name": "CardUIShim",
 				"submitPermissions": this._getSubmitPermissions(),
 				"buttons": ["login", "signup"],
-				"eventsContext": enableBundledIdentity ? "bundled" : "custom"
+				"eventsContext": eventsContext,
+				"authWidgetConfig": this.config.get("auth.authWidgetConfig")
 			}]
 		},
-		"Sharing": {} // TODO: add appropriate plugin data
+		"Sharing": {
+			"name": "CardUISocialSharing",
+			"appId": this.config.get("dependencies.Janrain.appId"),
+			"eventsContext": eventsContext,
+			"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
+		}
 	};
 
 	var config = this.config.get(componentID, {});

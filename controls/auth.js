@@ -8,7 +8,8 @@ if (Echo.Control.isDefined(auth)) return;
 auth.config = {
 	"buttons": ["login", "signup"],
 	"eventsContent": undefined,
-	"infoMessages": {"enabled": false}
+	"infoMessages": {"enabled": false},
+	"authWidgetConfig": {}
 };
 
 auth.dependencies = [{
@@ -127,7 +128,9 @@ auth.methods._detectAuthProvider = function() {
 
 auth.methods._assembleIdentityControl = function(type, element) {
 	var auth = this;
-	if (!this.user.get("sessionID")) return element.hide();
+	if (!this.user.get("sessionID")) {
+		return element.hide();
+	}
 	return element.on("click", function() {
 		Backplane.response([{
 			// IMPORTANT: we use ID of the last received message
@@ -139,7 +142,11 @@ auth.methods._assembleIdentityControl = function(type, element) {
 				"type": "identity/login/request",
 				"source": auth.config.get("eventsContext"),
 				"payload": {
-					"key": "value"
+					"data": {},
+					"config": {
+						"eventsContext": auth.config.get("eventsContext"),
+						"authWidgetConfig": auth.config.get("authWidgetConfig")
+					}
 				}
 			}
 		}]);
