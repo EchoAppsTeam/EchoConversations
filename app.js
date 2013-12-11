@@ -302,16 +302,23 @@ conversations.methods._retrieveData = function(callback) {
 
 	Echo.StreamServer.API.request({
 		"endpoint": "mux",
+		"apiBaseURL": this.config.get("apiBaseURL"),
 		"data": {
 			"requests": requests,
 			"appkey": this.config.get("dependencies.StreamServer.appkey")
 		},
 		"onData": function(data) {
+			$.each(data, function(key, value) {
+				// Ignore errors.
+				// In this case streams/counters will try to fetch initial data by yourself.
+				if (!value || value.result === "error") delete data[key];
+			});
 			app.set("data", data);
 			callback();
 		},
 		"onError": function() {
-			// TODO: need to handle error case...
+			// Ignore mux error also.
+			callback();
 		}
 	}).send();
 };
