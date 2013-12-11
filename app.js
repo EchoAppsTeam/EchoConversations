@@ -207,10 +207,6 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"displayEmptyStream": componentID !== "topPosts",
 			"displayTopPostHighlight": config.displayTopPostHighlight
 		}, {
-			"name": "Sorter",
-			"parentID": componentID,
-			"initialValue": config.initialSortOrder
-		}, {
 			"name": "ModerationCardUI"
 		}, {
 			"name": "ItemsRollingWindow",
@@ -220,12 +216,13 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 };
 
 conversations.methods._getConditionalPluginList = function(componentID) {
+	var config = this.config.get(componentID);
 	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	var plugins = {
-		"Like": {
+		"displayLikeIntent": {
 			"name": "LikeCardUI"
 		},
-		"Reply": {
+		"displayReplyIntent": {
 			"name": "ReplyCardUI",
 			"nestedPlugins": [{
 				"name": "JanrainBackplaneHandler",
@@ -239,14 +236,18 @@ conversations.methods._getConditionalPluginList = function(componentID) {
 				"submitPermissions": this._getSubmitPermissions()
 			}]
 		},
-		"Sharing": {
+		"displaySharingIntent": {
 			"name": "CardUISocialSharing"
+		},
+		"displaySortOrderPulldown": {
+			"name": "Sorter",
+			"parentID": componentID,
+			"initialValue": config.initialSortOrder
 		}
 	};
 
-	var config = this.config.get(componentID, {});
 	return Echo.Utils.foldl([], plugins, function(value, acc, name) {
-		if (!!config["display" + name + "Intent"]) {
+		if (!!config[name]) {
 			acc.push(value);
 		}
 	});
