@@ -10,8 +10,7 @@ plugin.init = function() {
 };
 
 plugin.config = {
-	"appId": "",
-	"sharingWidgetConfig": {}
+	"eventsContext": "bundled"
 };
 
 plugin.labels = {
@@ -35,7 +34,7 @@ plugin.methods._prepareData = function(item) {
 	};
 };
 
-plugin.methods._share = function(data, config) {
+plugin.methods._share = function(data) {
 	Backplane.response([{
 		// IMPORTANT: we use ID of the last received message
 		// from the server-side to avoid same messages re-processing
@@ -44,28 +43,24 @@ plugin.methods._share = function(data, config) {
 		"channel_name": Backplane.getChannelName(),
 		"message": {
 			"type": "content/share/request",
-			"source": config.eventsContext || "bundled",
-			"payload": {"data": data || {}, "config": config || {}}
+			"source": this.config.get("eventsContext"),
+			"payload": data
 		}
 	}]);
 };
 
 plugin.methods._assembleButton = function(name) {
 	var self = this;
-	var callback = function() {
-		var item = this;
-		self._share(self._prepareData(item.data), {
-			"eventsContext": self.config.get("eventsContext"),
-			"sharingWidgetConfig": self.config.get("sharingWidgetConfig")
-		});
-	};
 	return function() {
+		var item = this;
 		return {
 			"name": name,
 			"icon": "icon-share",
 			"label": self.labels.get("share"),
 			"visible": true,
-			"callback": callback
+			"callback": function() {
+				self._share(self._prepareData(item.data));
+			}
 		};
 	};
 };

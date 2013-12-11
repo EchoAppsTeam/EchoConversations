@@ -50,8 +50,8 @@ conversations.config = {
 	"auth": {
 		"enableBundledIdentity": true,
 		"allowAnonymousSubmission": false,
-		"authWidgetConfig": {},
-		"sharingWidgetConfig": {}
+		"authWidgetConfig": {"auth": 1},
+		"sharingWidgetConfig": {"sharing": 2}
 	},
 	"dependencies": {
 		"Janrain": {"appId": undefined},
@@ -124,14 +124,15 @@ conversations.renderers.composer = function(element) {
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
 				"enabled": enableBundledIdentity,
-				"eventsContext": "bundled"
+				"eventsContext": "bundled",
+				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
+				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
 			}, {
 				"name": "CardUIShim",
 				"submitPermissions": this._getSubmitPermissions(),
 				"buttons": ["login", "signup"],
 				"eventsContext": enableBundledIdentity ? "bundled" : "custom",
-				"displaySharingOnPost": config.displaySharingOnPost,
-				"authWidgetConfig": this.config.get("auth.authWidgetConfig")
+				"displaySharingOnPost": config.displaySharingOnPost
 			}],
 			"data": {
 				"object": {
@@ -229,20 +230,19 @@ conversations.methods._getConditionalPluginList = function(componentID) {
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
 				"enabled": enableBundledIdentity,
-				"eventsContext": "bundled"
+				"eventsContext": "bundled",
+				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
+				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
 			}, {
 				"name": "CardUIShim",
 				"submitPermissions": this._getSubmitPermissions(),
 				"buttons": ["login", "signup"],
-				"eventsContext": eventsContext,
-				"authWidgetConfig": this.config.get("auth.authWidgetConfig")
+				"eventsContext": eventsContext
 			}]
 		},
 		"Sharing": {
 			"name": "CardUISocialSharing",
-			"appId": this.config.get("dependencies.Janrain.appId"),
-			"eventsContext": eventsContext,
-			"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
+			"eventsContext": eventsContext
 		}
 	};
 

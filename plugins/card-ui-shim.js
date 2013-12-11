@@ -348,8 +348,7 @@ plugin.config = {
 	"submitPermissions": "forceLogin",
 	"buttons": ["login"],
 	"eventsContext": "bundled",
-	"displaySharingOnPost": true,
-	"authWidgetConfig": {}
+	"displaySharingOnPost": true
 };
 
 plugin.labels = {

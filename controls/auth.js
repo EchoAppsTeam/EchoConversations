@@ -8,8 +8,7 @@ if (Echo.Control.isDefined(auth)) return;
 auth.config = {
 	"buttons": ["login", "signup"],
 	"eventsContent": undefined,
-	"infoMessages": {"enabled": false},
-	"authWidgetConfig": {}
+	"infoMessages": {"enabled": false}
 };
 
 auth.dependencies = [{
@@ -148,13 +147,7 @@ auth.methods._publishBackplaneEvent = function(type, data) {
 		"message": {
 			"type": type,
 			"source": context,
-			"payload": {
-				"data": this.user.data || {},
-				"config": {
-					"eventsContext": context,
-					"authWidgetConfig": this.config.get("authWidgetConfig")
-				}
-			}
+			"payload": this.user.data || {}
 		}
 	}]);
 };

@@ -10,7 +10,9 @@ Echo.Variables.JanrainHandler = Echo.Variables.JanrainHandler || {};
 
 plugin.config = {
 	"appId": undefined,
-	"eventsContext": undefined
+	"eventsContext": undefined,
+	"authWidgetConfig": {},
+	"sharingWidgetConfig": {}
 };
 
 plugin.init = function() {
@@ -28,7 +30,7 @@ plugin.init = function() {
 		// if login is requested
 		if (message.type === "identity/login/request" && sourceMatch) {
 			global.modal && global.modal.destroy();
-			global.modal = plugin._openAuthDialog(message.payload.config);
+			global.modal = plugin._openAuthDialog();
 		}
 		// when login/logout is complete
 		if (message.type === "identity/ack") {
@@ -36,14 +38,14 @@ plugin.init = function() {
 		}
 		// if sharing is requested
 		if (message.type === "content/share/request" && sourceMatch) {
-			plugin._openSharingDialog(message.payload.data, message.payload.config);
+			plugin._openSharingDialog(message.payload);
 		}
 	});
 };
 
-plugin.methods._openAuthDialog = function(config) {
-	var plugin = this, authConfig = config.signinWidgetConfig;
-	var configStr = Echo.Utils.objectToJSON(authConfig);
+plugin.methods._openAuthDialog = function() {
+	var plugin = this, config = plugin.config.get("authWidgetConfig");
+	var configStr = Echo.Utils.objectToJSON(config);
 	var url = this.component.config.get("cdnBaseURL.sdk") +
 			"/third-party/janrain/auth.html?appId=" + plugin.config.get("appId") +
 			"&signinConfig=" + encodeURIComponent(configStr) +
@@ -68,8 +70,9 @@ plugin.methods._openAuthDialog = function(config) {
 };
 
 // copied over from JanrainSharing plugin with a slight modification...
-plugin.methods._openSharingDialog = function(data, config) {
+plugin.methods._openSharingDialog = function(data) {
 	var url, plugin = this;
+	var config = plugin.config.get("sharingWidgetConfig");
 	var callback = function() {
 		plugin.set("foreignConfig", $.extend(true, {}, janrain.engage.share.getState()));
 		plugin._showPopup(data, config);
