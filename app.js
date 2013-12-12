@@ -27,7 +27,20 @@ conversations.config = {
 		"replyNestingLevels": 2,
 		"itemStates": "Untouched,ModeratorApproved",
 		"itemMarkers": ["Top"],
-		"maxItemBodyCharacters": 200
+		"maxItemBodyCharacters": 200,
+		"sortOrderEntries": [{
+			"title": "Newest First",
+			"value": "reverseChronological"
+		}, {
+			"title": "Oldest First",
+			"value": "chronological"
+		}, {
+			"title": "Most popular",
+			"value": "repliesDescending"
+		}, {
+			"title": "Most likes",
+			"value": "likesDescending"
+		}]
 	},
 	"allPosts": {
 		"visible": true,
@@ -45,7 +58,20 @@ conversations.config = {
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
 		"itemStates": "Untouched,ModeratorApproved",
 		"itemMarkers": [],
-		"maxItemBodyCharacters": 200
+		"maxItemBodyCharacters": 200,
+		"sortOrderEntries": [{
+			"title": "Newest First",
+			"value": "reverseChronological"
+		}, {
+			"title": "Oldest First",
+			"value": "chronological"
+		}, {
+			"title": "Most popular",
+			"value": "repliesDescending"
+		}, {
+			"title": "Most likes",
+			"value": "likesDescending"
+		}]
 	},
 	"auth": {
 		"enableBundledIdentity": true,
@@ -242,7 +268,8 @@ conversations.methods._getConditionalPluginList = function(componentID) {
 		"displaySortOrderPulldown": {
 			"name": "Sorter",
 			"parentID": componentID,
-			"initialValue": config.initialSortOrder
+			"initialValue": config.initialSortOrder,
+			"entries": config.sortOrderEntries
 		}
 	};
 
