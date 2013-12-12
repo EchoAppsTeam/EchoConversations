@@ -33,7 +33,7 @@ auth.templates.anonymous =
 		'<span class="{class:login} echo-linkColor echo-clickable">' +
 			'{label:login}' +
 		'</span>' +
-		'<span class="{class:or}"> {label:or} </span>' +
+		'<span class="echo-primaryFont {class:or}"> {label:or} </span>' +
 		'<span class="{class:signup} echo-linkColor echo-clickable">' +
 			'{label:signup}' +
 		'</span>' +
@@ -44,7 +44,7 @@ auth.templates.logged =
 		'<div class="{class:avatar}"></div>' +
 		'<div class="{class:container}">' +
 			'<div class="{class:name}"></div>' +
-			'<div class="{class:via}"></div>' +
+			'<div class="echo-primaryFont {class:via}"></div>' +
 		'</div>' +
 		'<div class="echo-clear"></div>' +
 	'</div>';
@@ -150,7 +150,8 @@ auth.methods._publishBackplaneEvent = function(type, data) {
 };
 
 auth.css =
-	".{class:container} { float: left; }" +
+	'.{class:container} { float: left; }' +
+	'.{class:or} { font-size: 14px; }' +
 	'.{class:via} { margin-left: 15px; color: #D3D3D3; line-height: 18px; font-size: 14px; }' +
 	'.{class:name} .{class:dropdown} { background: url("{%= baseURL %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
 	'.{class:name} ul.nav .dropdown .dropdown-toggle { font-size: 20px; }' +

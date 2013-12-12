@@ -347,7 +347,11 @@ conversations.methods._removeUserInvalidationFrom = function() {
 };
 
 conversations.css =
-	'.{class:container} .echo-primaryFont, .{class:container} .echo-secondaryFont { font-family: "Helvetica Neue", arial, sans-serif; }' +
+	'.{class:container} li > a, ' +
+	'.{class:container} .echo-primaryFont,' +
+	'.{class:container} .echo-secondaryFont,' +
+	'.{class:container} .echo-linkColor ' +
+		'{ font-family: "Helvetica Neue", arial, sans-serif; }' +
 	'.{class:composer} { margin-bottom: 10px; }' +
 	'.{class:topPosts} > div { margin-bottom: 25px; }' +
 	// set box-sizing property for all nested elements to default (content-box)

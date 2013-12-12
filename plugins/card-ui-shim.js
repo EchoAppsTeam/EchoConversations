@@ -187,7 +187,7 @@ plugin.templates.chevron =
 plugin.templates.button =
 	'<a class="{class:button} {class:button}-{data:name}">' +
 		'<i class="{plugin.class:buttonIcon} {data:icon}"></i>' +
-		'<span class="{class:buttonCaption}">{data:label}</span>' +
+		'<span class="echo-primaryFont {class:buttonCaption}">{data:label}</span>' +
 	'</a>';
 
 plugin.templates.topPostMarker =
