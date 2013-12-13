@@ -117,8 +117,8 @@ plugin.css =
 	'.{plugin.class} .{class:body} .echo-control-message { margin: 0px 0px 10px; border: 1px solid #d2d2d2; box-shadow: 0px 1px 1px #d2d2d2; border-radius: 3px; color: #c6c6c6; padding: 30px 0px 30px 0px; text-align: left;}' +
 	'.{plugin.class} .{class:body} .echo-control-message .echo-control-message-info { height: 35px; display: block; font-size: 14px; line-height: 16px; font-weight: normal; font-style: normal; background-image: url({%= baseURL %}/images/info.png); padding-left: 40px; width: 180px; margin: 0px auto; }' +
 	'.{plugin.class} .echo-control-message-info { background: url({%= baseURL %}/images/info.png) no-repeat; }' +
-	'.{plugin.class} .{class:item} { margin: 0px 0px 10px 0px; padding: 0px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; overflow: hidden; background: #ffffff; }' +
-	'.{plugin.class} .{class:item-children} .{class:item} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; overflow: visible; background: #f8f8f8; }';
+	'.{plugin.class} .{class:item} { margin: 0px 0px 10px 0px; padding: 0px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; background: #ffffff; }' +
+	'.{plugin.class} .{class:item-children} .{class:item} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; background: #f8f8f8; }';
 
 Echo.Plugin.create(plugin);
 
@@ -296,8 +296,9 @@ for (var i = 0; i <= 20; i++) {
 
 plugin.css =
 	'.{plugin.class:topPostMarker} { float: right; position: relative; top: -19px; right: 0px; }' +
-	'.{plugin.class} .{plugin.class:wrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; }' +
+	'.{plugin.class} .{plugin.class:wrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
 	'.{plugin.class} .{class:container} { border-left: 8px solid transparent; background: #ffffff; }' +
+	'.{plugin.class} .{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
 	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} { border-left: 8px solid #f5ba47; }' +
 
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
@@ -306,7 +307,7 @@ plugin.css =
 	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
 	'.{plugin.class} .{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
 
-	'.{plugin.class} .{class:content} { background: #f8f8f8; }' +
+	'.{plugin.class} .{class:content} { background: #f8f8f8; border-radius: 3px; }' +
 	'.{plugin.class} .{class:buttons} { margin-left: 0px; white-space: nowrap; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
