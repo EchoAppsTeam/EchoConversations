@@ -80,18 +80,29 @@ conversations.config = {
 		"sharingWidgetConfig": {}
 	},
 	"dependencies": {
-		"Janrain": {"appId": undefined},
-		"StreamServer": {"appkey": undefined}
-	},
-	"liveUpdates": {
-		"transport": "websockets"
+		"Janrain": {
+			"appId": undefined
+		},
+		"StreamServer": {
+			"appkey": undefined,
+			"apiBaseURL": "//api.echoenabled.com/v1/",
+			"submissionProxyURL": "https://apps.echoenabled.com/v2/esp/activity",
+			"liveUpdates": {
+				"transport": "websockets",
+				"URL": "//live.echoenabled.com/v1/"
+			}
+		}
 	}
 };
 
 conversations.config.normalizer = {
+	// we should keep "appkey" and "apiBaseURL" at the root level
+	// to let the Echo.UserSession class initialize correctly
 	"appkey": function() {
-		// We should move appkey to root level, otherwise user will not be initialized.
 		return this.get("dependencies.StreamServer.appkey");
+	},
+	"apiBaseURL": function(value) {
+		return this.get("dependencies.StreamServer.apiBaseURL");
 	},
 	"targetURL": function(value) {
 		return value
@@ -138,11 +149,14 @@ conversations.renderers.composer = function(element) {
 	}
 	var targetURL = this.config.get("targetURL");
 	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
+	var ssConfig = this.config.get("dependencies.StreamServer");
 	this.initComponent({
 		"id": "composer",
 		"component": "Echo.StreamServer.Controls.Submit",
 		"config": {
-			"appkey": this.config.get("dependencies.StreamServer.appkey"),
+			"appkey": ssConfig.appkey,
+			"apiBaseURL": ssConfig.apiBaseURL,
+			"submissionProxyURL": ssConfig.submissionProxyURL,
 			"target": element,
 			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
@@ -212,9 +226,13 @@ conversations.methods._getSubmitPermissions = function() {
 
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 	var config = this.config.get(componentID);
+	var ssConfig = this.config.get("dependencies.StreamServer");
 	var queryOverrides = componentID === "topPosts" ? {"replyNestingLevels": 0} : {};
 	return $.extend(true, {}, {
-		"appkey": this.config.get("dependencies.StreamServer.appkey"),
+		"appkey": ssConfig.appkey,
+		"apiBaseURL": ssConfig.apiBaseURL,
+		"liveUpdates": ssConfig.liveUpdates,
+		"submissionProxyURL": ssConfig.submissionProxyURL,
 		"query": this._assembleSearchQuery(componentID),
 		"data": this.get("data." + componentID + "-search"),
 		"asyncItemsRendering": true,
@@ -228,7 +246,8 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"name": "CardUIShim",
 			"counter": {
 				"data": this.get("data." + componentID + "-count"),
-				"query": this._assembleSearchQuery(componentID, queryOverrides)
+				"query": this._assembleSearchQuery(componentID, queryOverrides),
+				"apiBaseURL": ssConfig.apiBaseURL
 			},
 			"displayEmptyStream": componentID !== "topPosts",
 			"displayTopPostHighlight": config.displayTopPostHighlight
@@ -333,12 +352,13 @@ conversations.methods._retrieveData = function(callback) {
 		return;
 	}
 
+	var ssConfig = this.config.get("dependencies.StreamServer");
 	Echo.StreamServer.API.request({
 		"endpoint": "mux",
-		"apiBaseURL": this.config.get("apiBaseURL"),
+		"apiBaseURL": ssConfig.apiBaseURL,
 		"data": {
-			"requests": requests,
-			"appkey": this.config.get("dependencies.StreamServer.appkey")
+			"appkey": ssConfig.appkey,
+			"requests": requests
 		},
 		"onData": function(data) {
 			$.each(data, function(key, value) {

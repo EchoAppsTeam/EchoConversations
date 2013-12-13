@@ -45,6 +45,7 @@ plugin.init = function() {
 			"target": $("<div>"),
 			"appkey": item.config.get("appkey"),
 			"context": item.config.get("context"),
+			"apiBaseURL": this.config.get("counter.apiBaseURL"),
 			"query": this.config.get("counter.query"),
 			"data": this.config.get("counter.data")
 		});
