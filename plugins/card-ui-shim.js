@@ -19,11 +19,11 @@ plugin.events = {
 	"Echo.StreamServer.Controls.Counter.onError": function(_, data) {
 		var count = (data.data.errorCode === "more_than") ? data.data.errorMessage + "+" : "";
 		this.set("count", count);
-		this.component.view.render({"name": "header"});
+		this.view.render({"name": "caption"});
 	},
 	"Echo.StreamServer.Controls.Counter.onUpdate": function(_, data) {
 		this.set("count", Echo.Utils.get(data, "data.count", ""));
-		this.component.view.render({"name": "header"});
+		this.view.render({"name": "caption"});
 	},
 	"Echo.StreamServer.Controls.Stream.Item.onAdd": function() {
 		this.component.view.render({"name": "container"});
@@ -110,6 +110,8 @@ plugin.component.renderers.state = function(element) {
 };
 
 plugin.css =
+	'.{plugin.cass} .{class:more} { border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
+	'.{plugin.cass} .{class:messageText} { border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{plugin.class:caption} { line-height: 18px; }' +
 	'.{plugin.class} .{class:header} { padding: 5px 0px 5px 0px; margin: 0px; font-size: 14px; }' +
 	'.{plugin.class} .{class:body} .echo-control-message { margin: 0px 0px 10px; border: 1px solid #d2d2d2; box-shadow: 0px 1px 1px #d2d2d2; border-radius: 3px; color: #c6c6c6; padding: 30px 0px 30px 0px; text-align: left;}' +
