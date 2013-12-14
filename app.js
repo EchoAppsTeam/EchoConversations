@@ -188,115 +188,57 @@ conversations.renderers.composer = function(element) {
 };
 
 conversations.renderers.topPosts = function(element) {
-	var config = this.config.get("topPosts");
-	if (!config.visible) {
-		return element;
-	}
+	this.view.render({
+		"target": element,
+		"name": "_stream",
+		"extra": {"id": "topPosts"}
+	});
+};
+
+conversations.renderers.allPosts = function(element) {
+	this.view.render({
+		"target": element,
+		"name": "_stream",
+		"extra": {"id": "allPosts"}
+	});
+};
+
+conversations.renderers._stream = function(element, extra) {
 	this.initComponent({
-		"id": "topPosts",
-		"component": "Echo.StreamServer.Controls.Stream",
-		"config": this._assembleStreamConfig("topPosts", {
+		"id": extra.id,
+		"component": "Echo.Apps.Conversations.StreamEntry",
+		"config": this._assembleStreamConfig(extra.id, {
 			"target": element
 		})
 	});
 	return element;
 };
 
-conversations.renderers.allPosts = function(element) {
-	var config = this.config.get("allPosts");
-	if (!config.visible) {
-		return element;
-	}
-	this.initComponent({
-		"id": "allPosts",
-		"component": "Echo.StreamServer.Controls.Stream",
-		"config": this._assembleStreamConfig("allPosts", {
-			"target": element,
-			"labels": {
-				"emptyStream": config.noPostsMessage
-			}
-		})
-	});
-	return element;
-};
-
-conversations.methods._getSubmitPermissions = function() {
-	return this.config.get("auth.allowAnonymousSubmission") ? "allowGuest" : "forceLogin";
-};
-
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
-	var config = this.config.get(componentID);
 	var ssConfig = this.config.get("dependencies.StreamServer");
 	var queryOverrides = componentID === "topPosts" ? {"replyNestingLevels": 0} : {};
-	return $.extend(true, {}, {
+	return $.extend({
+		"id": componentID,
+		"auth": this.config.get("auth"),
 		"appkey": ssConfig.appkey,
 		"apiBaseURL": ssConfig.apiBaseURL,
 		"liveUpdates": ssConfig.liveUpdates,
 		"submissionProxyURL": ssConfig.submissionProxyURL,
-		"query": this._assembleSearchQuery(componentID),
-		"data": this.get("data." + componentID + "-search"),
-		"asyncItemsRendering": true,
-		"item": {
-			"reTag": false,
-			"limits": {
-				"maxBodyCharacters": config.maxItemBodyCharacters
-			}
+		"janrainAppId": this.config.get("dependencies.Janrain.appId"),
+		"stream": {
+			"data": this.get("data." + componentID + "-search"),
+			"query": this._assembleSearchQuery(componentID)
 		},
-		"plugins": [].concat(this._getConditionalPluginList(componentID), [{
-			"name": "CardUIShim",
-			"counter": {
-				"data": this.get("data." + componentID + "-count"),
-				"query": this._assembleSearchQuery(componentID, queryOverrides),
-				"apiBaseURL": ssConfig.apiBaseURL
-			},
-			"displayEmptyStream": componentID !== "topPosts",
-			"displayTopPostHighlight": config.displayTopPostHighlight
-		}, {
-			"name": "ModerationCardUI"
-		}, {
-			"name": "ItemsRollingWindow",
-			"moreButton": true
-		}])
-	}, config, overrides);
+		"counter": {
+			"data": this.get("data." + componentID + "-count"),
+			"query": this._assembleSearchQuery(componentID, queryOverrides)
+		},
+		"displayEmptyStream": componentID === "allPosts"
+	}, this.config.get(componentID), overrides);
 };
 
-conversations.methods._getConditionalPluginList = function(componentID) {
-	var config = this.config.get(componentID);
-	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
-	var plugins = {
-		"displayLikeIntent": {
-			"name": "LikeCardUI"
-		},
-		"displayReplyIntent": {
-			"name": "ReplyCardUI",
-			"nestedPlugins": [{
-				"name": "JanrainBackplaneHandler",
-				"appId": this.config.get("dependencies.Janrain.appId"),
-				"enabled": enableBundledIdentity,
-				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
-				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
-			}, {
-				"name": "CardUIShim",
-				"buttons": ["login", "signup"],
-				"submitPermissions": this._getSubmitPermissions()
-			}]
-		},
-		"displaySharingIntent": {
-			"name": "CardUISocialSharing"
-		},
-		"displaySortOrderPulldown": {
-			"name": "Sorter",
-			"parentID": componentID,
-			"initialValue": config.initialSortOrder,
-			"entries": config.sortOrderEntries
-		}
-	};
-
-	return Echo.Utils.foldl([], plugins, function(value, acc, name) {
-		if (!!config[name]) {
-			acc.push(value);
-		}
-	});
+conversations.methods._getSubmitPermissions = function() {
+	return this.config.get("auth.allowAnonymousSubmission") ? "allowGuest" : "forceLogin";
 };
 
 conversations.methods._assembleSearchQuery = function(componentID, overrides) {

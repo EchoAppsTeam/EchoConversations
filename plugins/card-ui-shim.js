@@ -7,50 +7,11 @@
  */
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream");
 
-plugin.labels = {
-	"emptyStream": "There are no contributions yet.<br>Be first to chime in!"
-};
-
 plugin.config = {
 	"displayEmptyStream": true
 };
 
-plugin.events = {
-	"Echo.StreamServer.Controls.Counter.onError": function(_, data) {
-		var count = (data.data.errorCode === "more_than") ? data.data.errorMessage + "+" : "";
-		this.set("count", count);
-		this.view.render({"name": "caption"});
-	},
-	"Echo.StreamServer.Controls.Counter.onUpdate": function(_, data) {
-		this.set("count", Echo.Utils.get(data, "data.count", ""));
-		this.view.render({"name": "caption"});
-	},
-	"Echo.StreamServer.Controls.Stream.Item.onAdd": function() {
-		this.component.view.render({"name": "container"});
-		this._counter && this._counter.refresh();
-	},
-	"Echo.StreamServer.Controls.Stream.Item.onDelete": function() {
-		this.component.view.render({"name": "container"});
-		this._counter && this._counter.refresh();
-	}
-};
-
 plugin.init = function() {
-	var item = this.component;
-	this.extendTemplate("insertBefore", "state", plugin.templates.caption);
-
-	if (item.config.get("displayCounter")) {
-		this.set("count", this.config.get("counter.data.count"));
-		this._counter = new Echo.StreamServer.Controls.Counter({
-			"target": $("<div>"),
-			"appkey": item.config.get("appkey"),
-			"context": item.config.get("context"),
-			"apiBaseURL": this.config.get("counter.apiBaseURL"),
-			"query": this.config.get("counter.query"),
-			"data": this.config.get("counter.data")
-		});
-	}
-
 	// Stream should trigger 'onActivitiesComplete' event to start items liveUpdate animation
 	this.component._executeNextActivity = function() {
 		var acts = this.activities;
@@ -82,19 +43,8 @@ plugin.init = function() {
 	};
 };
 
-plugin.templates.caption =
-	'<span class="{plugin.class:caption}"></span>';
-
-plugin.renderers.caption = function(element) {
-	var item = this.component;
-	var label = this.component.config.get("label");
-	if (item.config.get("displayCounter") && this.get("count")) {
-		label += " (" + this.get("count") + ")";
-	}
-
-	return label
-		? element.empty().append(label).show()
-		: element.hide();
+plugin.component.renderers.header = function(element) {
+	return element.hide();
 };
 
 plugin.component.renderers.container = function(element) {
@@ -104,10 +54,6 @@ plugin.component.renderers.container = function(element) {
 	return (items.length || this.config.get("displayEmptyStream"))
 		? element.show()
 		: element.hide();
-};
-
-plugin.component.renderers.state = function(element) {
-	return element.hide();
 };
 
 plugin.css =
