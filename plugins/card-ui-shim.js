@@ -165,6 +165,10 @@ plugin.events = {
 	}
 };
 
+plugin.labels = {
+	"topPostIndicatorTitle": "Top Post"
+};
+
 plugin.config = {
 	"fadeTimeout": 10000, // 10 seconds
 	"displayTopPostHighlight": true
@@ -195,14 +199,15 @@ plugin.templates.button =
 	'</a>';
 
 plugin.templates.topPostMarker =
-	'<i class="icon-bookmark {plugin.class:topPostMarker}"></i>';
+	'<i class="icon-bookmark {plugin.class:topPostMarker}" title="{plugin.label:topPostIndicatorTitle}"></i>';
 
 
 plugin.renderers.topPostMarker = function(element) {
 	var item = this.component;
 	var itemMarkers = item.get("data.object.markers", []);
-	var visible = !!this.config.get("displayTopPostHighlight") && !item.get("depth") && ~$.inArray("Top", itemMarkers);
-
+	var visible = !!this.config.get("displayTopPostHighlight") &&
+			!item.get("depth") &&
+			~$.inArray("Top", itemMarkers);
 	return visible
 		? element.show()
 		: element.hide();
