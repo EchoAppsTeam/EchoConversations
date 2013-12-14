@@ -70,8 +70,9 @@ entry.init = function() {
 			"target": $("<div>"),
 			"appkey": this.config.get("appkey"),
 			"context": this.config.get("context"),
+			"apiBaseURL": this.config.get("apiBaseURL"),
 			"query": this.config.get("counter.query"),
-			"data": this.get("counter.data")
+			"data": this.config.get("counter.data")
 		});
 		this.set("isEmpty", !this.get("count"));
 	}
