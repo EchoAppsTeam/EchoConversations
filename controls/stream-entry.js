@@ -106,7 +106,6 @@ entry.renderers.counter = function(element) {
 	if (!this.config.get("displayCounter") || !this.get("count")) {
 		return element.hide();
 	}
-	console.log(this.get("count"));
 	var count = this.substitute({
 		"template": "({data:count})",
 		"data": {"count": this.get("count")}
@@ -266,7 +265,7 @@ entry.css =
 	'.{class:caption} { line-height: 18px; font-size: 14px; }' +
 	'.{class:counter} { line-height: 18px; font-size: 14px; }' +
 	'.{class:sorter} ul.nav { margin-bottom: 0px; font-size: 13px; }' +
-	'.{class:sorter} ul.nav > li > a { text-decoration: none; color: #7f7f7f; line-height: 18px; }' +
+	'.{class:sorter} ul.nav > li > a { text-decoration: none; color: #7f7f7f; line-height: 22px; }' +
 	'.{class:sorter} ul.nav > li > a:hover,' +
 	'.{class:sorter} ul.nav > li > a:focus ' +
 		'{ background-color: transparent}' +

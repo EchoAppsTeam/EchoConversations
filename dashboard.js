@@ -149,6 +149,7 @@ dashboard.vars = {
 	}, {
 		"component": "Input",
 		"name": "noPostsMessage",
+		"type": "string",
 		"default": "There are no posts yet.<br>Be the first to chime in!",
 		"config": {
 			"title": "No Posts Message",
