@@ -89,7 +89,9 @@ conversations.config = {
 			"submissionProxyURL": "https://apps.echoenabled.com/v2/esp/activity",
 			"liveUpdates": {
 				"transport": "websockets",
-				"URL": "//live.echoenabled.com/v1/"
+				"websockets": {
+					"URL": "//live.echoenabled.com/v1/"
+				}
 			}
 		}
 	}
