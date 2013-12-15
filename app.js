@@ -96,13 +96,13 @@ conversations.config = {
 };
 
 conversations.config.normalizer = {
-	// we should keep "appkey" and "apiBaseURL" at the root level
-	// to let the Echo.UserSession class initialize correctly
-	"appkey": function() {
-		return this.get("dependencies.StreamServer.appkey");
-	},
-	"apiBaseURL": function(value) {
-		return this.get("dependencies.StreamServer.apiBaseURL");
+	"dependencies": function(value) {
+		// we should keep "appkey" and "apiBaseURL" at the root level
+		// to let the Echo.UserSession class initialize correctly
+		var ssConfig = value.StreamServer || {};
+		this.set("appkey", ssConfig.appkey);
+		this.set("apiBaseURL", ssConfig.apiBaseURL);
+		return value;
 	},
 	"targetURL": function(value) {
 		return value
