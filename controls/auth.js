@@ -127,7 +127,8 @@ auth.methods._detectAuthProvider = function() {
 
 auth.methods._assembleIdentityControl = function(type, element) {
 	var auth = this;
-	if (!this.user.get("sessionID")) {
+	var buttons = this.config.get("buttons");
+	if (!this.user.get("sessionID") || !~$.inArray(type, buttons)) {
 		return element.hide();
 	}
 	return element.on("click", function() {

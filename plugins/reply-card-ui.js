@@ -139,7 +139,7 @@ plugin.methods.destroy = function() {
 
 plugin.methods._submitConfig = function(target) {
 	var plugin = this, item = this.component;
-	return plugin.config.assemble({
+	return plugin.config.assemble($.extend(true, {
 		"target": target,
 		"targetURL": item.get("data.object.id"),
 		"parent": item.config.getAsHash(),
@@ -149,7 +149,7 @@ plugin.methods._submitConfig = function(target) {
 			plugin.set("submit", this);
 			plugin._expand();
 		}
-	});
+	}, this.config.get("auth")));
 };
 
 plugin.methods._showSubmit = function() {

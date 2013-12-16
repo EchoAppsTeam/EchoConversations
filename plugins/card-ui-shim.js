@@ -526,7 +526,7 @@ plugin.component.renderers.container = function(element) {
 };
 
 plugin.renderers.auth = function(element) {
-	var config = this.config.assemble({"target": element});
+	var config = this.config.assemble($.extend(true, {"target": element}, this.config.get("auth")));
 	new Echo.StreamServer.Controls.CardUIAuth(config);
 	return element;
 };

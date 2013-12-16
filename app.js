@@ -172,7 +172,8 @@ conversations.renderers.composer = function(element) {
 				"name": "CardUIShim",
 				"submitPermissions": this._getSubmitPermissions(),
 				"buttons": ["login", "signup"],
-				"displaySharingOnPost": config.displaySharingOnPost
+				"displaySharingOnPost": config.displaySharingOnPost,
+				"auth": this.config.get("auth")
 			}],
 			"data": {
 				"object": {

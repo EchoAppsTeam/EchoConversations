@@ -62,7 +62,6 @@ entry.events = {
 	}
 };
 
-
 entry.init = function() {
 	if (this.config.get("displayCounter")) {
 		this.set("count", this.config.get("counter.data.count"));
@@ -233,6 +232,7 @@ entry.methods._getConditionalPluginList = function(componentID) {
 		},
 		"displayReplyIntent": {
 			"name": "ReplyCardUI",
+			"auth": this.config.get("auth"),
 			"nestedPlugins": [{
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("janrainAppId"),
