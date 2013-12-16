@@ -26,7 +26,7 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"replyNestingLevels": 2,
 		"itemStates": "Untouched,ModeratorApproved",
-		"itemMarkers": ["Top"],
+		"itemMarkers": ["Conversations.TopPost"],
 		"maxItemBodyCharacters": 200,
 		"sortOrderEntries": [{
 			"title": "Newest First",

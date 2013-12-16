@@ -153,7 +153,7 @@ plugin.renderers.topPostMarker = function(element) {
 	var itemMarkers = item.get("data.object.markers", []);
 	var visible = !!this.config.get("displayTopPostHighlight") &&
 			!item.get("depth") &&
-			~$.inArray("Top", itemMarkers);
+			~$.inArray("Conversations.TopPost", itemMarkers);
 	return visible
 		? element.show()
 		: element.hide();

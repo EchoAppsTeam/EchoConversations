@@ -146,6 +146,10 @@ plugin.statuses = [
 	"SystemFlagged"
 ];
 
+plugin.button2marker = {
+	"Top": "Conversations.TopPost"
+};
+
 plugin.button2status = {
 	"Spam": "ModeratorFlagged",
 	"Delete": "ModeratorDeleted",
@@ -310,7 +314,7 @@ plugin.methods._assembleMarkerButton = function(name) {
 				"verbs": ["http://activitystrea.ms/schema/1.0/" + ((action === "add") ? "mark" : "unmark")],
 				"targets": [{"id": item.get("data.object.id")}],
 				"object": {
-					"content": name
+					"content": plugin.button2marker[name] || name
 				}
 			};
 
