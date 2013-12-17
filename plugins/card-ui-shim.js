@@ -249,9 +249,9 @@ for (var i = 0; i <= 20; i++) {
 plugin.css =
 	'.{plugin.class:topPostMarker} { float: right; position: relative; top: -19px; right: 0px; }' +
 	'.{plugin.class} .{plugin.class:wrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
-	'.{plugin.class} .{class:container} { border-left: 8px solid transparent; background: #ffffff; }' +
+	'.{plugin.class} .{class:container} { border-left: 4px solid transparent; background: #ffffff; }' +
 	'.{plugin.class} .{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
-	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} { border-left: 8px solid #f5ba47; }' +
+	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} { border-left: 4px solid #f5ba47; }' +
 
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
 	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
@@ -300,7 +300,7 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
 
 	'.{plugin.class} .{class:data} { padding: 7px 0px 0px 0px; }' +
-	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 15px 16px 0px 8px; }' +
+	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 15px 16px 0px 12px; }' +
 
 	itemDepthRules.join("\n");
 
