@@ -356,7 +356,7 @@ conversations.css =
 	'.{class:container} .echo-secondaryFont,' +
 	'.{class:container} .echo-linkColor ' +
 		'{ font-family: "Helvetica Neue", arial, sans-serif; }' +
-	'.{class:composer} { margin-bottom: 10px; }' +
+	'.{class:postComposer} { margin-bottom: 10px; }' +
 	'.{class:topPosts} > div { margin-bottom: 25px; }' +
 	// set box-sizing property for all nested elements to default (content-box)
 	// as its can be overwritten on the page.
