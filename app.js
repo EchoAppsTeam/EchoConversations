@@ -8,9 +8,21 @@ var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 conversations.config = {
 	"targetURL": "",
 	"bozoFilter": false,
-	"composer": {
+	"postComposer": {
 		"visible": true,
-		"displaySharingOnPost": true
+		"displaySharingOnPost": true,
+		"comments": {
+			"prompt": "What's on your mind, dude?",
+			"resolveURLs": true
+		}
+	},
+	"replyComposer": {
+		"visible": true,
+		"displaySharingOnPost": true,
+		"comments": {
+			"prompt": "What's on your mind?",
+			"resolveURLs": true
+		}
 	},
 	"topPosts": {
 		"visible": true,
@@ -134,7 +146,7 @@ conversations.init = function() {
 
 conversations.templates.main =
 	'<div class="{class:container}">' +
-		'<div class="{class:composer}"></div>' +
+		'<div class="{class:postComposer}"></div>' +
 		'<div class="{class:topPosts}"></div>' +
 		'<div class="{class:allPosts}"></div>' +
 	'</div>';
@@ -144,8 +156,8 @@ conversations.templates.defaultQuery =
 	'itemsPerPage:{data:initialItemsPerPage} {data:markers} type:comment ' +
 	'{data:operators} children:{data:replyNestingLevels} {data:operators}';
 
-conversations.renderers.composer = function(element) {
-	var config = this.config.get("composer");
+conversations.renderers.postComposer = function(element) {
+	var config = this.config.get("postComposer");
 	if (!config.visible) {
 		return element;
 	}
@@ -153,7 +165,7 @@ conversations.renderers.composer = function(element) {
 	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	var ssConfig = this.config.get("dependencies.StreamServer");
 	this.initComponent({
-		"id": "composer",
+		"id": "postComposer",
 		"component": "Echo.StreamServer.Controls.Submit",
 		"config": {
 			"appkey": ssConfig.appkey,
@@ -168,13 +180,12 @@ conversations.renderers.composer = function(element) {
 				"enabled": enableBundledIdentity,
 				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
 				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
-			}, {
+			}, $.extend({
 				"name": "CardUIShim",
 				"submitPermissions": this._getSubmitPermissions(),
 				"buttons": ["login", "signup"],
-				"displaySharingOnPost": config.displaySharingOnPost,
 				"auth": this.config.get("auth")
-			}],
+			}, this.config.get("postComposer"))],
 			"data": {
 				"object": {
 					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
@@ -236,7 +247,8 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"data": this.get("data." + componentID + "-count"),
 			"query": this._assembleSearchQuery(componentID, queryOverrides)
 		},
-		"displayEmptyStream": componentID === "allPosts"
+		"displayEmptyStream": componentID === "allPosts",
+		"replyComposer": this.config.get("replyComposer")
 	}, this.config.get(componentID), overrides);
 };
 

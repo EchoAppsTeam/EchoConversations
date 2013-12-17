@@ -27,6 +27,7 @@ entry.config = {
 	"displaySortOrderPulldown": true,
 	"displayCounter": true,
 	"displayEmptyStream": false,
+	"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
 	"sortOrderEntries": [{
 		"title": "Newest First",
 		"value": "reverseChronological"
@@ -40,7 +41,14 @@ entry.config = {
 		"title": "Most likes",
 		"value": "likesDescending"
 	}],
-	"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!"
+	"replyComposer": {
+		"visible": true,
+		"displaySharingOnPost": true,
+		"comments": {
+			"prompt": "What's on your mind?",
+			"resolveURLs": true
+		}
+	}
 };
 
 entry.vars = {
@@ -232,31 +240,33 @@ entry.methods._getStreamConfig = function() {
 entry.methods._getConditionalPluginList = function(componentID) {
 	var self = this, auth = this.config.get("auth");
 	var plugins = {
-		"displayLikeIntent": {
+		"Like": {
 			"name": "LikeCardUI"
 		},
-		"displayReplyIntent": {
+		"Reply": {
 			"name": "ReplyCardUI",
 			"auth": this.config.get("auth"),
+			"enabled": this.config.get("replyComposer.visible"),
+			"actionString": this.config.get("replyComposer.comments.prompt"),
 			"nestedPlugins": [{
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("janrainAppId"),
 				"enabled": auth.enableBundledIdentity,
 				"authWidgetConfig": auth.authWidgetConfig,
 				"sharingWidgetConfig": auth.sharingWidgetConfig
-			}, {
+			}, $.extend({
 				"name": "CardUIShim",
 				"buttons": ["login", "signup"],
 				"submitPermissions": this._getSubmitPermissions()
-			}]
+			}, this.config.get("replyComposer"))]
 		},
-		"displaySharingIntent": {
+		"Sharing": {
 			"name": "CardUISocialSharing"
 		}
 	};
 
 	return Echo.Utils.foldl([], plugins, function(value, acc, name) {
-		if (!!self.config.get(name)) {
+		if (!!self.config.get("display" + name + "Intent")) {
 			acc.push(value);
 		}
 	});

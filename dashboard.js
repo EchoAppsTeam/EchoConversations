@@ -15,6 +15,13 @@ dashboard.mappings = {
 	},
 	"dependencies.janrainapp": {
 		"key": "dependencies.Janrain.appId"
+	},
+	// TODO: add 'resolveURLs' parameter to 'post/replyComposer' sections
+	"postComposer.prompt": {
+		"key": "postComposer.comments.prompt"
+	},
+	"replyComposer.prompt": {
+		"key": "replyComposer.comments.prompt"
 	}
 };
 
@@ -155,6 +162,34 @@ dashboard.vars = {
 			"title": "No Posts Message",
 			"desc": "Specifies the message shown to users when the are no posts to show"
 		}
+	}],
+	"baseComposerECL": [{
+		"component": "Checkbox",
+		"name": "visible",
+		"type": "boolean",
+		"default": true,
+		"config": {
+			"title": "Visible",
+			"desc": "If enabled, users can submit Comments"
+		}
+	}, {
+		"component": "Checkbox",
+		"name": "displaySharingOnPost",
+		"type": "boolean",
+		"default": "true",
+		"config": {
+			"title": "Display Sharing on Post",
+			"desc": "If enabled, users will be given the option to share their Posts on submit"
+		}
+	}, {
+		"component": "Input",
+		"name": "prompt",
+		"type": "string",
+		"default": "What's on your mind?",
+		"config": {
+			"title": "Prompt",
+			"desc": "Specifies the ghost text displayed in the Comment Prompt"
+		}
 	}]
 };
 
@@ -181,30 +216,18 @@ dashboard.config = {
 		}
 	}, {
 		"component": "Group",
-		"name": "composer",
+		"name": "postComposer",
 		"type": "object",
 		"config": {
-			"title": "Composer"
-		},
-		"items": [{
-			"component": "Checkbox",
-			"name": "visible",
-			"type": "boolean",
-			"default": true,
-			"config": {
-				"title": "Visible",
-				"desc": "If enabled, the Post Composer will be displayed to end users"
-			}
-		}, {
-			"component": "Checkbox",
-			"name": "displaySharingOnPost",
-			"type": "boolean",
-			"default": "true",
-			"config": {
-				"title": "Display Sharing on Post",
-				"desc": "If enabled, users will be given the option to share their Posts on submit"
-			}
-		}]
+			"title": "Post Composer"
+		}
+	}, {
+		"component": "Group",
+		"name": "replyComposer",
+		"type": "object",
+		"config": {
+			"title": "Reply Composer"
+		}
 	}, {
 		"component": "Group",
 		"name": "topPosts",
@@ -303,6 +326,14 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					this["items"] = assembleBaseECL.call(this);
+					return this;
+				},
+				"postComposer": function() {
+					this["items"] = component.get("baseComposerECL");
+					return this;
+				},
+				"replyComposer": function() {
+					this["items"] = component.get("baseComposerECL");
 					return this;
 				}
 			};

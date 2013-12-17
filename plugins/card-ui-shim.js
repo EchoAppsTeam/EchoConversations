@@ -320,7 +320,11 @@ var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Subm
 plugin.config = {
 	"submitPermissions": "forceLogin",
 	"buttons": ["login"],
-	"displaySharingOnPost": true
+	"displaySharingOnPost": true,
+	"comments": {
+		"prompt": "What's on your mind",
+		"resolveURLs": true
+	}
 };
 
 plugin.events = {
@@ -396,6 +400,8 @@ plugin.init = function() {
 		}
 		return true;
 	});
+
+	submit.config.set("actionString", this.config.get("comments.prompt"));
 
 // 	Note: let's keep the "attach" icon hidden for now,
 //		as there is no functionality associated with it..
