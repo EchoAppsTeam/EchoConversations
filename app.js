@@ -12,7 +12,7 @@ conversations.config = {
 		"visible": true,
 		"displaySharingOnPost": true,
 		"comments": {
-			"prompt": "What's on your mind, dude?",
+			"prompt": "What's on your mind?",
 			"resolveURLs": true
 		}
 	},
