@@ -127,6 +127,10 @@ entry.renderers.stream = function(element) {
 entry.renderers.sorter = function(element) {
 	var self = this;
 
+	if (!this.config.get("displaySortOrderPulldown")) {
+		return element.hide();
+	}
+
 	var assembleTitle = function(title) {
 		return self.substitute({
 			"template": entry.templates.sorterTitle,
