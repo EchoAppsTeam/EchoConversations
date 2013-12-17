@@ -127,6 +127,8 @@ plugin.init = function() {
 	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
 	this.extendTemplate("insertAsLastChild", "expandChildren", plugin.templates.chevron);
 	this.extendTemplate("remove", "date");
+	this.set("buttonsLayout", "inline");
+	this._initPageObserver();
 };
 
 plugin.templates.date =
@@ -193,6 +195,72 @@ plugin.component.renderers.container = function(element) {
 		}));
 };
 
+plugin.component.renderers._inlineButtons = function(element) {
+	var item = this.component;
+	var buttons = $.map(item.buttonsOrder, function(name) { return item.get("buttons." + name); });
+	$.map(buttons, function(button) {
+		if (!button || !Echo.Utils.invoke(button.visible)) {
+			return;
+		}
+		item.view.render({
+			"name": "_button",
+			"target": element,
+			"extra": button
+		});
+	});
+};
+
+plugin.component.renderers._dropdownButtons = function(element) {
+	var self = this;
+	var item = this.component;
+	var tpl =
+		'<div class="dropdown">' +
+			'<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-list"></i></a>' +
+		'</div>';
+
+	var elem = $(this.substitute({
+		"template": tpl,
+		"data": {}
+	}));
+	var buttons = $.map(item.buttonsOrder, function(name) { return self.component.get("buttons." + name); });
+
+	(function assembleItems(container, buttons, inner) {
+		var menu = $('<ul class="dropdown-menu" role="menu">');
+		$.map(buttons, function(button) {
+			if (!button || !Echo.Utils.invoke(button.visible)) {
+				return;
+			}
+			var elem = $("<li>");
+			item.view.render({
+				"name": "_button",
+				"target": elem,
+				"extra": $.extend({"inner": inner}, button)
+			});
+			if (button.entries) {
+				elem.addClass("dropdown-submenu");
+				assembleItems(elem, button.entries, true);
+			}
+			menu.append(elem);
+		});
+		container.append(menu);
+	})(elem, buttons);
+
+	return element.append(elem);
+};
+
+plugin.component.renderers.buttons = function(element) {
+	var item = this.component;
+	item._assembleButtons();
+	item._sortButtons();
+	element.empty();
+
+	item.view.render({
+		"name": "_" + this.get("buttonsLayout") + "Buttons",
+		"target": element
+	});
+	return element;
+};
+
 plugin.component.renderers._button = function(element, extra) {
 	var template = extra.template || plugin.templates.button;
 
@@ -202,11 +270,30 @@ plugin.component.renderers._button = function(element, extra) {
 		"icon": extra.icon || "icon-comment"
 	};
 	var button = $(this.substitute({"template": template, "data": data}));
-	if (!extra.clickable) return element.append(button);
-	var clickables = $(".echo-clickable", button);
-	if (extra.element) {
-		button.find("span").empty().append(extra.element);
+	if (extra.inner) {
+		button.addClass("echo-clickable");
 	}
+	var clickables = $(".echo-clickable", button);
+	if (!extra.clickable) return element.append(button);
+
+	if (extra.entries) {
+		var entries = $.map(extra.entries, function(entry) {
+			return Echo.Utils.invoke(entry.visible)
+				? {"title": entry.label, "handler": entry.callback}
+				: null;
+		});
+		new Echo.GUI.Dropdown({
+			"target": button.find("span"),
+			"extraClass": this.cssPrefix + "dropdownButton",
+			"entries": $.map(entries, function(entry) { return $.extend({"handler": entry.callback}, entry); }),
+			"title": extra.label || ""
+		});
+		extra.callback = function(ev) {
+			button.find(".dropdown-toggle").dropdown("toggle");
+			ev.preventDefault();
+		};
+	}
+
 	if (!clickables.length) {
 		clickables = button;
 		button.addClass("echo-clickable");
@@ -214,17 +301,67 @@ plugin.component.renderers._button = function(element, extra) {
 	clickables[extra.once ? "one" : "on"]({
 		"click": function(event) {
 			event.stopPropagation();
-			if (extra.callback) extra.callback();
+			if (extra.callback) extra.callback(event);
 		}
 	});
 
-	var _data = this.component.get("buttons." + extra.plugin + "." + extra.name);
-	_data.element = button;
-	_data.clickableElements = clickables;
-	if (Echo.Utils.isMobileDevice()) {
-		clickables.addClass("echo-linkColor");
+	if (!extra.inner) {
+		var _data = this.component.get("buttons." + extra.plugin + "." + extra.name);
+		_data.element = button;
+		_data.clickableElements = clickables;
+		if (Echo.Utils.isMobileDevice()) {
+			clickables.addClass("echo-linkColor");
+		}
 	}
 	return element.append(button);
+};
+
+plugin.methods._initPageObserver = function() {
+	// TODO need to unsubscribe when item destroyed
+	var self = this;
+
+	// observe DOM tree and call _pageLayoutChange if something was changed
+	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+	if (MutationObserver) {
+		var observer = new MutationObserver(function(mutations) {
+			self._pageLayoutChange();
+		});
+		var config = {"childList": true, "subtree": true, "attributes": true};
+		observer.observe(document, config);
+	}
+	$("body").on("DOMSubtreeModified", function() {
+		self._pageLayoutChange();
+	});
+
+	$(window).on("resize", function() {
+		self._pageLayoutChange();
+	});
+};
+
+plugin.methods._pageLayoutChange = function() {
+	var item = this.component;
+	var footer = item.view.get("footer");
+	var buttons = item.view.get("buttons");
+
+	if (footer && buttons && footer.is(":visible")) {
+		var likes = footer.children("div").first();
+		var layout = this.get("buttonsLayout");
+
+		var likesWidth = likes.width();
+		var buttonsWidth = layout === "inline"
+			? buttons.width() + likesWidth + 5
+			: this.get("buttonsWidth") || (buttons.width() + likesWidth + 5);
+
+		if (layout === "inline" && footer.width() < buttonsWidth) {
+			this.set("buttonsLayout", "dropdown");
+			this.set("buttonsWidth", buttonsWidth);
+			item.view.render({"name": "buttons"});
+		} else if (layout === "dropdown" && footer.width() > buttonsWidth) {
+			this.set("buttonsWidth", 0);
+			this.set("buttonsLayout", "inline");
+			item.view.render({"name": "buttons"});
+		}
+	}
 };
 
 var cache = {};
@@ -247,6 +384,9 @@ for (var i = 0; i <= 20; i++) {
 }
 
 plugin.css =
+	'.{plugin.class} .{plugin.class:dropdownButton} { display: inline; margin-left: 0px; }' +
+	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown { display: inline; }' +
+	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
 	'.{plugin.class:topPostMarker} { float: right; position: relative; top: -19px; right: 0px; }' +
 	'.{plugin.class} .{plugin.class:wrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
 	'.{plugin.class} .{class:container} { border-left: 8px solid transparent; background: #ffffff; }' +
