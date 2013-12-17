@@ -301,7 +301,8 @@ plugin.methods._assembleMarkerButton = function(name) {
 	}
 
 	var itemMarkers = item.get("data.object.markers", []);
-	var action = ~$.inArray(name, itemMarkers)
+	var marker = plugin.button2marker[name];
+	var action = ~$.inArray(marker, itemMarkers)
 		? "remove"
 		: "add";
 	return {
@@ -314,7 +315,7 @@ plugin.methods._assembleMarkerButton = function(name) {
 				"verbs": ["http://activitystrea.ms/schema/1.0/" + ((action === "add") ? "mark" : "unmark")],
 				"targets": [{"id": item.get("data.object.id")}],
 				"object": {
-					"content": plugin.button2marker[name] || name
+					"content": marker || name
 				}
 			};
 
