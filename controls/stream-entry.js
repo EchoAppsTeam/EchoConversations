@@ -148,7 +148,8 @@ entry.renderers.sorter = function(element) {
 
 				var sortOrder = query.match(/sortOrder:(\S+)/);
 
-				return sortOrder.length ? sortOrder.pop() : self.config.get("initialSortOrder");
+				return $.isArray(sortOrder) && sortOrder.length
+					? sortOrder.pop() : self.config.get("initialSortOrder");
 		})();
 
 		var values = $.grep(self.config.get("sortOrderEntries"), function(entry) {
