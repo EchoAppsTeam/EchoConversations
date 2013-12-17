@@ -243,17 +243,23 @@ plugin.methods._assembleButton = function(name) {
 	var self = this;
 	var callback = function() {
 		var item = this;
-		var buttonNode = item.get("buttons." + self.name + "." + name + ".element");
-		$("." + item.cssPrefix + "buttonCaption", buttonNode)
-			.empty()
-			.append(self.labels.get(name.toLowerCase() + "Processing"));
+
+		var buttonHandler = function() {
+			var buttonNode = item.get("buttons." + self.name + "." + name + ".element");
+			buttonNode.off("click");
+			$("." + item.cssPrefix + "buttonCaption", buttonNode)
+				.empty()
+				.append(self.labels.get(name.toLowerCase() + "Processing"));
+			self._sendActivity(name, item);
+		};
+
 		if (!item.user.is("logged")) {
 			self.deferredActivity = function() {
-				self._sendActivity(name, item);
+				buttonHandler();
 			};
 			self._requestLoginPrompt();
 		} else {
-			self._sendActivity(name, item);
+			buttonHandler();
 		}
 	};
 	return function() {
@@ -267,7 +273,6 @@ plugin.methods._assembleButton = function(name) {
 			"icon": "icon-heart",
 			"label": self.labels.get(name.toLowerCase() + "Control"),
 			"visible": action === name,
-			"once": true,
 			"callback": callback
 		};
 	};
