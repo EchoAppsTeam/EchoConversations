@@ -256,6 +256,7 @@ plugin.css =
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
 	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
 
+	'.{plugin.class} .{class:blocker-backdrop} { background-color: transparent; }' +
 	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
 	'.{plugin.class} .{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
 
