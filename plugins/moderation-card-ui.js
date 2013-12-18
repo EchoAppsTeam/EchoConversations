@@ -21,7 +21,7 @@ plugin.init = function() {
 plugin.config = {
 	"removePersonalItemsAllowed": false,
 	"statusAnimationTimeout": 1000, // milliseconds
-	"userActions": ["ban", "permissions", "approveuser"],
+	"userActions": ["ban", "permissions", "approveUser"],
 	"markerActions": ["top"],
 	"itemActions": ["approve", "untouch", "spam", "delete"]
 };
@@ -425,7 +425,7 @@ plugin.methods._assembleBanButton = function() {
 };
 
 // TODO merge this method with '_assembleBanButton'
-plugin.methods._assembleApproveuserButton = function() {
+plugin.methods._assembleApproveUserButton = function() {
 	var self = this;
 	var item = this.component;
 
