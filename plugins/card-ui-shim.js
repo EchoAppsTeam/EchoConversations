@@ -217,10 +217,11 @@ plugin.component.renderers._inlineButtons = function(element) {
 plugin.component.renderers._dropdownButtons = function(element) {
 	var self = this;
 	var item = this.component;
-	var elem = $(
-		'<div class="dropdown">' +
-			'<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-list"></i></a>' +
-		'</div>');
+	var elem = $(this.substitute({
+		"template": '<div class="dropdown">' +
+				'<a class="dropdown-toggle {class:button}" data-toggle="dropdown" href="#"><i class="icon-list {plugin.class:buttonIcon}"></i></a>' +
+			'</div>'
+	}));
 
 	var buttons = $.map(item.buttonsOrder, function(name) { return self.component.get("buttons." + name); });
 
@@ -418,13 +419,16 @@ plugin.css =
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 20px 0px 0px 8px; margin: 0px 15px 2px 0px; }' +
 
 	'.{plugin.class} .{class:button} { margin-right: 10px; }' +
+	'.{plugin.class} .{class:buttons} .dropdown .{class:button} { margin-right: 0px; }' +
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{plugin.class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
 	'.{plugin.class} .{plugin.class:buttonIcon} { opacity: 0.3; }' +
 	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
 	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #262626; text-decoration: none; }' +
 	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{plugin.class:buttonIcon},' +
+		'.{plugin.class} .{class:container}:hover .{plugin.class:buttonIcon},' +
 			'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
+
 
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{plugin.class:chevron} { margin-top: 0px !important; }' +
