@@ -21,7 +21,7 @@ plugin.init = function() {
 plugin.config = {
 	"removePersonalItemsAllowed": false,
 	"statusAnimationTimeout": 1000, // milliseconds
-	"userActions": ["ban", "permissions"],
+	"userActions": ["ban", "permissions", "approveuser"],
 	"markerActions": ["top"],
 	"itemActions": ["approve", "untouch", "spam", "delete"]
 };
@@ -36,6 +36,10 @@ plugin.labels = {
 	"deleteButton": "Delete",
 	"spamButton": "Spam",
 	"untouchButton": "Untouch",
+	"approveUser": "Approve User",
+	"untouchUser": "Return User to Untouched",
+	"approvingUser": "Approving User...",
+	"untouchingUser": "Returning User to Untouched",
 	"changingStatusToCommunityFlagged": "Flagging...",
 	"changingStatusToModeratorApproved": "Approving...",
 	"changingStatusToModeratorDeleted": "Deleting...",
@@ -385,7 +389,6 @@ plugin.methods._assembleBanButton = function() {
 		return false;
 	}
 
-	// TODO handle anonymous(fake) users
 	return {
 		"title": this.labels.get(isBanned ? "unbanUser" : "banUser"),
 		"handler": function() {
@@ -417,6 +420,52 @@ plugin.methods._assembleBanButton = function() {
 					item.unblock();
 				}
 			});
+		}
+	};
+};
+
+// TODO merge this method with '_assembleBanButton'
+plugin.methods._assembleApproveuserButton = function() {
+	var self = this;
+	var item = this.component;
+
+	if (item.get("data.actor.id") === item.user.config.get("fakeIdentityURL")) {
+		return false;
+	}
+	var action = item.get("data.actor.status") === "ModeratorApproved"
+		? "untouch"
+		: "approve";
+
+	return {
+		"title": this.labels.get(action === "approve" ? "approveUser" : "untouchUser" ),
+		"handler": function() {
+				item.block(self.labels.get(action === "approve" ? "approvingUser" : "untouchingUser"));
+				var newStatus = action === "approve" ? "ModeratorApproved" : "Untouched";
+				self._sendUserUpdate({
+					"field": "state",
+					"value": newStatus,
+					"onData": function(response) {
+						self._publishCompleteActionEvent({
+							"name": action,
+							"state": "Complete",
+							"response": response
+						});
+						self._publishUserUpdateEvent({
+							"item": item,
+							"field": "state",
+							"value": newStatus
+						});
+						item.unblock();
+					},
+					"onError": function(response) {
+						self._publishCompleteActionEvent({
+							"name": action,
+							"state": "Error",
+							"response": response
+						});
+						item.unblock();
+					}
+				});
 		}
 	};
 };
