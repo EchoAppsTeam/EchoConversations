@@ -275,7 +275,7 @@ plugin.component.renderers._button = function(element, extra) {
 	var data = {
 		"label": extra.label || "",
 		"name": extra.name,
-		"icon": extra.icon || "icon-comment"
+		"icon": extra.icon || (!extra.inner && "icon-comment")
 	};
 	var button = $(this.substitute({"template": template, "data": data}));
 	if (extra.inner) {
