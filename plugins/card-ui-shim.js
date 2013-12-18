@@ -81,7 +81,11 @@ Echo.Plugin.create(plugin);
 var plugin = Echo.Plugin.manifest("CardUIShim", "Echo.StreamServer.Controls.Stream.Item");
 
 plugin.events = {
+	"Echo.StreamServer.Controls.Stream.Item.onRender": function() {
+		this._pageLayoutChange();
+	},
 	"Echo.StreamServer.Controls.Stream.onActivitiesComplete": function() {
+		this._pageLayoutChange();
 		var self = this;
 		var container = this.component.view.get("container");
 		if (this.get("isLiveUpdate") && container) {
@@ -213,16 +217,19 @@ plugin.component.renderers._inlineButtons = function(element) {
 plugin.component.renderers._dropdownButtons = function(element) {
 	var self = this;
 	var item = this.component;
-	var tpl =
+	var elem = $(
 		'<div class="dropdown">' +
 			'<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-list"></i></a>' +
-		'</div>';
+		'</div>');
 
-	var elem = $(this.substitute({
-		"template": tpl,
-		"data": {}
-	}));
 	var buttons = $.map(item.buttonsOrder, function(name) { return self.component.get("buttons." + name); });
+
+	var closeDropdown = function(callback) {
+		return function() {
+			elem.find(".dropdown-toggle").dropdown("toggle");
+			callback && callback();
+		};
+	};
 
 	(function assembleItems(container, buttons, inner) {
 		var menu = $('<ul class="dropdown-menu" role="menu">');
@@ -230,17 +237,17 @@ plugin.component.renderers._dropdownButtons = function(element) {
 			if (!button || !Echo.Utils.invoke(button.visible)) {
 				return;
 			}
-			var elem = $("<li>");
+			var menuItem = $("<li>");
 			item.view.render({
 				"name": "_button",
-				"target": elem,
-				"extra": $.extend({"inner": inner}, button)
+				"target": menuItem,
+				"extra": $.extend({}, button, {"inner": inner, "clickable": true, "callback": closeDropdown(button.callback)})
 			});
 			if (button.entries) {
-				elem.addClass("dropdown-submenu");
-				assembleItems(elem, button.entries, true);
+				menuItem.addClass("dropdown-submenu");
+				assembleItems(menuItem, button.entries, true);
 			}
-			menu.append(elem);
+			menu.append(menuItem);
 		});
 		container.append(menu);
 	})(elem, buttons);
@@ -328,10 +335,6 @@ plugin.methods._initPageObserver = function() {
 		});
 		var config = {"childList": true, "subtree": true, "attributes": true};
 		observer.observe(document, config);
-	} else {
-		$("body").on("DOMSubtreeModified", function() {
-			self._pageLayoutChange();
-		});
 	}
 
 	$(window).on("resize", function() {
