@@ -82,28 +82,35 @@ auth.renderers.avatar = function(element) {
 
 auth.renderers.name = function(element) {
 	var auth = this, isSwitchAssembled = false;
+
 	var template = '<span class="{class:dropdown}"></span>';
+	var entries = [{
+		"visible": ~$.inArray("login", this.config.get("buttons")),
+		"title": this.labels.get("switchIdentity"),
+		"handler": function() {
+			if (!isSwitchAssembled) {
+				var target = $(this);
+				auth._assembleIdentityControl("login", target);
+				isSwitchAssembled = true;
+				target.click();
+			}
+		}
+	}, {
+		"visible": true,
+		"title": this.labels.get("logout"),
+		"handler": function() {
+			auth._publishBackplaneEvent("identity/logout/request");
+			auth.user.logout();
+		}
+	}];
+
 	new Echo.GUI.Dropdown({
 		"target": element,
 		"title": auth.user.get("name", "") + this.substitute({"template": template}),
 		"extraClass": "nav",
-		"entries": [{
-			"title": this.labels.get("switchIdentity"),
-			"handler": function() {
-				if (!isSwitchAssembled) {
-					var target = $(this);
-					auth._assembleIdentityControl("login", target);
-					isSwitchAssembled = true;
-					target.click();
-				}
-			}
-		}, {
-			"title": this.labels.get("logout"),
-			"handler": function() {
-				auth._publishBackplaneEvent("identity/logout/request");
-				auth.user.logout();
-			}
-		}]
+		"entries": $.grep(entries, function(entry) {
+			return !!entry.visible;
+		})
 	});
 	return element;
 };

@@ -256,7 +256,6 @@ entry.methods._getConditionalPluginList = function(componentID) {
 		},
 		"Reply": {
 			"name": "ReplyCardUI",
-			"auth": this.config.get("auth"),
 			"enabled": visible(),
 			"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
 			"nestedPlugins": [{
@@ -267,7 +266,7 @@ entry.methods._getConditionalPluginList = function(componentID) {
 				"sharingWidgetConfig": auth.sharingWidgetConfig
 			}, $.extend({
 				"name": "CardUIShim",
-				"buttons": ["login", "signup"],
+				"auth":	this.config.get("auth"),
 				"submitPermissions": this._getSubmitPermissions()
 			}, this.config.get("replyComposer"))]
 		},

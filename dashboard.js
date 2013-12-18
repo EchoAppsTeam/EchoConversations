@@ -292,6 +292,15 @@ dashboard.config = {
 				"title": "Bundled Login and Sharing",
 				"desc": "If set to false, the bundled Janrain Login and Sharing functionality is disabled along with related identity features"
 			}
+		}, {
+			"component": "Checkbox",
+			"name": "hideLoginButtons",
+			"type": "boolean",
+			"default": false,
+			"config": {
+				"title": "Hide Login Buttons",
+				"desc": "If enabled, login buttons are hidden for end users"
+			}
 		}]
 	}, {
 		"component": "Group",

@@ -93,6 +93,7 @@ conversations.config = {
 	},
 	"auth": {
 		"enableBundledIdentity": true,
+		"hideLoginButtons": false,
 		"allowAnonymousSubmission": false,
 		"authWidgetConfig": {},
 		"sharingWidgetConfig": {}
@@ -128,6 +129,10 @@ conversations.config.normalizer = {
 		return value
 			|| $("link[rel='canonical']").attr('href')
 			|| document.location.href.split("#")[0];
+	},
+	"auth": function(value) {
+		value.buttons = !!value.hideLoginButtons ? [] : ["login", "signup"];
+		return value;
 	}
 };
 
@@ -196,7 +201,6 @@ conversations.renderers.postComposer = function(element) {
 			}, $.extend({
 				"name": "CardUIShim",
 				"submitPermissions": this._getSubmitPermissions(),
-				"buttons": ["login", "signup"],
 				"auth": this.config.get("auth")
 			}, this.config.get("postComposer"))],
 			"data": {
