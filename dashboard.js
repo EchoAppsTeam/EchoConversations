@@ -16,7 +16,6 @@ dashboard.mappings = {
 	"dependencies.janrainapp": {
 		"key": "dependencies.Janrain.appId"
 	},
-	// TODO: add 'resolveURLs' parameter to 'post/replyComposer' sections
 	"postComposer.prompt": {
 		"key": "postComposer.comments.prompt"
 	},
@@ -170,7 +169,7 @@ dashboard.vars = {
 		"default": true,
 		"config": {
 			"title": "Visible",
-			"desc": "If enabled, users can submit Comments"
+			"desc": "If enabled, the composer will be displayed to end users"
 		}
 	}, {
 		"component": "Checkbox",
@@ -182,14 +181,40 @@ dashboard.vars = {
 			"desc": "If enabled, users will be given the option to share their Posts on submit"
 		}
 	}, {
-		"component": "Input",
-		"name": "prompt",
-		"type": "string",
-		"default": "What's on your mind?",
+		"component": "Group",
+		"name": "contentTypes",
+		"type": "object",
 		"config": {
-			"title": "Prompt",
-			"desc": "Specifies the ghost text displayed in the Comment Prompt"
-		}
+			"title": "Content Types"
+		},
+		"items": [{
+			"component": "Group",
+			"name": "comments",
+			"type": "object",
+			"config": {
+				"title": "Comments"
+			},
+			// TODO: add 'resolveURLs' setting
+			"items": [{
+				"component": "Checkbox",
+				"name": "visible",
+				"type": "boolean",
+				"default": true,
+				"config": {
+					"title": "Visible",
+					"desc": "If enabled, users can submit Comments"
+				}
+			}, {
+				"component": "Input",
+				"name": "prompt",
+				"type": "string",
+				"default": "What's on your mind?",
+				"config": {
+					"title": "Prompt",
+					"desc": "Specifies the ghost text displayed in the Comment Prompt"
+				}
+			}]
+		}]
 	}]
 };
 

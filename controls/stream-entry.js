@@ -44,9 +44,12 @@ entry.config = {
 	"replyComposer": {
 		"visible": true,
 		"displaySharingOnPost": true,
-		"comments": {
-			"prompt": "What's on your mind?",
-			"resolveURLs": true
+		"contentTypes": {
+			"comments": {
+				"visible": true,
+				"prompt": "What's on your mind?",
+				"resolveURLs": true
+			}
 		}
 	}
 };
@@ -239,6 +242,14 @@ entry.methods._getStreamConfig = function() {
 
 entry.methods._getConditionalPluginList = function(componentID) {
 	var self = this, auth = this.config.get("auth");
+
+	var visible = function() {
+		var config = self.config.get("replyComposer");
+		return config.visible && !!$.map(config.contentTypes, function(type) {
+			return type.visible ? type : undefined;
+		}).length;
+	};
+
 	var plugins = {
 		"Like": {
 			"name": "LikeCardUI"
@@ -246,8 +257,8 @@ entry.methods._getConditionalPluginList = function(componentID) {
 		"Reply": {
 			"name": "ReplyCardUI",
 			"auth": this.config.get("auth"),
-			"enabled": this.config.get("replyComposer.visible"),
-			"actionString": this.config.get("replyComposer.comments.prompt"),
+			"enabled": visible(),
+			"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
 			"nestedPlugins": [{
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("janrainAppId"),

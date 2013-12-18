@@ -321,9 +321,12 @@ plugin.config = {
 	"submitPermissions": "forceLogin",
 	"buttons": ["login"],
 	"displaySharingOnPost": true,
-	"comments": {
-		"prompt": "What's on your mind",
-		"resolveURLs": true
+	"contentTypes": {
+		"comments": {
+			"visible": true,
+			"prompt": "What's on your mind",
+			"resolveURLs": true
+		}
 	}
 };
 
@@ -401,7 +404,7 @@ plugin.init = function() {
 		return true;
 	});
 
-	submit.config.set("actionString", this.config.get("comments.prompt"));
+	submit.config.set("actionString", this.config.get("contentTypes.comments.prompt"));
 
 // 	Note: let's keep the "attach" icon hidden for now,
 //		as there is no functionality associated with it..

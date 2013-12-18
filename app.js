@@ -11,17 +11,23 @@ conversations.config = {
 	"postComposer": {
 		"visible": true,
 		"displaySharingOnPost": true,
-		"comments": {
-			"prompt": "What's on your mind?",
-			"resolveURLs": true
+		"contentTypes": {
+			"comments": {
+				"visible": true,
+				"prompt": "What's on your mind?",
+				"resolveURLs": true
+			}
 		}
 	},
 	"replyComposer": {
 		"visible": true,
 		"displaySharingOnPost": true,
-		"comments": {
-			"prompt": "What's on your mind?",
-			"resolveURLs": true
+		"contentTypes": {
+			"comments": {
+				"visible": true,
+				"prompt": "What's on your mind?",
+				"resolveURLs": true
+			}
 		}
 	},
 	"topPosts": {
@@ -158,9 +164,16 @@ conversations.templates.defaultQuery =
 
 conversations.renderers.postComposer = function(element) {
 	var config = this.config.get("postComposer");
-	if (!config.visible) {
+
+	var visible = function() {
+		return config.visible && !!$.map(config.contentTypes, function(type) {
+			return type.visible ? type : undefined;
+		}).length;
+	};
+	if (!visible()) {
 		return element;
 	}
+
 	var targetURL = this.config.get("targetURL");
 	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	var ssConfig = this.config.get("dependencies.StreamServer");
