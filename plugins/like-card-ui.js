@@ -303,7 +303,7 @@ plugin.init = function() {
 };
 
 plugin.labels = {
-	"more": "and {count} more"
+	"more": "+{count}"
 };
 
 plugin.templates.more =

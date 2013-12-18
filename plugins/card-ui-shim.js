@@ -328,10 +328,11 @@ plugin.methods._initPageObserver = function() {
 		});
 		var config = {"childList": true, "subtree": true, "attributes": true};
 		observer.observe(document, config);
+	} else {
+		$("body").on("DOMSubtreeModified", function() {
+			self._pageLayoutChange();
+		});
 	}
-	$("body").on("DOMSubtreeModified", function() {
-		self._pageLayoutChange();
-	});
 
 	$(window).on("resize", function() {
 		self._pageLayoutChange();
