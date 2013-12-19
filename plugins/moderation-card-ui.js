@@ -428,8 +428,9 @@ plugin.methods._assembleApproveUserButton = function() {
 		: "approve";
 
 	return {
-		"title": this.labels.get(action === "approve" ? "approveUser" : "untouchUser" ),
-		"handler": function() {
+		"label": this.labels.get(action === "approve" ? "approveUser" : "untouchUser" ),
+		"visible": true,
+		"callback": function() {
 				item.block(self.labels.get(action === "approve" ? "approvingUser" : "untouchingUser"));
 				var newStatus = action === "approve" ? "ModeratorApproved" : "Untouched";
 				self._sendUserUpdate({
