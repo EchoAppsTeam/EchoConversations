@@ -256,8 +256,9 @@ plugin.methods._assembleButton = function(name) {
 		return false;
 	}
 	return {
-		"title": this.labels.get(name.toLowerCase() + "Button"),
-		"handler": function() {
+		"label": this.labels.get(name.toLowerCase() + "Button"),
+		"visible": true,
+		"callback": function() {
 			var status = getStatus(item);
 			item.block(self.labels.get("changingStatusTo" + status));
 			var activity = {
@@ -310,8 +311,9 @@ plugin.methods._assembleMarkerButton = function(name) {
 		? "remove"
 		: "add";
 	return {
-		"title": this.labels.get(action + name + "MarkerButton"),
-		"handler": function() {
+		"label": this.labels.get(action + name + "MarkerButton"),
+		"visible": true,
+		"callback": function() {
 			item.block(self.labels.get(
 				((action === "add") ? "adding" : "removing") + name + "Marker"
 			));
@@ -358,24 +360,12 @@ plugin.methods._assembleModerateButton = function() {
 
 			if (button) entries.push(button);
 		});
-		var element = $("<span>");
-		new Echo.GUI.Dropdown({
-			"target": element,
-			"extraClass": "nav " + self.cssPrefix + "moderateButton",
-			"title": self.labels.get("moderateButton"),
-			"entries": entries
-		});
 
 		return {
 			"name": "Moderate",
-			"element": element,
 			"icon": "icon-ok",
 			"visible": this.user.is("admin"),
-			"callback": function() {
-				element.find(".dropdown-toggle")
-					.removeAttr("href")
-					.dropdown("toggle");
-			}
+			"entries": entries
 		};
 	};
 };
@@ -390,8 +380,9 @@ plugin.methods._assembleBanButton = function() {
 	}
 
 	return {
-		"title": this.labels.get(isBanned ? "unbanUser" : "banUser"),
-		"handler": function() {
+		"label": this.labels.get(isBanned ? "unbanUser" : "banUser"),
+		"visible": true,
+		"callback": function() {
 			var newState = isBanned ? "Untouched" : "ModeratorBanned";
 			var action = isBanned ? "UnBan" : "Ban";
 			item.block(self.labels.get("processingAction", {"state": newState}));
@@ -481,8 +472,9 @@ plugin.methods._assemblePermissionsButton = function() {
 	}
 
 	return {
-		"title": this.labels.get((next || "user") + "Button"),
-		"handler": function() {
+		"label": this.labels.get((next || "user") + "Button"),
+		"visible": true,
+		"callback": function() {
 			var action = "UserPermissions";
 			var roles = next !== ""
 				? (item.get("data.actor.roles") || []).concat(next)

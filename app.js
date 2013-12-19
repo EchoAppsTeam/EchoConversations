@@ -368,6 +368,7 @@ conversations.methods._removeUserInvalidationFrom = function() {
 };
 
 conversations.css =
+	'.{class:container} { min-height: 200px; }' +
 	'.{class:container} li > a, ' +
 	'.{class:container} .echo-primaryFont,' +
 	'.{class:container} .echo-secondaryFont,' +
