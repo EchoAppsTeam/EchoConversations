@@ -258,7 +258,6 @@ entry.methods._getConditionalPluginList = function(componentID) {
 			"name": "ReplyCardUI",
 			"enabled": visible(),
 			"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
-			"replyComposer": this.config.get("replyComposer"),
 			"nestedPlugins": [{
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("janrainAppId"),
@@ -269,7 +268,7 @@ entry.methods._getConditionalPluginList = function(componentID) {
 				"name": "CardUIShim",
 				"auth":	this.config.get("auth"),
 				"submitPermissions": this._getSubmitPermissions()
-			}, this.config.get("replyComposer"))]
+			}, this.config.get("replyComposer"))].concat(this.config.get("replyComposer.plugins"))
 		},
 		"Sharing": {
 			"name": "CardUISocialSharing"

@@ -164,7 +164,7 @@ plugin.methods._showSubmit = function() {
 	}
 	var config = this._submitConfig(target);
 	// add plugin for submit
-	config.plugins.push({
+	config.plugins.splice(0, 0, {
 		"name": "ReplyCardUI",
 		"inReplyTo": item.get("data")
 	});
@@ -177,7 +177,6 @@ plugin.methods._showSubmit = function() {
 			});
 		}
 	});
-	config.plugins = config.plugins.concat(this.config.get("replyComposer.plugins"));
 	new Echo.StreamServer.Controls.Submit(config);
 	return target;
 };
