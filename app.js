@@ -38,6 +38,7 @@ conversations.config = {
 		"queryOverride": "",
 		"initialItemsPerPage": 5,
 		"initialSortOrder": "reverseChronological",
+		"includeTopContributors": true,
 		"displaySortOrderPulldown": true,
 		"displayCounter": true,
 		"displayTopPostHighlight": true,
@@ -46,7 +47,10 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"replyNestingLevels": 2,
 		"itemStates": "Untouched,ModeratorApproved",
-		"itemMarkers": ["Conversations.TopPost"],
+		"itemMarkers": [],
+		"userMarkers": ["Conversations.TopContributor"],
+		"itemMarkersToAdd": ["Conversations.TopPost"],
+		"itemMarkersToRemove": ["Conversations.RemovedFromTopPosts"],
 		"maxItemBodyCharacters": 200,
 		"sortOrderEntries": [{
 			"title": "Newest First",
@@ -61,6 +65,10 @@ conversations.config = {
 			"title": "Most likes",
 			"value": "likesDescending"
 		}],
+		"moderation": {
+			"displayCommunityFlaggedPosts": true,
+			"displaySystemFlaggedPosts": true
+		},
 		"plugins": []
 	},
 	"allPosts": {
@@ -93,6 +101,10 @@ conversations.config = {
 			"title": "Most likes",
 			"value": "likesDescending"
 		}],
+		"moderation": {
+			"displayCommunityFlaggedPosts": true,
+			"displaySystemFlaggedPosts": true
+		},
 		"plugins": []
 	},
 	"auth": {
@@ -171,6 +183,11 @@ conversations.templates.defaultQuery =
 	'childrenof:{data:targetURL} sortOrder:{data:initialSortOrder} ' +
 	'itemsPerPage:{data:initialItemsPerPage} {data:markers} type:comment ' +
 	'{data:operators} children:{data:replyNestingLevels} {data:operators}';
+
+conversations.templates.topConditions = {
+	"onlyPosts":  "markers:{data:itemsMarkersToAdd} -markers:{data:itemMarkersToRemove}",
+	"contributors": "(user.markers:{data:userMarkers} OR markers:{data:itemMarkersToAdd}) -markers:{data:itemMarkersToRemove}"
+};
 
 conversations.renderers.postComposer = function(element) {
 	var config = this.config.get("postComposer");
@@ -288,9 +305,24 @@ conversations.methods._assembleSearchQuery = function(componentID, overrides) {
 		var states = config.itemStates;
 		var userId = this.user && this.user.get("identityUrl");
 
-		markers = config.itemMarkers.length
-			? "markers:" + config.itemMarkers.join(",")
-			: "";
+		if (componentID === "topPosts") {
+			markers = this.substitute({
+				"template": conversations.templates.topConditions[
+					config.includeTopContributors ? "contributors" : "onlyPosts"
+				],
+				"data": {
+					"userMarkers": config.userMarkers.join(","),
+					"itemMarkersToAdd": config.itemMarkersToAdd.join(","),
+					"itemMarkersToRemove": config.itemMarkersToRemove.join(",")
+				}
+			});
+
+		} else {
+			markers = config.itemMarkers.length
+				? "markers:" + config.itemMarkers.join(",")
+				: "";
+		}
+
 		operators = (this.config.get("bozoFilter") && userId)
 			? "(state:" + states + " OR user.id:" + userId + ")"
 			: "state: " + states;

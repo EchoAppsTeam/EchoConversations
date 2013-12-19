@@ -16,6 +16,7 @@ entry.config = {
 	"visible": true,
 	"label": "",
 	"initialSortOrder": "reverseChronological",
+	"includeTopContributors": false,
 	"displayTopPostHighlight": true,
 	"displaySharingIntent": true,
 	"displayLikeIntent": true,
@@ -51,6 +52,18 @@ entry.config = {
 				"resolveURLs": true
 			}
 		}
+	},
+	"moderation": {
+		"extraActions": ["topPost"]
+	}
+};
+
+entry.config.normalizer = {
+	"moderation": function(value) {
+		if (this.get("includeTopContributors")) {
+			value.extraActions.push("topContributor");
+		}
+		return value;
 	}
 };
 
@@ -232,7 +245,8 @@ entry.methods._getStreamConfig = function() {
 			"onAdd": itemUpdatesHandler,
 			"onDelete": itemUpdatesHandler
 		}, {
-			"name": "ModerationCardUI"
+			"name": "ModerationCardUI",
+			"extraActions": this.config.get("moderation.extraActions")
 		}, {
 			"name": "ItemsRollingWindow",
 			"moreButton": true

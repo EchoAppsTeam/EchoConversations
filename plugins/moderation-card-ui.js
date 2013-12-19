@@ -14,23 +14,33 @@ plugin.init = function() {
 	var item = this.component;
 	this.set("itemStatus", item.get("data.object.status"));
 	this.extendTemplate("insertAfter", "avatar", plugin.templates.status);
-
 	item.addButtonSpec("ModerationCardUI", this._assembleModerateButton());
 };
 
 plugin.config = {
 	"removePersonalItemsAllowed": false,
 	"statusAnimationTimeout": 1000, // milliseconds
-	"userActions": ["ban", "permissions", "approveUser"],
-	"markerActions": ["top"],
-	"itemActions": ["approve", "untouch", "spam", "delete"]
+	"itemActions": ["approve", "untouch", "spam", "delete"],
+	"extraActions": ["topPost", "topContributor"],
+	"userActions": ["approveUser", "ban", "permissions"],
+	"topMarkers": {
+		"posts": {
+			"add": "Conversations.TopPost",
+			"remove": "Conversations.RemovedFromTopPosts"
+		},
+		"contributor": "Conversations.TopContributor"
+	}
 };
 
 plugin.labels = {
-	"addTopMarkerButton": "Add to Top Posts",
-	"removeTopMarkerButton": "Remove from Top Posts",
-	"addingTopMarker": "Adding to Top Posts",
-	"removingTopMarker": "Removing from Top Posts",
+	"addTopPostButton": "Add to Top Posts",
+	"removeTopPostButton": "Remove from Top Posts",
+	"addingTopPost": "Adding to Top Posts",
+	"removingTopPost": "Removing from Top Posts",
+	"addTopContributorButton": "Add to Top Contributors",
+	"removeTopContributorButton": "Remove from Top Contributors",
+	"addingTopContributor": "Add to Top Contributors",
+	"removingTopContributor": "Removing from Top Contributors",
 	"moderateButton": "Moderate",
 	"approveButton": "Approve",
 	"deleteButton": "Delete",
@@ -149,10 +159,6 @@ plugin.statuses = [
 	"ModeratorFlagged",
 	"SystemFlagged"
 ];
-
-plugin.button2marker = {
-	"Top": "Conversations.TopPost"
-};
 
 plugin.button2status = {
 	"Spam": "ModeratorFlagged",
@@ -296,37 +302,127 @@ plugin.methods._assembleButton = function(name) {
 	};
 };
 
-plugin.methods._assembleMarkerButton = function(name) {
-	var self = this;
-	var item = this.component;
+plugin.methods._assembleTopContributorButton = function(name) {
+	var self = this, item = this.component;
 
-	// customer can add/remove markers for root items only
 	if (item.get("depth")) {
 		return false;
 	}
 
-	var itemMarkers = item.get("data.object.markers", []);
-	var marker = plugin.button2marker[name];
-	var action = ~$.inArray(marker, itemMarkers)
-		? "remove"
-		: "add";
+	var marker = this.config.get("topMarkers").contributor;
+	var userMarkers = item.get("data.actor.markers", []);
+	var action = ~$.inArray(marker, userMarkers) ? "remove" : "add";
+
 	return {
-		"label": this.labels.get(action + name + "MarkerButton"),
+		"label": this.labels.get(action + name + "Button"),
 		"visible": true,
 		"callback": function() {
 			item.block(self.labels.get(
-				((action === "add") ? "adding" : "removing") + name + "Marker"
+				((action === "add") ? "adding" : "removing") + name
 			));
-			var activity = {
-				"verbs": ["http://activitystrea.ms/schema/1.0/" + ((action === "add") ? "mark" : "unmark")],
-				"targets": [{"id": item.get("data.object.id")}],
-				"object": {
-					"content": marker || name
+			var markers = (function() {
+				if (action === "add") {
+					userMarkers.push(marker);
+				} else {
+					userMarkers = $.grep(userMarkers, function(_) {
+						return _ !== marker;
+					});
 				}
-			};
+				return userMarkers.length
+					? userMarkers.join(",") : "-";
+			})();
+			self._sendUserUpdate({
+				"field": "markers",
+				"value": markers,
+				"onData": function(response) {
+					self._publishCompleteActionEvent({
+						"name": action,
+						"state": "Complete",
+						"response": response
+					});
+					self._publishUserUpdateEvent({
+						"item": item,
+						"field": "markers",
+						"value": markers
+					});
+					item.unblock();
+				},
+				"onError": function(response) {
+					self._publishCompleteActionEvent({
+						"name": action,
+						"state": "Error",
+						"response": response
+					});
+					item.unblock();
+				}
+			});
+		}
+	};
+};
 
+plugin.methods._assembleTopPostButton = function(name) {
+	var self = this;
+	var item = this.component;
+
+	// moderators can add/remove markers for root items only
+	if (item.get("depth")) {
+		return false;
+	}
+
+	var markers = this.config.get("topMarkers");
+	var itemMarkers = item.get("data.object.markers", []);
+	var userMarkers = item.get("data.actor.markers", []);
+
+	var states = {
+		"added": ~$.inArray(markers.posts.add, itemMarkers),
+		"removed": ~$.inArray(markers.posts.remove, itemMarkers),
+		"contributor": ~$.inArray(markers.contributor, userMarkers)
+	};
+
+	// TODO: simplify this heavy logic
+	var action = ~$.inArray("topContributor", this.config.get("extraActions"))
+		? (((states.added || states.contributor) && !states.removed) ? "remove" : "add")
+		: (states.added && !states.removed ? "remove" : "add");
+
+	var assembleActivities = function() {
+		var activities = [];
+		states.added && activities.push({
+			"verb": "unmark",
+			"content": markers.posts.add
+		});
+		states.removed && activities.push({
+			"verb": "unmark",
+			"content": markers.posts.remove
+		});
+		action === "add" && activities.push({
+			"verb": "mark",
+			"content": markers.posts.add
+		});
+		action === "remove" && activities.push({
+			"verb": "mark",
+			"content": markers.posts.remove
+		});
+		return activities;
+	};
+
+	return {
+		"label": this.labels.get(action + name + "Button"),
+		"visible": true,
+		"callback": function() {
+			item.block(self.labels.get(
+				((action === "add") ? "adding" : "removing") + name
+			));
+			var content = $.map(assembleActivities(), function(activity) {
+				return {
+					"verbs": ["http://activitystrea.ms/schema/1.0/" + activity.verb],
+					"targets": [{"id": item.get("data.object.id")}],
+					"object": {
+						"content": activity.content
+					}
+				};
+			});
 			self._sendRequest({
-				"content": activity,
+				"content": content,
 				"appkey": item.config.get("appkey"),
 				"sessionID": item.user.get("sessionID"),
 				"target-query": item.config.get("parent.query")
@@ -344,28 +440,25 @@ plugin.methods._assembleMarkerButton = function(name) {
 
 plugin.methods._assembleModerateButton = function() {
 	var self = this;
-	var userActions = this.config.get("userActions");
-	var markerActions = this.config.get("markerActions");
 
-	var actions = this.config.get("itemActions").concat(markerActions).concat(userActions);
+	var actions = Echo.Utils.foldl([], ["item", "extra", "user"], function(v, acc) {
+		acc = [].concat(acc, self.config.get(v + "Actions"));
+		return acc;
+	});
+
 	return function() {
-		var entries = [];
-		$.map(actions, function(action) {
-			var _action = Echo.Utils.capitalize(action);
-			var button = (~$.inArray(action, userActions))
-				? self["_assemble" + _action + "Button"]()
-				: ~$.inArray(action, markerActions)
-					? self._assembleMarkerButton(_action)
-					: self._assembleButton(_action);
-
-			if (button) entries.push(button);
-		});
-
 		return {
 			"name": "Moderate",
 			"icon": "icon-ok",
 			"visible": this.user.is("admin"),
-			"entries": entries
+			"entries": $.map(actions, function(action) {
+				var _action = Echo.Utils.capitalize(action);
+				var handler = ~$.inArray(action, self.config.get("itemActions"))
+					? "_assembleButton"
+					: "_assemble" + _action + "Button";
+				var button = self[handler](_action);
+				return button || undefined;
+			})
 		};
 	};
 };
@@ -592,6 +685,7 @@ var plugin = Echo.Plugin.manifest("ModerationCardUI", "Echo.StreamServer.Control
 
 plugin.events = {
 	"Echo.StreamServer.Controls.Stream.Item.Plugins.ModerationCardUI.onUserUpdate": function(topic, args) {
+		// TODO: refresh component if case of user attribute changing
 		this.events.publish({
 			"topic": "onUserUpdate",
 			"data": args,
