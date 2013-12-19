@@ -236,7 +236,7 @@ entry.methods._getStreamConfig = function() {
 		}, {
 			"name": "ItemsRollingWindow",
 			"moreButton": true
-		}])
+		}], this.config.get("streamPlugins"))
 	};
 };
 
@@ -258,6 +258,7 @@ entry.methods._getConditionalPluginList = function(componentID) {
 			"name": "ReplyCardUI",
 			"enabled": visible(),
 			"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
+			"replyComposer": this.config.get("replyComposer"),
 			"nestedPlugins": [{
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("janrainAppId"),

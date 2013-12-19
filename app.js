@@ -17,7 +17,8 @@ conversations.config = {
 				"prompt": "What's on your mind?",
 				"resolveURLs": true
 			}
-		}
+		},
+		"plugins": []
 	},
 	"replyComposer": {
 		"visible": true,
@@ -28,7 +29,8 @@ conversations.config = {
 				"prompt": "What's on your mind?",
 				"resolveURLs": true
 			}
-		}
+		},
+		"plugins": []
 	},
 	"topPosts": {
 		"visible": true,
@@ -58,7 +60,8 @@ conversations.config = {
 		}, {
 			"title": "Most likes",
 			"value": "likesDescending"
-		}]
+		}],
+		"plugins": []
 	},
 	"allPosts": {
 		"visible": true,
@@ -89,14 +92,16 @@ conversations.config = {
 		}, {
 			"title": "Most likes",
 			"value": "likesDescending"
-		}]
+		}],
+		"plugins": []
 	},
 	"auth": {
 		"enableBundledIdentity": true,
 		"hideLoginButtons": false,
 		"allowAnonymousSubmission": false,
 		"authWidgetConfig": {},
-		"sharingWidgetConfig": {}
+		"sharingWidgetConfig": {},
+		"plugins": []
 	},
 	"dependencies": {
 		"Janrain": {
@@ -202,7 +207,7 @@ conversations.renderers.postComposer = function(element) {
 				"name": "CardUIShim",
 				"submitPermissions": this._getSubmitPermissions(),
 				"auth": this.config.get("auth")
-			}, this.config.get("postComposer"))],
+			}, this.config.get("postComposer"))].concat(config.plugins),
 			"data": {
 				"object": {
 					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
@@ -264,6 +269,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"data": this.get("data." + componentID + "-count"),
 			"query": this._assembleSearchQuery(componentID, queryOverrides)
 		},
+		"streamPlugins": this.config.get(componentID + ".plugins"),
 		"displayEmptyStream": componentID === "allPosts",
 		"replyComposer": this.config.get("replyComposer")
 	}, this.config.get(componentID), overrides);

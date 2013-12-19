@@ -177,6 +177,7 @@ plugin.methods._showSubmit = function() {
 			});
 		}
 	});
+	config.plugins = config.plugins.concat(this.config.get("replyComposer.plugins"));
 	new Echo.StreamServer.Controls.Submit(config);
 	return target;
 };
