@@ -327,75 +327,100 @@ conversations.methods._getSubmitPermissions = function() {
 };
 
 conversations.methods._assembleSearchQuery = function(componentID, overrides) {
-	var operators = [], markers;
+	var operators, markers;
 	var config = this.config.get(componentID, {});
 	var query = config.queryOverride;
 
 	if (!query) {
-		if (componentID === "topPosts") {
-			markers = this.substitute({
-				"template": conversations.templates.topConditions[
-					config.includeTopContributors ? "contributors" : "onlyPosts"
-				],
-				"data": {
-					"userMarkers": config.userMarkers.join(","),
-					"itemMarkersToAdd": config.itemMarkersToAdd.join(","),
-					"itemMarkersToRemove": config.itemMarkersToRemove.join(",")
-				}
-			});
-
-		} else {
-			markers = config.itemMarkers.length
-				? "markers:" + config.itemMarkers.join(",")
-				: "";
-		}
-
-		operators = this._assembleStreamQueryOperators(componentID);
+		var argsBuilder = this._getQueryArgsBuilder(componentID);
+		markers = argsBuilder.markers();
+		operators = argsBuilder.operators();
 	}
+
 	return this.substitute({
 		"template": query || conversations.templates.defaultQuery,
 		"data": $.extend({}, config, {
 			"markers": markers || "",
-			"operators": operators.length ? "(" + operators.join(" OR ") + ")" : "",
+			"operators": operators || "",
 			"targetURL": this.config.get("targetURL"),
 			"initialSortOrder": Echo.Cookie.get([componentID, "sortOrder"].join(".")) || config.initialSortOrder
 		}, overrides)
 	});
 };
 
-conversations.methods._assembleStreamQueryOperators = function(componentID) {
-	var config = this.config.get(componentID);
+conversations.methods._getQueryArgsBuilder = function(componentID) {
+	var self = this;
+	var config = this.config.get(componentID, {});
+
+	return {
+		"topPosts": {
+			"markers": function() {
+				return self.substitute({
+					"template": conversations.templates.topConditions[
+						config.includeTopContributors ? "contributors" : "onlyPosts"
+					],
+					"data": {
+						"userMarkers": config.userMarkers.join(","),
+						"itemMarkersToAdd": config.itemMarkersToAdd.join(","),
+						"itemMarkersToRemove": config.itemMarkersToRemove.join(",")
+					}
+				});
+			},
+			"operators": function() {
+				return "";
+			}
+		},
+		"allPosts": {
+			"markers": function() {
+				return config.itemMarkers.length
+					? "markers:" + config.itemMarkers.join(",")
+					: "";
+			},
+			"operators": function() {
+				return self._assembleAllPostsOperators(componentID);
+			}
+		},
+		"moderationQueue": {
+			"markers": function() {
+				return config.itemMarkers.length
+					? "markers:" + config.itemMarkers.join(",")
+					: "";
+			},
+			"operators": function() {
+				return "state:Untouched -user.roles:moderator,administrator";
+			}
+		}
+	}[componentID];
+};
+
+conversations.methods._assembleAllPostsOperators = function() {
 	var operators = [];
+	var config = this.config.get("allPosts");
 
-	if (componentID === "moderationQueue") {
-		operators.push("state:Untouched -user.roles:moderator,administrator");
-	} else {
+	// items with specific status
+	var states = !Echo.Utils.get(config, "moderation.premoderation.enable")
+		? config.itemStates
+		: "ModeratorApproved";
+	operators.push("state:" + states);
 
-		// items with specific status
-		var states = !Echo.Utils.get(config, "moderation.premoderation.enable")
-			? config.itemStates
-			: "ModeratorApproved";
-		operators.push("state:" + states);
-
-		// items for current user (if bozo filter enabled)
-		var userId = this.user && this.user.get("identityUrl");
-		if (this.config.get("bozoFilter") && userId) {
-			operators.push("user.id:" + userId);
-		}
-
-		// approved users (if approvedUserBypass enabled)
-		if (
-			Echo.Utils.get(config, "moderation.premoderation.enable")
-			&& Echo.Utils.get(config, "moderation.premoderation.approvedUserBypass")
-		) {
-			operators.push("(user.state:ModeratorApproved AND -state:ModeratorDeleted)");
-		}
-
-		// always display admin/moderator posts if they are not deleted
-		operators.push("(user.roles:moderator,administrator AND -state:ModeratorDeleted)");
+	// items for current user (if bozo filter enabled)
+	var userId = this.user && this.user.get("identityUrl");
+	if (this.config.get("bozoFilter") && userId) {
+		operators.push("user.id:" + userId);
 	}
 
-	return operators;
+	// approved users (if approvedUserBypass enabled)
+	if (
+		Echo.Utils.get(config, "moderation.premoderation.enable")
+		&& Echo.Utils.get(config, "moderation.premoderation.approvedUserBypass")
+	) {
+		operators.push("(user.state:ModeratorApproved AND -state:ModeratorDeleted)");
+	}
+
+	// always display admin/moderator posts if they are not deleted
+	operators.push("(user.roles:moderator,administrator AND -state:ModeratorDeleted)");
+
+	return "(" + operators.join(" OR ") + ")";
 };
 
 conversations.methods._retrieveData = function(callback) {

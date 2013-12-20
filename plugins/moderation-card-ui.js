@@ -343,7 +343,8 @@ plugin.methods._assembleTopContributorButton = function(name) {
 					self._publishUserUpdateEvent({
 						"item": item,
 						"field": "markers",
-						"value": markers
+						"value": markers,
+						"refresh": true
 					});
 					item.unblock();
 				},
@@ -379,7 +380,7 @@ plugin.methods._assembleTopPostButton = function(name) {
 		"contributor": ~$.inArray(markers.contributor, userMarkers)
 	};
 
-	// TODO: simplify this heavy logic
+	// TODO: simplify this heavy logic if it's possible
 	var action = ~$.inArray("topContributor", this.config.get("extraActions"))
 		? (((states.added || states.contributor) && !states.removed) ? "remove" : "add")
 		: (states.added && !states.removed ? "remove" : "add");
@@ -612,7 +613,8 @@ plugin.methods._publishUserUpdateEvent = function(data) {
 		"data": {
 			"item": data.item,
 			"field": data.field,
-			"value": data.value
+			"value": data.value,
+			"refresh": data.refresh
 		},
 		"global": false,
 		"propagation": false
@@ -685,7 +687,10 @@ var plugin = Echo.Plugin.manifest("ModerationCardUI", "Echo.StreamServer.Control
 
 plugin.events = {
 	"Echo.StreamServer.Controls.Stream.Item.Plugins.ModerationCardUI.onUserUpdate": function(topic, args) {
-		// TODO: refresh component if case of user attribute changing
+		if (args.refresh) {
+			this.component.config.remove("data");
+			this.component.refresh();
+		}
 		this.events.publish({
 			"topic": "onUserUpdate",
 			"data": args,
