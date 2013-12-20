@@ -46,7 +46,7 @@ conversations.config = {
 		"displayLikeIntent": true,
 		"displayReplyIntent": true,
 		"replyNestingLevels": 2,
-		"itemStates": "Untouched,ModeratorApproved",
+		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
 		"userMarkers": ["Conversations.TopContributor"],
 		"itemMarkersToAdd": ["Conversations.TopPost"],
@@ -65,6 +65,7 @@ conversations.config = {
 			"title": "Most likes",
 			"value": "likesDescending"
 		}],
+		"displayCommunityFlagIntent": false,
 		"moderation": {
 			"displayCommunityFlaggedPosts": true,
 			"displaySystemFlaggedPosts": true
@@ -85,7 +86,7 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"replyNestingLevels": 2,
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
-		"itemStates": "Untouched,ModeratorApproved",
+		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
 		"maxItemBodyCharacters": 200,
 		"sortOrderEntries": [{
@@ -101,9 +102,14 @@ conversations.config = {
 			"title": "Most likes",
 			"value": "likesDescending"
 		}],
+		"displayCommunityFlagIntent": true,
 		"moderation": {
-			"displayCommunityFlaggedPosts": true,
-			"displaySystemFlaggedPosts": true
+			"displayCommunityFlaggedPosts": false,
+			"displaySystemFlaggedPosts": false,
+			"premoderation": {
+				"enable": false,
+				"approvedUserBypass": true
+			}
 		},
 		"plugins": []
 	},
@@ -400,8 +406,14 @@ conversations.methods._assembleAllPostsOperators = function() {
 	// items with specific status
 	var states = !Echo.Utils.get(config, "moderation.premoderation.enable")
 		? config.itemStates
-		: "ModeratorApproved";
-	operators.push("state:" + states);
+		: ["ModeratorApproved"];
+
+	$.map(["CommunityFlagged", "SystemFlagged"], function(state) {
+		if (Echo.Utils.get(config, "moderation.display" + state + "Posts")) {
+			states.push(state);
+		}
+	});
+	operators.push("state:" + states.join(","));
 
 	// items for current user (if bozo filter enabled)
 	var userId = this.user && this.user.get("identityUrl");

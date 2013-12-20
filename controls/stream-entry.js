@@ -265,6 +265,9 @@ entry.methods._getConditionalPluginList = function(componentID) {
 	};
 
 	var plugins = {
+		"CommunityFlag": {
+			"name": "CommunityFlagUI"
+		},
 		"Like": {
 			"name": "LikeCardUI"
 		},
