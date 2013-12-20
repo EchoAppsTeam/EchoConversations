@@ -418,7 +418,7 @@ plugin.css =
 	'.{plugin.class} .{class:container-child} { padding: 20px 0px 0px 16px; margin: 0px 15px 2px 0px; }' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 20px 0px 0px 8px; margin: 0px 15px 2px 0px; }' +
 
-	'.echo-sdk-ui .{plugin.class} .{class:button} a:focus { outline: none; }' +
+	'.echo-sdk-ui .{plugin.class} .{class:buttons} a:focus { outline: none; }' +
 	'.{plugin.class} .{class:button} { margin-right: 10px; }' +
 	'.{plugin.class} .{class:buttons} .dropdown .{class:button} { margin-right: 0px; }' +
 	'.{plugin.class} .{class:button-delim} { display: none; }' +

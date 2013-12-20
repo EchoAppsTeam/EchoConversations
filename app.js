@@ -401,11 +401,12 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 
 conversations.methods._assembleTopPostsOperators = function() {
 	var config = this.config.get("topPosts");
-	return $.map(["CommunityFlagged", "SystemFlagged"], function(state) {
+	var states  = $.map(["CommunityFlagged", "SystemFlagged"], function(state) {
 		return !Echo.Utils.get(config, "moderation.display" + state + "Posts")
 			? "-state:" + state
 			: null;
-	}).join(" ");
+	});
+	return states.join(" ") + " -state:ModeratorDeleted";
 };
 
 conversations.methods._assembleAllPostsOperators = function() {
