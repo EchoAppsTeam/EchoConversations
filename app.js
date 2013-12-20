@@ -168,7 +168,7 @@ conversations.templates.main =
 	'</div>';
 
 conversations.templates.defaultQuery =
-	'childrenof:{data:targetURL} sortOrder:{data:initialSortOrder} ' +
+	'childrenof:{data:targetURL} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
 	'itemsPerPage:{data:initialItemsPerPage} {data:markers} type:comment ' +
 	'{data:operators} children:{data:replyNestingLevels} {data:operators}';
 
@@ -198,6 +198,8 @@ conversations.renderers.postComposer = function(element) {
 			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
 			"plugins": [{
+				"name": "URLResolving"
+			}, {
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
 				"enabled": enableBundledIdentity,
@@ -287,13 +289,13 @@ conversations.methods._assembleSearchQuery = function(componentID, overrides) {
 	if (!query) {
 		var states = config.itemStates;
 		var userId = this.user && this.user.get("identityUrl");
-
+/*
 		markers = config.itemMarkers.length
 			? "markers:" + config.itemMarkers.join(",")
 			: "";
 		operators = (this.config.get("bozoFilter") && userId)
 			? "(state:" + states + " OR user.id:" + userId + ")"
-			: "state: " + states;
+			: "state: " + states;*/
 	}
 	return this.substitute({
 		"template": query || conversations.templates.defaultQuery,

@@ -67,9 +67,32 @@ module.exports = function(grunt) {
 				"<%= clean.build %>"
 			]
 		},
+		"wrap": {
+			"options": {
+				"header": [
+					"(function(jQuery) {",
+					"var $ = jQuery;",
+					""
+				],
+				"footer": [
+					"})(Echo.jQuery);"
+				]
+			},
+			"third-party": {
+				"files": [{
+					"expand": true,
+					"cwd": "<%= dirs.build %>",
+					"src": ["third-party/*"]
+				}]
+			}
+		},
 		"copy": {
 			"js": {
 				"src": "<%= sources.js %>",
+				"dest": "<%= dirs.build %>/"
+			},
+			"third-party": {
+				"src": "third-party/*.js",
 				"dest": "<%= dirs.build %>/"
 			},
 			"images": {
@@ -135,7 +158,7 @@ module.exports = function(grunt) {
 			"options": {
 				"jshintrc": ".jshintrc"
 			},
-			"grunt": ["Gruntfile.js", "grunt/**/*.js", "<%= sources.js %>"]
+			"grunt": ["Gruntfile.js", "grunt/**/*.js"]
 		},
 		"release": {
 			"options": {
@@ -166,25 +189,25 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-                "watch": {
-                        "src": {
-                                "files": [
+		"watch": {
+			"src": {
+				"files": [
 					"<%= sources.js %>",
 					"<%= sources.demo %>",
 					"Gruntfile.js",
 					"grunt/**"
 				],
-                                "tasks": ["default"],
-                                "options": {
-                                        "interrupt": true
-                                }
-                        }
-                },
+				"tasks": ["default"],
+				"options": {
+					"interrupt": true
+				}
+			}
+		},
 		"check-environment": {
 			"options": {
 				"list": shared.config("environments")
 			}
-                },
+		},
 		"init-environment": {
 			"options": {
 				"list": shared.config("environments")

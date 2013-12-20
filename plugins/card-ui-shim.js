@@ -758,3 +758,140 @@ plugin.css =
 Echo.Plugin.create(plugin);
 
 })(Echo.jQuery);
+
+(function($) {
+"use strict";
+
+/**
+ * @class Echo.StreamServer.Controls.Submit.Plugins.URLResolving
+ * Extends Submit control to enable url media resoving.
+ */
+var plugin = Echo.Plugin.manifest("URLResolving", "Echo.StreamServer.Controls.Submit");
+
+plugin.config = {
+	"apiKey": "8ded698289204c8c8348c08314a0c250"
+};
+
+plugin.init = function() {
+	$.embedly.defaults.key = this.config.get("apiKey");
+	this.media = {};
+	this.timer = null;
+
+	this.extendTemplate("insertAfter", "content", plugin.templates.preview);
+};
+
+plugin.events = {
+	"Echo.StreamServer.Controls.Submit.onPostInit": function(topic, args) {
+		var self = this;
+		var content = args.postData.content[0].object.content;
+		var mediaContent = $.map(this.media, function(media) {
+			return media.html;
+		}).join("\n");
+
+		var media = $("<div/>")
+			.append($(plugin.templates.wrappers.text).text(content))
+			.append($(plugin.templates.wrappers.media).html(mediaContent));
+
+		args.postData.content[0].object.content = media.html();
+	}
+};
+
+plugin.dependencies = [{
+	"url": "http://ec.safin.ul.js-kit.com/third-party/jquery.embedly.js"
+}];
+
+plugin.templates = {
+	"preview": '<div class="{plugin.class:MediaPreview}"></div>',
+	"wrappers": {
+		"media": '<div class="echo-item-files"></div>',
+		"text": '<div class="echo-item-text"></div>'
+	},
+	"video":
+		'<div class="echo-item-video" oembed="{data:oembed}">{data:html}</div>',
+	"photo":
+		'<div class="echo-item-photo" oembed="...">' +
+			'<a href="{data:original_url}" target="_blank">' +
+				'<img src="{data:thumbnail_url}" width="{data:thumbnail_width}" height="{data:thumbnail_height}" data-src-full="{data:url}"/>' +
+			'</a>' +
+		'</div>',
+	"link": // it's an article
+		'<div class="echo-item-article" oembed="...">' +
+			'<div class="echo-item-template-container" style="margin-bottom: 10px;">' +
+				'<div class="echo-item-template-article-title echo-linkColor" style="margin-bottom: 10px; font-size: 15px; font-weight: bold; color: #476CB8;">' +
+					'<a href="" target="_blank">{data:title}</a>' +
+				'</div>' +
+				'<div class="echo-item-template-article">' +
+					'<div class="echo-item-template-article-thumbnail" style="width: 25%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden;">' +
+						'<img src="{data:thumbnail_url}" style="width: auto; height: auto; max-height:120px; max-width:120px;" />' +
+					'</div>' +
+					'<div class="echo-item-template-article-descriptionContainer" style="width: 75%; float: left;">' +
+					'<div class="echo-item-template-article-description"style="margin-left: 10px;">{data:description}</div>' +
+				'</div>' +
+				'<div class="echo-clear" style="clear: both;"></div>' +
+			'</div>' +
+		'</div>'
+};
+
+plugin.component.renderers.text = function(element) {
+	var self = this;
+
+	element.on("keyup", function() {
+		self._URLResolver(element.val());
+	});
+
+	this.parentRenderer("text", arguments);
+	return element;
+};
+
+plugin.methods._URLResolver= function(text) {
+	var self = this;
+	var urlRegex = /(https?:\/\/[^\s]+)/g;
+
+	clearTimeout(this.timer);
+
+	this.timer = setTimeout(function() {
+		var matchedURLs = text.match(urlRegex);
+		if (matchedURLs) {
+			var unprocessedURLs = $.map(matchedURLs, function(url) {
+				if (typeof self.media[url] === "undefined") {
+					self.media[url] = {};
+					return url;
+				} else {
+					return null;
+				}
+			});
+			$.embedly.oembed(unprocessedURLs)
+				.progress($.proxy(self._addMedia, self));
+			$.embedly.extract(unprocessedURLs).progress(function(data) {
+				console.log(data);
+			});
+		}
+	}, 1000);
+};
+
+plugin.methods._addMedia = function(data) {
+	var html = this._prepareMediaContent(data);
+	this.media[data.original_url] = {
+		"data": data,
+		"html": html
+	};
+	this.component.view.get("body").addClass(this.cssPrefix + "EnabledMedia");
+	this.view.get("MediaPreview").prepend(html);
+};
+
+plugin.methods._prepareMediaContent = function(media) {
+	return this.substitute({"template": plugin.templates[media.type], "data": media});
+};
+
+plugin.css =
+	'.{class:body}.{plugin.class:EnabledMedia} .{class:content}.{class:border} { border-bottom: none; }' +
+	'.{class:body}.{plugin.class:EnabledMedia} .{plugin.class:MediaPreview} { padding: 5px; border: 1px solid #D2D2D2; border-top: 1px dashed #D2D2D2; }' +
+	// video item styles
+	'.echo-item-video { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
+	'.echo-item-video > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.echo-item-video > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.echo-item-video > object { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }';
+
+Echo.Plugin.create(plugin);
+
+})(Echo.jQuery);
