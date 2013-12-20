@@ -148,7 +148,8 @@ dashboard.vars = {
 		}
 	}, {
 		"component": "Group",
-		"name": "Moderation",
+		"name": "moderation",
+		"type": "object",
 		"config": {
 			"title": "Moderation"
 		},
@@ -251,7 +252,7 @@ dashboard.vars = {
 			"component": "Checkbox",
 			"name": "approvedUserBypass",
 			"type": "boolean",
-			"default": false,
+			"default": true,
 			"config": {
 				"title": "Approved User Bypass",
 				"desc": "If True, Users marked as ‘Approved’ bypass the Pre-moderation process, reducing unnecessary moderation overhead. Users who have 3 or more Posts approved are automatically marked as Approved Users"
@@ -420,6 +421,7 @@ dashboard.config.normalizer = {
 					items.splice(11, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
+						"type": "boolean",
 						"default": true,
 						"config": {
 							"title": "Display Community Flag Intent",
