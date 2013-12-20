@@ -309,7 +309,7 @@ plugin.methods._assembleTopContributorButton = function(name) {
 		return false;
 	}
 
-	var marker = this.config.get("topMarkers").contributor;
+	var marker = this.config.get("topMarkers.contributor");
 	var userMarkers = item.get("data.actor.markers", []);
 	var action = ~$.inArray(marker, userMarkers) ? "remove" : "add";
 
