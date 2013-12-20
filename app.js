@@ -417,11 +417,9 @@ conversations.methods._assembleAllPostsOperators = function() {
 		? config.itemStates
 		: ["ModeratorApproved"];
 
-	$.map(["CommunityFlagged", "SystemFlagged"], function(state) {
-		if (Echo.Utils.get(config, "moderation.display" + state + "Posts")) {
-			states.push(state);
-		}
-	});
+	states = states.concat($.grep(["CommunityFlagged", "SystemFlagged"], function(state) {
+		return Echo.Utils.get(config, "moderation.display" + state + "Posts");
+	}));
 	operators.push("state:" + states.join(","));
 
 	// items for current user (if bozo filter enabled)
