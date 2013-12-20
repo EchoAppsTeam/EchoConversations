@@ -107,6 +107,7 @@ conversations.config = {
 		},
 		"plugins": []
 	},
+	"moderationQueue": {},
 	"auth": {
 		"enableBundledIdentity": true,
 		"hideLoginButtons": false,
@@ -133,14 +134,23 @@ conversations.config = {
 	}
 };
 
+conversations.labels = {
+	"allPostsTab": "All Posts",
+	"moderationQueueTab": "Moderation Queue"
+};
+
 conversations.config.normalizer = {
-	"dependencies": function(value) {
-		// we should keep "appkey" and "apiBaseURL" at the root level
-		// to let the Echo.UserSession class initialize correctly
-		var ssConfig = value.StreamServer || {};
-		this.set("appkey", ssConfig.appkey);
-		this.set("apiBaseURL", ssConfig.apiBaseURL);
-		return value;
+	"appkey": function() {
+		return this.get("dependencies.StreamServer.appkey");
+	},
+	"apiBaseURL": function() {
+		return this.get("dependencies.StreamServer.apiBaseURL");
+	},
+	"submissionProxyURL": function() {
+		return this.get("dependencies.StreamServer.submissionProxyURL");
+	},
+	"moderationQueue": function(value) {
+		return $.extend(true, {}, this.get("allPosts"), value);
 	},
 	"targetURL": function(value) {
 		return value
@@ -249,11 +259,31 @@ conversations.renderers.topPosts = function(element) {
 };
 
 conversations.renderers.allPosts = function(element) {
-	this.view.render({
-		"target": element,
-		"name": "_stream",
-		"extra": {"id": "allPosts"}
-	});
+	var self = this;
+	if (this.user.is("admin") && this.config.get("allPosts.moderation.premoderation.enable")) {
+		new Echo.GUI.Tabs({
+			"target": element,
+			"entries": $.map(["allPosts", "moderationQueue"], function(id) {
+				var elem = $("<div>");
+				self.view.render({
+					"target": elem,
+					"name": "_stream",
+					"extra": {"id": id}
+				});
+				return {
+					"id": id,
+					"label": self.labels.get(id + "Tab"),
+					"panel": elem
+				};
+			})
+		});
+	} else {
+		this.view.render({
+			"target": element,
+			"name": "_stream",
+			"extra": {"id": "allPosts"}
+		});
+	}
 };
 
 conversations.renderers._stream = function(element, extra) {
@@ -287,7 +317,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"query": this._assembleSearchQuery(componentID, queryOverrides)
 		},
 		"streamPlugins": this.config.get(componentID + ".plugins"),
-		"displayEmptyStream": componentID === "allPosts",
+		"displayEmptyStream": ~$.inArray(componentID, ["allPosts", "moderationQueue"]),
 		"replyComposer": this.config.get("replyComposer")
 	}, this.config.get(componentID), overrides);
 };
@@ -297,14 +327,11 @@ conversations.methods._getSubmitPermissions = function() {
 };
 
 conversations.methods._assembleSearchQuery = function(componentID, overrides) {
-	var operators, markers;
+	var operators = [], markers;
 	var config = this.config.get(componentID, {});
 	var query = config.queryOverride;
 
 	if (!query) {
-		var states = config.itemStates;
-		var userId = this.user && this.user.get("identityUrl");
-
 		if (componentID === "topPosts") {
 			markers = this.substitute({
 				"template": conversations.templates.topConditions[
@@ -323,19 +350,52 @@ conversations.methods._assembleSearchQuery = function(componentID, overrides) {
 				: "";
 		}
 
-		operators = (this.config.get("bozoFilter") && userId)
-			? "(state:" + states + " OR user.id:" + userId + ")"
-			: "state: " + states;
+		operators = this._assembleStreamQueryOperators(componentID);
 	}
 	return this.substitute({
 		"template": query || conversations.templates.defaultQuery,
 		"data": $.extend({}, config, {
 			"markers": markers || "",
-			"operators": operators || "",
+			"operators": operators.length ? "(" + operators.join(" OR ") + ")" : "",
 			"targetURL": this.config.get("targetURL"),
 			"initialSortOrder": Echo.Cookie.get([componentID, "sortOrder"].join(".")) || config.initialSortOrder
 		}, overrides)
 	});
+};
+
+conversations.methods._assembleStreamQueryOperators = function(componentID) {
+	var config = this.config.get(componentID);
+	var operators = [];
+
+	if (componentID === "moderationQueue") {
+		operators.push("state:Untouched -user.roles:moderator,administrator");
+	} else {
+
+		// items with specific status
+		var states = !Echo.Utils.get(config, "moderation.premoderation.enable")
+			? config.itemStates
+			: "ModeratorApproved";
+		operators.push("state:" + states);
+
+		// items for current user (if bozo filter enabled)
+		var userId = this.user && this.user.get("identityUrl");
+		if (this.config.get("bozoFilter") && userId) {
+			operators.push("user.id:" + userId);
+		}
+
+		// approved users (if approvedUserBypass enabled)
+		if (
+			Echo.Utils.get(config, "moderation.premoderation.enable")
+			&& Echo.Utils.get(config, "moderation.premoderation.approvedUserBypass")
+		) {
+			operators.push("(user.state:ModeratorApproved AND -state:ModeratorDeleted)");
+		}
+
+		// always display admin/moderator posts if they are not deleted
+		operators.push("(user.roles:moderator,administrator AND -state:ModeratorDeleted)");
+	}
+
+	return operators;
 };
 
 conversations.methods._retrieveData = function(callback) {
@@ -414,6 +474,7 @@ conversations.css =
 		'{ font-family: "Helvetica Neue", arial, sans-serif; }' +
 	'.{class:postComposer} { margin-bottom: 10px; }' +
 	'.{class:topPosts} > div { margin-bottom: 25px; }' +
+	'.{class:allPosts} > .echo-tabs-panels { overflow: inherit; }' +
 	// set box-sizing property for all nested elements to default (content-box)
 	// as its can be overwritten on the page.
 	// TODO: get rid of these rules at all!

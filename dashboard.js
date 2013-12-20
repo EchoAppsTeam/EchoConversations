@@ -266,7 +266,42 @@ dashboard.config = {
 		"type": "object",
 		"config": {
 			"title": "All Posts"
-		}
+		},
+		"items": [{
+			"component": "Group",
+			"name": "moderation",
+			"type": "object",
+			"config": {
+				"title": "Moderation"
+			},
+			"items": [{
+				"component": "Group",
+				"name": "premoderation",
+				"type": "object",
+				"config": {
+					"title": "Pre-moderation"
+				},
+				"items": [{
+					"component": "Checkbox",
+					"name": "enable",
+					"type": "boolean",
+					"default": false,
+					"config": {
+						"title": "Enable",
+						"desc": "If True, Posts from general users need to be manually Approved by a Moderator or Admin before being displayed to general users"
+					}
+				}, {
+					"component": "Checkbox",
+					"name": "approvedUserBypass",
+					"type": "boolean",
+					"default": true,
+					"config": {
+						"title": "Approved User Bypass",
+						"desc": "If True, Users marked as ‘Approved’ bypass the Pre-moderation process, reducing unnecessary moderation overhead. Users who have 3 or more Posts approved are automatically marked as Approved Users"
+					}
+				}]
+			}]
+		}]
 	}, {
 		"component": "Group",
 		"name": "auth",
@@ -359,7 +394,7 @@ dashboard.config.normalizer = {
 					return this;
 				},
 				"allPosts": function() {
-					this["items"] = assembleBaseECL.call(this);
+					this.items = assembleBaseECL.call(this).concat(this.items);
 					return this;
 				},
 				"postComposer": function() {
