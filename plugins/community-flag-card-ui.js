@@ -4,7 +4,7 @@
 var $ = jQuery;
 
 /**
- * @class Echo.StreamServer.Controls.Stream.Item.Plugins.CommunityFlagUI
+ * @class Echo.StreamServer.Controls.Stream.Item.Plugins.CommunityFlagCardUI
  * Adds extra Flag/Unflag buttons to each item in the Echo Stream
  * control for the authenticated users. The item will receive the
  * CommunityFlagged state as soon as it is flagged by a certain number
@@ -17,7 +17,7 @@ var $ = jQuery;
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
- * 			"name": "CommunityFlagUI"
+ * 			"name": "CommunityFlagCardUI"
  * 		}]
  * 	});
  *
@@ -29,13 +29,13 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("CommunityFlagUI", "Echo.StreamServer.Controls.Stream.Item");
+var plugin = Echo.Plugin.manifest("CommunityFlagCardUI", "Echo.StreamServer.Controls.Stream.Item");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	this.component.addButtonSpec("CommunityFlagUI", this._assembleButton("Flag"));
-	this.component.addButtonSpec("CommunityFlagUI", this._assembleButton("Unflag"));
+	this.component.addButtonSpec("CommunityFlagCardUI", this._assembleButton("Flag"));
+	this.component.addButtonSpec("CommunityFlagCardUI", this._assembleButton("Unflag"));
 };
 
 plugin.config = {
@@ -115,7 +115,8 @@ plugin.methods._assembleButton = function(name) {
 	var plugin = this;
 	var callback = function() {
 		var item = this;
-		item.get("buttons." + plugin.name + "." + name + ".element")
+		var buttonNode = item.get("buttons." + plugin.name + "." + name + ".element");
+		$("." + item.cssPrefix + "buttonCaption", buttonNode)
 			.empty()
 			.append(plugin.labels.get(name.toLowerCase() + "Processing"));
 		var activity = {
@@ -134,11 +135,11 @@ plugin.methods._assembleButton = function(name) {
 			},
 			"onData": function(response) {
 				/**
-				 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.CommunityFlagUI.onFlagComplete
+				 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.CommunityFlagCardUI.onFlagComplete
 				 * Triggered if flag operation was completed.
 				 */
 				/**
-				 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.CommunityFlagUI.onUnflagComplete
+				 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.CommunityFlagCardUI.onUnflagComplete
 				 * Triggered if reverse flag operation was completed.
 				 */
 				plugin._publishEventComplete({
@@ -154,11 +155,11 @@ plugin.methods._assembleButton = function(name) {
 			},
 			"onError": function(response) {
 				/**
-				 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.CommunityFlagUI.onFlagError
+				 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.CommunityFlagCardUI.onFlagError
 				 * Triggered if flag operation failed.
 				 */
 				/**
-				 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.CommunityFlagUI.onUnflagError
+				 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.CommunityFlagCardUI.onUnflagError
 				 * Triggered if reverse flag operation failed.
 				 */
 				plugin._publishEventComplete({

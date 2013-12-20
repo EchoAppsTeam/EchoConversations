@@ -270,7 +270,7 @@ entry.methods._getConditionalPluginList = function(componentID) {
 		"name": "LikeCardUI"
 	}, {
 		"intentID": "CommunityFlag",
-		"name": "CommunityFlagUI"
+		"name": "CommunityFlagCardUI"
 	}, {
 		"intentID": "Reply",
 		"name": "ReplyCardUI",
