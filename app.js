@@ -524,6 +524,7 @@ conversations.css =
 		'{ font-family: "Helvetica Neue", arial, sans-serif; }' +
 	'.{class:postComposer} { margin-bottom: 10px; }' +
 	'.{class:topPosts} > div { margin-bottom: 25px; }' +
+	'.{class:allPosts} .echo-tabs-header > li > a { font-size: 13px; }' +
 	'.{class:allPosts} > .echo-tabs-panels { overflow: inherit; }' +
 	// set box-sizing property for all nested elements to default (content-box)
 	// as its can be overwritten on the page.
