@@ -45,6 +45,7 @@ conversations.config = {
 		"displaySharingIntent": true,
 		"displayLikeIntent": true,
 		"displayReplyIntent": true,
+		"displayCommunityFlagIntent": false,
 		"replyNestingLevels": 2,
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
@@ -65,7 +66,6 @@ conversations.config = {
 			"title": "Most likes",
 			"value": "likesDescending"
 		}],
-		"displayCommunityFlagIntent": false,
 		"moderation": {
 			"displayCommunityFlaggedPosts": true,
 			"displaySystemFlaggedPosts": true
@@ -84,6 +84,7 @@ conversations.config = {
 		"displaySharingIntent": true,
 		"displayLikeIntent": true,
 		"displayReplyIntent": true,
+		"displayCommunityFlagIntent": true,
 		"replyNestingLevels": 2,
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
 		"itemStates": ["Untouched", "ModeratorApproved"],
@@ -102,7 +103,6 @@ conversations.config = {
 			"title": "Most likes",
 			"value": "likesDescending"
 		}],
-		"displayCommunityFlagIntent": true,
 		"moderation": {
 			"displayCommunityFlaggedPosts": false,
 			"displaySystemFlaggedPosts": false,
@@ -230,7 +230,7 @@ conversations.renderers.postComposer = function(element) {
 			"target": element,
 			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
-			"plugins": [{
+			"plugins": [].concat([{
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
 				"enabled": enableBundledIdentity,
@@ -240,7 +240,7 @@ conversations.renderers.postComposer = function(element) {
 				"name": "CardUIShim",
 				"submitPermissions": this._getSubmitPermissions(),
 				"auth": this.config.get("auth")
-			}, this.config.get("postComposer"))].concat(config.plugins),
+			}, this.config.get("postComposer"))], config.plugins),
 			"data": {
 				"object": {
 					"content": Echo.Utils.get(Echo.Variables, targetURL, "")

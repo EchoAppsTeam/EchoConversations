@@ -21,6 +21,7 @@ entry.config = {
 	"displaySharingIntent": true,
 	"displayLikeIntent": true,
 	"displayReplyIntent": true,
+	"displayCommunityFlagIntent": true,
 	"itemStates": "Untouched,ModeratorApproved",
 	"itemMarkers": [""],
 	"maxItemBodyCharacters": 200,
@@ -174,7 +175,7 @@ entry.renderers.sorter = function(element) {
 
 				return $.isArray(sortOrder) && sortOrder.length
 					? sortOrder.pop() : self.config.get("initialSortOrder");
-		})();
+			})();
 
 		var values = $.grep(self.config.get("sortOrderEntries"), function(entry) {
 			return entry.value === value;
@@ -275,7 +276,7 @@ entry.methods._getConditionalPluginList = function(componentID) {
 			"name": "ReplyCardUI",
 			"enabled": visible(),
 			"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
-			"nestedPlugins": [{
+			"nestedPlugins": [].concat([{
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("janrainAppId"),
 				"enabled": auth.enableBundledIdentity,
@@ -285,7 +286,7 @@ entry.methods._getConditionalPluginList = function(componentID) {
 				"name": "CardUIShim",
 				"auth":	this.config.get("auth"),
 				"submitPermissions": this._getSubmitPermissions()
-			}, this.config.get("replyComposer"))].concat(this.config.get("replyComposer.plugins"))
+			}, this.config.get("replyComposer"))], this.config.get("replyComposer.plugins"))
 		},
 		"Sharing": {
 			"name": "CardUISocialSharing"
