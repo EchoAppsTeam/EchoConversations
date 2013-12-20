@@ -265,38 +265,35 @@ entry.methods._getConditionalPluginList = function(componentID) {
 		}).length;
 	};
 
-	var plugins = {
-		"CommunityFlag": {
-			"name": "CommunityFlagUI"
-		},
-		"Like": {
-			"name": "LikeCardUI"
-		},
-		"Reply": {
-			"name": "ReplyCardUI",
-			"enabled": visible(),
-			"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
-			"nestedPlugins": [].concat([{
-				"name": "JanrainBackplaneHandler",
-				"appId": this.config.get("janrainAppId"),
-				"enabled": auth.enableBundledIdentity,
-				"authWidgetConfig": auth.authWidgetConfig,
-				"sharingWidgetConfig": auth.sharingWidgetConfig
-			}, $.extend({
-				"name": "CardUIShim",
-				"auth":	this.config.get("auth"),
-				"submitPermissions": this._getSubmitPermissions()
-			}, this.config.get("replyComposer"))], this.config.get("replyComposer.plugins"))
-		},
-		"Sharing": {
-			"name": "CardUISocialSharing"
-		}
-	};
+	var plugins = [{
+		"intentID": "Like",
+		"name": "LikeCardUI"
+	}, {
+		"intentID": "CommunityFlag",
+		"name": "CommunityFlagUI"
+	}, {
+		"intentID": "Reply",
+		"name": "ReplyCardUI",
+		"enabled": visible(),
+		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
+		"nestedPlugins": [].concat([{
+			"name": "JanrainBackplaneHandler",
+			"appId": this.config.get("janrainAppId"),
+			"enabled": auth.enableBundledIdentity,
+			"authWidgetConfig": auth.authWidgetConfig,
+			"sharingWidgetConfig": auth.sharingWidgetConfig
+		}, $.extend({
+			"name": "CardUIShim",
+			"auth":	this.config.get("auth"),
+			"submitPermissions": this._getSubmitPermissions()
+		}, this.config.get("replyComposer"))], this.config.get("replyComposer.plugins"))
+	}, {
+		"intentID": "Sharing",
+		"name": "CardUISocialSharing"
+	}];
 
-	return Echo.Utils.foldl([], plugins, function(value, acc, name) {
-		if (!!self.config.get("display" + name + "Intent")) {
-			acc.push(value);
-		}
+	return $.grep(plugins, function(plugin) {
+		return !!self.config.get("display" + plugin.intentID + "Intent");
 	});
 };
 
