@@ -373,7 +373,7 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 				});
 			},
 			"operators": function() {
-				return "";
+				return self._assembleTopPostsOperators(componentID);
 			}
 		},
 		"allPosts": {
@@ -397,6 +397,15 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 			}
 		}
 	}[componentID];
+};
+
+conversations.methods._assembleTopPostsOperators = function() {
+	var config = this.config.get("topPosts");
+	return $.map(["CommunityFlagged", "SystemFlagged"], function(state) {
+		return !Echo.Utils.get(config, "moderation.display" + state + "Posts")
+			? "-state:" + state
+			: null;
+	}).join(" ");
 };
 
 conversations.methods._assembleAllPostsOperators = function() {
