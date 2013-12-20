@@ -405,6 +405,7 @@ dashboard.config.normalizer = {
 					items.splice(5, 0, {
 						"component": "Checkbox",
 						"name": "includeTopContributors",
+						"type": "boolean",
 						"default": true,
 						"config": {
 							"title": "Include Top Contributors",
