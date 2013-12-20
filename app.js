@@ -113,7 +113,9 @@ conversations.config = {
 		},
 		"plugins": []
 	},
-	"moderationQueue": {},
+	"moderationQueue": {
+		"label": "Moderation Queue"
+	},
 	"auth": {
 		"enableBundledIdentity": true,
 		"hideLoginButtons": false,
@@ -138,11 +140,6 @@ conversations.config = {
 			}
 		}
 	}
-};
-
-conversations.labels = {
-	"allPostsTab": "All Posts",
-	"moderationQueueTab": "Moderation Queue"
 };
 
 conversations.config.normalizer = {
@@ -278,7 +275,7 @@ conversations.renderers.allPosts = function(element) {
 				});
 				return {
 					"id": id,
-					"label": self.labels.get(id + "Tab"),
+					"label": self.config.get(id + ".label"),
 					"panel": elem
 				};
 			})
