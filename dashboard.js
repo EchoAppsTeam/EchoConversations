@@ -15,12 +15,6 @@ dashboard.mappings = {
 	},
 	"dependencies.janrainapp": {
 		"key": "dependencies.Janrain.appId"
-	},
-	"postComposer.prompt": {
-		"key": "postComposer.comments.prompt"
-	},
-	"replyComposer.prompt": {
-		"key": "replyComposer.comments.prompt"
 	}
 };
 
@@ -153,6 +147,27 @@ dashboard.vars = {
 			})
 		}
 	}, {
+		"component": "Group",
+		"name": "Moderation",
+		"config": {
+			"title": "Moderation"
+		},
+		"items": [{
+			"component": "Checkbox",
+			"name": "displayCommunityFlaggedPosts",
+			"default": false,
+			"config": {
+				"title": "Display Community Flagged Posts"
+			}
+		}, {
+			"component": "Checkbox",
+			"name": "displaySystemFlaggedPosts",
+			"default": false,
+			"config": {
+				"title": "Display System Flagged Posts"
+			}
+		}]
+	}, {
 		"component": "Input",
 		"name": "noPostsMessage",
 		"type": "string",
@@ -215,6 +230,33 @@ dashboard.vars = {
 				}
 			}]
 		}]
+	}],
+	"premoderationECL": [{
+		"component": "Group",
+		"name": "premoderation",
+		"type": "object",
+		"config": {
+			"title": "Pre-moderation"
+		},
+		"items": [{
+			"component": "Checkbox",
+			"name": "enable",
+			"type": "boolean",
+			"default": false,
+			"config": {
+				"title": "Enable",
+				"desc": "If True, Posts from general users need to be manually Approved by a Moderator or Admin before being displayed to general users"
+			}
+		}, {
+			"component": "Checkbox",
+			"name": "approvedUserBypass",
+			"type": "boolean",
+			"default": false,
+			"config": {
+				"title": "Approved User Bypass",
+				"desc": "If True, Users marked as ‘Approved’ bypass the Pre-moderation process, reducing unnecessary moderation overhead. Users who have 3 or more Posts approved are automatically marked as Approved Users"
+			}
+		}]
 	}]
 };
 
@@ -266,42 +308,7 @@ dashboard.config = {
 		"type": "object",
 		"config": {
 			"title": "All Posts"
-		},
-		"items": [{
-			"component": "Group",
-			"name": "moderation",
-			"type": "object",
-			"config": {
-				"title": "Moderation"
-			},
-			"items": [{
-				"component": "Group",
-				"name": "premoderation",
-				"type": "object",
-				"config": {
-					"title": "Pre-moderation"
-				},
-				"items": [{
-					"component": "Checkbox",
-					"name": "enable",
-					"type": "boolean",
-					"default": false,
-					"config": {
-						"title": "Enable",
-						"desc": "If True, Posts from general users need to be manually Approved by a Moderator or Admin before being displayed to general users"
-					}
-				}, {
-					"component": "Checkbox",
-					"name": "approvedUserBypass",
-					"type": "boolean",
-					"default": true,
-					"config": {
-						"title": "Approved User Bypass",
-						"desc": "If True, Users marked as ‘Approved’ bypass the Pre-moderation process, reducing unnecessary moderation overhead. Users who have 3 or more Posts approved are automatically marked as Approved Users"
-					}
-				}]
-			}]
-		}]
+		}
 	}, {
 		"component": "Group",
 		"name": "auth",
@@ -388,13 +395,38 @@ dashboard.config.normalizer = {
 			var itemHandlers = {
 				"topPosts": function() {
 					var items = assembleBaseECL.call(this);
+
 					items[3]["default"] = 5; // override initialItemsPerPage value
+					items[12]["items"][0]["default"] = true;
+					items[12]["items"][1]["default"] = true;
 					items.pop();
+
+					items.splice(5, 0, {
+						"component": "Checkbox",
+						"name": "includeTopContributors",
+						"default": true,
+						"config": {
+							"title": "Include Top Contributors",
+							"desc": "If True, Posts from users marked as ‘Top Contributors’ are automatically " +
+								"included in the Top Posts stream unless manually removed"
+						}
+					});
 					this["items"] = items;
 					return this;
 				},
 				"allPosts": function() {
-					this.items = assembleBaseECL.call(this).concat(this.items);
+					var items = assembleBaseECL.call(this);
+					items[12]["items"].push(component.get("premoderationECL"));
+					items.splice(11, 0, {
+						"component": "Checkbox",
+						"name": "displayCommunityFlagIntent",
+						"default": true,
+						"config": {
+							"title": "Display Community Flag Intent",
+							"desc": ""
+						}
+					});
+					this["items"] = items;
 					return this;
 				},
 				"postComposer": function() {
