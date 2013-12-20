@@ -6,8 +6,7 @@
 
 <body>
 
-<!-- <script type="text/javascript" src="http://cdn.echoenabled.com/sdk/v3/loader.js"></script> -->
-<script src="http://cdn.sdk.evseev.ul.js-kit.com/sdk/v3/dev/loader.js"></script>
+<script type="text/javascript" src="http://cdn.echoenabled.com/sdk/v3/loader.js"></script>
 
 <div id="container" style="margin: 0px auto; width: 50%; max-width: 440px;"></div>
 
@@ -21,18 +20,18 @@
 		},
 		"config": {
 			"target": document.getElementById("container"),
-			"targetURL": "http://alex.echoplatform.com/test/conversations",
+			"targetURL": "http://echoplatform.com/test/conversations",
 			"auth": {
 				"allowAnonymousSubmission": true
-      },
-      "allPosts": {
-        "moderation": {
-          "premoderation": {
-            "enable": true,
-            "approvedUserBypass": true
-          }
-        }
-      },
+			},
+			"allPosts": {
+				"moderation": {
+					"premoderation": {
+						"enable": true,
+						"approvedUserBypass": true
+					}
+				}
+			},
 			"dependencies": {
 				"Janrain": {"appId": "echo"},
 				"StreamServer": {"appkey": "echo.jssdk.demo.aboutecho.com"}
