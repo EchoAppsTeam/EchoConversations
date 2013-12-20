@@ -198,7 +198,7 @@ conversations.templates.defaultQuery =
 	'{data:operators} children:{data:replyNestingLevels} {data:operators}';
 
 conversations.templates.topConditions = {
-	"onlyPosts":  "markers:{data:itemsMarkersToAdd} -markers:{data:itemMarkersToRemove}",
+	"onlyPosts":  "markers:{data:itemMarkersToAdd} -markers:{data:itemMarkersToRemove}",
 	"contributors": "(user.markers:{data:userMarkers} OR markers:{data:itemMarkersToAdd}) -markers:{data:itemMarkersToRemove}"
 };
 
