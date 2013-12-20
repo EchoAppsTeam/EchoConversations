@@ -266,7 +266,7 @@ conversations.renderers.topPosts = function(element) {
 
 conversations.renderers.allPosts = function(element) {
 	var self = this;
-	if (this.user.is("admin") && this.config.get("allPosts.moderation.premoderation.enable")) {
+	if (this._moderationQueueEnabled()) {
 		new Echo.GUI.Tabs({
 			"target": element,
 			"entries": $.map(["allPosts", "moderationQueue"], function(id) {
@@ -393,7 +393,7 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 					: "";
 			},
 			"operators": function() {
-				return "state:Untouched -user.roles:moderator,administrator";
+				return "state:Untouched -user.roles:moderator,administrator -user.state:ModeratorApproved";
 			}
 		}
 	}[componentID];
@@ -444,7 +444,11 @@ conversations.methods._assembleAllPostsOperators = function() {
 
 conversations.methods._retrieveData = function(callback) {
 	var app = this;
-	var requests = Echo.Utils.foldl([], ["topPosts", "allPosts"], function(name, acc) {
+	var ids = ["topPosts", "allPosts"];
+	if (this._moderationQueueEnabled()) {
+		ids.push("moderationQueue");
+	}
+	var requests = Echo.Utils.foldl([], ids, function(name, acc) {
 		if (!app.config.get(name + ".visible")) return;
 		acc.push({
 			"id": name + "-search",
@@ -490,6 +494,10 @@ conversations.methods._retrieveData = function(callback) {
 			callback();
 		}
 	}).send();
+};
+
+conversations.methods._moderationQueueEnabled = function() {
+	return this.user.is("admin") && this.config.get("allPosts.moderation.premoderation.enable");
 };
 
 // removing "Echo.UserSession.onInvalidate" subscription from an app
