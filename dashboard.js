@@ -341,8 +341,7 @@ dashboard.config = {
 			"type": "boolean",
 			"default": false,
 			"config": {
-				"title": "Hide Login Buttons",
-				"desc": "If enabled, login buttons are hidden for end users"
+				"title": "Hide Login Buttons"
 			}
 		}]
 	}, {
@@ -426,7 +425,7 @@ dashboard.config.normalizer = {
 						"default": true,
 						"config": {
 							"title": "Display Community Flag Intent",
-							"desc": ""
+							"desc": "If enabled, users are offered the option to flag a post as inappropriate"
 						}
 					});
 					this["items"] = items;
