@@ -116,7 +116,8 @@ plugin.events = {
 };
 
 plugin.labels = {
-	"topPostIndicatorTitle": "Top Post"
+	"topPostIndicatorTitle": "Top Post",
+	"actions": "Actions"
 };
 
 plugin.config = {
@@ -153,6 +154,13 @@ plugin.templates.button =
 plugin.templates.topPostMarker =
 	'<i class="icon-bookmark {plugin.class:topPostMarker}" title="{plugin.label:topPostIndicatorTitle}"></i>';
 
+plugin.templates.dropdownButtons =
+	'<div class="dropdown">' +
+		'<a class="dropdown-toggle {class:button}" data-toggle="dropdown" href="#">' +
+			'<i class="{plugin.class:buttonIcon} icon-list"></i>' +
+			'<span class="echo-primaryFont {class:buttonCaption}">{plugin.label:actions}</span>' +
+		'</a>' +
+	'</div>';
 
 plugin.renderers.topPostMarker = function(element) {
 	var item = this.component;
@@ -218,9 +226,7 @@ plugin.component.renderers._dropdownButtons = function(element) {
 	var self = this;
 	var item = this.component;
 	var elem = $(this.substitute({
-		"template": '<div class="dropdown">' +
-				'<a class="dropdown-toggle {class:button}" data-toggle="dropdown" href="#"><i class="icon-list {plugin.class:buttonIcon}"></i></a>' +
-			'</div>'
+		"template": plugin.templates.dropdownButtons
 	}));
 
 	var buttons = $.map(item.buttonsOrder, function(name) { return self.component.get("buttons." + name); });
@@ -424,12 +430,14 @@ plugin.css =
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{plugin.class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
 	'.{plugin.class} .{plugin.class:buttonIcon} { opacity: 0.3; }' +
+	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor,' +
+	'.echo-sdk-ui .{plugin.class} .{class:button}:active,' +
+	'.echo-sdk-ui .{plugin.class} .{class:button}:focus { text-decoration: none; color: #c6c6c6; }' +
+	'.{plugin.class} .{class:container}:hover a.{class:button} { color: #262626; text-decoration: none; }' +
 	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
-	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #262626; text-decoration: none; }' +
 	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{plugin.class:buttonIcon},' +
 		'.{plugin.class} .{class:container}:hover .{plugin.class:buttonIcon},' +
-			'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
-
+		'.{plugin.class} .{class:container}:hover .{class:buttonCaption} {opacity: 0.8; }' +
 
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{plugin.class:chevron} { margin-top: 0px !important; }' +
