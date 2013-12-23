@@ -430,14 +430,14 @@ plugin.css =
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{plugin.class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
 	'.{plugin.class} .{plugin.class:buttonIcon} { opacity: 0.3; }' +
-	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor,' +
-	'.echo-sdk-ui .{plugin.class} .{class:button}:active,' +
-	'.echo-sdk-ui .{plugin.class} .{class:button}:focus { text-decoration: none; color: #c6c6c6; }' +
+		'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor,' +
+		'.echo-sdk-ui .{plugin.class} .{class:button}:active,' +
+		'.echo-sdk-ui .{plugin.class} .{class:button}:focus { text-decoration: none; color: #c6c6c6; }' +
 	'.{plugin.class} .{class:container}:hover a.{class:button} { color: #262626; text-decoration: none; }' +
 	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
 	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{plugin.class:buttonIcon},' +
 		'.{plugin.class} .{class:container}:hover .{plugin.class:buttonIcon},' +
-		'.{plugin.class} .{class:container}:hover .{class:buttonCaption} {opacity: 0.8; }' +
+		'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
 
 	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{plugin.class:chevron} { margin-top: 0px !important; }' +
