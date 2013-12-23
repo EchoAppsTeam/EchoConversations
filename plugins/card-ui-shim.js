@@ -801,7 +801,10 @@ plugin.dependencies = [{
 }];
 
 plugin.templates = {
-	"preview": '<div class="{plugin.class:MediaPreview}"></div>',
+	"preview":
+		'<div class="{plugin.class:MediaPreview}">' +
+			'<div class="{plugin.class:MediaPreviewContainer}"></div>' +
+		'</div>',
 	"wrappers": {
 		"media": '<div class="echo-item-files"></div>',
 		"text": '<div class="echo-item-text"></div>'
@@ -811,7 +814,7 @@ plugin.templates = {
 	"photo":
 		'<div class="echo-item-photo" oembed="...">' +
 			'<a href="{data:original_url}" target="_blank">' +
-				'<img src="{data:thumbnail_url}" width="{data:thumbnail_width}" height="{data:thumbnail_height}" data-src-full="{data:url}"/>' +
+				'<img src="{data:thumbnail_url}" width="" height="" data-src-full="{data:url}"/>' +
 			'</a>' +
 		'</div>',
 	"link": // it's an article
@@ -830,6 +833,31 @@ plugin.templates = {
 				'<div class="echo-clear" style="clear: both;"></div>' +
 			'</div>' +
 		'</div>'
+};
+
+plugin.renderers.MediaPreview = function(element) {
+	var self = this;
+	var container = self.view.get("MediaPreviewContainer");
+
+	element.on("mousewheel", function(e) {
+		var viewWidth = element.width();
+		var cotentWidth = container.width();
+
+		container.css("left", function(index, style) {
+			var pos = parseInt(style);
+			var k = e.originalEvent.wheelDelta > 0 ? 60 : -60;
+
+			if (pos + k > 0) {
+				return 0;
+			} else if(pos + k < viewWidth - cotentWidth) {
+				return viewWidth - cotentWidth;
+			} else {
+				return pos + k;
+			}
+		});
+
+		return false;
+	});
 };
 
 plugin.component.renderers.text = function(element) {
@@ -860,11 +888,14 @@ plugin.methods._URLResolver= function(text) {
 					return null;
 				}
 			});
-			$.embedly.oembed(unprocessedURLs)
-				.progress($.proxy(self._addMedia, self));
-			$.embedly.extract(unprocessedURLs).progress(function(data) {
-				console.log(data);
+
+			self.view.get("MediaPreview")
+			$.embedly.oembed(unprocessedURLs).progress($.proxy(self._addMedia, self)).done(function() {
+
 			});
+			//$.embedly.extract(unprocessedURLs).progress(function(data) {
+				//console.log(data);
+			//});
 		}
 	}, 1000);
 };
@@ -876,7 +907,8 @@ plugin.methods._addMedia = function(data) {
 		"html": html
 	};
 	this.component.view.get("body").addClass(this.cssPrefix + "EnabledMedia");
-	this.view.get("MediaPreview").prepend(html);
+
+	this.view.get("MediaPreviewContainer").append($("<div/>").addClass(this.cssPrefix + "PreviewItem").html(html)).css("width", "+=216px");
 };
 
 plugin.methods._prepareMediaContent = function(media) {
@@ -886,6 +918,9 @@ plugin.methods._prepareMediaContent = function(media) {
 plugin.css =
 	'.{class:body}.{plugin.class:EnabledMedia} .{class:content}.{class:border} { border-bottom: none; }' +
 	'.{class:body}.{plugin.class:EnabledMedia} .{plugin.class:MediaPreview} { padding: 5px; border: 1px solid #D2D2D2; border-top: 1px dashed #D2D2D2; }' +
+	'.{plugin.class:MediaPreview} { overflow: hidden; }' +
+	'.{plugin.class:MediaPreview} .{plugin.class:PreviewItem} { float: left; width: 210px; border: 1px solid #DEDEDE; margin-right: 5px;padding: 2px;}' +
+	'.{plugin.class:MediaPreviewContainer} { position: relative; left: 0px; transition: left 0.2s linear 0s; -webkit-transition: left 0.2s linear 0s }' +
 	// video item styles
 	'.echo-item-video { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
 	'.echo-item-video > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
