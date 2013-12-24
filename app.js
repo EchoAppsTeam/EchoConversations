@@ -108,7 +108,8 @@ conversations.config = {
 			"displaySystemFlaggedPosts": false,
 			"premoderation": {
 				"enable": false,
-				"approvedUserBypass": true
+				"approvedUserBypass": true,
+				"markers": ["Conversations.Premoderation"]
 			}
 		},
 		"plugins": []
@@ -193,7 +194,7 @@ conversations.templates.main =
 	'</div>';
 
 conversations.templates.defaultQuery =
-	'childrenof:{data:targetURL} sortOrder:{data:initialSortOrder} ' +
+	'{data:filter}:{data:targetURL} sortOrder:{data:initialSortOrder} ' +
 	'itemsPerPage:{data:initialItemsPerPage} {data:markers} type:comment ' +
 	'{data:operators} children:{data:replyNestingLevels} {data:operators}';
 
@@ -217,6 +218,7 @@ conversations.renderers.postComposer = function(element) {
 	var targetURL = this.config.get("targetURL");
 	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	var ssConfig = this.config.get("dependencies.StreamServer");
+
 	this.initComponent({
 		"id": "postComposer",
 		"component": "Echo.StreamServer.Controls.Submit",
@@ -227,6 +229,7 @@ conversations.renderers.postComposer = function(element) {
 			"target": element,
 			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
+			"markers": this._getSubmitMarkers(),
 			"plugins": [].concat([{
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
@@ -302,7 +305,7 @@ conversations.renderers._stream = function(element, extra) {
 
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 	var ssConfig = this.config.get("dependencies.StreamServer");
-	var queryOverrides = componentID === "topPosts" ? {"replyNestingLevels": 0} : {};
+	var queryOverrides = componentID !== "allPosts" ? {"replyNestingLevels": 0} : {};
 	return $.extend({
 		"id": componentID,
 		"auth": this.config.get("auth"),
@@ -321,6 +324,11 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		},
 		"streamPlugins": this.config.get(componentID + ".plugins"),
 		"displayEmptyStream": ~$.inArray(componentID, ["allPosts", "moderationQueue"]),
+		"moderation": {
+			"premoderation": {
+				"markers": this._getSubmitMarkers()
+			}
+		},
 		"replyComposer": this.config.get("replyComposer")
 	}, this.config.get(componentID), overrides);
 };
@@ -330,24 +338,16 @@ conversations.methods._getSubmitPermissions = function() {
 };
 
 conversations.methods._assembleSearchQuery = function(componentID, overrides) {
-	var operators, markers;
 	var config = this.config.get(componentID, {});
 	var query = config.queryOverride;
-
-	if (!query) {
-		var argsBuilder = this._getQueryArgsBuilder(componentID);
-		markers = argsBuilder.markers();
-		operators = argsBuilder.operators();
-	}
+	var args = query ? {} : this._getQueryArgsBuilder(componentID)();
 
 	return this.substitute({
 		"template": query || conversations.templates.defaultQuery,
 		"data": $.extend({}, config, {
-			"markers": markers || "",
-			"operators": operators || "",
 			"targetURL": this.config.get("targetURL"),
 			"initialSortOrder": Echo.Cookie.get([componentID, "sortOrder"].join(".")) || config.initialSortOrder
-		}, overrides)
+		}, args, overrides)
 	});
 };
 
@@ -356,9 +356,11 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 	var config = this.config.get(componentID, {});
 
 	return {
-		"topPosts": {
-			"markers": function() {
-				return self.substitute({
+		"topPosts": function() {
+			return {
+				"operators": self._assembleTopPostsOperators(componentID),
+				"filter": "childrenof",
+				"markers": self.substitute({
 					"template": conversations.templates.topConditions[
 						config.includeTopContributors ? "contributors" : "onlyPosts"
 					],
@@ -367,31 +369,26 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 						"itemMarkersToAdd": config.itemMarkersToAdd.join(","),
 						"itemMarkersToRemove": config.itemMarkersToRemove.join(",")
 					}
-				});
-			},
-			"operators": function() {
-				return self._assembleTopPostsOperators(componentID);
-			}
+				})
+			};
 		},
-		"allPosts": {
-			"markers": function() {
-				return config.itemMarkers.length
+		"allPosts": function() {
+			return {
+				"operators": self._assembleAllPostsOperators(componentID),
+				"filter": "childrenof",
+				"markers": config.itemMarkers.length
 					? "markers:" + config.itemMarkers.join(",")
-					: "";
-			},
-			"operators": function() {
-				return self._assembleAllPostsOperators(componentID);
-			}
+					: ""
+			};
 		},
-		"moderationQueue": {
-			"markers": function() {
-				return config.itemMarkers.length
-					? "markers:" + config.itemMarkers.join(",")
-					: "";
-			},
-			"operators": function() {
-				return "state:Untouched -user.roles:moderator,administrator -user.state:ModeratorApproved";
-			}
+		"moderationQueue": function() {
+			return {
+				"operators": "state:Untouched -user.roles:moderator,administrator -user.state:ModeratorApproved",
+				"filter": "scope",
+				"markers": config.itemMarkers.length
+						? "markers:" + config.itemMarkers.join(",")
+						: ""
+			};
 		}
 	}[componentID];
 };
@@ -496,6 +493,13 @@ conversations.methods._retrieveData = function(callback) {
 
 conversations.methods._moderationQueueEnabled = function() {
 	return this.user.is("admin") && this.config.get("allPosts.moderation.premoderation.enable");
+};
+
+conversations.methods._getSubmitMarkers = function() {
+	var config = this.config.get("allPosts.moderation.premoderation");
+	return config.enable &&
+		!(this.user.is("admin") || (this.user.get("state") === "ModeratorApproved" && config.approvedUserBypass))
+		? config.markers : [];
 };
 
 // removing "Echo.UserSession.onInvalidate" subscription from an app
