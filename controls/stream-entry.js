@@ -55,10 +55,10 @@ entry.config = {
 		}
 	},
 	"moderation": {
-		"extraActions": ["topPost"],
-		"premoderation": {
-			"markers": []
-		}
+		"extraActions": ["topPost"]
+	},
+	"premoderation": {
+		"markers": []
 	}
 };
 
@@ -278,7 +278,8 @@ entry.methods._getConditionalPluginList = function(componentID) {
 		"intentID": "Reply",
 		"name": "ReplyCardUI",
 		"enabled": visible(),
-		"markers": this.config.get("moderation.premoderation.markers", []),
+		// TODO: pass markers through data
+		"extraMarkers": this.config.get("premoderation.markers"),
 		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
 		"nestedPlugins": [].concat([{
 			"name": "JanrainBackplaneHandler",

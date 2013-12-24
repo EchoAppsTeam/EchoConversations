@@ -141,9 +141,10 @@ plugin.methods._submitConfig = function(target) {
 	var plugin = this, item = this.component;
 	return plugin.config.assemble({
 		"target": target,
-		"targetURL": item.get("data.object.id"),
 		"parent": item.config.getAsHash(),
 		"data": plugin.get("data") || {},
+		"markers": this.config.get("extraMarkers"),
+		"targetURL": item.get("data.object.id"),
 		"targetQuery": item.config.get("query", ""),
 		"ready": function() {
 			plugin.set("submit", this);
@@ -252,6 +253,7 @@ plugin.methods._getSubmitKey = function() {
 plugin.methods._getSubmitData = function() {
 	var data = {};
 	var submit = this.get("submit");
+
 	data["content"] = submit.view.get("text").val();
 	$.map(["tags", "markers"], function(field) {
 		var elements = submit.view.get(field).val().split(", ");

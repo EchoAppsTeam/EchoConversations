@@ -306,6 +306,7 @@ conversations.renderers._stream = function(element, extra) {
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 	var ssConfig = this.config.get("dependencies.StreamServer");
 	var queryOverrides = componentID !== "allPosts" ? {"replyNestingLevels": 0} : {};
+
 	return $.extend({
 		"id": componentID,
 		"auth": this.config.get("auth"),
@@ -324,10 +325,8 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		},
 		"streamPlugins": this.config.get(componentID + ".plugins"),
 		"displayEmptyStream": ~$.inArray(componentID, ["allPosts", "moderationQueue"]),
-		"moderation": {
-			"premoderation": {
-				"markers": this._getSubmitMarkers()
-			}
+		"premoderation": {
+			"markers": this._getSubmitMarkers()
 		},
 		"replyComposer": this.config.get("replyComposer")
 	}, this.config.get(componentID), overrides);
