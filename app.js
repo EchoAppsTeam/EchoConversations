@@ -117,7 +117,9 @@ conversations.config = {
 		"plugins": []
 	},
 	"moderationQueue": {
-		"label": "Moderation Queue"
+		"label": "Moderation Queue",
+		"displayReplyIntent": false,
+		"displaySharingIntent": false
 	},
 	"auth": {
 		"enableBundledIdentity": true,
