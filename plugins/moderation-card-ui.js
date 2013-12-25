@@ -305,7 +305,10 @@ plugin.methods._assembleButton = function(name) {
 plugin.methods._assembleTopContributorButton = function(name) {
 	var self = this, item = this.component;
 
-	if (item.get("depth")) {
+	if (
+		item.get("depth")
+		|| item.get("data.actor.id") === item.user.config.get("fakeIdentityURL")
+	) {
 		return false;
 	}
 
