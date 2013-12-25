@@ -210,7 +210,6 @@ dashboard.vars = {
 			"config": {
 				"title": "Comments"
 			},
-			// TODO: add 'resolveURLs' setting
 			"items": [{
 				"component": "Checkbox",
 				"name": "visible",
@@ -228,6 +227,15 @@ dashboard.vars = {
 				"config": {
 					"title": "Prompt",
 					"desc": "Specifies the ghost text displayed in the Comment Prompt"
+				}
+			}, {
+				"component": "Checkbox",
+				"name": "resolveURLs",
+				"type": "boolean",
+				"default": true,
+				"config": {
+					"title": "Resolve URLs",
+					"desc": "If enabled, resolves URLs found in the comment body to rich attached content"
 				}
 			}]
 		}]
