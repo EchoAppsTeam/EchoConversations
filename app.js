@@ -144,6 +144,13 @@ conversations.config = {
 				}
 			}
 		}
+	},
+	"topMarkers": {
+		"posts": {
+			"add": "Conversations.TopPost",
+			"remove": "Conversations.RemovedFromTopPosts"
+		},
+		"contributor": "Conversations.TopContributor"
 	}
 };
 
@@ -560,7 +567,9 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		"query": this._assembleSearchQuery(componentID),
 		"plugins": [].concat(this._getConditionalStreamPluginList(componentID), [{
 			"name": "CardUIShim",
-			"displayTopPostHighlight": config.displayTopPostHighlight
+			"displayTopPostHighlight": config.displayTopPostHighlight,
+			"includeTopContributors": this.config.get("topPosts.includeTopContributors"),
+			"topMarkers": this.config.get("topMarkers")
 		}, {
 			"name": "ItemEventsProxy",
 			"onAdd": function() {
@@ -576,13 +585,14 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		}, {
 			"name": "ModerationCardUI",
 			"extraActions": $.map({
-				"topPost": "topPosts.visible",
-				"topContributor": componentID + ".includeTopContributors"
+				"topPost": "visible",
+				"topContributor": "includeTopContributors"
 			}, function(configKey, action) {
-				return self.config.get(configKey)
+				return self.config.get("topPosts." + configKey)
 					? action
 					: undefined;
-			})
+			}),
+			"topMarkers": this.config.get("topMarkers")
 		}, {
 			"name": "ItemsRollingWindow",
 			"moreButton": true
