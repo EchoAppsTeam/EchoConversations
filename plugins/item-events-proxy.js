@@ -12,10 +12,12 @@ plugin.config = {
 
 plugin.events = {
 	"Echo.StreamServer.Controls.Stream.Item.onAdd": function() {
-		this.config.get("onAdd").call(this.component);
+		var onAdd = this.config.get("onAdd");
+		onAdd && onAdd.call(this.component);
 	},
 	"Echo.StreamServer.Controls.Stream.Item.onDelete": function() {
-		this.config.get("onDelete").call(this.component);
+		var onDelete = this.config.get("onDelete");
+		onDelete && onDelete.call(this.component);
 	}
 };
 

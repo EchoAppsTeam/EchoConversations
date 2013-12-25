@@ -193,9 +193,35 @@ conversations.init = function() {
 conversations.templates.main =
 	'<div class="{class:container}">' +
 		'<div class="{class:postComposer}"></div>' +
-		'<div class="{class:topPosts}"></div>' +
-		'<div class="{class:allPosts}"></div>' +
+		'<div class="{class:topPostsContainer}">' +
+			'<div class="{class:topPostsHeader}"></div>' +
+			'<div class="{class:topPosts}"></div>' +
+		'</div>' +
+		'<div class="{class:allPostsContainer}">' +
+			'<div class="active {class:allPosts}"></div>' +
+		'</div>' +
 	'</div>';
+
+conversations.templates.streamHeader =
+	'<div class="{class:streamHeader}">' +
+		'<span class="echo-primaryFont {class:streamTitle}"></span>' +
+		'<div class="pull-right echo-primaryFont {class:streamSorter}"></div>' +
+	'</div>';
+
+conversations.templates.tabs = {};
+conversations.templates.tabs.nav =
+	'<ul class="nav nav-tabs {class:tabs}">';
+
+conversations.templates.tabs.navItem =
+		'<li class="{data:class}">' +
+			'<a href="#{data:tabId}" data-toggle="{data:type}">{data:label}</a>' +
+		'</li>';
+
+conversations.templates.tabs.content =
+		'<div class="tab-content {class:tabsContent}"></div>';
+
+conversations.templates.tabs.contentItem =
+	'<div class="tab-pane {data:class}" id="{data:tabId}"></div>';
 
 conversations.templates.defaultQuery =
 	'{data:filter}:{data:targetURL} sortOrder:{data:initialSortOrder} ' +
@@ -203,7 +229,7 @@ conversations.templates.defaultQuery =
 	'{data:operators} children:{data:replyNestingLevels} {data:operators}';
 
 conversations.templates.topConditions = {
-	"onlyPosts":  "markers:{data:itemMarkersToAdd} -markers:{data:itemMarkersToRemove}",
+	"onlyPosts": "markers:{data:itemMarkersToAdd} -markers:{data:itemMarkersToRemove}",
 	"contributors": "(user.markers:{data:userMarkers} OR markers:{data:itemMarkersToAdd}) -markers:{data:itemMarkersToRemove}"
 };
 
@@ -260,84 +286,363 @@ conversations.renderers.postComposer = function(element) {
 	return element;
 };
 
-conversations.renderers.topPosts = function(element) {
+conversations.renderers.topPostsContainer = function(element) {
+	var topPosts = this.getComponent("topPosts");
+
+	var visible = this.config.get("topPosts.visible")
+		&& topPosts
+		&& $.grep(topPosts.get("threads"), function(item) { return !item.deleted; }).length > 0;
+
+	return visible
+		? element.show()
+		: element.hide();
+};
+
+conversations.renderers.topPostsHeader = function(element) {
 	this.view.render({
 		"target": element,
-		"name": "_stream",
+		"name": "_streamHeader",
 		"extra": {"id": "topPosts"}
 	});
 };
 
-conversations.renderers.allPosts = function(element) {
+conversations.renderers.topPosts = function(element) {
 	var self = this;
-	if (this._moderationQueueEnabled()) {
-		new Echo.GUI.Tabs({
-			"target": element,
-			"entries": $.map(["allPosts", "moderationQueue"], function(id) {
-				var elem = $("<div>");
-				self.view.render({
-					"target": elem,
-					"name": "_stream",
-					"extra": {"id": id}
-				});
-				return {
-					"id": id,
-					"label": self.config.get(id + ".label"),
-					"panel": elem
-				};
-			})
-		});
-	} else {
-		this.view.render({
-			"target": element,
-			"name": "_stream",
-			"extra": {"id": "allPosts"}
-		});
-	}
-};
-
-conversations.renderers._stream = function(element, extra) {
 	this.initComponent({
-		"id": extra.id,
-		"component": "Echo.Apps.Conversations.StreamEntry",
-		"config": this._assembleStreamConfig(extra.id, {
+		"id": "topPosts",
+		"component": "Echo.StreamServer.Controls.Stream",
+		"config": this._assembleStreamConfig("topPosts", {
+			"onItemAdd": function() {
+				self.view.render({"name": "topPostsContainer"});
+			},
+			"onItemDelete": function() {
+				self.view.render({"name": "topPostsContainer"});
+			},
+			"ready": function() {
+				self.view.render({"name": "topPostsContainer"});
+			},
 			"target": element
 		})
 	});
+};
+
+conversations.renderers.allPosts = function(element) {
+	if (this._moderationQueueEnabled()) {
+		this.view.render({
+			"name": "_tabs",
+			"target": element,
+			"extra": {
+				"tabs": [{
+					"name": "allPosts",
+					"active": true,
+					"renderer": "_streamTitle"
+					}, {
+					"name": "moderationQueue",
+					"renderer": "_streamTitle"
+				}, {
+					"name": "sorter",
+					"type": "dropdown",
+					"extraClass": "pull-right",
+					"renderer": "_streamSorter"
+				}]
+			}
+		});
+	} else {
+		this.view.render({
+			"name": "_allPosts",
+			"target": element
+		});
+	}
 	return element;
 };
 
-conversations.methods._assembleStreamConfig = function(componentID, overrides) {
-	var ssConfig = this.config.get("dependencies.StreamServer");
-	var queryOverrides = componentID !== "allPosts" ? {"replyNestingLevels": 0} : {};
 
-	return $.extend({
+conversations.renderers._allPosts = function(element, extra) {
+	element.empty();
+	this.view.render({
+		"target": element,
+		"name": "_streamHeader",
+		"extra": {"id": "allPosts"}
+	});
+	var component = this.initComponent({
+		"id": "allPosts",
+		"component": "Echo.StreamServer.Controls.Stream",
+		"config": this._assembleStreamConfig("allPosts", {
+			"target": $("<div>")
+		})
+	});
+	element.append(component.config.get("target"));
+	return element;
+};
+
+conversations.renderers._tabs = function(element, extra) {
+	var self = this;
+
+	var tpls = conversations.templates.tabs;
+
+	var nav = $(this.substitute({"template": tpls.nav}));
+	var content = $(this.substitute({"template": tpls.content}));
+
+	$.map(extra.tabs, function(tab) {
+		tab.type = tab.type || "tab"; // tab || dropdown
+		tab.id = tab.id || (tab.name + "-" + self.config.get("context"));
+		var li = $(self.substitute({
+			"template": tpls.navItem,
+			"data": {
+				"label": tab.name,
+				"class": (tab.active ? "active" : "") + " " + (tab.extraClass || ""),
+				"type": tab.type,
+				"tabId": tab.id
+			}
+		}));
+		if (tab.renderer) {
+			self.view.render({
+				"target": li.find("a"),
+				"name": tab.renderer,
+				"extra": {"id": tab.name}
+			});
+			li.on("shown", function(ev) {
+				var sorter = element.find("." + self.cssPrefix + "streamSorter");
+				if (sorter) {
+					// re-render sorter dropdown in case if customer switched tab
+					self.view.render({
+						"target": sorter,
+						"name": "_streamSorter",
+						"extra": {"id": tab.name}
+					});
+				}
+			});
+		}
+		nav.append(li);
+
+		if (tab.type === "tab") {
+			var container = $(self.substitute({
+				"template": tpls.contentItem,
+				"data": {
+					"tabId": tab.id,
+					"class": tab.active ? "active": ""
+				}
+			}));
+			var component = self.initComponent({
+				"id": tab.name,
+				"component": "Echo.StreamServer.Controls.Stream",
+				"config": self._assembleStreamConfig(tab.name, {
+					"target": $("<div>")
+				})
+			});
+
+			content.append(container.append(component.config.get("target")));
+		}
+	});
+	return element.empty().append(nav).append(content);
+};
+
+conversations.renderers._streamHeader = function(element, extra) {
+	var view = this.view.fork();
+	var header = view.render({
+		"template": conversations.templates.streamHeader
+	});
+	this.view.render({
+		"target": view.get("streamTitle"),
+		"name": "_streamTitle",
+		"extra": {"id": extra.id}
+	});
+	if (this.config.get(extra.id + ".displaySortOrderPulldown")) {
+		this.view.render({
+			"target": view.get("streamSorter"),
+			"name": "_streamSorter",
+			"extra": {"id": extra.id}
+		});
+	}
+	return element.empty().append(header);
+};
+
+conversations.renderers._streamSorter = function(element, extra) {
+	var self = this;
+	if (!~$.inArray(extra.id, ["allPosts", "topPosts", "moderationQueue"])) {
+		extra.id = "allPosts";
+	}
+	var config = this.config.get(extra.id);
+
+	var getCurrentTitle = function() {
+		var value = Echo.Cookie.get([extra.id, "sortOrder"].join("."))
+			|| (function() {
+
+				var stream = self.getComponent(extra.id);
+				var query = stream
+					? stream.config.get("query")
+					: self._assembleSearchQuery(extra.id);
+
+				var sortOrder = query.match(/sortOrder:(\S+)/);
+
+				return $.isArray(sortOrder) && sortOrder.length
+					? sortOrder.pop() : config.initialSortOrder;
+			})();
+
+		var values = $.grep(config.sortOrderEntries || [], function(entry) {
+			return entry.value === value;
+		});
+		return values.length ? values.pop().title : "";
+	};
+
+	var dropdown = new Echo.GUI.Dropdown({
+		"target": element,
+		"title": getCurrentTitle(),
+		"extraClass": "nav",
+		"entries": $.map(config.sortOrderEntries || [], function(entry) {
+			return {
+				"title": entry.title,
+				"handler": function() {
+					Echo.Cookie.set([extra.id, "sortOrder"].join("."), entry.value);
+					dropdown.setTitle(entry.title);
+
+					var stream = self.getComponent(extra.id);
+					if (stream) {
+						var query = stream.config.get("query");
+						stream.config.set("query", query.replace(/sortOrder:\S+/, "sortOrder:" + entry.value));
+						stream.config.remove("data");
+						stream.refresh();
+					}
+				}
+			};
+		})
+	});
+	return element.addClass(this.cssPrefix + "streamSorter");
+};
+
+conversations.renderers._streamTitle = function(element, extra) {
+	var config = this.config.get(extra.id);
+	element.empty().append(config.label);
+	if (config.displayCounter) {
+		var counterContainer = $("<span>");
+		this.initComponent({
+			"id": extra.id + "Counter",
+			"component": "Echo.StreamServer.Controls.Counter",
+			"config": {
+				"target": counterContainer,
+				"infoMessages": {
+					"layout": "compact"
+				},
+				"query": this._assembleCounterQuery(extra.id),
+				"data": this.get("data." + extra.id + "-count")
+			}
+		});
+		element
+			.append("&nbsp;(")
+			.append(counterContainer)
+			.append(")");
+	}
+
+	return element.addClass(this.cssPrefix + "streamTitle");
+};
+
+
+conversations.methods._assembleStreamConfig = function(componentID, overrides) {
+	var self = this;
+	// StreamServer config
+	var ssConfig = this.config.get("dependencies.StreamServer");
+
+	// component config
+	var config = this.config.get(componentID);
+	config.get = function(name) {
+		return Echo.Utils.get(this, name);
+	};
+	return $.extend(true, {
 		"id": componentID,
-		"auth": this.config.get("auth"),
 		"appkey": ssConfig.appkey,
+		"context": this.config.get("context"),
 		"apiBaseURL": ssConfig.apiBaseURL,
 		"liveUpdates": ssConfig.liveUpdates,
 		"submissionProxyURL": ssConfig.submissionProxyURL,
-		"janrainAppId": this.config.get("dependencies.Janrain.appId"),
-		"stream": {
-			"data": this.get("data." + componentID + "-search"),
-			"query": this._assembleSearchQuery(componentID)
+		"asyncItemsRendering": true,
+		"labels": {
+			"emptyStream": config.get("noPostsMessage")
 		},
-		"counter": {
-			"data": this.get("data." + componentID + "-count"),
-			"query": this._assembleSearchQuery(componentID, queryOverrides)
+		"item": {
+			"reTag": false,
+			"limits": {
+				"maxBodyCharacters": config.get("maxItemBodyCharacters")
+			}
 		},
-		"streamPlugins": this.config.get(componentID + ".plugins"),
-		"displayEmptyStream": ~$.inArray(componentID, ["allPosts", "moderationQueue"]),
-		"premoderation": {
-			"markers": this._getSubmitMarkers()
-		},
-		"replyComposer": this.config.get("replyComposer")
+		"data": this.get("data." + componentID + "-search"),
+		"query": this._assembleSearchQuery(componentID),
+		"plugins": [].concat(this._getConditionalStreamPluginList(componentID), [{
+			"name": "CardUIShim",
+			"displayTopPostHighlight": config.get("displayTopPostHighlight")
+		}, {
+			"name": "ItemEventsProxy",
+			"onAdd": overrides.onItemAdd,
+			"onDelete": overrides.onItemDelete
+		}, {
+			"name": "ModerationCardUI",
+			"extraActions": $.map({
+					"topPost": "topPosts.visible",
+					"topContributor": componentID + ".includeTopContributors"
+				}, function(configKey, action) {
+					return self.config.get(configKey)
+						? action
+						: undefined;
+				})
+		}, {
+			"name": "ItemsRollingWindow",
+			"moreButton": true
+		}])
 	}, this.config.get(componentID), overrides);
+};
+
+conversations.methods._getConditionalStreamPluginList = function(componentID) {
+	var auth = this.config.get("auth");
+
+	var config = this.config.get(componentID);
+	config.get = function(name) {
+		return Echo.Utils.get(this, name);
+	};
+
+	var replyComposerConfig = this.config.get("replyComposer");
+	var displayReplyComposer = replyComposerConfig.visible && !!$.map(replyComposerConfig.contentTypes, function(type) {
+		return type.visible ? type : undefined;
+	}).length;
+	var plugins = [{
+		"intentID": "Like",
+		"name": "LikeCardUI"
+	}, {
+		"intentID": "CommunityFlag",
+		"name": "CommunityFlagCardUI"
+	}, {
+		"intentID": "Reply",
+		"name": "ReplyCardUI",
+		// TODO: pass markers through data
+		"extraMarkers": this._getSubmitMarkers(),
+		"enabled": displayReplyComposer,
+		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
+		"nestedPlugins": [].concat([{
+			"name": "JanrainBackplaneHandler",
+			"appId": this.config.get("dependencies.Janrain.appId"),
+			"enabled": auth.enableBundledIdentity,
+			"authWidgetConfig": auth.authWidgetConfig,
+			"sharingWidgetConfig": auth.sharingWidgetConfig
+		}, $.extend({
+			"name": "CardUIShim",
+			"auth": this.config.get("auth"),
+			"submitPermissions": this._getSubmitPermissions()
+		}, this.config.get("replyComposer"))], this.config.get("replyComposer.plugins"))
+	}, {
+		"intentID": "Sharing",
+		"name": "CardUISocialSharing"
+	}];
+
+	return $.grep(plugins, function(plugin) {
+		return !!config.get("display" + plugin.intentID + "Intent");
+	});
 };
 
 conversations.methods._getSubmitPermissions = function() {
 	return this.config.get("auth.allowAnonymousSubmission") ? "allowGuest" : "forceLogin";
+};
+
+conversations.methods._assembleCounterQuery = function(componentID) {
+	var overrides = name !== "allPosts" ? {"replyNestingLevels": 0} : {};
+	return this._assembleSearchQuery(componentID, overrides);
 };
 
 conversations.methods._assembleSearchQuery = function(componentID, overrides) {
@@ -399,7 +704,7 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 
 conversations.methods._assembleTopPostsOperators = function() {
 	var config = this.config.get("topPosts");
-	var states  = $.map(["CommunityFlagged", "SystemFlagged"], function(state) {
+	var states = $.map(["CommunityFlagged", "SystemFlagged"], function(state) {
 		return !Echo.Utils.get(config, "moderation.display" + state + "Posts")
 			? "-state:" + state
 			: null;
@@ -456,11 +761,10 @@ conversations.methods._retrieveData = function(callback) {
 		});
 		if (app.config.get(name + ".displayCounter")) {
 			// for Top Posts we need to count only root items...
-			var overrides = name === "topPosts" ? {"replyNestingLevels": 0} : {};
 			acc.push({
 				"id": name + "-count",
 				"method": "count",
-				"q": app._assembleSearchQuery(name, overrides)
+				"q": app._assembleCounterQuery(name)
 			});
 		}
 	});
@@ -524,6 +828,27 @@ conversations.methods._removeUserInvalidationFrom = function() {
 };
 
 conversations.css =
+	'.{class:streamHeader} { padding: 5px 0px; }' +
+	'.{class:streamTitle} { line-height: 18px; font-size: 14px; }' +
+	'.{class:streamCounter} { line-height: 18px; font-size: 14px; }' +
+
+	'.{class:streamSorter} { font-size: 13px; }' +
+	'.echo-sdk-ui .{class:streamSorter}:focus { outline: none; }' +
+	'.{class:streamSorter} > ul > li > a { background: url("{%= baseURL %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
+	'.{class:streamSorter} ul.nav { margin-bottom: 0px; font-size: 13px; }' +
+	'.{class:streamSorter} ul.nav > li > a { text-decoration: none; color: #7f7f7f; line-height: 22px; }' +
+	'.{class:streamSorter} ul.nav > li > a:hover,' +
+		'.{class:streamSorter} ul.nav > li > a:focus { background-color: transparent}' +
+
+	'.echo-sdk-ui .tab-content.{class:tabsContent} { overflow: visible; }' +
+	'.echo-sdk-ui .nav.{class:tabs} { margin-bottom: 5px; }' +
+	'.{class:tabs} > li > a { font-size: 13px; }' +
+	'.echo-sdk-ui .nav.{class:tabs} > li > a:hover,' +
+		'.echo-sdk-ui .nav.{class:tabs} > li > a:focus { background-color: transparent; border: 1px solid transparent; }' +
+
+	'.echo-sdk-ui .{class:streamSorter} .nav .dropdown .dropdown-toggle { background-color: transparent; border-color: transparent; color: #7f7f7f; }' +
+
+	'.echo-sdk-ui .{class:tabs} ul.nav { margin-bottom: 0px; }' +
 	'.{class:container} { min-height: 200px; }' +
 	'.{class:container} li > a, ' +
 	'.{class:container} .echo-primaryFont,' +
@@ -532,8 +857,6 @@ conversations.css =
 		'{ font-family: "Helvetica Neue", arial, sans-serif; }' +
 	'.{class:postComposer} { margin-bottom: 10px; }' +
 	'.{class:topPosts} > div { margin-bottom: 25px; }' +
-	'.{class:allPosts} .echo-tabs-header > li > a { font-size: 13px; }' +
-	'.echo-sdk-ui .{class:allPosts} > .echo-tabs-panels { overflow: inherit; }' +
 	// set box-sizing property for all nested elements to default (content-box)
 	// as its can be overwritten on the page.
 	// TODO: get rid of these rules at all!
