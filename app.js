@@ -843,6 +843,8 @@ conversations.css =
 	'.echo-sdk-ui .tab-content.{class:tabsContent} { overflow: visible; }' +
 	'.echo-sdk-ui .nav.{class:tabs} { margin-bottom: 5px; }' +
 	'.{class:tabs} > li > a { font-size: 13px; }' +
+	'.{class:tabs} > li > a, .{class:tabs} > li > a:hover { color: #7f7f7f; }' +
+	'.{class:tabs} > li.active > a { font-weight: bold; }' +
 	'.echo-sdk-ui .nav.{class:tabs} > li > a:hover,' +
 		'.echo-sdk-ui .nav.{class:tabs} > li > a:focus { background-color: transparent; border: 1px solid transparent; }' +
 
