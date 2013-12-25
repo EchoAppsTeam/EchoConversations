@@ -194,6 +194,7 @@ conversations.renderers.postComposer = function(element) {
 			"appkey": ssConfig.appkey,
 			"apiBaseURL": ssConfig.apiBaseURL,
 			"submissionProxyURL": ssConfig.submissionProxyURL,
+			"requestMethod": "POST",
 			"target": element,
 			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
@@ -289,13 +290,14 @@ conversations.methods._assembleSearchQuery = function(componentID, overrides) {
 	if (!query) {
 		var states = config.itemStates;
 		var userId = this.user && this.user.get("identityUrl");
-/*
+
 		markers = config.itemMarkers.length
 			? "markers:" + config.itemMarkers.join(",")
 			: "";
 		operators = (this.config.get("bozoFilter") && userId)
 			? "(state:" + states + " OR user.id:" + userId + ")"
-			: "state: " + states;*/
+			: "state: " + states;
+		operators = "-state:ModeratorDeleted";
 	}
 	return this.substitute({
 		"template": query || conversations.templates.defaultQuery,

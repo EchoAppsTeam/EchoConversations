@@ -236,6 +236,8 @@ entry.methods._getStreamConfig = function() {
 		}, {
 			"name": "ItemsRollingWindow",
 			"moreButton": true
+		}, {
+			"name": "URLResolver"
 		}], this.config.get("streamPlugins"))
 	};
 };
