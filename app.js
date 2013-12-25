@@ -236,12 +236,7 @@ conversations.templates.topConditions = {
 conversations.renderers.postComposer = function(element) {
 	var config = this.config.get("postComposer");
 
-	var visible = function() {
-		return config.visible && !!$.map(config.contentTypes, function(type) {
-			return type.visible ? type : undefined;
-		}).length;
-	};
-	if (!visible()) {
+	if (!this._isComposerVisible("postComposer")) {
 		return element;
 	}
 
@@ -581,13 +576,13 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		}, {
 			"name": "ModerationCardUI",
 			"extraActions": $.map({
-					"topPost": "topPosts.visible",
-					"topContributor": componentID + ".includeTopContributors"
-				}, function(configKey, action) {
-					return self.config.get(configKey)
-						? action
-						: undefined;
-				})
+				"topPost": "topPosts.visible",
+				"topContributor": componentID + ".includeTopContributors"
+			}, function(configKey, action) {
+				return self.config.get(configKey)
+					? action
+					: undefined;
+			})
 		}, {
 			"name": "ItemsRollingWindow",
 			"moreButton": true
@@ -597,12 +592,8 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 
 conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	var auth = this.config.get("auth");
-
 	var config = this.config.get(componentID);
-	var replyComposerConfig = this.config.get("replyComposer");
-	var displayReplyComposer = replyComposerConfig.visible && !!$.map(replyComposerConfig.contentTypes, function(type) {
-		return type.visible ? type : undefined;
-	}).length;
+
 	var plugins = [{
 		"intentID": "Like",
 		"name": "LikeCardUI"
@@ -614,7 +605,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"name": "ReplyCardUI",
 		// TODO: pass markers through data
 		"extraMarkers": this._getSubmitMarkers(),
-		"enabled": displayReplyComposer,
+		"enabled": this._isComposerVisible("replyComposer"),
 		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
 		"nestedPlugins": [].concat([{
 			"name": "JanrainBackplaneHandler",
@@ -635,6 +626,13 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	return $.grep(plugins, function(plugin) {
 		return !!config["display" + plugin.intentID + "Intent"];
 	});
+};
+
+conversations.methods._isComposerVisible = function(composerID) {
+	var config = this.config.get(composerID);
+	return config.visible && !!$.map(config.contentTypes, function(type) {
+		return type.visible ? type : undefined;
+	}).length;
 };
 
 conversations.methods._getSubmitPermissions = function() {
