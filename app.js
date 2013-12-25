@@ -571,8 +571,16 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"displayTopPostHighlight": config.get("displayTopPostHighlight")
 		}, {
 			"name": "ItemEventsProxy",
-			"onAdd": overrides.onItemAdd,
-			"onDelete": overrides.onItemDelete
+			"onAdd": function() {
+				var counter = self.getComponent(componentID + "Counter");
+				counter && counter.request.liveUpdates.start(true);
+				overrides.onItemAdd && overrides.onItemAdd();
+			},
+			"onDelete": function() {
+				var counter = self.getComponent(componentID + "Counter");
+				counter && counter.request.liveUpdates.start(true);
+				overrides.onItemDelete && overrides.onItemDelete();
+			}
 		}, {
 			"name": "ModerationCardUI",
 			"extraActions": $.map({
