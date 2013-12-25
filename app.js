@@ -213,12 +213,12 @@ conversations.templates.tabs.nav =
 	'<ul class="nav nav-tabs {class:tabs}">';
 
 conversations.templates.tabs.navItem =
-		'<li class="{data:class}">' +
-			'<a href="#{data:tabId}" data-toggle="{data:type}">{data:label}</a>' +
-		'</li>';
+	'<li class="{data:class}">' +
+		'<a href="#{data:tabId}" data-toggle="{data:type}">{data:label}</a>' +
+	'</li>';
 
 conversations.templates.tabs.content =
-		'<div class="tab-content {class:tabsContent}"></div>';
+	'<div class="tab-content {class:tabsContent}"></div>';
 
 conversations.templates.tabs.contentItem =
 	'<div class="tab-pane {data:class}" id="{data:tabId}"></div>';
@@ -336,7 +336,7 @@ conversations.renderers.allPosts = function(element) {
 					"name": "allPosts",
 					"active": true,
 					"renderer": "_streamTitle"
-					}, {
+				}, {
 					"name": "moderationQueue",
 					"renderer": "_streamTitle"
 				}, {
@@ -695,8 +695,8 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 				"operators": "state:Untouched -user.roles:moderator,administrator -user.state:ModeratorApproved",
 				"filter": "scope",
 				"markers": config.itemMarkers.length
-						? "markers:" + config.itemMarkers.join(",")
-						: ""
+					? "markers:" + config.itemMarkers.join(",")
+					: ""
 			};
 		}
 	}[componentID];
