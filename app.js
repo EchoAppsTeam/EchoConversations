@@ -544,9 +544,6 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 
 	// component config
 	var config = this.config.get(componentID);
-	config.get = function(name) {
-		return Echo.Utils.get(this, name);
-	};
 	return $.extend(true, {
 		"id": componentID,
 		"appkey": ssConfig.appkey,
@@ -556,19 +553,19 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		"submissionProxyURL": ssConfig.submissionProxyURL,
 		"asyncItemsRendering": true,
 		"labels": {
-			"emptyStream": config.get("noPostsMessage")
+			"emptyStream": config.noPostsMessage
 		},
 		"item": {
 			"reTag": false,
 			"limits": {
-				"maxBodyCharacters": config.get("maxItemBodyCharacters")
+				"maxBodyCharacters": config.maxItemBodyCharacters
 			}
 		},
 		"data": this.get("data." + componentID + "-search"),
 		"query": this._assembleSearchQuery(componentID),
 		"plugins": [].concat(this._getConditionalStreamPluginList(componentID), [{
 			"name": "CardUIShim",
-			"displayTopPostHighlight": config.get("displayTopPostHighlight")
+			"displayTopPostHighlight": config.displayTopPostHighlight
 		}, {
 			"name": "ItemEventsProxy",
 			"onAdd": function() {
@@ -602,10 +599,6 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	var auth = this.config.get("auth");
 
 	var config = this.config.get(componentID);
-	config.get = function(name) {
-		return Echo.Utils.get(this, name);
-	};
-
 	var replyComposerConfig = this.config.get("replyComposer");
 	var displayReplyComposer = replyComposerConfig.visible && !!$.map(replyComposerConfig.contentTypes, function(type) {
 		return type.visible ? type : undefined;
@@ -640,7 +633,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	}];
 
 	return $.grep(plugins, function(plugin) {
-		return !!config.get("display" + plugin.intentID + "Intent");
+		return !!config["display" + plugin.intentID + "Intent"];
 	});
 };
 
