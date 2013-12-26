@@ -249,7 +249,7 @@ conversations.templates.tabs.contentItem =
 conversations.templates.defaultQuery =
 	'{data:filter}:{data:targetURL} sortOrder:{data:initialSortOrder} ' +
 	'itemsPerPage:{data:initialItemsPerPage} {data:markers} type:{data:types} ' +
-	'{data:operators} children:{data:replyNestingLevels} {data:operators}';
+	'{data:operators} children:{data:replyNestingLevels} {data:childrenOperators}';
 
 conversations.templates.topConditions = {
 	"onlyPosts": "markers:{data:itemMarkersToAdd} -markers:{data:itemMarkersToRemove}",
@@ -696,7 +696,17 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 	return {
 		"topPosts": function() {
 			return {
-				"operators": self._assembleTopPostsOperators(componentID),
+				"operators": self._assembleStates(componentID, true),
+				"childrenOperators": (function() {
+					var acc = [];
+					acc.push(self._assembleStates(componentID));
+
+					var moderation = self._assembleModerationOperators();
+					if (moderation) {
+						acc = acc.concat(moderation);
+					}
+					return self._operatorsToString(acc);
+				})(),
 				"filter": "childrenof",
 				"markers": self.substitute({
 					"template": conversations.templates.topConditions[
@@ -711,8 +721,25 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 			};
 		},
 		"allPosts": function() {
+			var operators = (function() {
+				var acc = [];
+				acc.push(self._assembleStates(componentID));
+
+				// items for current user (if bozo filter enabled)
+				var userId = self.user && self.user.get("identityUrl");
+				if (self.config.get("bozoFilter") && userId) {
+					acc.push("user.id:" + userId);
+				}
+
+				var moderation = self._assembleModerationOperators();
+				if (moderation) {
+					acc = acc.concat(moderation);
+				}
+				return self._operatorsToString(acc);
+			})();
 			return {
-				"operators": self._assembleAllPostsOperators(componentID),
+				"operators": operators,
+				"childrenOperators": operators,
 				"filter": "childrenof",
 				"markers": config.itemMarkers.length
 					? "markers:" + config.itemMarkers.join(",")
@@ -720,8 +747,10 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 			};
 		},
 		"moderationQueue": function() {
+			var operators = "state:Untouched -user.roles:moderator,administrator -user.state:ModeratorApproved";
 			return {
-				"operators": "state:Untouched -user.roles:moderator,administrator -user.state:ModeratorApproved",
+				"operators": operators,
+				"childrenOperators": operators,
 				"filter": "scope",
 				"markers": config.itemMarkers.length
 					? "markers:" + config.itemMarkers.join(",")
@@ -731,48 +760,36 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 	}[componentID];
 };
 
-conversations.methods._assembleTopPostsOperators = function() {
-	var config = this.config.get("topPosts");
-	var states = $.map(["CommunityFlagged", "SystemFlagged"], function(state) {
-		return !Echo.Utils.get(config, "moderation.display" + state + "Posts")
-			? "-state:" + state
-			: null;
-	});
-	return states.join(" ") + " -state:ModeratorDeleted";
-};
-
-conversations.methods._assembleAllPostsOperators = function() {
-	var operators = [];
+conversations.methods._assembleStates = function(componentID, ignorePremoderation) {
 	var config = this.config.get("allPosts");
+	var premoderation = this.config.get("allPosts.moderation.premoderation");
 
-	// items with specific status
-	var states = !Echo.Utils.get(config, "moderation.premoderation.enable")
-		? config.itemStates
-		: ["ModeratorApproved"];
+	var states = premoderation.enable && !ignorePremoderation
+		? ["ModeratorApproved"]
+		: config.itemStates;
 
 	states = states.concat($.grep(["CommunityFlagged", "SystemFlagged"], function(state) {
 		return Echo.Utils.get(config, "moderation.display" + state + "Posts");
 	}));
-	operators.push("state:" + states.join(","));
+	return "state:" + states.join(",");
+};
 
-	// items for current user (if bozo filter enabled)
-	var userId = this.user && this.user.get("identityUrl");
-	if (this.config.get("bozoFilter") && userId) {
-		operators.push("user.id:" + userId);
+conversations.methods._assembleModerationOperators = function() {
+	var premoderation = this.config.get("allPosts.moderation.premoderation");
+	if (!premoderation.enable) return "";
+
+	var operators = [];
+	if (premoderation.approvedUserByPass) {
+		operators.push("user.state:ModeratorApproved AND -state:ModeratorDeleted");
 	}
-
-	// approved users (if approvedUserBypass enabled)
-	if (
-		Echo.Utils.get(config, "moderation.premoderation.enable")
-		&& Echo.Utils.get(config, "moderation.premoderation.approvedUserBypass")
-	) {
-		operators.push("(user.state:ModeratorApproved AND -state:ModeratorDeleted)");
-	}
-
-	// always display admin/moderator posts if they are not deleted
 	operators.push("(user.roles:moderator,administrator AND -state:ModeratorDeleted)");
+	return this._operatorsToString(operators);
+};
 
-	return "(" + operators.join(" OR ") + ")";
+conversations.methods._operatorsToString = function(operators) {
+	return operators.length > 1
+		? "(" + operators.join(" OR ") + ")"
+		: operators.join("");
 };
 
 conversations.methods._retrieveData = function(callback) {
@@ -833,11 +850,16 @@ conversations.methods._moderationQueueEnabled = function() {
 	return this.user.is("admin") && this.config.get("allPosts.moderation.premoderation.enable");
 };
 
-conversations.methods._getSubmitMarkers = function() {
+conversations.methods._isModerationRequired = function() {
 	var config = this.config.get("allPosts.moderation.premoderation");
 	return config.enable &&
-		!(this.user.is("admin") || (this.user.get("state") === "ModeratorApproved" && config.approvedUserBypass))
-		? config.markers : [];
+		!(this.user.is("admin") || (this.user.get("state") === "ModeratorApproved" && config.approvedUserBypass));
+};
+
+conversations.methods._getSubmitMarkers = function() {
+	return this._isModerationRequired()
+		? this.config.get("allPosts.moderation.premoderation.markers")
+		: [];
 };
 
 // removing "Echo.UserSession.onInvalidate" subscription from an app
