@@ -210,14 +210,14 @@ conversations.templates.main =
 	'</div>';
 
 conversations.templates.streamHeader =
-	'<div class="{class:streamHeader}">' +
-		'<span class="echo-primaryFont {class:streamTitle}"></span>' +
-		'<div class="pull-right echo-primaryFont {class:streamSorter}"></div>' +
-	'</div>';
+	'<ul class="nav nav-tabs {class:tabs} {class:streamHeader}">' +
+		'<li class="echo-primaryFont {class:streamTitle}"></li>' +
+		'<li class="pull-right echo-primaryFont {class:streamSorter}"></li>' +
+	'</ul>';
 
 conversations.templates.tabs = {};
 conversations.templates.tabs.nav =
-	'<ul class="nav nav-tabs {class:tabs}">';
+	'<ul class="nav nav-tabs {class:tabs} {class:streamHeader}">';
 
 conversations.templates.tabs.navItem =
 	'<li class="{data:class}">' +
@@ -838,30 +838,31 @@ conversations.methods._removeUserInvalidationFrom = function() {
 
 conversations.css =
 	'.{class:streamHeader} { padding: 5px 0px; }' +
-	'.{class:streamTitle} { line-height: 18px; font-size: 14px; }' +
-	'.{class:streamCounter} { line-height: 18px; font-size: 14px; }' +
+	'.{class:streamTitle} { font-size: 14px; }' +
+	'.{class:streamCounter} { font-size: 14px; }' +
 
 	// streamSorter dropdown
 	'.{class:streamSorter} { font-size: 13px; }' +
 	'.echo-sdk-ui .{class:streamSorter}:focus { outline: none; }' +
 	'.{class:streamSorter} > ul > li > a { background: url("{%= baseURL %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
 	'.{class:streamSorter} ul.nav { margin-bottom: 0px; font-size: 13px; }' +
-	'.{class:streamSorter} ul.nav > li > a { text-decoration: none; color: #7f7f7f; line-height: 22px; }' +
+	'.{class:streamSorter} ul.nav > li > a { text-decoration: none; color: #C6C6C6; line-height: 18px; }' +
 	'.{class:streamSorter} .dropdown-menu { float: right; left: auto; right: 0; }' +
-	'.echo-sdk-ui .{class:streamSorter} .nav .dropdown .dropdown-toggle { background-color: transparent; border-color: transparent; color: #7f7f7f; }' +
+	'.echo-sdk-ui .{class:streamSorter} .nav .dropdown .dropdown-toggle { background-color: transparent; border-color: transparent; color: #C6C6C6; }' +
 	'.{class:streamSorter} ul.nav > li > a:hover,' +
 		'.{class:streamSorter} ul.nav > li > a:focus { background-color: transparent}' +
 
 	// tabs
 	'.echo-sdk-ui .tab-content.{class:tabsContent} { overflow: visible; }' +
-	'.echo-sdk-ui .nav.{class:tabs} { margin-bottom: 5px; }' +
-	'.{class:tabs} > li > a, .{class:tabs} > li > a:hover { color: #7f7f7f; }' +
+	'.echo-sdk-ui .nav.{class:tabs} { margin: 0px; padding: 5px 0px; }' +
+	'.echo-sdk-ui .nav.{class:tabs} > li { height: 18px; line-height: 18px; }' +
+	'.{class:tabs} > li > a, .{class:tabs} > li > a:hover { color: #C6C6C6; }' +
 	'.echo-sdk-ui .nav.{class:tabs} { border: 0px; }' +
-	'.echo-sdk-ui .nav.{class:tabs} > li > a { font-size: 14px; padding: 0px; padding-bottom: 3px; margin-right: 10px; border: 0px; }' +
+	'.echo-sdk-ui .nav.{class:tabs} > li > a { font-size: 14px; line-height: 18px; padding: 0px; margin-right: 15px; border: 0px; }' +
 	'.echo-sdk-ui .nav.{class:tabs} > li.active > a,' +
 		'.echo-sdk-ui .nav.{class:tabs} > li.active > a:hover,' +
 		'.echo-sdk-ui .nav.{class:tabs} > li.active > a:focus,' +
-		'.echo-sdk-ui .nav.{class:tabs} > li.active > a:active { border-bottom: 3px solid #d8d8d8; outline: none; color: black; }' +
+		'.echo-sdk-ui .nav.{class:tabs} > li.active > a:active { border-bottom: 0px solid #d8d8d8; outline: none; color: black; }' +
 	'.echo-sdk-ui .nav.{class:tabs} > .active > a,' +
 		'.echo-sdk-ui .nav.{class:tabs} > .active > a:focus,' +
 		'.echo-sdk-ui .nav.{class:tabs} > .active > a:hover { border: 0px; }' +
