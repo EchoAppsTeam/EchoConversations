@@ -20,7 +20,10 @@ plugin.init = function() {
 };
 
 plugin.config = {
-	"actionString": "Add a comment..."
+	"actionString": "Add a comment...",
+	"pauseTimeout": 0,
+	"submitFormTimeout": 300,
+	"compactFormTimeout": 200
 };
 
 plugin.labels = {
@@ -41,7 +44,10 @@ plugin.events = {
 		}
 	},
 	"Echo.StreamServer.Controls.Submit.onPostComplete": function() {
-		this._hideSubmit();
+		var self = this;
+		setTimeout(function() {
+			self._hideSubmit(true);
+		}, this.config.get("pauseTimeout"));
 	},
 	"Echo.StreamServer.Controls.Stream.Item.onRender": function() {
 		if (this.get("expanded")) {
@@ -110,10 +116,11 @@ plugin.renderers.avatar =function(element) {
 	return element;
 };
 
-plugin.renderers.compactForm = function(element) {
+plugin.renderers.compactForm = function(element, extra) {
 	var item = this.component;
 	if (!item.get("depth") && !this.get("expanded")) {
-		return element.show();
+		extra = extra || {};
+		return element.slideDown(+extra.animate && this.config.get("compactFormTimeout"));
 	}
 	return element.hide();
 };
@@ -182,21 +189,28 @@ plugin.methods._showSubmit = function() {
 	return target;
 };
 
-plugin.methods._hideSubmit = function() {
-	var item = this.component;
+plugin.methods._hideSubmit = function(animate) {
+	var self = this, item = this.component;
+
 	var submit = this.get("submit");
 	if (submit) {
 		submit.set("data", undefined);
 	}
 	this.set("expanded", false);
-	this.view.get("submitForm").empty().hide();
-	this.view.render({"name": "avatar"});
-	this.view.render({"name": "compactForm"});
-	item.view.render({"name": "container"});
-	
-	this.events.publish({
-		"topic": "onCollapse"
-	});
+
+	var timeout = +animate && this.config.get("submitFormTimeout");
+	this.view.get("submitForm")
+		.slideUp(timeout, function() {
+			self.view.render({"name": "avatar"});
+			self.view.render({
+				"name": "compactForm",
+				"extra": {"animate": animate}
+			});
+			item.view.render({"name": "container"});
+			self.events.publish({
+				"topic": "onCollapse"
+			});
+		});
 };
 
 plugin.methods._expand = function() {

@@ -18,6 +18,12 @@ conversations.config = {
 				"resolveURLs": true
 			}
 		},
+		"confirmation": {
+			"enable": true,
+			"message": "Thanks, your post has been submitted for review",
+			"timeout": 5000,
+			"hidingTimeout": 300
+		},
 		"plugins": []
 	},
 	"replyComposer": {
@@ -29,6 +35,11 @@ conversations.config = {
 				"prompt": "What's on your mind?",
 				"resolveURLs": true
 			}
+		},
+		"confirmation": {
+			"enable": true,
+			"message": "Thanks, your post has been submitted for review",
+			"timeout": 5000
 		},
 		"plugins": []
 	},
@@ -294,11 +305,14 @@ conversations.renderers.postComposer = function(element) {
 				"enabled": enableBundledIdentity,
 				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
 				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
-			}, $.extend({
+			}, $.extend(true, this.config.get("postComposer"), {
 				"name": "CardUIShim",
 				"submitPermissions": this._getSubmitPermissions(),
+				"confirmation": {
+					"enable": this._isModerationRequired() && this.config.get("postComposer.enable")
+				},
 				"auth": this.config.get("auth")
-			}, this.config.get("postComposer"))], config.plugins),
+			})], config.plugins),
 			"data": {
 				"object": {
 					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
@@ -646,6 +660,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		// TODO: pass markers through data
 		"extraMarkers": this._getSubmitMarkers(),
 		"enabled": this._isComposerVisible("replyComposer"),
+		"pauseTimeout": +this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout"),
 		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
 		"nestedPlugins": [].concat([{
 			"name": "JanrainBackplaneHandler",
@@ -653,11 +668,14 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"enabled": auth.enableBundledIdentity,
 			"authWidgetConfig": auth.authWidgetConfig,
 			"sharingWidgetConfig": auth.sharingWidgetConfig
-		}, $.extend({
+		}, $.extend(true, this.config.get("replyComposer"), {
 			"name": "CardUIShim",
 			"auth": this.config.get("auth"),
+			"confirmation": {
+				"enable": this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout")
+			},
 			"submitPermissions": this._getSubmitPermissions()
-		}, this.config.get("replyComposer"))], this.config.get("replyComposer.plugins"))
+		})], this.config.get("replyComposer.plugins"))
 	}, {
 		"intentID": "Sharing",
 		"name": "CardUISocialSharing"

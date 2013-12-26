@@ -499,6 +499,12 @@ plugin.config = {
 			"prompt": "What's on your mind",
 			"resolveURLs": true
 		}
+	},
+	"confirmation": {
+		"enable": false,
+		"message": "Thanks, your post has been submitted for review",
+		"timeout": 5000,
+		"hidingTimeout": 200
 	}
 };
 
@@ -520,6 +526,21 @@ plugin.events = {
 		"handler": function() {
 			this.view.render({"name": "postButton"});
 		}
+	},
+	"Echo.StreamServer.Controls.Submit.onPostInit": function() {
+		if (this.config.get("confirmation.enable")) {
+			this.view.get("confirmation").hide();
+		}
+	},
+	"Echo.StreamServer.Controls.Submit.onPostComplete": function() {
+		if (this.config.get("confirmation.enable")) {
+			var self = this;
+			var confirmation = this.view.get("confirmation");
+			confirmation.show();
+			setTimeout(function() {
+				confirmation.slideUp(self.config.get("confirmation.hidingTimeout"));
+			}, this.config.get("confirmation.timeout"));
+		}
 	}
 };
 
@@ -527,10 +548,6 @@ plugin.labels = {
 	"post": "Post",
 	"postAndShare": "Post and Share"
 };
-
-plugin.templates.attach = '<div class="{plugin.class:attach}"><img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" /></div>';
-
-plugin.templates.auth = '<div class="{plugin.class:auth}"></div>';
 
 plugin.templates.postButton =
 	'<div class="btn-group">' +
@@ -542,18 +559,25 @@ plugin.templates.postButton =
 		'</ul>' +
 	'</div>';
 
+plugin.templates.attach = '<div class="{plugin.class:attach}"><img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" /></div>';
+
+plugin.templates.auth = '<div class="{plugin.class:auth}"></div>';
+
+plugin.templates.confirmation =
+	'<div class="alert alert-success echo-primaryFont {plugin.class:confirmation}">' +
+		'{plugin.config:confirmation.message}' +
+	'</div>';
 
 plugin.init = function() {
 	var self = this, submit = this.component;
 
+	this.extendTemplate("insertAsFirstChild", "container", plugin.templates.confirmation);
 	this.extendTemplate("remove", "postButton");
 	this.extendTemplate("insertAsFirstChild", "postContainer", plugin.templates.postButton);
-
 	this.extendTemplate("insertBefore", "header", plugin.templates.auth);
 
 	// drop all validators
 	submit.validators = [];
-
 	submit.addPostValidator(function() {
 		var areFieldsValid = true;
 		var isGuestAllowed = self.config.get("submitPermissions") === "allowGuest";
@@ -584,18 +608,8 @@ plugin.init = function() {
 //	this.extendTemplate("insertAsFirstChild", "controls", plugin.templates.attach);
 };
 
-plugin.methods._requestLoginPrompt = function() {
-	Backplane.response([{
-		// IMPORTANT: we use ID of the last received message
-		// from the server-side to avoid same messages re-processing
-		// because of the "since" parameter cleanup...
-		"id": Backplane.since,
-		"channel_name": Backplane.getChannelName(),
-		"message": {
-			"type": "identity/login/request",
-			"payload": this.component.user.data || {}
-		}
-	}]);
+plugin.renderers.confirmation = function(element) {
+	return element.hide();
 };
 
 plugin.renderers.postButton = function(element) {
@@ -713,6 +727,20 @@ plugin.renderers.auth = function(element) {
 	return element;
 };
 
+plugin.methods._requestLoginPrompt = function() {
+	Backplane.response([{
+		// IMPORTANT: we use ID of the last received message
+		// from the server-side to avoid same messages re-processing
+		// because of the "since" parameter cleanup...
+		"id": Backplane.since,
+		"channel_name": Backplane.getChannelName(),
+		"message": {
+			"type": "identity/login/request",
+			"payload": this.component.user.data || {}
+		}
+	}]);
+};
+
 plugin.methods._share = function(data) {
 	var item = data.postData.content[0];
 	var payload = {
@@ -764,6 +792,7 @@ plugin.methods._userStatus = function() {
 };
 
 plugin.css =
+	'.echo-sdk-ui .{plugin.class:confirmation} { margin-bottom: 10px; }' +
 	'.{plugin.class} .{class:urlContainer} { display: none; }' +
 	'.{plugin.class} .{class:avatar} { display: none; }' +
 	'.{plugin.class} .{class:fieldsWrapper} { margin-left: 0px; }' +
