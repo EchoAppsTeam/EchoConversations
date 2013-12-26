@@ -174,7 +174,7 @@ conversations.config.normalizer = {
 		return this.get("dependencies.StreamServer.submissionProxyURL");
 	},
 	"moderationQueue": function(value) {
-		// TODO this code doesn't work if there is "moderationQueue" hash defined in the app config.
+		// TODO this code doesn't work if there is "moderationQueue" hash defined before "allPosts" in the app config.
 		return $.extend(true, {}, this.get("allPosts"), value);
 	},
 	"targetURL": function(value) {
