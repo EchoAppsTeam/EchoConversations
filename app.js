@@ -761,7 +761,7 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 };
 
 conversations.methods._assembleStates = function(componentID, ignorePremoderation) {
-	var config = this.config.get("allPosts");
+	var config = this.config.get(componentID);
 	var premoderation = this.config.get("allPosts.moderation.premoderation");
 
 	var states = premoderation.enable && !ignorePremoderation
