@@ -188,6 +188,22 @@ conversations.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.css"
 }];
 
+conversations.events = {
+	"Echo.StreamServer.Controls.Counter.onUpdate": function(_, data) {
+		var app = this;
+		$.each(["allPosts", "topPosts", "moderationQueue"], function(k, componentName) {
+			var component = app.getComponent(componentName + "Counter");
+			if (component && component.config.get("target").is(data.target)) {
+				app._publishCounterUpdateEvent({
+					"component": componentName,
+					"count": data.data.count
+				});
+				return false;
+			}
+		});
+	}
+};
+
 conversations.init = function() {
 	var app = this;
 	this._removeUserInvalidationFrom(this);
@@ -301,31 +317,37 @@ conversations.renderers.topPostsContainer = function(element) {
 };
 
 conversations.renderers.topPostsHeader = function(element) {
-	this.view.render({
-		"target": element,
-		"name": "_streamHeader",
-		"extra": {"id": "topPosts"}
-	});
+	if (this.config.get("topPosts.visible")) {
+		this.view.render({
+			"target": element,
+			"name": "_streamHeader",
+			"extra": {"id": "topPosts"}
+		});
+	}
+	return element;
 };
 
 conversations.renderers.topPosts = function(element) {
 	var self = this;
-	this.initComponent({
-		"id": "topPosts",
-		"component": "Echo.StreamServer.Controls.Stream",
-		"config": this._assembleStreamConfig("topPosts", {
-			"onItemAdd": function() {
-				self.view.render({"name": "topPostsContainer"});
-			},
-			"onItemDelete": function() {
-				self.view.render({"name": "topPostsContainer"});
-			},
-			"ready": function() {
-				self.view.render({"name": "topPostsContainer"});
-			},
-			"target": element
-		})
-	});
+	if (this.config.get("topPosts.visible")) {
+		this.initComponent({
+			"id": "topPosts",
+			"component": "Echo.StreamServer.Controls.Stream",
+			"config": this._assembleStreamConfig("topPosts", {
+				"onItemAdd": function() {
+					self.view.render({"name": "topPostsContainer"});
+				},
+				"onItemDelete": function() {
+					self.view.render({"name": "topPostsContainer"});
+				},
+				"ready": function() {
+					self.view.render({"name": "topPostsContainer"});
+				},
+				"target": element
+			})
+		});
+	}
+	return element;
 };
 
 conversations.renderers.allPosts = function(element) {
@@ -798,6 +820,7 @@ conversations.methods._retrieveData = function(callback) {
 				// In this case streams/counters will try to fetch initial data by yourself.
 				if (!value || value.result === "error") delete data[key];
 			});
+			app._publishInitialCounterUpdateEvents(data);
 			app.set("data", data);
 			callback();
 		},
@@ -833,6 +856,27 @@ conversations.methods._removeUserInvalidationFrom = function() {
 				return false;
 			}
 		});
+	});
+};
+
+conversations.methods._publishInitialCounterUpdateEvents = function(data) {
+	var app = this;
+	$.map(["topPosts", "allPosts", "moderationQueue"], function(component) {
+		var response = data[component + "-count"];
+		if (response) {
+			app._publishCounterUpdateEvent({
+				"component": component,
+				"count": response.count
+			});
+		}
+	});
+};
+
+conversations.methods._publishCounterUpdateEvent = function(data) {
+	this.events.publish({
+		"topic": "onPostsCountUpdate",
+		"global": true,
+		"data": $.extend(true, {"context": this.config.get("context")}, data)
 	});
 };
 
