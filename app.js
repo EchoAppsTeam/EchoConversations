@@ -71,6 +71,9 @@ conversations.config = {
 			"displayCommunityFlaggedPosts": true,
 			"displaySystemFlaggedPosts": true
 		},
+		"events": {
+			"onPostCountUpdate": null
+		},
 		"plugins": []
 	},
 	"allPosts": {
@@ -114,12 +117,18 @@ conversations.config = {
 				"markers": ["Conversations.Premoderation"]
 			}
 		},
+		"events": {
+			"onPostCountUpdate": null
+		},
 		"plugins": []
 	},
 	"moderationQueue": {
 		"label": "Moderation Queue",
 		"displayReplyIntent": false,
-		"displaySharingIntent": false
+		"displaySharingIntent": false,
+		"events": {
+			"onPostCountUpdate": null
+		}
 	},
 	"auth": {
 		"enableBundledIdentity": true,
@@ -165,6 +174,7 @@ conversations.config.normalizer = {
 		return this.get("dependencies.StreamServer.submissionProxyURL");
 	},
 	"moderationQueue": function(value) {
+		// TODO this code doesn't work if there is "moderationQueue" hash defined in the app config.
 		return $.extend(true, {}, this.get("allPosts"), value);
 	},
 	"targetURL": function(value) {
@@ -194,7 +204,7 @@ conversations.events = {
 		$.each(["allPosts", "topPosts", "moderationQueue"], function(k, componentName) {
 			var component = app.getComponent(componentName + "Counter");
 			if (component && component.config.get("target").is(data.target)) {
-				app._publishCounterUpdateEvent({
+				app._triggerCounterUpdateEvent({
 					"component": componentName,
 					"count": data.data.count
 				});
@@ -835,7 +845,7 @@ conversations.methods._retrieveData = function(callback) {
 				// In this case streams/counters will try to fetch initial data by yourself.
 				if (!value || value.result === "error") delete data[key];
 			});
-			app._publishInitialCounterUpdateEvents(data);
+			app._triggerInitialCounterUpdateEvents(data);
 			app.set("data", data);
 			callback();
 		},
@@ -879,12 +889,12 @@ conversations.methods._removeUserInvalidationFrom = function() {
 	});
 };
 
-conversations.methods._publishInitialCounterUpdateEvents = function(data) {
+conversations.methods._triggerInitialCounterUpdateEvents = function(data) {
 	var app = this;
 	$.map(["topPosts", "allPosts", "moderationQueue"], function(component) {
 		var response = data[component + "-count"];
 		if (response) {
-			app._publishCounterUpdateEvent({
+			app._triggerCounterUpdateEvent({
 				"component": component,
 				"count": response.count
 			});
@@ -892,12 +902,9 @@ conversations.methods._publishInitialCounterUpdateEvents = function(data) {
 	});
 };
 
-conversations.methods._publishCounterUpdateEvent = function(data) {
-	this.events.publish({
-		"topic": "onPostsCountUpdate",
-		"global": true,
-		"data": $.extend(true, {"context": this.config.get("context")}, data)
-	});
+conversations.methods._triggerCounterUpdateEvent = function(data) {
+	var callback = this.config.get(data.component + ".events.onPostCountUpdate");
+	callback && callback(data.count);
 };
 
 conversations.css =
