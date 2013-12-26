@@ -566,6 +566,11 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 	// StreamServer config
 	var ssConfig = this.config.get("dependencies.StreamServer");
 
+	var moderationExtraActions = this.config.get("topPosts.visible")
+		? this.config.get("topPosts.includeTopContributors")
+			? ["topPost", "topContributor"]
+			: ["topPost"]
+		: [];
 	// component config
 	var config = this.config.get(componentID);
 	return $.extend(true, {
@@ -606,14 +611,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			}
 		}, {
 			"name": "ModerationCardUI",
-			"extraActions": $.map({
-				"topPost": "visible",
-				"topContributor": "includeTopContributors"
-			}, function(configKey, action) {
-				return self.config.get("topPosts." + configKey)
-					? action
-					: undefined;
-			}),
+			"extraActions": moderationExtraActions,
 			"topMarkers": this.config.get("topMarkers")
 		}, {
 			"name": "ItemsRollingWindow",
