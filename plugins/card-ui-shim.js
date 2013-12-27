@@ -458,12 +458,16 @@ plugin.css =
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
+
+	'.{plugin.class} .{class:container-child} { padding: 12px 0px 10px 16px; margin: 0px 15px 2px 0px; }' +
+	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 12px 0px 10px 8px; margin: 0px 15px 2px 0px; }' +
+
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
 	'.{plugin.class} .{class:children} .{plugin.class:wrapper} { padding-top: 0px; background: none; border: none; }' +
-	'.{plugin.class} .{class:container-child} { padding: 10px 0px 8px 16px; margin: 0px 15px 2px 0px; }' +
-	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 10px 0px 8px 8px; margin: 0px 15px 2px 0px; }' +
+	'.{plugin.class} .{class:expandChildren} { padding-bottom: 0px; padding-top: 5px; }' +
+	'.{plugin.class} .{class:children} .{class:expandChildren} { padding-bottom: 10px; padding-top: 12px; }' +
 
 	'.echo-sdk-ui .{plugin.class} .{class:buttons} a:focus { outline: none; }' +
 	'.{plugin.class} .{class:button} { margin-right: 10px; }' +

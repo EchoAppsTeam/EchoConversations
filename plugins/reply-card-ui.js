@@ -10,6 +10,7 @@ if (Echo.Plugin.isDefined(plugin)) return;
 plugin.init = function() {
 	var self = this, item = this.component;
 	this.extendTemplate("insertAsLastChild", "content", plugin.templates.form);
+	this.extendTemplate("insertBefore", "expandChildren", plugin.templates.spacing);
 	var form = Echo.Utils.get(Echo.Variables, this._getSubmitKey());
 	$.each(form || {}, function(key, value) {
 		self.set(key, value);
@@ -66,6 +67,9 @@ plugin.templates.form =
 			'</div>' +
 		'</div>' +
 	'</div>';
+
+plugin.templates.spacing =
+	'<div class="{plugin.class:spacing}"></div>';
 
 plugin.component.renderers.container = function(element) {
 	var item = this.component;
@@ -277,17 +281,19 @@ plugin.methods._getSubmitData = function() {
 };
 
 plugin.css =
-	".{plugin.class} .{plugin.class:replyForm} { margin-right: 20px; border-left: 4px solid transparent; }" +
-	".{plugin.class} .{plugin.class:compactForm} { padding-top: 18px; padding-bottom: 18px; }" +
-	".{plugin.class} .{plugin.class:submitForm} { padding-top: 18px; padding-bottom: 18px; }" +
-	".{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 28px; line-height: 28px; }" +
-	".{plugin.class:avatar} { width: 28px; height: 28px; border-radius: 50%; margin: 1px 0px 0px 3px; }" +
-	".{plugin.class} .{plugin.class:avatar} > img { width: 28px; height: 28px; }" +
-	".{plugin.class:compactBorder} { margin-left: 39px; border: 1px solid #d8d8d8; }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-secondaryColor { color: #C6C6C6 }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-primaryFont { font-size: 12px; line-height: 24px; }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'] { width: 100%; height: 24px; border: none; margin: 0px; padding: 0px; box-shadow: none; vertical-align: middle; }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text']:focus { outline: 0; box-shadow: none; }";
+	'.{plugin.class} .{plugin.class:spacing} { margin-top: 10px; }' +
+	'.{plugin.class} .{class:children} .{plugin.class:spacing} { margin-top: 0px; }' +
+	'.{plugin.class} .{plugin.class:replyForm} { margin-right: 20px; border-left: 4px solid transparent; }' +
+	'.{plugin.class} .{plugin.class:compactForm} { padding-top: 8px; padding-bottom: 18px; }' +
+	'.{plugin.class} .{plugin.class:submitForm} { padding-top: 8px; padding-bottom: 18px; }' +
+	'.{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 28px; line-height: 28px; }' +
+	'.{plugin.class:avatar} { width: 28px; height: 28px; border-radius: 50%; margin: 1px 0px 0px 3px; }' +
+	'.{plugin.class} .{plugin.class:avatar} > img { width: 28px; height: 28px; }' +
+	'.{plugin.class:compactBorder} { margin-left: 39px; border: 1px solid #d8d8d8; }' +
+	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"].echo-secondaryColor { color: #C6C6C6 }' +
+	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"].echo-primaryFont { font-size: 12px; line-height: 24px; }' +
+	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"] { width: 100%; height: 24px; border: none; margin: 0px; padding: 0px; box-shadow: none; vertical-align: middle; }' +
+	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"]:focus { outline: 0; box-shadow: none; }';
 
 Echo.Plugin.create(plugin);
 
