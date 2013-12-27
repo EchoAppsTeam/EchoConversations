@@ -462,8 +462,8 @@ plugin.css =
 	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
 	'.{plugin.class} .{class:children} .{plugin.class:wrapper} { padding-top: 0px; background: none; border: none; }' +
-	'.{plugin.class} .{class:container-child} { padding: 20px 0px 0px 16px; margin: 0px 15px 2px 0px; }' +
-	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 20px 0px 0px 8px; margin: 0px 15px 2px 0px; }' +
+	'.{plugin.class} .{class:container-child} { padding: 10px 0px 8px 16px; margin: 0px 15px 2px 0px; }' +
+	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 10px 0px 8px 8px; margin: 0px 15px 2px 0px; }' +
 
 	'.echo-sdk-ui .{plugin.class} .{class:buttons} a:focus { outline: none; }' +
 	'.{plugin.class} .{class:button} { margin-right: 10px; }' +
