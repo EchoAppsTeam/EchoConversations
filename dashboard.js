@@ -17,10 +17,10 @@ dashboard.mappings = {
 		"key": "dependencies.Janrain.appId"
 	},
 	"replyComposer.contentTypes.comments.confirmationMessage": {
-		"key": "replyComposer.contentTypes.comments.confirmation.message"
+		"key": "replyComposer.confirmation.message"
 	},
 	"postComposer.contentTypes.comments.confirmationMessage": {
-		"key": "postComposer.contentTypes.comments.confirmation.message"
+		"key": "postComposer.confirmation.message"
 	}
 };
 
