@@ -41,6 +41,7 @@ plugin.init = function() {
 		this.activities.animations--;
 		this._executeNextActivity();
 	};
+
 };
 
 plugin.component.renderers.header = function(element) {
@@ -135,6 +136,31 @@ plugin.init = function() {
 	this.extendTemplate("remove", "date");
 	this.set("buttonsLayout", "inline");
 	this._initPageObserver();
+
+	this.component.block = function(label) {
+		if (this.blocked) return;
+		this.blocked = true;
+		// Due to container have padding and we can't calculate width, we should take its parent (wrapper) instead.
+		var content = this.view.get("container").parent();
+		var width = content.width();
+		// we should take into account that the container has a 10px 0px padding value
+		var height = content.outerHeight();
+		this.blockers = {
+			"backdrop": $('<div class="' + this.cssPrefix + 'blocker-backdrop"></div>').css({
+				"width": width, "height": height
+			}),
+			"message": $(this.substitute({
+				"template": '<div class="{class:blocker-message}">{data:label}</div>',
+				"data": {"label": label}
+			})).css({
+				"left": ((parseInt(width, 10) - 200)/2) + 'px',
+				"top": ((parseInt(height, 10) - 20)/2) + 'px'
+			})
+		};
+		content.addClass("echo-relative")
+			.prepend(this.blockers.backdrop)
+			.prepend(this.blockers.message);
+		};
 };
 
 plugin.templates.date =
@@ -423,7 +449,6 @@ plugin.css =
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
 	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
 
-	'.{plugin.class} .{class:blocker-backdrop} { background-color: transparent; }' +
 	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
 	'.{plugin.class} .{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
 
