@@ -15,6 +15,12 @@ dashboard.mappings = {
 	},
 	"dependencies.janrainapp": {
 		"key": "dependencies.Janrain.appId"
+	},
+	"replyComposer.contentTypes.comments.confirmationMessage": {
+		"key": "replyComposer.contentTypes.comments.confirmation.message"
+	},
+	"postComposer.contentTypes.comments.confirmationMessage": {
+		"key": "postComposer.contentTypes.comments.confirmation.message"
 	}
 };
 
@@ -227,6 +233,15 @@ dashboard.vars = {
 				"config": {
 					"title": "Prompt",
 					"desc": "Specifies the ghost text displayed in the Comment Prompt"
+				}
+			}, {
+				"component": "Input",
+				"name": "confirmationMessage",
+				"type": "string",
+				"default": "Thanks, your post has been submitted for review",
+				"config": {
+					"title": "Confirmation message",
+					"desc": "Specifies the confirmation message text displayed after successful submission if pre-moderation mode is enabled"
 				}
 			}, {
 				"component": "Checkbox",
