@@ -15,7 +15,7 @@ conversations.config = {
 			"comments": {
 				"visible": true,
 				"prompt": "What's on your mind?",
-				"resolveURLs": true
+				"resolveURLs": false
 			}
 		},
 		"confirmation": {
@@ -33,7 +33,7 @@ conversations.config = {
 			"comments": {
 				"visible": true,
 				"prompt": "What's on your mind?",
-				"resolveURLs": true
+				"resolveURLs": false
 			}
 		},
 		"confirmation": {
