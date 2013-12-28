@@ -558,6 +558,10 @@ conversations.renderers._streamSorter = function(element, extra) {
 			};
 		})
 	});
+
+	// TODO: find a better solution to right-align the menu
+	//       and/or extend the Echo.GUI.Dropdown class to support this
+	element.find(".dropdown-menu").addClass("pull-right");
 	return element.addClass(this.cssPrefix + "streamSorter");
 };
 
