@@ -672,6 +672,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"enabled": this._isComposerVisible("replyComposer"),
 		"pauseTimeout": +this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout"),
 		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
+		"requestMethod": "POST",
 		"nestedPlugins": [].concat([{
 				"name": "URLResolver",
 				"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs")
