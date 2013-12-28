@@ -179,18 +179,18 @@ plugin.config = {
 };
 
 plugin.component.renderers.body = function(element) {
-	var contentParts = this.component.get("data.object.content")
-		.match(/(.*)(<div.+class="echo-item-files".*)/);
-
-	if (!contentParts) {
+	var fragment = $("<div/>").append(this.component.get("data.object.content"));
+	var mediaAttachments = fragment.find(".echo-item-files");
+	if (!mediaAttachments.length) {
 		return this.component.parentRenderer("body", arguments);
 	}
 
-	this.component.set("data.object.content", contentParts[1]);
+	mediaAttachments.detach();
+
+	this.component.set("data.object.content", fragment.html());
 	this.component.parentRenderer("body", arguments);
 
-	var fragment = $("<div/>").append(contentParts[2]);
-	var media = $.map(fragment.find("div[oembed]"), function(item) {
+	var media = $.map(mediaAttachments.find("div[oembed]"), function(item) {
 		return JSON.parse($(item).attr("oembed"));
 	});
 
