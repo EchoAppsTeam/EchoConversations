@@ -268,7 +268,7 @@ conversations.templates.tabs.contentItem =
 	'<div class="tab-pane {data:class}" id="{data:tabId}"></div>';
 
 conversations.templates.defaultQuery =
-	'{data:filter}:{data:targetURL} sortOrder:{data:initialSortOrder} ' +
+	'{data:filter}:{data:targetURL} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
 	'itemsPerPage:{data:initialItemsPerPage} {data:markers} type:{data:types} ' +
 	'{data:operators} children:{data:replyNestingLevels} {data:childrenOperators}';
 
@@ -300,6 +300,9 @@ conversations.renderers.postComposer = function(element) {
 			"infoMessages": {"enabled": false},
 			"markers": this._getSubmitMarkers(),
 			"plugins": [].concat([{
+				"name": "URLResolver",
+				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs")
+			}, {
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
 				"enabled": enableBundledIdentity,
@@ -640,6 +643,8 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		}, {
 			"name": "ItemsRollingWindow",
 			"moreButton": true
+		}, {
+			"name": "URLResolver"
 		}])
 	}, this.config.get(componentID), overrides);
 };
@@ -663,6 +668,9 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"pauseTimeout": +this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout"),
 		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
 		"nestedPlugins": [].concat([{
+				"name": "URLResolver",
+				"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs")
+		}, {
 			"name": "JanrainBackplaneHandler",
 			"appId": this.config.get("dependencies.Janrain.appId"),
 			"enabled": auth.enableBundledIdentity,
