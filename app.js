@@ -295,6 +295,7 @@ conversations.renderers.postComposer = function(element) {
 			"appkey": ssConfig.appkey,
 			"apiBaseURL": ssConfig.apiBaseURL,
 			"submissionProxyURL": ssConfig.submissionProxyURL,
+			"requestMethod": "POST",
 			"target": element,
 			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
