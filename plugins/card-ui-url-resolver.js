@@ -194,10 +194,11 @@ plugin.component.renderers.body = function(element) {
 		return JSON.parse($(item).attr("oembed"));
 	});
 
-	var textElement = this.component.view.get("text");
 	if (media.length) {
-		Echo.Utils.safelyExecute(textElement.append, normalizeMediaContent.call(this, media), textElement);
+		var bodyElement = this.component.view.get("body");
+		Echo.Utils.safelyExecute(bodyElement.after, normalizeMediaContent.call(this, media), bodyElement);
 	} else {
+		var textElement = this.component.view.get("text");
 		Echo.Utils.safelyExecute(textElement.append, contentParts[1], textElement);
 	}
 
