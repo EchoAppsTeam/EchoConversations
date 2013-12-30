@@ -252,13 +252,19 @@ conversations.templates.streamHeader =
 		'<li class="pull-right echo-primaryFont {class:streamSorter}"></li>' +
 	'</ul>';
 
+conversations.templates.streamTitle =
+	'<span class="{class:streamTitle}">' +
+		'<span class="{class:streamCaption}">{data:label}</span>' +
+		'<span class="{class:streamCounter}"></span>' +
+	'</span>';
+
 conversations.templates.tabs = {};
 conversations.templates.tabs.nav =
 	'<ul class="nav nav-tabs {class:tabs} {class:streamHeader}">';
 
 conversations.templates.tabs.navItem =
 	'<li class="{data:class}">' +
-		'<a href="#{data:tabId}" data-toggle="{data:type}">{data:label}</a>' +
+		'<a href="#{data:tabId}" data-toggle="{data:type}"></a>' +
 	'</li>';
 
 conversations.templates.tabs.content =
@@ -441,7 +447,6 @@ conversations.renderers._tabs = function(element, extra) {
 		var li = $(self.substitute({
 			"template": tpls.navItem,
 			"data": {
-				"label": tab.name,
 				"class": (tab.active ? "active" : "") + " " + (tab.extraClass || ""),
 				"type": tab.type,
 				"tabId": tab.id
@@ -568,30 +573,31 @@ conversations.renderers._streamSorter = function(element, extra) {
 
 conversations.renderers._streamTitle = function(element, extra) {
 	var config = this.config.get(extra.id);
-	element.empty().append(config.label);
+	var view = this.view.fork();
+	var title = view.render({
+		"template": conversations.templates.streamTitle,
+		"data": {
+			"label": config.label
+		}
+	});
 	if (config.displayCounter) {
-		var counterContainer = $("<span>");
 		this.initComponent({
 			"id": extra.id + "Counter",
 			"component": "Echo.StreamServer.Controls.Counter",
 			"config": {
-				"target": counterContainer,
+				"target": view.get("streamCounter"),
 				"infoMessages": {
 					"layout": "compact"
 				},
+				"plugins": [{"name": "CounterCardUI"}],
 				"query": this._assembleCounterQuery(extra.id),
 				"data": this.get("data." + extra.id + "-count")
 			}
 		});
-		element
-			.append("&nbsp;(")
-			.append(counterContainer)
-			.append(")");
 	}
 
-	return element.addClass(this.cssPrefix + "streamTitle");
+	return element.append(title);
 };
-
 
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 	var self = this;
