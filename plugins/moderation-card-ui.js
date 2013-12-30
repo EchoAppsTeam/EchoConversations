@@ -690,16 +690,11 @@ var plugin = Echo.Plugin.manifest("ModerationCardUI", "Echo.StreamServer.Control
 
 plugin.events = {
 	"Echo.StreamServer.Controls.Stream.Item.Plugins.ModerationCardUI.onUserUpdate": function(topic, args) {
-		if (args.refresh) {
-			this.component.config.remove("data");
-			this.component.refresh();
-		}
 		this.events.publish({
 			"topic": "onUserUpdate",
 			"data": args,
 			"global": false
 		});
-		return {"stop": ["bubble"]};
 	}
 };
 

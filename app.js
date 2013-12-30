@@ -210,6 +210,21 @@ conversations.dependencies = [{
 }];
 
 conversations.events = {
+	// TODO move this login into moderation plugin.
+	"Echo.StreamServer.Controls.Stream.Item.Plugins.ModerationCardUI.onUserUpdate": function(_, args) {
+		var self = this;
+		if (args.refresh) {
+			$.map(["allPosts", "topPosts", "moderationQueue"], function(section) {
+				$.map(["", "Counter"], function(element) {
+					var component = self.getComponent(section + element);
+					if (component) {
+						component.config.remove("data");
+						component.refresh();
+					}
+				});
+			});
+		}
+	},
 	"Echo.StreamServer.Controls.Counter.onUpdate": function(_, data) {
 		var app = this;
 		$.each(["allPosts", "topPosts", "moderationQueue"], function(k, componentName) {
