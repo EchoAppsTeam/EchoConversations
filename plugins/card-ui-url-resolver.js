@@ -21,7 +21,7 @@ var normalizeMediaContent = function(items) {
 	$.map(items, function(oembed) {
 		var card = prepareMediaContent.call(self, oembed);
 		container.append(card);
-		width += card.outerWidth(true) + 15;
+		width += card.outerWidth(true) + 18;
 	});
 
 	container.css("width", width);
@@ -64,13 +64,13 @@ var prepareMediaContent = function(oembed) {
 	};
 
 	var height, width, item, ratio;
-	var maxHeight = this.config.get("mediaHeight");
+	var maxWidth = this.config.get("mediaWidth");
 
 	if (oembed.type === "photo") {
-		if (oembed.thumbnail_height > maxHeight) {
-			ratio = maxHeight / oembed.thumbnail_height;
-			width = oembed.thumbnail_width * ratio;
-			height = maxHeight;
+		if (oembed.thumbnail_width > maxWidth) {
+			ratio = maxWidth / oembed.thumbnail_width;
+			width = maxWidth;
+			height = oembed.thumbnail_height * ratio;
 		} else {
 			width = oembed.thumbnail_width;
 			height = oembed.thumbnail_height;
@@ -82,10 +82,10 @@ var prepareMediaContent = function(oembed) {
 	} else if (oembed.type === "video") {
 		var oembedWidth = oembed.thumbnail_width || oembed.width;
 		var oembedHeight = oembed.thumbnail_height || oembed.height;
-		if (oembedHeight > maxHeight) {
-			ratio = maxHeight / oembedHeight;
-			width = oembedWidth * ratio;
-			height = maxHeight;
+		if (oembedWidth > maxWidth) {
+			ratio = maxWidth / oembedWidth;
+			width = maxWidth;
+			height = oembedHeight * ratio;
 		} else {
 			width = oembedWidth;
 			height = oembedHeight;
@@ -117,8 +117,8 @@ var prepareMediaContent = function(oembed) {
 		}
 
 	} else if (oembed.type === "link") {
-		height = maxHeight;
-		width = maxHeight * 1.3;
+		width = maxWidth;
+		height = "";
 		item = $(this.substitute({
 			"template": templates[oembed.type],
 			"data": oembed
@@ -138,8 +138,8 @@ var addMediaCSS = function() {
 		'.{plugin.class:MediaContainer} { position: relative; left: 0px; }' +
 		'.{plugin.class:Media}:hover { overflow: auto; }' +
 		'.{plugin.class:Media} { overflow: hidden; }' +
-		'.{plugin.class:Media} { padding: 10px 5px; border: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
-		'.{plugin.class:Media} .echo-media-item { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; float: left; margin: 0 5px 0 0; padding: 4px; }' +
+		'.{plugin.class:Media} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
+		'.{plugin.class:Media} .echo-media-item { width: 90%; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; float: left; margin: 0 8px 0 0; padding: 4px; }' +
 
 		// scrollbar
 		'.{plugin.class:Media}::-webkit-scrollbar { height: 10px; }' +
@@ -175,7 +175,7 @@ var addMediaCSS = function() {
 var itemPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Stream.Item");
 
 itemPlugin.config = {
-	"mediaHeight": 230
+	"mediaWidth": 340
 };
 
 itemPlugin.component.renderers.body = function(element) {
@@ -398,8 +398,8 @@ submitPlugin.css =
 	'.{class:body}.{plugin.class:EnabledMedia} .{plugin.class:Media} { border-top-style: dashed; }' +
 	'.{class:body}.{plugin.class:EnabledMedia} .echo-media-item { position: relative; }' +
 	'.{plugin.class:Media} .echo-item-template-article-title { margin-right: 25px; }' +
-	'.{plugin.class:Close} { line-height: 1; opacity: 0.7; font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
-	'.{plugin.class:Close}:hover { opacity: 1; }';
+	'.{plugin.class:Close} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
+	'.{plugin.class:Close}:hover { opacity: 1; filter: alpha(opacity=100); }';
 
 Echo.Plugin.create(submitPlugin);
 
