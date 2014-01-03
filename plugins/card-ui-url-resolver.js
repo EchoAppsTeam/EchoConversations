@@ -63,12 +63,12 @@ var prepareMediaContent = function(oembed) {
 			'</div>'
 	};
 
-	var height, width, item;
+	var height, width, item, ratio;
 	var maxHeight = this.config.get("mediaHeight");
 
 	if (oembed.type === "photo") {
 		if (oembed.thumbnail_height > maxHeight) {
-			var ratio = maxHeight / oembed.thumbnail_height;
+			ratio = maxHeight / oembed.thumbnail_height;
 			width = oembed.thumbnail_width * ratio;
 			height = maxHeight;
 		} else {
@@ -83,7 +83,7 @@ var prepareMediaContent = function(oembed) {
 		var oembedWidth = oembed.thumbnail_width || oembed.width;
 		var oembedHeight = oembed.thumbnail_height || oembed.height;
 		if (oembedHeight > maxHeight) {
-			var ratio = maxHeight / oembedHeight;
+			ratio = maxHeight / oembedHeight;
 			width = oembedWidth * ratio;
 			height = maxHeight;
 		} else {
@@ -172,70 +172,56 @@ var addMediaCSS = function() {
  * @class Echo.StreamServer.Controls.Submit.Plugins.URLResolver
  * Extends Stream Item control to enable url media resoving.
  */
-var plugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Stream.Item");
+var itemPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Stream.Item");
 
-plugin.config = {
+itemPlugin.config = {
 	"mediaHeight": 230
 };
 
-plugin.component.renderers.body = function(element) {
-	var fragment = $("<div/>").append(this.component.get("data.object.content"));
-	var mediaAttachments = fragment.find(".echo-item-files");
-	if (!mediaAttachments.length) {
-		return this.component.parentRenderer("body", arguments);
-	}
+itemPlugin.component.renderers.body = function(element) {
+	var self = this;
+	var item = this.component;
 
-	mediaAttachments.detach();
-
-	this.component.set("data.object.content", fragment.html());
-	this.component.parentRenderer("body", arguments);
-
-	var media = $.map(mediaAttachments.find("div[oembed]"), function(item) {
-		return JSON.parse($(item).attr("oembed"));
+	// we need detach media attachments before parent renderer will be called
+	Echo.Utils.safelyExecute(function() {
+		var fragment = $("<div/>").append(item.get("data.object.content"));
+		var attachments = fragment.find(".echo-item-files").detach();
+		var media = $.map(attachments.find("div[oembed]"), function(item) {
+			return JSON.parse($(item).attr("oembed"));
+		});
+		if (media.length) {
+			attachments.remove();
+			item.set("data.object.content", fragment.html());
+			item.view.get("body").after(normalizeMediaContent.call(self, media));
+		}
 	});
 
-	if (media.length) {
-		var bodyElement = this.component.view.get("body");
-		Echo.Utils.safelyExecute(bodyElement.after, normalizeMediaContent.call(this, media), bodyElement);
-	} else {
-		var textElement = this.component.view.get("text");
-		Echo.Utils.safelyExecute(textElement.append, contentParts[1], textElement);
-	}
-
-	return element;
+	return this.component.parentRenderer("body", arguments);
 };
 
-plugin.methods.jsonDecode = function(text) {
-	return JSON.parse(text.replace(/&/g, '&amp;')
-		.replace(/"/g, '&quot;')
-		.replace(/'/g, '&#39;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;'));
-};
-
-Echo.Plugin.create(plugin);
+Echo.Plugin.create(itemPlugin);
 
 /**
  * @class Echo.StreamServer.Controls.Submit.Plugins.URLResolver
  * Extends Submit control to enable url media resoving.
  */
-var plugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Submit");
+var submitPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Submit");
 
-plugin.config = {
+submitPlugin.config = {
 	"apiKey": "8ded698289204c8c8348c08314a0c250",
 	"maxDescriptionCharacters": "200",
 	"mediaHeight": 230
 };
 
-plugin.init = function() {
+submitPlugin.init = function() {
 	$.embedly.defaults.key = this.config.get("apiKey");
 	this.media = {};
 	this.timer = null;
 
-	this.extendTemplate("insertAfter", "content", plugin.templates.preview);
+	this.extendTemplate("insertAfter", "content", submitPlugin.templates.preview);
 };
 
-plugin.events = {
+submitPlugin.events = {
 	"Echo.StreamServer.Controls.Submit.onPostInit": function(topic, args) {
 		var self = this;
 		var content = args.postData.content[0].object.content;
@@ -243,7 +229,7 @@ plugin.events = {
 		var mediaContent = $.map(this.media, function(media) {
 			if (!media.type) return null;
 			return self.substitute({
-				"template": plugin.templates.media[media.type],
+				"template": submitPlugin.templates.media[media.type],
 				"data": $.extend(true, {}, media, {
 					"oembed": self.jsonEncode(media)
 				})
@@ -253,7 +239,7 @@ plugin.events = {
 		if (!mediaContent.length) return;
 
 		args.postData.content[0].object.content = self.substitute({
-			"template": plugin.templates.message,
+			"template": submitPlugin.templates.message,
 			"data": {
 				"text": content,
 				"media": mediaContent.join("")
@@ -267,20 +253,20 @@ plugin.events = {
 	}
 };
 
-plugin.dependencies = [{
+submitPlugin.dependencies = [{
 	"url": "{%= baseURL %}/third-party/jquery.embedly.js",
 	"loaded": function() { return !!$.fn.embedly; }
 }];
 
-plugin.templates.preview =
+submitPlugin.templates.preview =
 	'<div class="{plugin.class:SubmitMedia}"></div>';
 
-plugin.templates.message =
+submitPlugin.templates.message =
   '<div class="echo-item-text">{data:text}</div>' +
 	'<div class="echo-item-files">{data:media}</div>';
 
 
-plugin.templates.media = {
+submitPlugin.templates.media = {
 	"link":
 		'<div class="echo-media-item" oembed="{data:oembed}">' +
 			'<div class="echo-item-article" style="width: {plugin.config:linkWidth}">' +
@@ -312,7 +298,7 @@ plugin.templates.media = {
 		'</div>'
 };
 
-plugin.component.renderers.text = function(element) {
+submitPlugin.component.renderers.text = function(element) {
 	var self = this;
 	element.on("keyup paste", function() {
 		clearTimeout(self.timer);
@@ -326,11 +312,11 @@ plugin.component.renderers.text = function(element) {
 	return element;
 };
 
-plugin.methods.getURLs = function(text) {
+submitPlugin.methods.getURLs = function(text) {
 	return text.match(/(https?:\/\/[^\s]+)/g) || [];
 };
 
-plugin.methods.resolveURLs = function(urls, callback) {
+submitPlugin.methods.resolveURLs = function(urls, callback) {
 	var self = this;
 	var unresolvedURLs = $.grep(urls, function(url) {
 		if(!self.media[url]) {
@@ -354,7 +340,7 @@ plugin.methods.resolveURLs = function(urls, callback) {
 	}
 };
 
-plugin.methods.jsonEncode = function(json) {
+submitPlugin.methods.jsonEncode = function(json) {
 	return JSON.stringify(json)
 		.replace(/&/g, '&amp;')
 		.replace(/"/g, '&quot;')
@@ -363,7 +349,7 @@ plugin.methods.jsonEncode = function(json) {
 		.replace(/>/g, '&gt;');
 };
 
-plugin.methods.attachMedia = function(data) {
+submitPlugin.methods.attachMedia = function(data) {
 	if (!data) return;
 	var self = this;
 	var submitMediaContainer = this.view.get("SubmitMedia");
@@ -407,13 +393,14 @@ plugin.methods.attachMedia = function(data) {
 	});
 };
 
-plugin.css =
+submitPlugin.css =
 	'.{class:body}.{plugin.class:EnabledMedia} .{class:content}.{class:border} { border-bottom: none; }' +
 	'.{class:body}.{plugin.class:EnabledMedia} .{plugin.class:Media} { border-top-style: dashed; }' +
 	'.{class:body}.{plugin.class:EnabledMedia} .echo-media-item { position: relative; }' +
-	'.{plugin.class:Close} { width: 33px; height: 33px; background: rgba(0, 0, 0, 0.7); line-height: 28px; text-align: center; font-size: 30px; border-radius: 50%; font-weight: bold; position: absolute; top: 8px; right: 8px; cursor: pointer; color: #FFF; }' +
-	'.{plugin.class:Close}:hover { background: #3498DB; }';
+	'.{plugin.class:Media} .echo-item-template-article-title { margin-right: 25px; }' +
+	'.{plugin.class:Close} { line-height: 1; opacity: 0.7; font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
+	'.{plugin.class:Close}:hover { opacity: 1; }';
 
-Echo.Plugin.create(plugin);
+Echo.Plugin.create(submitPlugin);
 
 })(Echo.jQuery);

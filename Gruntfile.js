@@ -159,7 +159,7 @@ module.exports = function(grunt) {
 			"options": {
 				"jshintrc": ".jshintrc"
 			},
-			"grunt": ["Gruntfile.js", "grunt/**/*.js"]
+			"grunt": ["Gruntfile.js", "grunt/**/*.js", "<%= sources.js %>"]
 		},
 		"release": {
 			"options": {
