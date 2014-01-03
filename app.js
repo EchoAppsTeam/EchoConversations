@@ -645,6 +645,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 };
 
 conversations.methods._getStreamPluginList = function(componentID, overrides) {
+	var self = this;
 	var config = this.config.get(componentID);
 	var moderationExtraActions = this.config.get("topPosts.visible")
 		? this.config.get("topPosts.includeTopContributors")
@@ -659,12 +660,12 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		}, {
 			"name": "ItemEventsProxy",
 			"onAdd": function() {
-				var counter = this.getComponent(componentID + "Counter");
+				var counter = self.getComponent(componentID + "Counter");
 				counter && counter.request.liveUpdates.start(true);
 				overrides.onItemAdd && overrides.onItemAdd();
 			},
 			"onDelete": function() {
-				var counter = this.getComponent(componentID + "Counter");
+				var counter = self.getComponent(componentID + "Counter");
 				counter && counter.request.liveUpdates.start(true);
 				overrides.onItemDelete && overrides.onItemDelete();
 			}
