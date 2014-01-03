@@ -615,17 +615,13 @@ conversations.renderers._streamTitle = function(element, extra) {
 };
 
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
-	var self = this;
 	// StreamServer config
 	var ssConfig = this.config.get("dependencies.StreamServer");
 
-	var moderationExtraActions = this.config.get("topPosts.visible")
-		? this.config.get("topPosts.includeTopContributors")
-			? ["topPost", "topContributor"]
-			: ["topPost"]
-		: [];
 	// component config
-	var config = this.config.get(componentID);
+	var config = $.extend(true, {}, this.config.get(componentID));
+	config.plugins = this._getStreamPluginList(componentID, overrides);
+
 	return $.extend(true, {
 		"id": componentID,
 		"appkey": ssConfig.appkey,
@@ -644,8 +640,18 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			}
 		},
 		"data": this.get("data." + componentID + "-search"),
-		"query": this._assembleSearchQuery(componentID),
-		"plugins": [].concat(this._getConditionalStreamPluginList(componentID), [{
+		"query": this._assembleSearchQuery(componentID)
+	}, config, overrides);
+};
+
+conversations.methods._getStreamPluginList = function(componentID, overrides) {
+	var config = this.config.get(componentID);
+	var moderationExtraActions = this.config.get("topPosts.visible")
+		? this.config.get("topPosts.includeTopContributors")
+			? ["topPost", "topContributor"]
+			: ["topPost"]
+		: [];
+	return [].concat(this._getConditionalStreamPluginList(componentID), [{
 			"name": "CardUIShim",
 			"displayTopPostHighlight": config.displayTopPostHighlight,
 			"includeTopContributors": this.config.get("topPosts.includeTopContributors"),
@@ -653,12 +659,12 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		}, {
 			"name": "ItemEventsProxy",
 			"onAdd": function() {
-				var counter = self.getComponent(componentID + "Counter");
+				var counter = this.getComponent(componentID + "Counter");
 				counter && counter.request.liveUpdates.start(true);
 				overrides.onItemAdd && overrides.onItemAdd();
 			},
 			"onDelete": function() {
-				var counter = self.getComponent(componentID + "Counter");
+				var counter = this.getComponent(componentID + "Counter");
 				counter && counter.request.liveUpdates.start(true);
 				overrides.onItemDelete && overrides.onItemDelete();
 			}
@@ -671,8 +677,8 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"moreButton": true
 		}, {
 			"name": "URLResolver"
-		}])
-	}, this.config.get(componentID), overrides);
+		}], config.plugins);
+
 };
 
 conversations.methods._getConditionalStreamPluginList = function(componentID) {
