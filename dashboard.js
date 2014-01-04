@@ -247,7 +247,7 @@ dashboard.vars = {
 				"component": "Checkbox",
 				"name": "resolveURLs",
 				"type": "boolean",
-				"default": false,
+				"default": true,
 				"config": {
 					"title": "Resolve URLs",
 					"desc": "If enabled, resolves URLs found in the comment body to rich attached content"
