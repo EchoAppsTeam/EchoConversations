@@ -75,7 +75,6 @@ var prepareMediaContent = function(oembed) {
 		};
 	} else {
 		// use detail media instead of thumbnail media
-		oembed.thumbnail_url = oembed.url;
 		ratio = maxWidth / oembed.width;
 		dimensions = {
 			"width": maxWidth,
@@ -91,6 +90,9 @@ var prepareMediaContent = function(oembed) {
 	};
 
 	if (oembed.type === "photo") {
+		if (oembed.thumbnail_width < maxWidth) {
+			oembed.thumbnail_url = oembed.url;
+		}
 		item = getEmenetByType(oembed, dimensions);
 	} else if (oembed.type === "video") {
 		item = getEmenetByType(oembed, dimensions);
@@ -227,7 +229,7 @@ var submitPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Contro
 submitPlugin.config = {
 	"apiKey": "8ded698289204c8c8348c08314a0c250",
 	"maxDescriptionCharacters": "200",
-	"mediaHeight": 230
+	"mediaWidth": 230
 };
 
 submitPlugin.init = function() {
