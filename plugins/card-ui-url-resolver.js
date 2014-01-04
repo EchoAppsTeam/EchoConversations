@@ -199,6 +199,9 @@ itemPlugin.component.renderers.body = function(element) {
 	return this.component.parentRenderer("body", arguments);
 };
 
+itemPlugin.css =
+	'.{plugin.class:Media} { margin-left: -16px; margin-right: -16px; }';
+
 Echo.Plugin.create(itemPlugin);
 
 /**

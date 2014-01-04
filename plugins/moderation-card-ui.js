@@ -81,12 +81,13 @@ plugin.events = {
 		var item = this.component;
 		if (item.user.is("admin")) {
 			var element = item.view.get("container");
+			var indicator = item.view.get("indicator");
 			var itemStatus = this.get("itemStatus") || "Untouched";
 			var newStatus = item.get("data.object.status") || "Untouched";
 
 			if (itemStatus !== newStatus) {
-				var transition = "border-left " + this.config.get("statusAnimationTimeout") + "ms linear";
-				element.css({
+				var transition = "background-color " + this.config.get("statusAnimationTimeout") + "ms linear";
+				indicator.css({
 					"transition": transition,
 					"-o-transition": transition,
 					"-ms-transition": transition,
@@ -661,10 +662,10 @@ plugin.css =
 	'  { background-color: transparent; }' +
 
 	// item statuses
-	'.{plugin.class} .{plugin.class:status-Untouched} { border-left: 4px solid #3498db; }' +
-	'.{plugin.class} .{plugin.class:status-ModeratorApproved} { border-left: 4px solid #15c177; }' +
-	'.{plugin.class} .{plugin.class:status-ModeratorDeleted} { border-left: 4px solid #bf383a; }' +
-	'.{plugin.class} .{plugin.class:status-SystemFlagged}, .{plugin.class:status-CommunityFlagged}, .{plugin.class:status-ModeratorFlagged} { border-left: 4px solid #ff9e00; }' +
+	'.{plugin.class} .{plugin.class:status-Untouched} .{class:indicator} { background-color: #3498db; }' +
+	'.{plugin.class} .{plugin.class:status-ModeratorApproved} .{class:indicator} { background-color: #15c177; }' +
+	'.{plugin.class} .{plugin.class:status-ModeratorDeleted} .{class:indicator} { background-color: #bf383a; }' +
+	'.{plugin.class} .{plugin.class:status-SystemFlagged} .{class:indicator}, .{plugin.class:status-CommunityFlagged} .{class:indicator}, .{plugin.class:status-ModeratorFlagged} .{class:indicator} { background-color: #ff9e00; }' +
 
 	// actor statuses
 	($.map({

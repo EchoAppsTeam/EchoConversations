@@ -128,6 +128,9 @@ plugin.config = {
 };
 
 plugin.init = function() {
+
+	this.extendTemplate("insertAsFirstChild", "container", plugin.templates.indicator);
+
 	this.set("isLiveUpdate", this.component.config.get("live"));
 	this.extendTemplate("replace", "header", plugin.templates.header);
 	this.extendTemplate("insertBefore", "frame", plugin.templates.topPostMarker);
@@ -189,6 +192,9 @@ plugin.templates.dropdownButtons =
 		'</a>' +
 	'</div>';
 
+plugin.templates.indicator =
+	'<div class="{class:indicator}"></div>';
+
 plugin.renderers.topPostMarker = function(element) {
 	var item = this.component;
 
@@ -221,6 +227,18 @@ plugin.renderers.date = function(element) {
 	return element.html(this.age);
 };
 
+plugin.component.renderers.indicator = function(element) {
+	var transition = "background-color " + this.config.get("fadeTimeout") + "ms linear";
+	element.css({
+		"transition": transition,
+		"-o-transition": transition,
+		"-ms-transition": transition,
+		"-moz-transition": transition,
+		"-webkit-transition": transition
+	});
+	return element;
+};
+
 plugin.component.renderers.tags = function(element) {
 	return element.hide();
 };
@@ -232,15 +250,8 @@ plugin.component.renderers.markers = function(element) {
 plugin.component.renderers.container = function(element) {
 	if (this.get("isLiveUpdate")) {
 		element.addClass(this.cssPrefix + "liveUpdate");
-		var transition = "border-left " + this.config.get("fadeTimeout") + "ms linear";
-		element.css({
-			"transition": transition,
-			"-o-transition": transition,
-			"-ms-transition": transition,
-			"-moz-transition": transition,
-			"-webkit-transition": transition
-		});
 	}
+
 	element = this.parentRenderer("container", arguments);
 	return this.component.view.rendered()
 		? element
@@ -433,18 +444,22 @@ plugin.methods._transitionSupported = function() {
 var itemDepthRules = [];
 // 100 is a maximum level of children in query, but we can apply styles for ~20
 for (var i = 0; i <= 20; i++) {
-	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 8 + (i - 1) * 39 : 16) + 'px; }');
+	itemDepthRules.push('.{plugin.class} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 12 + (i - 1) * 39 : 16) + 'px; }');
 }
 
 plugin.css =
+	// indicator
+	'.{plugin.class} .{class:container} { position: relative; }' +
+	'.{plugin.class} .{class:indicator} { position: absolute; left: 0px; top: 0px; bottom: 0px; width: 4px; background-color: transperent; }' +
+
+	// common
 	'.{plugin.class} .{plugin.class:dropdownButton} { display: inline; margin-left: 0px; }' +
 	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown { display: inline; }' +
 	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
 	'.{plugin.class:topPostMarker} { float: right; position: relative; top: -19px; right: 0px; }' +
 	'.{plugin.class} .{plugin.class:wrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
-	'.{plugin.class} .{class:container} { border-left: 4px solid transparent; background: #ffffff; }' +
 	'.{plugin.class} .{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
-	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} { border-left: 4px solid #f5ba47; }' +
+	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} .{class:indicator} { background-color: #f5ba47; }' +
 
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
 	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
@@ -460,7 +475,7 @@ plugin.css =
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
 
 	'.{plugin.class} .{class:container-child} { padding: 12px 0px 10px 16px; margin: 0px 15px 2px 0px; }' +
-	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 12px 0px 10px 8px; margin: 0px 15px 2px 0px; }' +
+	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 12px 0px 10px 12px; margin: 0px 15px 2px 0px; }' +
 
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
@@ -502,7 +517,7 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
 
 	'.{plugin.class} .{class:data} { padding: 7px 0px 0px 0px; }' +
-	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 15px 16px 0px 12px; }' +
+	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
 
 	itemDepthRules.join("\n");
 
