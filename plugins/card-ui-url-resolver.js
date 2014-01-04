@@ -174,15 +174,33 @@ var addMediaCSS = function() {
  */
 var itemPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Stream.Item");
 
+itemPlugin.events = {
+	"Echo.StreamServer.Controls.Stream.Item.onReady": function() {
+		var media = this.view.get("mediaContent");
+		if (media) {
+			this.config.set("mediaWidth", media.outerWidth() * 0.9);
+			this.view.render({"name": "mediaContent"});
+		}
+	}
+};
+
 itemPlugin.config = {
 	"mediaWidth": 340
 };
 
-itemPlugin.component.renderers.body = function(element) {
+itemPlugin.vars = {
+	"media": []
+};
+
+itemPlugin.templates.media =
+	'<div class="{plugin.class:mediaContent}"></div>';
+
+itemPlugin.init = function() {
 	var self = this;
 	var item = this.component;
 
-	// we need detach media attachments before parent renderer will be called
+	this.extendTemplate("insertAfter", "body", itemPlugin.templates.media);
+
 	Echo.Utils.safelyExecute(function() {
 		var fragment = $("<div/>").append(item.get("data.object.content"));
 		var attachments = fragment.find(".echo-item-files").detach();
@@ -192,15 +210,21 @@ itemPlugin.component.renderers.body = function(element) {
 		if (media.length) {
 			attachments.remove();
 			item.set("data.object.content", fragment.html());
-			item.view.get("body").after(normalizeMediaContent.call(self, media));
+			self.set("media", media);
 		}
 	});
+};
 
-	return this.component.parentRenderer("body", arguments);
+itemPlugin.renderers.mediaContent = function(element) {
+	element.empty();
+	if (this.get("media")) {
+		element.append(normalizeMediaContent.call(this, this.get("media")));
+	}
+	return element;
 };
 
 itemPlugin.css =
-	'.{plugin.class:Media} { margin-left: -16px; margin-right: -16px; }';
+	'.{plugin.class:mediaContent} { margin-left: -16px; margin-right: -16px; }';
 
 Echo.Plugin.create(itemPlugin);
 
