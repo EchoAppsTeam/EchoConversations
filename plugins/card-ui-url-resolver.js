@@ -167,6 +167,9 @@ var addMediaCSS = function() {
 var itemPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Stream.Item");
 
 itemPlugin.events = {
+	"Echo.StreamServer.Controls.Stream.onReady": function() {
+		this._resizeMediaContent();
+	},
 	"Echo.StreamServer.Controls.Stream.Item.onRender": function() {
 		this._resizeMediaContent();
 	},
