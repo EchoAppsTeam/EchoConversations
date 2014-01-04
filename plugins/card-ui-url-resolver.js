@@ -21,9 +21,8 @@ var normalizeMediaContent = function(items) {
 	$.map(items, function(oembed) {
 		var card = prepareMediaContent.call(self, oembed);
 		container.append(card);
-		width += card.outerWidth(true) + 18;
+		width += card.outerWidth(true) + 30;
 	});
-
 	container.css("width", width);
 
 	return element;
@@ -34,15 +33,31 @@ var prepareMediaContent = function(oembed) {
 	var templates = {
 		"photo":
 			'<div class="echo-media-item">' +
-				'<a href="{data:url}" target="_blank">' +
-					'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
-				'</a>' +
+				'<div class="echo-item-photo">' +
+					'<div class="echo-item-photo-avatar"><img src="{config:defaultAvatar}"/>{data:author_name}</div>' +
+					'<a href="{data:url}" target="_blank">' +
+						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
+					'</a>' +
+					'<div class="echo-item-photo-label">' +
+						'<div class="echo-item-photo-label-container">' +
+							'<div class="echo-item-title">{data:title}</div>' +
+							'<div class="echo-item-description">{data:description}</div>' +
+						'</div>' +
+					'</div>' +
+				'</div>' +
+				'<div class="echo-item-source-icon" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
 			'</div>',
 		"video":
 			'<div class="echo-media-item">' +
-				'<div class="echo-item-video-placeholder">' +
-					'<div class="echo-item-play-button"></div>' +
-					'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
+				'<div class="echo-item-video">' +
+					'<div class="echo-item-video-avatar"><img src="{config:defaultAvatar}"/>{data:author_name}</div>' +
+					'<div class="echo-item-video-placeholder">' +
+						'<div class="echo-item-play-button"></div>' +
+						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
+					'</div>' +
+					'<div class="echo-item-title">{data:title}</div>' +
+					'<div class="echo-item-description">{data:description}</div>' +
+					'<div class="echo-item-source-icon" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
 				'</div>' +
 			'</div>',
 		"link":
@@ -85,7 +100,7 @@ var prepareMediaContent = function(oembed) {
 		return $(self.substitute({
 			"template": templates[oembed.type],
 			"data": oembed
-		})).css({"width": dimensions.width, "height": dimensions.height});
+		})).css({"width": dimensions.width});
 	};
 
 	if (oembed.type === "photo") {
@@ -125,15 +140,26 @@ var addMediaCSS = function() {
 
 	var css =
 		'.{plugin.class:MediaContainer} { position: relative; left: 0px; }' +
+		'.{plugin.class.Media} .echo-item-source-icon {}' +
 		'.{plugin.class:Media}:hover { overflow: auto; }' +
 		'.{plugin.class:Media} { overflow: hidden; }' +
 		'.{plugin.class:Media} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
-		'.{plugin.class:Media} .echo-media-item { width: 90%; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; float: left; margin: 0 8px 0 0; padding: 4px; }' +
+		'.{plugin.class:Media} .echo-media-item { width: 90%; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; float: left; margin: 0 8px 0 0; }' +
+
+		'.{plugin.class.Media} .echo-item-title { font-weight: bold; font-size: 13px; line-height: 16px; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
+		'.{plugin.class.Media} .echo-item-description { font-size: 13px; line-height: 16px; }' +
 
 		// scrollbar
 		'.{plugin.class:Media}::-webkit-scrollbar { height: 10px; }' +
 		'.{plugin.class:Media}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
 		'.{plugin.class:Media}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }' +
+
+		// photo
+		'.{plugin.class:Media} .echo-item-photo-avatar > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
+		'.{plugin.class:Media} .echo-item-photo-avatar { position: absolute; padding: 12px; color: #FFF; }' +
+		'.{plugin.class:Media} .echo-item-photo { position: relative; }' +
+		'.{plugin.class:Media} .echo-item-photo-label { position: absolute; bottom: 0; color: #FFF; width: 100%; background: rgba(0, 0, 0, 0.5); }' +
+		'.{plugin.class:Media} .echo-item-photo-label-container { padding: 10px; }' +
 
 		// play btn
 		'.{plugin.class:Media} .echo-item-video-placeholder { position: relative; }' +
@@ -143,7 +169,13 @@ var addMediaCSS = function() {
 		'.{plugin.class:Media} .echo-item-play-button { box-shadow: 0px 0px 40px #000; margin: auto; width: 60px; height: 60px; background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; }' +
 		'.{plugin.class:Media} .echo-item-play-button:hover { background-color: #3498DB; }' +
 
+		// video
+		'.{plugin.class.Media} .echo-item-video { padding: 10px; }' +
+		'.{plugin.class.Media} .echo-item-video-avatar { margin-bottom: 8px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
+		'.{plugin.class.Media} .echo-item-video-avatar > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
+
 		// article
+		'.{plugin.class.Media} .echo-item-article { padding: 10px; }' +
 		'.{plugin.class:Media} { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px;}' +
 		'.{plugin.class:Media} .echo-item-template-article-title { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding: 0 0 5px 0; margin-left: 10px; }' +
 		'.{plugin.class:Media} .echo-item-template-article-title a { color: #42474A; font-weight: bold; }' +
@@ -211,7 +243,7 @@ itemPlugin.methods._prepareMediaContent = function() {
 	var item = this.component;
 	Echo.Utils.safelyExecute(function() {
 		var fragment = $("<div/>").append(item.get("data.object.content"));
-		var attachments = fragment.find(".echo-item-files").detach();
+		var attachments = fragment.find(".echo-item-files");
 		var media = $.map(attachments.find("div[oembed]"), function(item) {
 			return JSON.parse($(item).attr("oembed"));
 		});
@@ -431,10 +463,10 @@ submitPlugin.methods.attachMedia = function(data) {
 
 submitPlugin.css =
 	'.{class:body}.{plugin.class:EnabledMedia} .{class:content}.{class:border} { border-bottom: none; }' +
-	'.{class:body}.{plugin.class:EnabledMedia} .{plugin.class:Media} { border-top-style: dashed; }' +
+	'.{class:body}.{plugin.class:EnabledMedia} .{plugin.class:Media} { border: 1px solid #DEDEDE; border-top-style: dashed; }' +
 	'.{class:body}.{plugin.class:EnabledMedia} .echo-media-item { position: relative; }' +
 	'.{plugin.class:Media} .echo-item-template-article-title { margin-right: 25px; }' +
-	'.{plugin.class:Close} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
+	'.{plugin.class:Close} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 8px; right: 15px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
 	'.{plugin.class:Close}:hover { opacity: 1; filter: alpha(opacity=100); }';
 
 Echo.Plugin.create(submitPlugin);
