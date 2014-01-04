@@ -30,6 +30,7 @@ var normalizeMediaContent = function(items) {
 };
 
 var prepareMediaContent = function(oembed) {
+	var self = this;
 	var templates = {
 		"photo":
 			'<div class="echo-media-item">' +
@@ -40,9 +41,9 @@ var prepareMediaContent = function(oembed) {
 		"video":
 			'<div class="echo-media-item">' +
 				'<div class="echo-item-video-placeholder">' +
+					'<div class="echo-item-play-button"></div>' +
 					'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
 				'</div>' +
-				'<div class="echo-item-play-button"></div>' +
 			'</div>',
 		"link":
 			'<div class="echo-media-item">' +
@@ -63,69 +64,56 @@ var prepareMediaContent = function(oembed) {
 			'</div>'
 	};
 
-	var height, width, item, ratio;
+	var dimensions, item, ratio;
 	var maxWidth = this.config.get("mediaWidth");
 
+	if (oembed.thumbnail_width > maxWidth) {
+		ratio = maxWidth / oembed.thumbnail_width;
+		dimensions = {
+			"width": maxWidth,
+			"height": oembed.thumbnail_height * ratio
+		};
+	} else {
+		// use detail media instead of thumbnail media
+		oembed.thumbnail_url = oembed.url;
+		ratio = maxWidth / oembed.width;
+		dimensions = {
+			"width": maxWidth,
+			"height": oembed.height * ratio
+		};
+	}
+
+	var getEmenetByType = function(oembed, dimensions) {
+		return $(self.substitute({
+			"template": templates[oembed.type],
+			"data": oembed
+		})).css({"width": dimensions.width, "height": dimensions.height});
+	};
+
 	if (oembed.type === "photo") {
-		if (oembed.thumbnail_width > maxWidth) {
-			ratio = maxWidth / oembed.thumbnail_width;
-			width = maxWidth;
-			height = oembed.thumbnail_height * ratio;
-		} else {
-			width = oembed.thumbnail_width;
-			height = oembed.thumbnail_height;
-		}
-		item = $(this.substitute({
-			"template": templates[oembed.type],
-			"data": oembed
-		}));
+		item = getEmenetByType(oembed, dimensions);
 	} else if (oembed.type === "video") {
-		var oembedWidth = oembed.thumbnail_width || oembed.width;
-		var oembedHeight = oembed.thumbnail_height || oembed.height;
-		if (oembedWidth > maxWidth) {
-			ratio = maxWidth / oembedWidth;
-			width = maxWidth;
-			height = oembedHeight * ratio;
-		} else {
-			width = oembedWidth;
-			height = oembedHeight;
-		}
-
-		item = $(this.substitute({
-			"template": templates[oembed.type],
-			"data": oembed
-		}));
-
+		item = getEmenetByType(oembed, dimensions);
 		if (oembed.thumbnail_url) {
-			item.find(".echo-item-play-button").css({
-				// TODO: get rid of this magic munbers
-				"margin-top": (height / -2 -30)
-			});
 			item.find(".echo-item-play-button").one("click", function() {
 				item.find(".echo-item-video-placeholder").html($(oembed.html).css({
-					"width": width,
-					"height": height
+					"width": dimensions.width,
+					"height": dimensions.height
 				}));
-				$(this).remove();
 			});
 		} else {
-				item.find(".echo-item-video-placeholder").html($(oembed.html).css({
-					"width": width,
-					"height": height
-				}));
-				item.find(".echo-item-play-button").remove();
+			item.find(".echo-item-video-placeholder").html($(oembed.html).css({
+				"width": dimensions.width,
+				"height": dimensions.height
+			}));
 		}
 
 	} else if (oembed.type === "link") {
-		width = maxWidth;
-		height = "";
-		item = $(this.substitute({
-			"template": templates[oembed.type],
-			"data": oembed
-		}));
+		item = getEmenetByType(oembed, {
+			"width": maxWidth,
+			"height": ""
+		});
 	}
-
-	item.css({"width": width, "height": height});
 
 	return item;
 };
@@ -147,7 +135,9 @@ var addMediaCSS = function() {
 		'.{plugin.class:Media}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }' +
 
 		// play btn
-		'.{plugin.class:Media} .echo-item-play-button { position: relative; cursor: pointer; }' +
+		'.{plugin.class:Media} .echo-item-video-placeholder { position: relative; }' +
+		'.{plugin.class:Media} .echo-item-play-button-container { position: absolute; top: 0; left: 0; }' +
+		'.{plugin.class:Media} .echo-item-play-button { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; }' +
 		'.{plugin.class:Media} .echo-item-play-button:after { content: ""; position: absolute; top: 10px; left: 20px; border-left: 30px solid #FFF; border-top: 20px solid transparent; border-bottom: 20px solid transparent; }' +
 		'.{plugin.class:Media} .echo-item-play-button { box-shadow: 0px 0px 40px #000; margin: auto; width: 60px; height: 60px; background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; }' +
 		'.{plugin.class:Media} .echo-item-play-button:hover { background-color: #3498DB; }' +
