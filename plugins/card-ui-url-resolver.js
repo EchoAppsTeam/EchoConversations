@@ -167,12 +167,11 @@ var addMediaCSS = function() {
 var itemPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Stream.Item");
 
 itemPlugin.events = {
+	"Echo.StreamServer.Controls.Stream.Item.onRender": function() {
+		this._resizeMediaContent();
+	},
 	"Echo.StreamServer.Controls.Stream.Item.onReady": function() {
-		var media = this.view.get("mediaContent");
-		if (media) {
-			this.config.set("mediaWidth", media.outerWidth() * 0.9);
-			this.view.render({"name": "mediaContent"});
-		}
+		this._resizeMediaContent();
 	}
 };
 
@@ -188,11 +187,26 @@ itemPlugin.templates.media =
 	'<div class="{plugin.class:mediaContent}"></div>';
 
 itemPlugin.init = function() {
+	this.extendTemplate("insertAfter", "body", itemPlugin.templates.media);
+	this._prepareMediaContent();
+};
+
+itemPlugin.component.renderers.body = function() {
+	this._prepareMediaContent();
+	return this.parentRenderer("body", arguments);
+};
+
+itemPlugin.renderers.mediaContent = function(element) {
+	element.empty();
+	if (this.get("media")) {
+		element.append(normalizeMediaContent.call(this, this.get("media")));
+	}
+	return element;
+};
+
+itemPlugin.methods._prepareMediaContent = function() {
 	var self = this;
 	var item = this.component;
-
-	this.extendTemplate("insertAfter", "body", itemPlugin.templates.media);
-
 	Echo.Utils.safelyExecute(function() {
 		var fragment = $("<div/>").append(item.get("data.object.content"));
 		var attachments = fragment.find(".echo-item-files").detach();
@@ -205,14 +219,15 @@ itemPlugin.init = function() {
 			self.set("media", media);
 		}
 	});
+
 };
 
-itemPlugin.renderers.mediaContent = function(element) {
-	element.empty();
-	if (this.get("media")) {
-		element.append(normalizeMediaContent.call(this, this.get("media")));
+itemPlugin.methods._resizeMediaContent = function() {
+	var media = this.view.get("mediaContent");
+	if (media && media.is(":visible")) {
+		this.config.set("mediaWidth", media.outerWidth() * 0.9);
+		this.view.render({"name": "mediaContent"});
 	}
-	return element;
 };
 
 itemPlugin.css =
