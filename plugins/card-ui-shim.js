@@ -450,7 +450,7 @@ for (var i = 0; i <= 20; i++) {
 plugin.css =
 	// indicator
 	'.{plugin.class} .{class:container} { position: relative; }' +
-	'.{plugin.class} .{class:indicator} { position: absolute; left: 0px; top: 0px; bottom: 0px; width: 4px; background-color: transperent; }' +
+	'.{plugin.class} .{class:indicator} { position: absolute; left: 0px; top: 0px; bottom: 0px; width: 4px; background-color: transperent; z-index: 10; }' +
 
 	// common
 	'.{plugin.class} .{plugin.class:dropdownButton} { display: inline; margin-left: 0px; }' +
