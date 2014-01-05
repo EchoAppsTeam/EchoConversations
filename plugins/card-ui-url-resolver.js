@@ -86,7 +86,6 @@ itemPlugin.methods._resizeMediaContent = function() {
 itemPlugin.css =
 	'.{plugin.class:mediaContent} { overflow: hidden; margin-bottom: 5px; }' +
 	'.{class:depth-0} .{plugin.class:mediaContent} { margin-left: -16px; margin-right: -16px; }' +
-	'.{plugin.class:mediaContent} { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px; font-size: 13px; line-height: 16px; }' +
 	'.{plugin.class:mediaContent}:hover { overflow: auto; }' +
 
 	'.{plugin.class:mediaContent} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
@@ -123,8 +122,6 @@ submitPlugin.init = function() {
 submitPlugin.events = {
 	"Echo.StreamServer.Controls.Submit.onPostInit": function(topic, args) {
 		var self = this;
-		var content = args.postData.content[0].object.content;
-
 		var mediaContent = $.map(this.media, function(media) {
 			if (!media.type) return null;
 			return self.substitute({
@@ -140,7 +137,7 @@ submitPlugin.events = {
 		args.postData.content[0].object.content = self.substitute({
 			"template": submitPlugin.templates.message,
 			"data": {
-				"text": content,
+				"text": args.postData.content[0].object.content,
 				"media": mediaContent.join("")
 			}
 		});

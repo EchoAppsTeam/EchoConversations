@@ -14,12 +14,12 @@ card.templates.photo =
 					'</a>' +
 					'<div class="{class:photoLabel}">' +
 						'<div class="{class:photoLabelContainer}">' +
-							'<div class="{class:photoTitle}">{data:title}</div>' +
+							'<div class="{class:title} {class:photoTitle}">{data:title}</div>' +
 							'<div class="{class:photoDescription}">{data:description}</div>' +
 						'</div>' +
 					'</div>' +
 				'</div>' +
-				'<div class="{class:itemSourceIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
+				'<div class="{class:sourceIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
 			'</div>';
 
 card.templates.video =
@@ -30,7 +30,7 @@ card.templates.video =
 						'<div class="{class:playButton}"></div>' +
 						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
 					'</div>' +
-					'<div class="{class:videoTitle}">{data:title}</div>' +
+					'<div class="{class:title} {class:videoTitle}">{data:title}</div>' +
 					'<div class="{class:videoDescription}">{data:description}</div>' +
 					'<div class="{class:sourceIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
 				'</div>' +
@@ -51,6 +51,7 @@ card.templates.link =
 						'</div>' +
 					'</div>' +
 					'<div class="echo-clear"></div>' +
+					'<div class="{class:sourceIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
 				'</div>' +
 			'</div>';
 
@@ -100,16 +101,27 @@ card.renderers.photoThumbnail = function(element) {
 	return element.attr("src", thumbnail);
 };
 
+card.renderers.sourceIcon = function(element) {
+	Echo.Utils.loadImage({
+		"image": element.data("url") + "/favicon.ico",
+		"onerror": $.noop,
+		"onload": function() {
+			$(this).attr("title", element.data("name")).appendTo(element);
+		}
+	});
+};
+
 
 card.css =
-	'.{class:item} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0 8px 0 0; }' +
-	'.{class:title} { font-weight: bold; font-size: 13px; line-height: 16px; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:description} { font-size: 13px; line-height: 16px; }' +
+	'.{class:item} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0 8px 0 0; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
+	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
+	'.{class:item} .{class:sourceIcon} > img { max-width: 20px; }' +
 
 	// photo
-	'.{class:photoAvatar} > img { width: 28px; height: 28px; border-radius: 50%; }' +
+	'.{class:photoAvatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
 	'.{class:photoAvatar} { position: absolute; padding: 12px; color: #FFF; }' +
 	'.{class:photo} { position: relative; }' +
+	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background: rgba(0, 0, 0, 0.5); }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
 
@@ -122,22 +134,25 @@ card.css =
 
 	// video
 	'.{class:video} { padding: 10px; }' +
+	'.{class:video} .{class:sourceIcon} > img { padding: 10px 0 0 0; }' +
 	'.{class:videoAvatar} { margin-bottom: 8px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:videoAvatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
 
-	'.{class:videoPlaceholder} { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
-	'.{class:videoPlaceholder} > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
-	'.{class:videoPlaceholder} > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
-	'.{class:videoPlaceholder} > object { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	// TODO: fix video resizing
+	//'.{class:videoPlaceholder} { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
+	//'.{class:videoPlaceholder} > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	//'.{class:videoPlaceholder} > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	//'.{class:videoPlaceholder} > object { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
 
 	// article
-	'.{class:article} { padding: 10px; max-width: 300px; min-width: 200px; }' +
+	'.{class:article} { padding: 10px; min-width: 200px; }' +
+	'.{class:article} .{class:sourceIcon} > img { padding: 10px 0 0 0; }' +
+	'.{class:article} .{class:articleTitle} > a { color: #42474A; font-weight: bold; }' +
+	'.{class:article} .{class:articleTitle} > a:hover { color: #42474A; }' +
 	'.{class:articleTitle} { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding: 0 0 5px 0; margin-left: 10px; }' +
-	'.{class:articleTitle} a { color: #42474A; font-weight: bold; }' +
-	'.{class:articleTitle} a:hover { color: #42474A; }' +
+	'.{class:articleDescription} { margin-left: 10px; font-size: 13px; line-height: 16px; }' +
 	'.{class:articleThumbnail} { width: 30%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden; }' +
 	'.{class:articleThumbnail} img { width: auto; height: auto; max-height:120px; max-width:120px; }' +
-	'.{class:articleDescription} { margin-left: 10px; font-size: 13px; line-height: 16px; }' +
 	'.{class:articleTemplate} { width: 70%; float: left; }';
 
 Echo.App.create(card);
