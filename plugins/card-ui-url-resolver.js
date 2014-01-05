@@ -177,14 +177,14 @@ var addMediaCSS = function() {
 		// article
 		'.{plugin.class.Media} .echo-item-article { padding: 10px; }' +
 		'.{plugin.class:Media} { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px;}' +
-		'.{plugin.class:Media} .echo-item-template-article-title { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding: 0 0 5px 0; margin-left: 10px; }' +
+		'.{plugin.class:Media} .echo-item-template-article-title { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding: 0 0 5px 0; margin-left: 10px; font-size: 13px; line-height: 16px; }' +
 		'.{plugin.class:Media} .echo-item-template-article-title a { color: #42474A; font-weight: bold; }' +
 		'.{plugin.class:Media} .echo-item-template-article-title a:hover { color: #42474A; }' +
 		'.{plugin.class:Media} .echo-item-template-article-thumbnail { width: 30%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden; }' +
 		'.{plugin.class:Media} .echo-item-template-article-thumbnail img { width: auto; height: auto; max-height:120px; max-width:120px; }' +
-		'.{plugin.class:Media} .echo-item-template-article-description { margin-left: 10px; }' +
+		'.{plugin.class:Media} .echo-item-template-article-description { margin-left: 10px; font-size: 13px; line-height: 16px; }' +
 		'.{plugin.class:Media} .echo-item-template-article { width: 70%; float: left; }' +
-		'.{plugin.class:Media} .echo-item-article { max-width: 300px; min-width: 200px; }';
+		'.{plugin.class:Media} .echo-item-article { min-width: 200px; }';
 
 	Echo.Utils.addCSS(this.substitute({
 		"template": css
