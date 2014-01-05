@@ -400,9 +400,6 @@ conversations.renderers.topPosts = function(element) {
 };
 
 conversations.renderers.allPosts = function(element) {
-	if (!this.config.get("allPosts.visible")) {
-		return element;
-	}
 	if (this._moderationQueueEnabled()) {
 		this.view.render({
 			"name": "_tabs",
