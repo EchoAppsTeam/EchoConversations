@@ -74,7 +74,6 @@ var prepareMediaContent = function(oembed) {
 			"height": oembed.thumbnail_height * ratio
 		};
 	} else {
-		// use detail media instead of thumbnail media
 		ratio = maxWidth / oembed.width;
 		dimensions = {
 			"width": maxWidth,
@@ -82,7 +81,7 @@ var prepareMediaContent = function(oembed) {
 		};
 	}
 
-	var getEmenetByType = function(oembed, dimensions) {
+	var getElementByType = function(oembed, dimensions) {
 		return $(self.substitute({
 			"template": templates[oembed.type],
 			"data": oembed
@@ -90,12 +89,12 @@ var prepareMediaContent = function(oembed) {
 	};
 
 	if (oembed.type === "photo") {
-		if (oembed.thumbnail_width < maxWidth) {
+		if (!oembed.thumbnail_url || oembed.thumbnail_width < maxWidth) {
 			oembed.thumbnail_url = oembed.url;
 		}
-		item = getEmenetByType(oembed, dimensions);
+		item = getElementByType(oembed, dimensions);
 	} else if (oembed.type === "video") {
-		item = getEmenetByType(oembed, dimensions);
+		item = getElementByType(oembed, dimensions);
 		if (oembed.thumbnail_url) {
 			item.find(".echo-item-play-button").one("click", function() {
 				item.find(".echo-item-video-placeholder").html($(oembed.html).css({
@@ -111,7 +110,7 @@ var prepareMediaContent = function(oembed) {
 		}
 
 	} else if (oembed.type === "link") {
-		item = getEmenetByType(oembed, {
+		item = getElementByType(oembed, {
 			"width": maxWidth,
 			"height": ""
 		});
