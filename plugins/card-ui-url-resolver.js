@@ -1,196 +1,6 @@
 (function($) {
 "use strict";
 
-var createMediaContainer = function() {
-	var template =
-		'<div class="{plugin.class:Media}">' +
-			'<div class="{plugin.class:MediaContainer}"></div>' +
-		'</div>';
-
-	addMediaCSS.call(this);
-
-	return $(this.substitute({"template": template}));
-};
-
-var normalizeMediaContent = function(items) {
-	var self = this;
-	var element = createMediaContainer.call(this);
-	var width = 0;
-
-	var container = element.find("." + this.cssPrefix + "MediaContainer");
-	$.map(items, function(oembed) {
-		var card = prepareMediaContent.call(self, oembed);
-		container.append(card);
-		width += card.outerWidth(true) + 30;
-	});
-	container.css("width", width);
-
-	return element;
-};
-
-var prepareMediaContent = function(oembed) {
-	var self = this;
-	var templates = {
-		"photo":
-			'<div class="echo-media-item">' +
-				'<div class="echo-item-photo">' +
-					'<div class="echo-item-photo-avatar"><img src="{config:defaultAvatar}"/>{data:author_name}</div>' +
-					'<a href="{data:url}" target="_blank">' +
-						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
-					'</a>' +
-					'<div class="echo-item-photo-label">' +
-						'<div class="echo-item-photo-label-container">' +
-							'<div class="echo-item-title">{data:title}</div>' +
-							'<div class="echo-item-description">{data:description}</div>' +
-						'</div>' +
-					'</div>' +
-				'</div>' +
-				'<div class="echo-item-source-icon" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
-			'</div>',
-		"video":
-			'<div class="echo-media-item">' +
-				'<div class="echo-item-video">' +
-					'<div class="echo-item-video-avatar"><img src="{config:defaultAvatar}"/>{data:author_name}</div>' +
-					'<div class="echo-item-video-placeholder">' +
-						'<div class="echo-item-play-button"></div>' +
-						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
-					'</div>' +
-					'<div class="echo-item-title">{data:title}</div>' +
-					'<div class="echo-item-description">{data:description}</div>' +
-					'<div class="echo-item-source-icon" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
-				'</div>' +
-			'</div>',
-		"link":
-			'<div class="echo-media-item">' +
-				'<div class="echo-item-article">' +
-					'<div class="echo-item-template-article-thumbnail">' +
-						'<img src="{data:thumbnail_url}"/>' +
-					'</div>' +
-					'<div class="echo-item-template-article">' +
-						'<div class="echo-item-template-article-title">' +
-							'<a href="{data:url}" target="_blank">{data:title}</a>' +
-						'</div>' +
-						'<div class="echo-item-template-article-descriptionContainer">' +
-							'<div class="echo-item-template-article-description">{data:description}</div>' +
-						'</div>' +
-					'</div>' +
-					'<div class="echo-clear"></div>' +
-				'</div>' +
-			'</div>'
-	};
-
-	var dimensions, item, ratio;
-	var maxWidth = this.config.get("mediaWidth");
-
-	if (oembed.thumbnail_width > maxWidth) {
-		ratio = maxWidth / oembed.thumbnail_width;
-		dimensions = {
-			"width": maxWidth,
-			"height": oembed.thumbnail_height * ratio
-		};
-	} else {
-		ratio = maxWidth / oembed.width;
-		dimensions = {
-			"width": maxWidth,
-			"height": oembed.height * ratio
-		};
-	}
-
-	var getElementByType = function(oembed, dimensions) {
-		return $(self.substitute({
-			"template": templates[oembed.type],
-			"data": oembed
-		})).css({"width": dimensions.width});
-	};
-
-	if (oembed.type === "photo") {
-		if (!oembed.thumbnail_url || oembed.thumbnail_width < maxWidth) {
-			oembed.thumbnail_url = oembed.url;
-		}
-		item = getElementByType(oembed, dimensions);
-	} else if (oembed.type === "video") {
-		item = getElementByType(oembed, dimensions);
-		if (oembed.thumbnail_url) {
-			item.find(".echo-item-play-button").one("click", function() {
-				item.find(".echo-item-video-placeholder").html($(oembed.html).css({
-					"width": dimensions.width,
-					"height": dimensions.height
-				}));
-			});
-		} else {
-			item.find(".echo-item-video-placeholder").html($(oembed.html).css({
-				"width": dimensions.width,
-				"height": dimensions.height
-			}));
-		}
-
-	} else if (oembed.type === "link") {
-		item = getElementByType(oembed, {
-			"width": maxWidth,
-			"height": ""
-		});
-	}
-
-	return item;
-};
-
-var addMediaCSS = function() {
-	var namespace = this.namespace + "shared";
-	if (Echo.Utils.hasCSS(namespace)) return;
-
-	var css =
-		'.{plugin.class:MediaContainer} { position: relative; left: 0px; }' +
-		'.{plugin.class.Media} .echo-item-source-icon {}' +
-		'.{plugin.class:Media}:hover { overflow: auto; }' +
-		'.{plugin.class:Media} { overflow: hidden; }' +
-		'.{plugin.class:Media} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
-		'.{plugin.class:Media} .echo-media-item { width: 90%; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; float: left; margin: 0 8px 0 0; }' +
-
-		'.{plugin.class.Media} .echo-item-title { font-weight: bold; font-size: 13px; line-height: 16px; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-		'.{plugin.class.Media} .echo-item-description { font-size: 13px; line-height: 16px; }' +
-
-		// scrollbar
-		'.{plugin.class:Media}::-webkit-scrollbar { height: 10px; }' +
-		'.{plugin.class:Media}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
-		'.{plugin.class:Media}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }' +
-
-		// photo
-		'.{plugin.class:Media} .echo-item-photo-avatar > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
-		'.{plugin.class:Media} .echo-item-photo-avatar { position: absolute; padding: 12px; color: #FFF; }' +
-		'.{plugin.class:Media} .echo-item-photo { position: relative; }' +
-		'.{plugin.class:Media} .echo-item-photo-label { position: absolute; bottom: 0; color: #FFF; width: 100%; background: rgba(0, 0, 0, 0.5); }' +
-		'.{plugin.class:Media} .echo-item-photo-label-container { padding: 10px; }' +
-
-		// play btn
-		'.{plugin.class:Media} .echo-item-video-placeholder { position: relative; }' +
-		'.{plugin.class:Media} .echo-item-play-button-container { position: absolute; top: 0; left: 0; }' +
-		'.{plugin.class:Media} .echo-item-play-button { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; }' +
-		'.{plugin.class:Media} .echo-item-play-button:after { content: ""; position: absolute; top: 10px; left: 20px; border-left: 30px solid #FFF; border-top: 20px solid transparent; border-bottom: 20px solid transparent; }' +
-		'.{plugin.class:Media} .echo-item-play-button { box-shadow: 0px 0px 40px #000; margin: auto; width: 60px; height: 60px; background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; }' +
-		'.{plugin.class:Media} .echo-item-play-button:hover { background-color: #3498DB; }' +
-
-		// video
-		'.{plugin.class.Media} .echo-item-video { padding: 10px; }' +
-		'.{plugin.class.Media} .echo-item-video-avatar { margin-bottom: 8px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-		'.{plugin.class.Media} .echo-item-video-avatar > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
-
-		// article
-		'.{plugin.class.Media} .echo-item-article { padding: 10px; }' +
-		'.{plugin.class:Media} { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px;}' +
-		'.{plugin.class:Media} .echo-item-template-article-title { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding: 0 0 5px 0; margin-left: 10px; font-size: 13px; line-height: 16px; }' +
-		'.{plugin.class:Media} .echo-item-template-article-title a { color: #42474A; font-weight: bold; }' +
-		'.{plugin.class:Media} .echo-item-template-article-title a:hover { color: #42474A; }' +
-		'.{plugin.class:Media} .echo-item-template-article-thumbnail { width: 30%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden; }' +
-		'.{plugin.class:Media} .echo-item-template-article-thumbnail img { width: auto; height: auto; max-height:120px; max-width:120px; }' +
-		'.{plugin.class:Media} .echo-item-template-article-description { margin-left: 10px; font-size: 13px; line-height: 16px; }' +
-		'.{plugin.class:Media} .echo-item-template-article { width: 70%; float: left; }' +
-		'.{plugin.class:Media} .echo-item-article { min-width: 200px; }';
-
-	Echo.Utils.addCSS(this.substitute({
-		"template": css
-	}), namespace);
-};
-
 /**
  * @class Echo.StreamServer.Controls.Submit.Plugins.URLResolver
  * Extends Stream Item control to enable url media resoving.
@@ -231,11 +41,21 @@ itemPlugin.component.renderers.body = function() {
 };
 
 itemPlugin.renderers.mediaContent = function(element) {
-	element.empty();
-	if (this.get("media")) {
-		element.append(normalizeMediaContent.call(this, this.get("media")));
-	}
-	return element;
+	var self = this;
+	var media = this.get("media");
+	// TODO calculate width here
+	var wrapper = $("<div>")
+		.css("width", media.length * this.config.get("mediaWidth"));
+	$.map(media, function(item) {
+		var container = $("<div>");
+		new Echo.Conversations.Card({
+			"target": container,
+			"data": item,
+			"maxWidth": self.config.get("mediaWidth")
+		});
+		wrapper.append(container);
+	});
+	return element.empty().append(wrapper);
 };
 
 itemPlugin.methods._prepareMediaContent = function() {
@@ -253,7 +73,6 @@ itemPlugin.methods._prepareMediaContent = function() {
 			self.set("media", media);
 		}
 	});
-
 };
 
 itemPlugin.methods._resizeMediaContent = function() {
@@ -265,7 +84,19 @@ itemPlugin.methods._resizeMediaContent = function() {
 };
 
 itemPlugin.css =
-	'.{plugin.class:mediaContent} { margin-left: -16px; margin-right: -16px; }';
+	'.{plugin.class:mediaContent} { overflow: hidden; margin-bottom: 5px; }' +
+	'.{class:depth-0} .{plugin.class:mediaContent} { margin-left: -16px; margin-right: -16px; }' +
+	'.{plugin.class:mediaContent} { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px; font-size: 13px; line-height: 16px; }' +
+	'.{plugin.class:mediaContent}:hover { overflow: auto; }' +
+
+	'.{plugin.class:mediaContent} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
+
+	'.{plugin.class:mediaContent} > div > div { float: left; }' +
+
+	// scrollbar
+	'.{plugin.class:mediaContent}::-webkit-scrollbar { height: 10px; }' +
+	'.{plugin.class:mediaContent}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
+	'.{plugin.class:mediaContent}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }';
 
 Echo.Plugin.create(itemPlugin);
 
@@ -423,7 +254,7 @@ submitPlugin.methods.attachMedia = function(data) {
 	var submitMediaContainer = this.view.get("SubmitMedia");
 
 	if (submitMediaContainer.is(":empty")) {
-		var mediaContainer = createMediaContainer.call(this);
+		var mediaContainer = $("<div>"); //createMediaContainer.call(this);
 		this.view.get("SubmitMedia").append(mediaContainer);
 		this.component.view.get("body").addClass(this.cssPrefix + "EnabledMedia");
 	}
@@ -431,7 +262,8 @@ submitPlugin.methods.attachMedia = function(data) {
 	var container = submitMediaContainer.find("." + this.cssPrefix + "MediaContainer");
 
 	$.map(data, function(oembed) {
-		var html = prepareMediaContent.call(self, oembed);
+		// TODO
+		var html = $("<div>"); //prepareMediaContent.call(self, oembed);
 		var detachBtn = $(self.substitute({
 			"template": '<div class="{plugin.class:Close}">&times;</div>'
 		}));
