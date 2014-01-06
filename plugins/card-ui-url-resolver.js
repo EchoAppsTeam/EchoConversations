@@ -28,7 +28,9 @@ itemPlugin.vars = {
 };
 
 itemPlugin.templates.media =
-	'<div class="{plugin.class:mediaContent}"></div>';
+	'<div class="{plugin.class:mediaContentContainer}">' +
+		'<div class="{plugin.class:mediaContent}"></div>' +
+	'</div>';
 
 itemPlugin.init = function() {
 	this.extendTemplate("insertAfter", "body", itemPlugin.templates.media);
@@ -42,23 +44,21 @@ itemPlugin.component.renderers.body = function() {
 
 itemPlugin.renderers.mediaContent = function(element) {
 	var self = this;
-	var media = this.get("media");
-
-	if (!media || !media.length) return element.hide();
-
-	// TODO calculate width here
-	var wrapper = $("<div>")
-		.css("width", media.length * this.config.get("mediaWidth"));
+	var media = this.get("media", []);
+	element
+		.empty()
+		.css("width", this.config.get("mediaWidth") * media.length);
 	$.map(media, function(item) {
 		var container = $("<div>");
 		new Echo.Conversations.NestedCard({
 			"target": container,
 			"data": item,
+			"context": self.config.get("context"),
 			"width": self.config.get("mediaWidth")
 		});
-		wrapper.append(container);
+		element.append(container);
 	});
-	return element.empty().append(wrapper);
+	return element;
 };
 
 itemPlugin.methods._prepareMediaContent = function() {
@@ -79,7 +79,7 @@ itemPlugin.methods._prepareMediaContent = function() {
 };
 
 itemPlugin.methods._resizeMediaContent = function() {
-	var media = this.view.get("mediaContent");
+	var media = this.view.get("mediaContentContainer");
 	if (media && media.is(":visible")) {
 		this.config.set("mediaWidth", media.outerWidth() * 0.9);
 		this.view.render({"name": "mediaContent"});
@@ -87,18 +87,18 @@ itemPlugin.methods._resizeMediaContent = function() {
 };
 
 itemPlugin.css =
-	'.{plugin.class:mediaContent} { overflow: hidden; margin-bottom: 5px; }' +
-	'.{class:depth-0} .{plugin.class:mediaContent} { margin-left: -16px; margin-right: -16px; }' +
-	'.{plugin.class:mediaContent}:hover { overflow: auto; }' +
+	'.{plugin.class:mediaContentContainer} { overflow: hidden; margin-bottom: 5px; }' +
+	'.{class:depth-0} .{plugin.class:mediaContentContainer} { margin-left: -16px; margin-right: -16px; }' +
+	'.{plugin.class:mediaContentContainer}:hover { overflow: auto; }' +
 
-	'.{plugin.class:mediaContent} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
+	'.{plugin.class:mediaContentContainer} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
 
-	'.{plugin.class:mediaContent} > div > div { float: left; }' +
+	'.{plugin.class:mediaContent} > div { float: left; }' +
 
 	// scrollbar
-	'.{plugin.class:mediaContent}::-webkit-scrollbar { height: 10px; }' +
-	'.{plugin.class:mediaContent}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
-	'.{plugin.class:mediaContent}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }';
+	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar { height: 10px; }' +
+	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
+	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }';
 
 Echo.Plugin.create(itemPlugin);
 
@@ -147,8 +147,8 @@ submitPlugin.events = {
 	},
 	"Echo.StreamServer.Controls.Submit.onPostComplete": function(topic, args) {
 		this.media = {};
-		this.view.get("SubmitMedia").empty();
-		this.component.view.get("body").removeClass(this.cssPrefix + "EnabledMedia");
+		this.view.get("mediaContent").empty();
+		this.component.view.get("body").removeClass(this.cssPrefix + "enabledMedia");
 	}
 };
 
@@ -158,7 +158,9 @@ submitPlugin.dependencies = [{
 }];
 
 submitPlugin.templates.preview =
-	'<div class="{plugin.class:SubmitMedia}"></div>';
+	'<div class="{plugin.class:mediaContentContainer}">' +
+		'<div class="{plugin.class:mediaContent}"></div>' +
+	'</div>';
 
 submitPlugin.templates.message =
   '<div class="echo-item-text">{data:text}</div>' +
@@ -251,55 +253,60 @@ submitPlugin.methods.jsonEncode = function(json) {
 submitPlugin.methods.attachMedia = function(data) {
 	if (!data) return;
 	var self = this;
-	var submitMediaContainer = this.view.get("SubmitMedia");
 
-	if (submitMediaContainer.is(":empty")) {
-		var mediaContainer = $("<div>"); //createMediaContainer.call(this);
-		this.view.get("SubmitMedia").append(mediaContainer);
-		this.component.view.get("body").addClass(this.cssPrefix + "EnabledMedia");
-	}
+	var mediaContentContainer = this.view.get("mediaContentContainer");
+	var container = this.view.get("mediaContent");
+	var body = this.component.view.get("body");
+	var maxWidth = mediaContentContainer.width() * 0.9;
 
-	var container = submitMediaContainer.find("." + this.cssPrefix + "MediaContainer");
 
 	$.map(data, function(oembed) {
-		// TODO
-		var html = $("<div>"); //prepareMediaContent.call(self, oembed);
+		body.addClass(self.cssPrefix + "enabledMedia");
+		var html = $("<div>");
+		var card = new Echo.Conversations.NestedCard({
+			"target": html,
+			"context": self.config.get("context"),
+			"maxWidth": maxWidth,
+			"data": oembed
+		});
 		var detachBtn = $(self.substitute({
 			"template": '<div class="{plugin.class:Close}">&times;</div>'
 		}));
 
 		detachBtn.one("click", function() {
-			var width = html.outerWidth(true);
 			self.media[oembed.original_url] = {};
+			card.destroy();
 			html.remove();
 			if (container.is(":empty")) {
-				submitMediaContainer.empty();
-				self.component.view.get("body").removeClass(self.cssPrefix + "EnabledMedia");
-			} else {
-				container.css("width", "-=" + width);
+				body.removeClass(self.cssPrefix + "enabledMedia");
 			}
 		});
+		if (container.is(":empty")) {
+			container.css("width", maxWidth);
+		} else {
+			container.css("width", "+=" + maxWidth);
+		}
 
 		html.append(detachBtn);
-		var isFirstAttachments = !!container.is(":empty");
-		container.prepend(html);
 
-		var width = html.outerWidth(true);
-		if (isFirstAttachments) {
-			container.css("width", width);
-		} else {
-			container.css("width", "+=" + width);
-		}
+		container.append(html);
 	});
 };
 
 submitPlugin.css =
-	'.{class:body}.{plugin.class:EnabledMedia} .{class:content}.{class:border} { border-bottom: none; }' +
-	'.{class:body}.{plugin.class:EnabledMedia} .{plugin.class:Media} { border: 1px solid #DEDEDE; border-top-style: dashed; }' +
-	'.{class:body}.{plugin.class:EnabledMedia} .echo-media-item { position: relative; }' +
-	'.{plugin.class:Media} .echo-item-template-article-title { margin-right: 25px; }' +
-	'.{plugin.class:Close} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 8px; right: 15px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
-	'.{plugin.class:Close}:hover { opacity: 1; filter: alpha(opacity=100); }';
+	'.{class:body}.{plugin.class:enabledMedia} .{class:content}.{class:border} { border-bottom: none; }' +
+	'.{class:body}.{plugin.class:enabledMedia} .{plugin.class:mediaContentContainer} { overflow: hidden; border: 1px solid #DEDEDE; border-top-style: dashed; background-color: #F1F1F1; padding: 10px 5px; }' +
+	'.{class:body}.{plugin.class:enabledMedia} .{plugin.class:mediaContentContainer}:hover { overflow: auto; }' +
+
+	'.{plugin.class:Close} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
+	'.{plugin.class:Close}:hover { opacity: 1; filter: alpha(opacity=100); }' +
+
+	'.{plugin.class:mediaContent} > div { float: left; position: relative; }' +
+
+	// scrollbar
+	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar { height: 10px; }' +
+	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
+	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }';
 
 Echo.Plugin.create(submitPlugin);
 

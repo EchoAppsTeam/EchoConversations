@@ -145,8 +145,8 @@ card.renderers.photoLabelContainer = function(element) {
 };
 
 card.css =
-	'.{class:item} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0 8px 0 0; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
-	'.{class:title} { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
+	'.{class} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0 8px 0 0; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
+	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:item} .{class:sourceIcon} > img { max-width: 20px; }' +
 	'.{class:avatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
 
@@ -183,7 +183,7 @@ card.css =
 	'.{class:article} .{class:sourceIcon} > img { padding: 10px 0 0 0; }' +
 	'.{class:article} .{class:articleTitle} > a { color: #42474A; font-weight: bold; }' +
 	'.{class:article} .{class:articleTitle} > a:hover { color: #42474A; }' +
-	'.{class:articleTitle} { padding: 0 0 5px 0; margin-left: 10px; }' +
+	'.{class:articleTitle} { padding: 0 0 5px 0; margin-left: 10px; margin-right: 15px; }' +
 	'.{class:articleDescription} { margin-left: 10px; font-size: 13px; line-height: 16px; }' +
 	'.{class:articleThumbnail} { width: 30%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden; }' +
 	'.{class:articleThumbnail} img { width: auto; height: auto; max-height:120px; max-width:120px; }' +
