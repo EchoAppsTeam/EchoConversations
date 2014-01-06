@@ -1,14 +1,16 @@
 (function($) {
 "use strict";
 
-var card = Echo.App.manifest("Echo.Conversations.Card");
+var card = Echo.App.manifest("Echo.Conversations.NestedCard");
 
 if (Echo.App.isDefined(card)) return;
 
 card.templates.photo =
 			'<div class="{class:item}">' +
 				'<div class="{class:photo}">' +
-					'<div class="{class:avatar} {class:photoAvatar}"><img src="{config:defaultAvatar}"/>{data:author_name}</div>' +
+					'<div class="{class:avatar} {class:photoAvatar}" title="{data:author_name}">' +
+						'<img src="{config:defaultAvatar}"/>{data:author_name}' +
+					'</div>' +
 					'<a href="{data:url}" target="_blank">' +
 						'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
 					'</a>' +
@@ -25,7 +27,9 @@ card.templates.photo =
 card.templates.video =
 			'<div class="{class:item}">' +
 				'<div class="{class:video}">' +
-					'<div class="{class:avatar} {class:videoAvatar}"><img src="{config:defaultAvatar}"/>{data:author_name}</div>' +
+					'<div class="{class:avatar} {class:videoAvatar}" title="{data:author_name}">' +
+						'<img src="{config:defaultAvatar}"/>{data:author_name}' +
+					'</div>' +
 					'<div class="{class:videoPlaceholder}">' +
 						'<div class="{class:playButton}"></div>' +
 						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
@@ -59,6 +63,10 @@ card.templates.main = function() {
 	return this.templates[this.get("data.type")];
 };
 
+card.config = {
+	"width": 340
+};
+
 card.init = function() {
 	// TODO handle situation when thumbnail_url is not defined
 	this.render();
@@ -66,16 +74,17 @@ card.init = function() {
 };
 
 card.renderers.item = function(element) {
-	var maxWidth = this.config.get("maxWidth");
-	if (maxWidth) {
-		element.css("max-width", maxWidth);
-	}
-	return element;
+	var width = this.config.get("width");
+	return element.css("max-width", width);
 };
 
 card.renderers.sourceIcon = function(element) {
+	var proviredURL = element.data("url");
+	var icon = proviredURL +
+		(proviredURL.substr(-1) === "/" ? "" : "/") +	"favicon.ico";
+
 	Echo.Utils.loadImage({
-		"image": element.data("url") + "/favicon.ico",
+		"image": icon,
 		"onerror": $.noop,
 		"onload": function() {
 			$(this).attr("title", element.data("name")).appendTo(element);
@@ -112,14 +121,20 @@ card.renderers.videoPlaceholder = function(element) {
 	if (!oembed.thumbnail_url) {
 		element.empty().append($(oembed.html));
 	}
-	return element;
+	var width = this.config.get("width");
+	return element.css("width", width);
 };
 
 /**
  *  Photo
  */
 card.renderers.photoThumbnail = function(element) {
-	var thumbnail = this.get("data.thumbnail_url", this.get("data.url"));
+	var width = this.config.get("width");
+	var oembed = this.get("data");
+	var thumbnail = oembed.thumbnail_url && oembed.thumbnail_width >= width
+		? oembed.thumbnail_url
+		: oembed.url;
+
 	return element.attr("src", thumbnail);
 };
 
@@ -136,7 +151,7 @@ card.css =
 	'.{class:avatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
 
 	// photo
-	'.{class:photoAvatar} { position: absolute; padding: 12px; color: #FFF; }' +
+	'.{class:photoAvatar} { position: absolute; padding: 12px; color: #FFF; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:photo} { position: relative; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background: rgba(0, 0, 0, 0.5); }' +
@@ -158,10 +173,10 @@ card.css =
 	'.{class:videoDescription} { margin: 5px 0 0 0; }' +
 
 	// TODO: fix video resizing
-	//'.{class:videoPlaceholder} { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
-	//'.{class:videoPlaceholder} > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
-	//'.{class:videoPlaceholder} > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
-	//'.{class:videoPlaceholder} > object { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.{class:videoPlaceholder} { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
+	'.{class:videoPlaceholder} > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.{class:videoPlaceholder} > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.{class:videoPlaceholder} > object { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
 
 	// article
 	'.{class:article} { padding: 10px; min-width: 200px; }' +

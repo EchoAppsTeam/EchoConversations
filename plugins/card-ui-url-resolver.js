@@ -43,15 +43,18 @@ itemPlugin.component.renderers.body = function() {
 itemPlugin.renderers.mediaContent = function(element) {
 	var self = this;
 	var media = this.get("media");
+
+	if (!media || !media.length) return element.hide();
+
 	// TODO calculate width here
 	var wrapper = $("<div>")
 		.css("width", media.length * this.config.get("mediaWidth"));
 	$.map(media, function(item) {
 		var container = $("<div>");
-		new Echo.Conversations.Card({
+		new Echo.Conversations.NestedCard({
 			"target": container,
 			"data": item,
-			"maxWidth": self.config.get("mediaWidth")
+			"width": self.config.get("mediaWidth")
 		});
 		wrapper.append(container);
 	});
