@@ -75,7 +75,7 @@ card.init = function() {
 
 card.renderers.item = function(element) {
 	var width = this.config.get("width");
-	return element.css("max-width", width);
+	return element.find("> div").css("max-width", width);
 };
 
 card.renderers.sourceIcon = function(element) {
@@ -118,11 +118,33 @@ card.renderers.playButton = function(element) {
 
 card.renderers.videoPlaceholder = function(element) {
 	var oembed = this.get("data");
+	var maxWidth = this.config.get("width");
+
 	if (!oembed.thumbnail_url) {
 		element.empty().append($(oembed.html));
 	}
-	var width = this.config.get("width");
-	return element.css("width", width);
+	console.log(oembed);
+	//TODO: calc height/width
+	var ratio, dimensions;
+	if (oembed.thumbnail_width) {
+		ratio = maxWidth / oembed.thumbnail_width;
+		dimensions = {
+			"width": maxWidth,
+			"height": oembed.thumbnail_height * ratio
+		};
+	} else if (maxWidth < oembed.width) {
+		ratio = maxWidth / oembed.width;
+		dimensions = {
+			"width": maxWidth,
+			"height": oembed.height * ratio
+		};
+	} else {
+		dimensions = {
+			"width": oembed.width,
+			"height": oembed.height
+		};
+	}
+	return element.css(dimensions);
 };
 
 /**
@@ -159,8 +181,7 @@ card.css =
 	'.{class:photoTitle} { margin: 0 0 5px 0; }' +
 
 	// play button
-	'.{class:videoPlaceholder} { position: relative; }' +
-	'.{class:playButton} { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; }' +
+	'.{class:playButton} { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 10; }' +
 	'.{class:playButton}:after { content: ""; position: absolute; top: 10px; left: 20px; border-left: 30px solid #FFF; border-top: 20px solid transparent; border-bottom: 20px solid transparent; }' +
 	'.{class:playButton} { box-shadow: 0px 0px 40px #000; margin: auto; width: 60px; height: 60px; background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; }' +
 	'.{class:playButton}:hover { background-color: #3498DB; }' +
@@ -171,12 +192,14 @@ card.css =
 	'.{class:videoAvatar} { margin-bottom: 8px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:videoTitle} { margin: 10px 0 0 0; }' +
 	'.{class:videoDescription} { margin: 5px 0 0 0; }' +
+	'.{class:videoPlaceholder} { position: relative; background: #000000; }' +
+	'.{class:videoPlaceholder} img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }' +
 
 	// TODO: fix video resizing
-	'.{class:videoPlaceholder} { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
-	'.{class:videoPlaceholder} > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
-	'.{class:videoPlaceholder} > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
-	'.{class:videoPlaceholder} > object { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	//'.{class:videoPlaceholder} { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
+	'.{class:videoPlaceholder} > iframe { width: 100%; height: 100%; }' +
+	'.{class:videoPlaceholder} > video { width: 100%; height: 100%; }' +
+	'.{class:videoPlaceholder} > object { width: 100%; height: 100%; }' +
 
 	// article
 	'.{class:article} { padding: 10px; min-width: 200px; }' +
