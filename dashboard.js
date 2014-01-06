@@ -455,11 +455,11 @@ dashboard.config.normalizer = {
 					return this;
 				},
 				"postComposer": function() {
-					this["items"] = component.get("baseComposerECL");
+					this["items"] = [].concat(component.get("baseComposerECL"));
 					return this;
 				},
 				"replyComposer": function() {
-					this["items"] = component.get("baseComposerECL");
+					this["items"] = [].concat(component.get("baseComposerECL"));
 					this["items"].splice(2, 0, {
 						"component": "Checkbox",
 						"name": "displayCompactForm",
