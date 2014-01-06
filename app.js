@@ -29,6 +29,7 @@ conversations.config = {
 	"replyComposer": {
 		"visible": true,
 		"displaySharingOnPost": true,
+		"displayCompactForm": true,
 		"contentTypes": {
 			"comments": {
 				"visible": true,
@@ -701,12 +702,13 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		// TODO: pass markers through data
 		"extraMarkers": this._getSubmitMarkers(),
 		"enabled": this._isComposerVisible("replyComposer"),
+		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
 		"pauseTimeout": +this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout"),
 		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
 		"requestMethod": "POST",
 		"nestedPlugins": [].concat([{
-				"name": "URLResolver",
-				"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs")
+			"name": "URLResolver",
+			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs")
 		}, {
 			"name": "JanrainBackplaneHandler",
 			"appId": this.config.get("dependencies.Janrain.appId"),

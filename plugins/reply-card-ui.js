@@ -10,7 +10,8 @@ if (Echo.Plugin.isDefined(plugin)) return;
 plugin.init = function() {
 	var self = this, item = this.component;
 	this.extendTemplate("insertAsLastChild", "content", plugin.templates.form);
-	this.extendTemplate("insertBefore", "expandChildren", plugin.templates.spacing);
+	// insert element to add addditional spacing above the children container
+	this.extendTemplate("insertBefore", "expandChildren", plugin.templates.childrenSpacing);
 	var form = Echo.Utils.get(Echo.Variables, this._getSubmitKey());
 	$.each(form || {}, function(key, value) {
 		self.set(key, value);
@@ -24,7 +25,8 @@ plugin.config = {
 	"actionString": "Add a comment...",
 	"pauseTimeout": 0,
 	"submitFormTimeout": 300,
-	"compactFormTimeout": 200
+	"compactFormTimeout": 200,
+	"displayCompactForm": false
 };
 
 plugin.labels = {
@@ -68,8 +70,8 @@ plugin.templates.form =
 		'</div>' +
 	'</div>';
 
-plugin.templates.spacing =
-	'<div class="{plugin.class:spacing}"></div>';
+plugin.templates.childrenSpacing =
+	'<div class="{plugin.class:childrenSpacing}"></div>';
 
 plugin.component.renderers.container = function(element) {
 	var item = this.component;
@@ -95,14 +97,27 @@ plugin.component.renderers.children = function() {
 	return item.parentRenderer("children", arguments);
 };
 
+plugin.component.renderers.expandChildren = function() {
+	var item = this.component;
+	var element = item.parentRenderer("expandChildren", arguments);
+
+	return !this.config.get("displayCompactForm")
+		? element.addClass(this.cssPrefix + "expandChildren")
+		: element;
+};
+
 plugin.renderers.replyForm = function(element) {
 	var item = this.component;
-	element.addClass(item.get("cssPrefix") + "depth-" + (item.get("depth") + 1));
-	return element;
+	return element
+		.addClass(item.get("cssPrefix") + "depth-" + (item.get("depth") + 1));
 };
 
 plugin.renderers.submitForm = function(element) {
-	return this.get("expanded") ? element.show() : element.empty().hide();
+	if (!this.config.get("displayCompactForm")) {
+		element.addClass(this.cssPrefix + "additionalSpacing");
+	}
+	return this.get("expanded")
+		? element.show() : element.empty().hide();
 };
 
 plugin.renderers.avatar =function(element) {
@@ -112,21 +127,21 @@ plugin.renderers.avatar =function(element) {
 		"image": item.user.get("avatar"),
 		"defaultImage": item.config.get("defaultAvatar")
 	});
-	if (item.get("depth") && !this.get("expanded")) {
-		element.hide();
-	} else {
-		element.show();
-	}
-	return element;
+	return item.get("depth") && !this.get("expanded")
+		? element.hide() : element.show();
+};
+
+plugin.renderers.childrenSpacing = function(element) {
+	return this._isCompactFormVisible()
+		? element.show()
+		: element.hide();
 };
 
 plugin.renderers.compactForm = function(element, extra) {
-	var item = this.component;
-	if (!item.get("depth") && !this.get("expanded")) {
-		extra = extra || {};
-		return element.slideDown(+extra.animate && this.config.get("compactFormTimeout"));
-	}
-	return element.hide();
+	extra = extra || {};
+	return this._isCompactFormVisible()
+		? element.slideDown(+extra.animate && this.config.get("compactFormTimeout"))
+		: element.hide();
 };
 
 plugin.renderers.compactField = function(element) {
@@ -217,9 +232,15 @@ plugin.methods._hideSubmit = function(animate) {
 		});
 };
 
+plugin.methods._isCompactFormVisible = function() {
+	var item = this.component;
+	return !item.get("depth") && !this.get("expanded") && this.config.get("displayCompactForm");
+};
+
 plugin.methods._expand = function() {
 	var item = this.component;
 	this.set("expanded", true);
+
 	this.view.render({"name": "submitForm"});
 	this.view.render({"name": "compactForm"});
 	this.view.render({"name": "avatar"});
@@ -281,11 +302,14 @@ plugin.methods._getSubmitData = function() {
 };
 
 plugin.css =
-	'.{plugin.class} .{plugin.class:spacing} { margin-top: 10px; }' +
-	'.{plugin.class} .{class:children} .{plugin.class:spacing} { margin-top: 0px; }' +
+	'.{plugin.class} .{plugin.class:childrenSpacing} { margin-top: 8px; }' +
+	'.{plugin.class} .{class:children} .{plugin.class:childrenSpacing} { margin-top: 0px; }' +
 	'.{plugin.class} .{plugin.class:replyForm} { margin-right: 20px; border-left: 4px solid transparent; }' +
-	'.{plugin.class} .{plugin.class:compactForm} { padding-top: 8px; padding-bottom: 18px; }' +
-	'.{plugin.class} .{plugin.class:submitForm} { padding-top: 8px; padding-bottom: 18px; }' +
+	'.{plugin.class} .{plugin.class:submitForm} { padding: 8px 0px 15px 0px; }' +
+	'.{plugin.class} .{plugin.class:compactForm} { padding: 8px 0px 15px 0px; }' +
+	'.{plugin.class} .{class:content} .{class:expandChildren} { padding: 8px 0px; }' +
+	'.{plugin.class} .{class:content} .{plugin.class:expandChildren} { padding: 15px 0px 8px 0px; }' +
+	'.{plugin.class} .{plugin.class:additionalSpacing} { padding-top: 15px; }' +
 	'.{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 28px; line-height: 28px; }' +
 	'.{plugin.class:avatar} { width: 28px; height: 28px; border-radius: 50%; margin: 1px 0px 0px 3px; }' +
 	'.{plugin.class} .{plugin.class:avatar} > img { width: 28px; height: 28px; }' +
