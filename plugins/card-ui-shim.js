@@ -431,6 +431,13 @@ for (var i = 0; i <= 20; i++) {
 }
 
 plugin.css =
+	// TODO: get rid of this item styles in the v1.3.5 (introduced for Stream+ app v1.0)
+	'.{plugin.class} .{class:body} .echo-item-video { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
+	'.{plugin.class} .{class:body} .echo-item-video > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.{plugin.class} .{class:body} .echo-item-video > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.{plugin.class} .{class:body} .echo-item-video > object { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.{plugin.class} .{class:body} .echo-item-title { font-size: 15px; font-weight: normal; line-height: 21px; margin: 0px; }' +
+
 	'.{plugin.class} .{plugin.class:dropdownButton} { display: inline; margin-left: 0px; }' +
 	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown { display: inline; }' +
 	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
