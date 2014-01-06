@@ -170,7 +170,7 @@ card.css =
 	'.{class} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
 	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:item} .{class:sourceIcon} > img { max-width: 20px; }' +
-	'.{class:avatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
+	'.echo-sdk-ui .{class:avatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
 
 	// photo
 	'.{class:photoAvatar} { position: absolute; padding: 12px; color: #FFF; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
