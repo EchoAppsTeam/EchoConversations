@@ -304,7 +304,7 @@ plugin.methods._getSubmitData = function() {
 plugin.css =
 	'.{plugin.class} .{plugin.class:childrenSpacing} { margin-top: 8px; }' +
 	'.{plugin.class} .{class:children} .{plugin.class:childrenSpacing} { margin-top: 0px; }' +
-	'.{plugin.class} .{plugin.class:replyForm} { margin-right: 20px; border-left: 4px solid transparent; }' +
+	'.{plugin.class} .{plugin.class:replyForm} { margin-right: 15px; border-left: 4px solid transparent; }' +
 	'.{plugin.class} .{plugin.class:submitForm} { padding: 8px 0px 15px 0px; }' +
 	'.{plugin.class} .{plugin.class:compactForm} { padding: 8px 0px 15px 0px; }' +
 	'.{plugin.class} .{class:content} .{class:expandChildren} { padding: 8px 0px; }' +
