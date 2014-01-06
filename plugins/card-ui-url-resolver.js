@@ -47,7 +47,7 @@ itemPlugin.renderers.mediaContent = function(element) {
 	var media = this.get("media", []);
 	element
 		.empty()
-		.css("width", this.config.get("mediaWidth") * media.length);
+		.css("width", (this.config.get("mediaWidth") + 16) * media.length);
 	$.map(media, function(item) {
 		var container = $("<div>");
 		new Echo.Conversations.NestedCard({
@@ -259,14 +259,13 @@ submitPlugin.methods.attachMedia = function(data) {
 	var body = this.component.view.get("body");
 	var maxWidth = mediaContentContainer.width() * 0.9;
 
-
 	$.map(data, function(oembed) {
 		body.addClass(self.cssPrefix + "enabledMedia");
 		var html = $("<div>");
 		var card = new Echo.Conversations.NestedCard({
 			"target": html,
 			"context": self.config.get("context"),
-			"maxWidth": maxWidth,
+			"width": maxWidth,
 			"data": oembed
 		});
 		var detachBtn = $(self.substitute({
@@ -282,9 +281,9 @@ submitPlugin.methods.attachMedia = function(data) {
 			}
 		});
 		if (container.is(":empty")) {
-			container.css("width", maxWidth);
+			container.css("width", maxWidth + 16); // + item margins
 		} else {
-			container.css("width", "+=" + maxWidth);
+			container.css("width", "+=" + (maxWidth + 16)); // + item margins
 		}
 
 		html.append(detachBtn);
