@@ -51,18 +51,17 @@ itemPlugin.renderers.mediaContent = function(element) {
 	var self = this;
 	var media = this.get("media", []);
 	element.empty();
-	(media.length > 1)
-		? element.css("width", (this.config.get("mediaWidth") + 16) * media.length)
-		: element.css("width", "auto");
 	$.map(media, function(item) {
 		var container = $("<div>");
 		new Echo.Conversations.NestedCard({
 			"target": container,
 			"data": item,
 			"context": self.config.get("context"),
-			"width": (media.length > 1) ? self.config.get("mediaWidth") : "100%"
+			"width": self.config.get("mediaWidth"),
+			"ready": function() {
+				element.append(container);
+			}
 		});
-		element.append(container);
 	});
 	return element;
 };
@@ -98,7 +97,8 @@ itemPlugin.css =
 
 	'.{plugin.class:multiple}.{plugin.class:mediaContentContainer} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
 
-	'.{plugin.class:mediaContent} > div { float: left; }' +
+	'.{plugin.class:mediaContent} { white-space: nowrap; }' +
+	'.{plugin.class:mediaContent} > div { display: inline-block; white-space: normal; vertical-align: top; }' +
 	'.{plugin.class:multiple} .{plugin.class:mediaContent} > div { margin-right: 8px; }' +
 
 	// scrollbar
@@ -286,11 +286,6 @@ submitPlugin.methods.attachMedia = function(data) {
 				body.removeClass(self.cssPrefix + "enabledMedia");
 			}
 		});
-		if (container.is(":empty")) {
-			container.css("width", maxWidth + 16); // + item margins
-		} else {
-			container.css("width", "+=" + (maxWidth + 16)); // + item margins
-		}
 
 		html.append(detachBtn);
 
@@ -305,7 +300,8 @@ submitPlugin.css =
 	'.{plugin.class:Close} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
 	'.{plugin.class:Close}:hover { opacity: 1; filter: alpha(opacity=100); }' +
 
-	'.{plugin.class:mediaContent} > div { float: left; margin-right: 8px; position: relative; }' +
+	'.{plugin.class:mediaContent} { white-space: nowrap; }' +
+	'.{plugin.class:mediaContent} > div { display: inline-block; white-space: normal; margin-right: 8px; position: relative; vertical-align: top; }' +
 
 	// scrollbar
 	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar { height: 10px; }' +
