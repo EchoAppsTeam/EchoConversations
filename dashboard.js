@@ -460,6 +460,16 @@ dashboard.config.normalizer = {
 				},
 				"replyComposer": function() {
 					this["items"] = component.get("baseComposerECL");
+					this["items"].splice(2, 0, {
+						"component": "Checkbox",
+						"name": "displayCompactForm",
+						"type": "boolean",
+						"default": true,
+						"config": {
+							"title": "Display Compact Form",
+							"desc": "If enabled, compact form is displayed below each top-level post"
+						}
+					});
 					return this;
 				}
 			};
