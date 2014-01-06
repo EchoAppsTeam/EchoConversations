@@ -42,19 +42,25 @@ itemPlugin.component.renderers.body = function() {
 	return this.parentRenderer("body", arguments);
 };
 
+itemPlugin.renderers.mediaContentContainer = function(element) {
+	var media = this.get("media", []);
+	return element.addClass(this.cssPrefix + (media.length > 1 ? "multiple" : "single"));
+};
+
 itemPlugin.renderers.mediaContent = function(element) {
 	var self = this;
 	var media = this.get("media", []);
-	element
-		.empty()
-		.css("width", (this.config.get("mediaWidth") + 16) * media.length);
+	element.empty();
+	(media.length > 1)
+		? element.css("width", (this.config.get("mediaWidth") + 16) * media.length)
+		: element.css("width", "auto");
 	$.map(media, function(item) {
 		var container = $("<div>");
 		new Echo.Conversations.NestedCard({
 			"target": container,
 			"data": item,
 			"context": self.config.get("context"),
-			"width": self.config.get("mediaWidth")
+			"width": (media.length > 1) ? self.config.get("mediaWidth") : "100%"
 		});
 		element.append(container);
 	});
@@ -88,11 +94,12 @@ itemPlugin.methods._resizeMediaContent = function() {
 
 itemPlugin.css =
 	'.{plugin.class:mediaContentContainer} { overflow-y: hidden; overflow-x: auto; margin-bottom: 5px; }' +
-	'.{class:depth-0} .{plugin.class:mediaContentContainer} { margin-left: -16px; margin-right: -16px; }' +
+	'.{class:depth-0} .{plugin.class:multiple}.{plugin.class:mediaContentContainer} { margin-left: -16px; margin-right: -16px; }' +
 
-	'.{plugin.class:mediaContentContainer} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
+	'.{plugin.class:multiple}.{plugin.class:mediaContentContainer} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
 
 	'.{plugin.class:mediaContent} > div { float: left; }' +
+	'.{plugin.class:multiple} .{plugin.class:mediaContent} > div { margin-right: 8px; }' +
 
 	// scrollbar
 	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar { height: 10px; }' +
@@ -298,7 +305,7 @@ submitPlugin.css =
 	'.{plugin.class:Close} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
 	'.{plugin.class:Close}:hover { opacity: 1; filter: alpha(opacity=100); }' +
 
-	'.{plugin.class:mediaContent} > div { float: left; position: relative; }' +
+	'.{plugin.class:mediaContent} > div { float: left; margin-right: 8px; position: relative; }' +
 
 	// scrollbar
 	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar { height: 10px; }' +
