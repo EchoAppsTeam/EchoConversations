@@ -56,6 +56,7 @@ conversations.config = {
 		"displaySharingIntent": true,
 		"displayLikeIntent": true,
 		"displayReplyIntent": true,
+		"displayEditIntent": true,
 		"displayCommunityFlagIntent": false,
 		"replyNestingLevels": 2,
 		"itemStates": ["Untouched", "ModeratorApproved"],
@@ -99,6 +100,7 @@ conversations.config = {
 		"displaySharingIntent": true,
 		"displayLikeIntent": true,
 		"displayReplyIntent": true,
+		"displayEditIntent": true,
 		"displayCommunityFlagIntent": true,
 		"replyNestingLevels": 2,
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
@@ -687,6 +689,9 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	var config = this.config.get(componentID);
 
 	var plugins = [{
+		"intentID": "Edit",
+		"name": "Edit"
+	}, {
 		"intentID": "Like",
 		"name": "LikeCardUI"
 	}, {

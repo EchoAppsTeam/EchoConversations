@@ -138,6 +138,15 @@ dashboard.vars = {
 			"desc": "If enabled, users are offered the option to reply to each post"
 		}
 	}, {
+		"component": "Checkbox",
+		"name": "displayEditIntent",
+		"type": "boolean",
+		"default": true,
+		"config": {
+			"title": "Display Edit Intent",
+			"desc": "If True, users will be able to edit their own posts. Moderators and admins will be able to edit any post."
+		}
+	}, {
 		"component": "Select",
 		"name": "replyNestingLevels",
 		"type": "number",
@@ -420,8 +429,8 @@ dashboard.config.normalizer = {
 					var items = assembleBaseECL.call(this);
 
 					items[3]["default"] = 5; // override initialItemsPerPage value
-					items[12]["items"][0]["default"] = true;
-					items[12]["items"][1]["default"] = true;
+					items[13]["items"][0]["default"] = true;
+					items[13]["items"][1]["default"] = true;
 					items.pop();
 
 					items.splice(5, 0, {
@@ -440,7 +449,7 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
-					items[12]["items"].push(component.get("premoderationECL"));
+					items[13]["items"].push(component.get("premoderationECL"));
 					items.splice(11, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
