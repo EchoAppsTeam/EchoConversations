@@ -714,7 +714,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"name": "CardUIShim",
 			"auth": this.config.get("auth"),
 			"confirmation": {
-				"enable": this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout")
+				"enable": this._isModerationRequired() && this.config.get("replyComposer.confirmation.enable")
 			},
 			"submitPermissions": this._getSubmitPermissions()
 		})], this.config.get("replyComposer.plugins"))
