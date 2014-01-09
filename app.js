@@ -8,6 +8,12 @@ var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 conversations.config = {
 	"targetURL": "",
 	"bozoFilter": false,
+	"streamingControl": {
+		"pauseOnHover": true,
+		"displayStreamingStateHeader": false,
+		// TODO handle this parameter
+		"EnablePausePlayToggle": true
+	},
 	"postComposer": {
 		"visible": true,
 		"displaySharingOnPost": true,
@@ -176,6 +182,17 @@ conversations.config = {
 	}
 };
 
+conversations.vars = {
+	"streamingState": "live",
+	"activitiesCount": 0
+};
+
+conversations.labels = {
+	"paused": "Streaming is Paused",
+	"live": "Streming is Live",
+	"itemsWaiting": "({count} new items waiting)"
+};
+
 conversations.config.normalizer = {
 	"appkey": function() {
 		return this.get("dependencies.StreamServer.appkey");
@@ -212,6 +229,14 @@ conversations.dependencies = [{
 }];
 
 conversations.events = {
+	"Echo.StreamServer.Controls.Stream.onActivitiesCountChange": function(_, data) {
+		var allPosts = this.getComponent("allPosts");
+		// display activities for 'allPosts' section only.
+		if (allPosts && allPosts.config.get("context") === data.context) {
+			this.set("activitiesCount", data.count);
+			this.view.render({"name": "itemsWaiting"});
+		}
+	},
 	// TODO move this login into moderation plugin.
 	"Echo.StreamServer.Controls.Stream.Item.Plugins.ModerationCardUI.onUserUpdate": function(_, args) {
 		var self = this;
@@ -253,6 +278,11 @@ conversations.init = function() {
 
 conversations.templates.main =
 	'<div class="{class:container}">' +
+		'<div class="{class:streamingStateContainer}">' +
+			'<div class="pull-right {class:itemsWaiting}"></div>' +
+			'<div class="{class:streamingState}"></div>' +
+			'<div class="clearfix"></div>' +
+		'</div>' +
 		'<div class="{class:postComposer}"></div>' +
 		'<div class="{class:topPostsContainer}">' +
 			'<div class="{class:topPostsHeader}"></div>' +
@@ -298,6 +328,51 @@ conversations.templates.defaultQuery =
 conversations.templates.topConditions = {
 	"onlyPosts": "markers:{data:itemMarkersToAdd} -markers:{data:itemMarkersToRemove}",
 	"contributors": "(user.markers:{data:userMarkers} OR markers:{data:itemMarkersToAdd}) -markers:{data:itemMarkersToRemove}"
+};
+
+conversations.renderers.streamingStateContainer = function(element) {
+	if (!this.config.get("streamingControl.displayStreamingStateHeader")) {
+		element.hide();
+	}
+	return element;
+};
+
+conversations.renderers.streamingState = function(element) {
+	var state = this.get("streamingState");
+	var oldState = {"paused": "live", "live": "paused"}[state];
+	return element
+		.empty()
+		.removeClass(this.cssPrefix + "streamingState-" + oldState)
+		.addClass(this.cssPrefix + "streamingState-" + state)
+		.append(this.labels.get(state));
+};
+
+conversations.renderers.itemsWaiting = function(element) {
+	var streamingState = this.get("streamingState");
+	var activitiesCount = this.get("activitiesCount");
+	element.empty();
+	if (streamingState === "paused" && activitiesCount) {
+		return element
+			.append(this.labels.get("itemsWaiting", {"count": activitiesCount}))
+			.show();
+	} else {
+		element.hide();
+	}
+	return element;
+};
+
+conversations.renderers.streamingStateCursor = function(element) {
+	return element.hide();
+};
+
+conversations.renderers.container = function(element) {
+	var self = this;
+	if (this.config.get("streamingControl.pauseOnHover")) {
+		element
+			.on("mouseenter", function() { self.setStreamingState("paused"); })
+			.on("mouseleave", function() { self.setStreamingState("live"); });
+	}
+	return element;
 };
 
 conversations.renderers.postComposer = function(element) {
@@ -616,6 +691,51 @@ conversations.renderers._streamTitle = function(element, extra) {
 	return element.append(title);
 };
 
+conversations.methods.setStreamingState = function(state) {
+	var self = this;
+	this.set("streamingState", state);
+	// change state of all streams
+	$.map(["topPosts", "allPosts", "moderationQueue"], function(streamName) {
+		var stream = self.getComponent(streamName);
+		if (stream) {
+			stream.setState(state);
+		}
+	});
+
+	// move cursor if state is 'paused'
+	if (state === "paused") {
+		var container = this.view.get("container");
+		var cursor = self.view.get("streamingStateCursor");
+		var moveCursor = function(event) {
+			cursor.show();
+			cursor.css({
+				"left": event.clientX,
+				"top": event.clientY
+			});
+		};
+		if (container && cursor) {
+			container
+				.on("mousemove", moveCursor)
+				.on("mouseleave", function() {
+					cursor.hide();
+					container.off("mouseleave", moveCursor);
+				});
+		}
+	}
+
+	this.view.render({"name": "streamingState"});
+};
+
+conversations.methods._moveStreamingStateCursor = function(event) {
+	var cursor = this.view.get("streamingStateCursor");
+	if (cursor) {
+		cursor.css({
+			"left": event.clientX,
+			"top": event.clientY
+		});
+	}
+};
+
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 	// StreamServer config
 	var ssConfig = this.config.get("dependencies.StreamServer");
@@ -632,6 +752,9 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		"liveUpdates": ssConfig.liveUpdates,
 		"submissionProxyURL": ssConfig.submissionProxyURL,
 		"asyncItemsRendering": true,
+		"state": {
+			"toggleBy": "none"
+		},
 		"labels": {
 			"emptyStream": config.noPostsMessage
 		},
@@ -976,6 +1099,13 @@ conversations.css =
 	'.{class:streamHeader} { padding: 5px 0px; }' +
 	'.{class:streamTitle} { font-size: 14px; }' +
 	'.{class:streamCounter} { font-size: 14px; }' +
+
+	// streaming state
+	'.{class:streamingStateContainer} { text-align: left; margin-bottom: 5px; }' +
+	'.{class:streamingState} { padding-left: 15px; float: right; font-size: 14px; line-height: 14px; }' +
+	'.{class:streamingState-live} { background: url({config:cdnBaseURL.sdk-assets}/images/control_play.png) no-repeat left 3px; }' +
+	'.{class:streamingState-paused} { background: url({config:cdnBaseURL.sdk-assets}/images/control_pause.png) no-repeat left 3px; }' +
+	'.{class:itemsWaiting} { font-size: 13px; color:  #c6c6c6; line-height: 14px; margin-left: 5px; }' +
 
 	// streamSorter dropdown
 	'.{class:streamSorter} { font-size: 13px; }' +

@@ -44,6 +44,24 @@ plugin.init = function() {
 
 };
 
+plugin.component.renderers.state = function(element) {
+	var activities = this.component.activities;
+	var activitiesCount = Echo.Utils.foldl(0, activities.queue, function(entry, acc) {
+		if (entry.affectCounter) return ++acc;
+	});
+	var currentState = this.component.getState() + activitiesCount;
+	if (currentState !== activities.lastState) {
+		this.component.events.publish({
+			"topic": "onActivitiesCountChange",
+			"data": {
+				"count": activitiesCount,
+				"context": this.component.config.get("context")
+			}
+		});
+	}
+	return this.parentRenderer("state", arguments);
+};
+
 plugin.component.renderers.header = function(element) {
 	return element.hide();
 };

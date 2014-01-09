@@ -316,6 +316,38 @@ dashboard.config = {
 		}
 	}, {
 		"component": "Group",
+		"name": "streamingControl",
+		"type": "object",
+		"config": {
+			"title": "Streaming control"
+		},
+		"items": [{
+			"component": "Checkbox",
+			"name": "pauseOnHover",
+			"type": "boolean",
+			"default": true,
+			"config": {
+				"title": "Pause on Hover"
+			}
+		}, {
+			"component": "Checkbox",
+			"name": "displayStreamingStateHeader",
+			"type": "boolean",
+			"default": false,
+			"config": {
+				"title": "Display streaming state header"
+			}
+		}, {
+			"component": "Checkbox",
+			"name": "EnablePausePlayToggle",
+			"type": "boolean",
+			"default": true,
+			"config": {
+				"title": "Enable play/pause toggle"
+			}
+		}]
+	}, {
+		"component": "Group",
 		"name": "postComposer",
 		"type": "object",
 		"config": {
