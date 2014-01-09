@@ -64,6 +64,8 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"displayEditIntent": true,
 		"displayCommunityFlagIntent": false,
+		"displayLikeCount": true,
+		"displayLikeFacepile": true,
 		"replyNestingLevels": 2,
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
@@ -108,6 +110,8 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"displayEditIntent": true,
 		"displayCommunityFlagIntent": true,
+		"displayLikeCount": true,
+		"displayLikeFacepile": true,
 		"replyNestingLevels": 2,
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
 		"itemStates": ["Untouched", "ModeratorApproved"],
@@ -816,7 +820,9 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"name": "Edit"
 	}, {
 		"intentID": "Like",
-		"name": "LikeCardUI"
+		"name": "LikeCardUI",
+		"displayAvatars": config.displayLikeFacepile,
+		"displayCount": config.displayLikeCount
 	}, {
 		"intentID": "CommunityFlag",
 		"name": "CommunityFlagCardUI"
@@ -830,8 +836,8 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
 		"requestMethod": "POST",
 		"nestedPlugins": [].concat([{
-				"name": "URLResolver",
-				"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs")
+			"name": "URLResolver",
+			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs")
 		}, {
 			"name": "JanrainBackplaneHandler",
 			"appId": this.config.get("dependencies.Janrain.appId"),

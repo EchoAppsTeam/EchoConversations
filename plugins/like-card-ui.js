@@ -40,7 +40,9 @@ plugin.config = {
 	 * This parameter is used to enable FacePile control rendering in async mode.
 	 */
 	"asyncFacePileRendering": false,
-	"likesPerPage": 5
+	"likesPerPage": 5,
+	"displayAvatars": true,
+	"displayCount": true
 };
 
 plugin.labels = {
@@ -133,7 +135,12 @@ plugin.renderers.likedBy = function(element) {
 			"text": false
 		}
 	});
-	config.plugins.push({"name": "LikeCardUI"});
+	config.plugins.push({
+		"name": "LikeCardUI",
+		"displayAvatars": this.config.get("displayAvatars"),
+		"displayCount": this.config.get("displayCount")
+	});
+
 	if (item.user.is("admin")) {
 		element.addClass(plugin.cssPrefix + "highlight");
 	}
@@ -298,29 +305,43 @@ var plugin = Echo.Plugin.manifest("LikeCardUI", "Echo.StreamServer.Controls.Face
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
-plugin.init = function() {
-	this.extendTemplate("replace", "more", plugin.templates.more);
+
+plugin.config = {
+	"displayAvatars": true,
+	"displayCount": true
 };
 
 plugin.labels = {
-	"more": "+{count}"
+	"count": "+{count}"
 };
 
-plugin.templates.more =
-	'<div class="{plugin.class:more}"></div>' +
-	'<div class="echo-clear"></div>';
-
-plugin.renderers.more = function(element) {
+plugin.component.renderers.more = function(element) {
 	var pile = this.component;
 	element.empty();
-	return pile._isMoreButtonVisible()
-		? element.show().append(this.labels.get("more", {
-			"count": pile.get("count.total") - pile.get("count.visible")
-		}))
+
+	var visible = this.config.get("displayCount") &&
+		(!this.config.get("displayAvatars") || pile._isMoreButtonVisible());
+
+	return visible
+		? element
+			.show()
+			.append(this.labels.get("count", {
+				"count": this.config.get("displayAvatars")
+					? pile.get("count.total") - pile.get("count.visible")
+					: pile.get("count.total")
+			}))
 		: element.hide();
 };
+
+plugin.component.renderers.actors = function() {
+	var element = this.parentRenderer("actors", arguments);
+	return this.config.get("displayAvatars")
+		? element.show()
+		: element.hide();
+};
+
 plugin.css =
-	'.{plugin.class:more} { float: right; font-size: 12px; margin-top: 5px;  white-space: nowrap; }';
+	'.{plugin.class} .{class:more} { float: right; font-size: 12px; margin-top: 5px;  white-space: nowrap; }';
 
 Echo.Plugin.create(plugin);
 

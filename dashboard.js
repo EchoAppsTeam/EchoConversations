@@ -144,7 +144,23 @@ dashboard.vars = {
 		"default": true,
 		"config": {
 			"title": "Display Edit Intent",
-			"desc": "If True, users will be able to edit their own posts. Moderators and admins will be able to edit any post."
+			"desc": "If enabled, users will be able to edit their own posts. Moderators and admins will be able to edit any post."
+		}
+	}, {
+		"component": "Checkbox",
+		"name": "displayLikeCount",
+		"type": "boolean",
+		"default": true,
+		"config": {
+			"title": "Display Like Count"
+		}
+	}, {
+		"component": "Checkbox",
+		"name": "displayLikeFacepile",
+		"type": "boolean",
+		"default": true,
+		"config": {
+			"title": "Display Like Facepile"
 		}
 	}, {
 		"component": "Select",
@@ -461,8 +477,8 @@ dashboard.config.normalizer = {
 					var items = assembleBaseECL.call(this);
 
 					items[3]["default"] = 5; // override initialItemsPerPage value
-					items[13]["items"][0]["default"] = true;
-					items[13]["items"][1]["default"] = true;
+					items[15]["items"][0]["default"] = true;
+					items[15]["items"][1]["default"] = true;
 					items.pop();
 
 					items.splice(5, 0, {
@@ -481,7 +497,7 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
-					items[13]["items"].push(component.get("premoderationECL"));
+					items[15]["items"].push(component.get("premoderationECL"));
 					items.splice(11, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
