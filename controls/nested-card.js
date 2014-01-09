@@ -123,7 +123,6 @@ card.renderers.videoPlaceholder = function(element) {
 	if (!oembed.thumbnail_url) {
 		element.empty().append($(oembed.html));
 	}
-	console.log(oembed);
 	//TODO: calc height/width
 	var ratio, dimensions;
 	if (oembed.thumbnail_width) {
