@@ -408,7 +408,7 @@ conversations.renderers.postComposer = function(element) {
 			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
 			"markers": this._getSubmitMarkers(),
-			"plugins": [].concat([{
+			"plugins": this._mergeSpecsByName([{
 				"name": "URLResolver",
 				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs")
 			}, {
@@ -771,34 +771,36 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 			? ["topPost", "topContributor"]
 			: ["topPost"]
 		: [];
-	return [].concat(this._getConditionalStreamPluginList(componentID), [{
-			"name": "CardUIShim",
-			"displayTopPostHighlight": config.displayTopPostHighlight,
-			"includeTopContributors": this.config.get("topPosts.includeTopContributors"),
-			"topMarkers": this.config.get("topMarkers")
-		}, {
-			"name": "ItemEventsProxy",
-			"onAdd": function() {
-				var counter = self.getComponent(componentID + "Counter");
-				counter && counter.request.liveUpdates.start(true);
-				overrides.onItemAdd && overrides.onItemAdd();
-			},
-			"onDelete": function() {
-				var counter = self.getComponent(componentID + "Counter");
-				counter && counter.request.liveUpdates.start(true);
-				overrides.onItemDelete && overrides.onItemDelete();
-			}
-		}, {
-			"name": "ModerationCardUI",
-			"extraActions": moderationExtraActions,
-			"topMarkers": this.config.get("topMarkers")
-		}, {
-			"name": "ItemsRollingWindow",
-			"moreButton": true
-		}, {
-			"name": "URLResolver"
-		}], config.plugins);
 
+	var plugins = [].concat(this._getConditionalStreamPluginList(componentID), [{
+		"name": "CardUIShim",
+		"displayTopPostHighlight": config.displayTopPostHighlight,
+		"includeTopContributors": this.config.get("topPosts.includeTopContributors"),
+		"topMarkers": this.config.get("topMarkers")
+	}, {
+		"name": "ItemEventsProxy",
+		"onAdd": function() {
+			var counter = self.getComponent(componentID + "Counter");
+			counter && counter.request.liveUpdates.start(true);
+			overrides.onItemAdd && overrides.onItemAdd();
+		},
+		"onDelete": function() {
+			var counter = self.getComponent(componentID + "Counter");
+			counter && counter.request.liveUpdates.start(true);
+			overrides.onItemDelete && overrides.onItemDelete();
+		}
+	}, {
+		"name": "ModerationCardUI",
+		"extraActions": moderationExtraActions,
+		"topMarkers": this.config.get("topMarkers")
+	}, {
+		"name": "ItemsRollingWindow",
+		"moreButton": true
+	}, {
+		"name": "URLResolver"
+	}]);
+
+	return this._mergeSpecsByName(plugins, config.plugins);
 };
 
 conversations.methods._getConditionalStreamPluginList = function(componentID) {
@@ -825,7 +827,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"pauseTimeout": +this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout"),
 		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
 		"requestMethod": "POST",
-		"nestedPlugins": [].concat([{
+		"nestedPlugins": this._mergeSpecsByName([{
 			"name": "URLResolver",
 			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs")
 		}, {
@@ -1054,6 +1056,41 @@ conversations.methods._getSubmitMarkers = function() {
 	return this._isModerationRequired()
 		? this.config.get("allPosts.moderation.premoderation.markers")
 		: [];
+};
+
+// borrowed from Echo.App
+conversations.methods._mergeSpecsByName = function(specs) {
+	var self = this;
+	var getSpecIndex = function(spec, specs) {
+		var idx = -1;
+		$.each(specs, function(i, _spec) {
+			if (spec.name === _spec.name) {
+				idx = i;
+				return false;
+			}
+		});
+		return idx;
+	};
+	// flatten update specs list
+	var updateSpecs = $.map(Array.prototype.slice.call(arguments, 1) || [], function(spec) {
+		return spec;
+	});
+	return Echo.Utils.foldl(specs, updateSpecs, function(extender) {
+		var id = getSpecIndex(extender, specs);
+		if (!~id) {
+			specs.push(extender);
+			return;
+		}
+		if (extender.name === specs[id].name) {
+			if (extender.nestedPlugins) {
+				specs[id].nestedPlugins = specs[id].nestedPlugins || [];
+				self._mergeSpecsByName(specs[id].nestedPlugins, extender.nestedPlugins);
+				// delete nested plugins in the extender to avoid override effect after extend below
+				delete extender.nestedPlugins;
+			}
+		}
+		specs[id] = $.extend(true, {}, specs[id], extender);
+	});
 };
 
 // removing "Echo.UserSession.onInvalidate" subscription from an app
