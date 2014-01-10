@@ -85,6 +85,15 @@ dashboard.vars = {
 		}
 	}, {
 		"component": "Checkbox",
+		"name": "displaySourceIcons",
+		"type": "boolean",
+		"default": true,
+		"config": {
+			"title": "Display source icons",
+			"desc": "If True, will display the source Icon for each post"
+		}
+	}, {
+		"component": "Checkbox",
 		"name": "displaySortOrderPulldown",
 		"type": "boolean",
 		"default": true,
@@ -479,8 +488,8 @@ dashboard.config.normalizer = {
 					var items = assembleBaseECL.call(this);
 
 					items[3]["default"] = 5; // override initialItemsPerPage value
-					items[14]["items"][0]["default"] = true;
-					items[14]["items"][1]["default"] = true;
+					items[15]["items"][0]["default"] = true;
+					items[15]["items"][1]["default"] = true;
 					items.pop();
 
 					items.splice(5, 0, {
@@ -499,7 +508,7 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
-					items[14]["items"].push(component.get("premoderationECL"));
+					items[15]["items"].push(component.get("premoderationECL"));
 					items.splice(11, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",

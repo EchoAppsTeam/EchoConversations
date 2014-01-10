@@ -56,6 +56,7 @@ conversations.config = {
 		"initialItemsPerPage": 5,
 		"initialSortOrder": "reverseChronological",
 		"includeTopContributors": true,
+		"displaySourceIcons": true,
 		"displaySortOrderPulldown": true,
 		"displayCounter": true,
 		"displayTopPostHighlight": true,
@@ -101,6 +102,7 @@ conversations.config = {
 		"queryOverride": "",
 		"initialItemsPerPage": 15,
 		"initialSortOrder": "reverseChronological",
+		"displaySourceIcons": true,
 		"displaySortOrderPulldown": true,
 		"displayCounter": true,
 		"displayTopPostHighlight": true,
@@ -753,7 +755,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		"item": {
 			"reTag": false,
 			"viaLabel": {
-				"icon": true
+				"icon": config.displaySourceIcons
 			},
 			"limits": {
 				"maxBodyCharacters": config.maxItemBodyCharacters
