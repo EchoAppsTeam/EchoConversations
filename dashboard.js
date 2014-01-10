@@ -355,7 +355,7 @@ dashboard.config = {
 			}
 		}, {
 			"component": "Checkbox",
-			"name": "EnablePausePlayToggle",
+			"name": "enablePausePlayToggle",
 			"type": "boolean",
 			"default": true,
 			"config": {

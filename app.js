@@ -12,7 +12,7 @@ conversations.config = {
 		"pauseOnHover": true,
 		"displayStreamingStateHeader": false,
 		// TODO handle this parameter
-		"EnablePausePlayToggle": true
+		"enablePausePlayToggle": true
 	},
 	"postComposer": {
 		"visible": true,
@@ -116,7 +116,7 @@ conversations.config = {
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
-		"itemTypes": ["comment"],
+		"itemTypes": ["comment", "note"],
 		"maxItemBodyCharacters": 200,
 		"sortOrderEntries": [{
 			"title": "Newest First",
@@ -188,6 +188,7 @@ conversations.config = {
 
 conversations.vars = {
 	"streamingState": "live",
+	"changeStateOnHover": true,
 	"activitiesCount": 0
 };
 
@@ -287,13 +288,15 @@ conversations.templates.main =
 			'<div class="{class:streamingState}"></div>' +
 			'<div class="clearfix"></div>' +
 		'</div>' +
-		'<div class="{class:postComposer}"></div>' +
-		'<div class="{class:topPostsContainer}">' +
-			'<div class="{class:topPostsHeader}"></div>' +
-			'<div class="{class:topPosts}"></div>' +
-		'</div>' +
-		'<div class="{class:allPostsContainer}">' +
-			'<div class="active {class:allPosts}"></div>' +
+		'<div class="{class:content}">' +
+			'<div class="{class:postComposer}"></div>' +
+			'<div class="{class:topPostsContainer}">' +
+				'<div class="{class:topPostsHeader}"></div>' +
+				'<div class="{class:topPosts}"></div>' +
+			'</div>' +
+			'<div class="{class:allPostsContainer}">' +
+				'<div class="active {class:allPosts}"></div>' +
+			'</div>' +
 		'</div>' +
 	'</div>';
 
@@ -342,8 +345,15 @@ conversations.renderers.streamingStateContainer = function(element) {
 };
 
 conversations.renderers.streamingState = function(element) {
+	var self = this;
 	var state = this.get("streamingState");
 	var oldState = {"paused": "live", "live": "paused"}[state];
+	if (this.config.get("streamingControl.enablePausePlayToggle")) {
+		element.addClass("echo-clickable");
+		element.on("click", function() {
+			self.setStreamingState(oldState, true);
+		});
+	}
 	return element
 		.empty()
 		.removeClass(this.cssPrefix + "streamingState-" + oldState)
@@ -365,11 +375,7 @@ conversations.renderers.itemsWaiting = function(element) {
 	return element;
 };
 
-conversations.renderers.streamingStateCursor = function(element) {
-	return element.hide();
-};
-
-conversations.renderers.container = function(element) {
+conversations.renderers.content = function(element) {
 	var self = this;
 	if (this.config.get("streamingControl.pauseOnHover")) {
 		element
@@ -695,9 +701,15 @@ conversations.renderers._streamTitle = function(element, extra) {
 	return element.append(title);
 };
 
-conversations.methods.setStreamingState = function(state) {
+conversations.methods.setStreamingState = function(state, permanent) {
 	var self = this;
+	if (!this.get("changeStateOnHover") && !permanent) {
+		return;
+	}
 	this.set("streamingState", state);
+	// prohibit to change state on mouse enter/leave container if user set 'pause' state using button
+	this.set("changeStateOnHover", !(permanent && state === "paused"));
+
 	// change state of all streams
 	$.map(["topPosts", "allPosts", "moderationQueue"], function(streamName) {
 		var stream = self.getComponent(streamName);
@@ -705,28 +717,6 @@ conversations.methods.setStreamingState = function(state) {
 			stream.setState(state);
 		}
 	});
-
-	// move cursor if state is 'paused'
-	if (state === "paused") {
-		var container = this.view.get("container");
-		var cursor = self.view.get("streamingStateCursor");
-		var moveCursor = function(event) {
-			cursor.show();
-			cursor.css({
-				"left": event.clientX,
-				"top": event.clientY
-			});
-		};
-		if (container && cursor) {
-			container
-				.on("mousemove", moveCursor)
-				.on("mouseleave", function() {
-					cursor.hide();
-					container.off("mouseleave", moveCursor);
-				});
-		}
-	}
-
 	this.view.render({"name": "streamingState"});
 };
 
