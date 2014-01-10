@@ -351,7 +351,9 @@ conversations.renderers.streamingState = function(element) {
 	var oldState = {"paused": "live", "live": "paused"}[state];
 	if (this.config.get("streamingControl.enablePausePlayToggle")) {
 		element.addClass("echo-clickable");
-		element.on("click", function() {
+		element
+			.off("click.streamingState")
+			.on("click.streamingState", function() {
 			self.setStreamingState(oldState, true);
 		});
 	}
