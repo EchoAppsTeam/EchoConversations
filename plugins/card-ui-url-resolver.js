@@ -171,7 +171,11 @@ submitPlugin.events = {
 			}
 		});
 
-		this.component.view.get("text").val(args.postData.content[0].object.content);
+		// workflow for Edit Plugin
+		var content = this.component.view.get("text").val();
+		var clone = this.component.view.get("text").clone().val(content);
+		this.component.view.get("text").hide().val(args.postData.content[0].object.content)
+			.parent().append(clone);
 	},
 	"Echo.StreamServer.Controls.Submit.onPostComplete": function(topic, args) {
 		this.set("resolvedMedia", {});
