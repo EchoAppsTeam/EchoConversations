@@ -515,14 +515,14 @@ plugin.css =
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{plugin.class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
 	'.{plugin.class} .{plugin.class:buttonIcon} { opacity: 0.3; }' +
-		'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor,' +
-		'.echo-sdk-ui .{plugin.class} .{class:button}:active,' +
-		'.echo-sdk-ui .{plugin.class} .{class:button}:focus { text-decoration: none; color: #c6c6c6; }' +
+	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor,' +
+	'.echo-sdk-ui .{plugin.class} .{class:button}:active,' +
+	'.echo-sdk-ui .{plugin.class} .{class:button}:focus { text-decoration: none; color: #c6c6c6; }' +
 	'.{plugin.class} .{class:container}:hover a.{class:button} { color: #262626; text-decoration: none; }' +
 	'.{plugin.class} .{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
 	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{plugin.class:buttonIcon},' +
-		'.{plugin.class} .{class:container}:hover .{plugin.class:buttonIcon},' +
-		'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
+	'.{plugin.class} .{class:container}:hover .{plugin.class:buttonIcon},' +
+	'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
 
 	'.{plugin.class} .{class:depth-0} .{class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{plugin.class:chevron} { margin-top: 0px !important; }' +
@@ -545,9 +545,9 @@ plugin.css =
 	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
 
 	// Edit Plugin
-	'.{class:container-root} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-plugin-Edit-header { line-height: 38px; margin-left: 45px; }' +
-	'.{class:container-root} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-body { padding: 7px 0px 0px 0px; }' +
-	'.{class:container-root} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-controls { margin-bottom: 5px; }' +
+	'.{class:depth-0} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-plugin-Edit-header { line-height: 38px; margin-left: 45px; }' +
+	'.{class:depth-0} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-body { padding: 7px 0px 0px 0px; }' +
+	'.{class:depth-0} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-controls { margin-bottom: 5px; }' +
 
 	itemDepthRules.join("\n");
 
