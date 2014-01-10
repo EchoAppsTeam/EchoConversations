@@ -21,7 +21,7 @@ conversations.config = {
 			"comments": {
 				"visible": true,
 				"prompt": "What's on your mind?",
-				"resolveURLs": false
+				"resolveURLs": true
 			}
 		},
 		"confirmation": {
@@ -35,11 +35,12 @@ conversations.config = {
 	"replyComposer": {
 		"visible": true,
 		"displaySharingOnPost": true,
+		"displayCompactForm": true,
 		"contentTypes": {
 			"comments": {
 				"visible": true,
 				"prompt": "What's on your mind?",
-				"resolveURLs": false
+				"resolveURLs": true
 			}
 		},
 		"confirmation": {
@@ -487,6 +488,9 @@ conversations.renderers.topPosts = function(element) {
 };
 
 conversations.renderers.allPosts = function(element) {
+	if (!this.config.get("allPosts.visible")) {
+		return element;
+	}
 	if (this._moderationQueueEnabled()) {
 		this.view.render({
 			"name": "_tabs",
@@ -826,6 +830,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		// TODO: pass markers through data
 		"extraMarkers": this._getSubmitMarkers(),
 		"enabled": this._isComposerVisible("replyComposer"),
+		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
 		"pauseTimeout": +this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout"),
 		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
 		"requestMethod": "POST",

@@ -283,7 +283,7 @@ dashboard.vars = {
 				"component": "Checkbox",
 				"name": "resolveURLs",
 				"type": "boolean",
-				"default": false,
+				"default": true,
 				"config": {
 					"title": "Resolve URLs",
 					"desc": "If enabled, resolves URLs found in the comment body to rich attached content"
@@ -523,11 +523,21 @@ dashboard.config.normalizer = {
 					return this;
 				},
 				"postComposer": function() {
-					this["items"] = component.get("baseComposerECL");
+					this["items"] = [].concat(component.get("baseComposerECL"));
 					return this;
 				},
 				"replyComposer": function() {
-					this["items"] = component.get("baseComposerECL");
+					this["items"] = [].concat(component.get("baseComposerECL"));
+					this["items"].splice(2, 0, {
+						"component": "Checkbox",
+						"name": "displayCompactForm",
+						"type": "boolean",
+						"default": true,
+						"config": {
+							"title": "Display Compact Form",
+							"desc": "If enabled, compact form is displayed below each top-level post"
+						}
+					});
 					return this;
 				}
 			};

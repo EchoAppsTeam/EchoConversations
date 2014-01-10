@@ -152,9 +152,9 @@ plugin.init = function() {
 	this.set("isLiveUpdate", this.component.config.get("live"));
 	this.extendTemplate("replace", "header", plugin.templates.header);
 	this.extendTemplate("insertBefore", "frame", plugin.templates.topPostMarker);
+	this.extendTemplate("remove", "date");
 	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
 	this.extendTemplate("insertAsLastChild", "expandChildren", plugin.templates.chevron);
-	this.extendTemplate("remove", "date");
 	this.set("buttonsLayout", "inline");
 	this._initPageObserver();
 
@@ -185,7 +185,7 @@ plugin.init = function() {
 };
 
 plugin.templates.date =
-	'<div class="{plugin.class:date}"></div>';
+	'<div class="{class:date}"></div>';
 
 plugin.templates.wrapper =
 	'<div class="{plugin.class:wrapper}"></div>';
@@ -237,12 +237,6 @@ plugin.renderers.topPostMarker = function(element) {
 	return visible
 		? element.show()
 		: element.hide();
-};
-
-plugin.renderers.date = function(element) {
-	// TODO: use parentRenderer here
-	this.age = this.component.getRelativeTime(this.component.timestamp);
-	return element.html(this.age);
 };
 
 plugin.component.renderers.indicator = function(element) {
@@ -473,17 +467,25 @@ plugin.css =
 	'.{plugin.class} .{class:container} { position: relative; }' +
 	'.{plugin.class} .{class:indicator} { position: absolute; left: 0px; top: 0px; bottom: 0px; width: 4px; background-color: transperent; z-index: 10; }' +
 
+	// TODO: get rid of this item styles (introduced for DS generated items)
+	'.{plugin.class} .{class:body} .echo-item-video { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
+	'.{plugin.class} .{class:body} .echo-item-video > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.{plugin.class} .{class:body} .echo-item-video > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.{plugin.class} .{class:body} .echo-item-video > object { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.{plugin.class} .{class:body} .echo-item-title { font-size: 15px; font-weight: normal; line-height: 21px; margin: 0px; }' +
+
 	// common
 	'.{plugin.class} .{plugin.class:dropdownButton} { display: inline; margin-left: 0px; }' +
 	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown { display: inline; }' +
 	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
+
 	'.{plugin.class:topPostMarker} { float: right; position: relative; top: -19px; right: 0px; }' +
 	'.{plugin.class} .{plugin.class:wrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
 	'.{plugin.class} .{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
 	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} .{class:indicator} { background-color: #f5ba47; }' +
 
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
-	'.{plugin.class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
+	'.{plugin.class} .{class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
 
 	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
 	'.{plugin.class} .{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
@@ -495,15 +497,15 @@ plugin.css =
 	'.{plugin.class} .{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
 
-	'.{plugin.class} .{class:container-child} { padding: 12px 0px 10px 16px; margin: 0px 15px 2px 0px; }' +
-	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 12px 0px 10px 12px; margin: 0px 15px 2px 0px; }' +
+	'.{plugin.class} .{class:container-child} { padding: 8px 0px 8px 16px; margin: 0px 15px 2px 0px; }' +
+	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding: 8px 0px 8px 8px; margin: 0px 15px 2px 0px; }' +
 
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
 	'.{plugin.class} .{class:children} .{plugin.class:wrapper} { padding-top: 0px; background: none; border: none; }' +
-	'.{plugin.class} .{class:expandChildren} { padding-bottom: 0px; padding-top: 5px; }' +
-	'.{plugin.class} .{class:children} .{class:expandChildren} { padding-bottom: 10px; padding-top: 12px; }' +
+	'.{plugin.class} .{class:expandChildren} { padding: 15px 0px 8px 16px; margin-bottom: 0px; }' +
+	'.{plugin.class} .{class:children} .{class:expandChildren} { padding: 8px 0px; margin-bottom: 0px; }' +
 
 	'.echo-sdk-ui .{plugin.class} .{class:buttons} a:focus { outline: none; }' +
 	'.{plugin.class} .{class:button} { margin-right: 10px; }' +
@@ -520,7 +522,7 @@ plugin.css =
 		'.{plugin.class} .{class:container}:hover .{plugin.class:buttonIcon},' +
 		'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
 
-	'.{plugin.class} .{class:depth-0} .{plugin.class:date} { line-height: 40px; }' +
+	'.{plugin.class} .{class:depth-0} .{class:date} { line-height: 40px; }' +
 	'.{plugin.class} .{plugin.class:chevron} { margin-top: 0px !important; }' +
 	'.{plugin.class} .{class:expandChildrenLabel} { margin-right: 5px; }' +
 	'.{plugin.class} .{class:expandChildren} .{class:expandChildrenLabel} { color: #D3D3D3; }' +
@@ -614,19 +616,24 @@ plugin.labels = {
 	"postAndShare": "Post and Share"
 };
 
+plugin.templates.auth = '<div class="{plugin.class:auth}"></div>';
+
+plugin.templates.attach =
+	'<div class="{plugin.class:attach}">' +
+		'<img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" />' +
+	'</div>';
+
 plugin.templates.postButton =
-	'<div class="btn-group">' +
-		'<button class="btn btn-primary {plugin.class:postButton}"></button>' +
-		'<button class="btn btn-primary dropdown-toggle {plugin.class:switchSharing}" data-toggle="dropdown"><span class="caret"></span></button>' +
+	'<div class="{class:postButton} btn-group">' +
+		'<button class="btn btn-primary {plugin.class:button}"></button>' +
+		'<button class="btn btn-primary dropdown-toggle {plugin.class:switchSharing}" data-toggle="dropdown">' +
+			'<span class="caret"></span>' +
+		'</button>' +
 		'<ul class="dropdown-menu pull-right">' +
 			'<li><a href="#" class="{plugin.class:switchToPost}">{plugin.label:post}</a></li>' +
 			'<li><a href="#" class="{plugin.class:switchToPostAndShare}">{plugin.label:postAndShare}</a></li>' +
 		'</ul>' +
 	'</div>';
-
-plugin.templates.attach = '<div class="{plugin.class:attach}"><img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" /></div>';
-
-plugin.templates.auth = '<div class="{plugin.class:auth}"></div>';
 
 plugin.templates.confirmation =
 	'<div class="alert alert-success echo-primaryFont {plugin.class:confirmation}">' +
@@ -636,10 +643,9 @@ plugin.templates.confirmation =
 plugin.init = function() {
 	var self = this, submit = this.component;
 
-	this.extendTemplate("insertAsFirstChild", "container", plugin.templates.confirmation);
-	this.extendTemplate("remove", "postButton");
-	this.extendTemplate("insertAsFirstChild", "postContainer", plugin.templates.postButton);
+	this.extendTemplate("replace", "postButton", plugin.templates.postButton);
 	this.extendTemplate("insertBefore", "header", plugin.templates.auth);
+	this.extendTemplate("insertAsFirstChild", "container", plugin.templates.confirmation);
 
 	// drop all validators
 	submit.validators = [];
@@ -677,7 +683,7 @@ plugin.renderers.confirmation = function(element) {
 	return element.hide();
 };
 
-plugin.renderers.postButton = function(element) {
+plugin.renderers.button = function(element) {
 	var self = this;
 	var submit = this.component;
 
@@ -792,6 +798,10 @@ plugin.renderers.auth = function(element) {
 	return element;
 };
 
+plugin.component.renderers.postButton = function(element) {
+	return element;
+};
+
 plugin.methods._requestLoginPrompt = function() {
 	Backplane.response([{
 		// IMPORTANT: we use ID of the last received message
@@ -871,7 +881,7 @@ plugin.css =
 	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{plugin.class} .{class:header} { margin-top: 10px; }' +
 	'.{plugin.class} .{class:postContainer} .dropdown-menu { min-width: 100px; }' +
-	'.{plugin.class} .btn.{plugin.class:postButton} { padding: 3px 12px 5px 12px; }' +
+	'.{plugin.class} .btn.{plugin.class:button} { padding: 3px 12px 5px 12px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
 Echo.Plugin.create(plugin);
