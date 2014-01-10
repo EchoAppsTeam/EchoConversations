@@ -16,7 +16,9 @@ card.templates.photo =
 					'</a>' +
 					'<div class="{class:photoLabel}">' +
 						'<div class="{class:photoLabelContainer}">' +
-							'<div class="{class:title} {class:photoTitle}">{data:title}</div>' +
+							'<div class="{class:title} {class:photoTitle}">' +
+								'<a class="echo-clickable" href="{data:url}" target="_blank">{data:title}</a>' +
+							'</div>' +
 							'<div class="{class:description} {class:photoDescription}">{data:description}</div>' +
 						'</div>' +
 					'</div>' +
@@ -60,7 +62,18 @@ card.templates.link =
 			'</div>';
 
 card.templates.main = function() {
-	return this.templates[this.get("data.type")];
+	var data = this.get("data");
+	var handlers = {
+		"link": function(data) {
+			var width = this.config.get("width");
+			return (width && data.thumbnail_width >= width)
+				? this.templates["photo"]
+				: this.templates["link"];
+		}
+	};
+	return handlers[data.type]
+		? handlers[data.type].call(this, data)
+		: this.templates[data.type];
 };
 
 card.config = {
@@ -176,8 +189,15 @@ card.css =
 	'.{class:photo} { position: relative; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background: rgba(0, 0, 0, 0.5); }' +
+	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
 	'.{class:photoTitle} { margin: 0 0 5px 0; }' +
+
+	'.{class:photoLabel} { max-height: 30%; overflow: hidden; }' +
+	'.{class:photo}:hover .{class:photoLabel} { max-height: 100%; }' +
+	$.map(["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(propertyName) {
+		return '.{class:photoLabel} { ' + propertyName +': max-height ease 300ms}';
+	}).join("") +
 
 	// play button
 	'.{class:playButton} { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 10; }' +
