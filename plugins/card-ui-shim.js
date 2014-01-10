@@ -466,6 +466,9 @@ for (var i = 0; i <= 20; i++) {
 }
 
 plugin.css =
+	// source icon
+	'.{plugin.class} .{class:sourceIcon} { margin-right: 10px; }' +
+
 	// indicator
 	'.{plugin.class} .{class:container} { position: relative; }' +
 	'.{plugin.class} .{class:indicator} { position: absolute; left: 0px; top: 0px; bottom: 0px; width: 4px; background-color: transperent; z-index: 10; }' +

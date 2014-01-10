@@ -754,6 +754,9 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		},
 		"item": {
 			"reTag": false,
+			"viaLabel": {
+				"icon": true
+			},
 			"limits": {
 				"maxBodyCharacters": config.maxItemBodyCharacters
 			}
