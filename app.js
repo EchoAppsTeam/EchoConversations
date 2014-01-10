@@ -64,8 +64,7 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"displayEditIntent": true,
 		"displayCommunityFlagIntent": false,
-		"displayLikeCount": true,
-		"displayLikeFacepile": true,
+		"likesDisplayStyle": "facepile",
 		"replyNestingLevels": 2,
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
@@ -110,8 +109,7 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"displayEditIntent": true,
 		"displayCommunityFlagIntent": true,
-		"displayLikeCount": true,
-		"displayLikeFacepile": true,
+		"likesDisplayStyle": "facepile",
 		"replyNestingLevels": 2,
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
 		"itemStates": ["Untouched", "ModeratorApproved"],
@@ -816,8 +814,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	}, {
 		"intentID": "Like",
 		"name": "LikeCardUI",
-		"displayAvatars": config.displayLikeFacepile,
-		"displayCount": config.displayLikeCount
+		"displayStyle": config.likesDisplayStyle
 	}, {
 		"intentID": "CommunityFlag",
 		"name": "CommunityFlagCardUI"

@@ -41,8 +41,7 @@ plugin.config = {
 	 */
 	"asyncFacePileRendering": false,
 	"likesPerPage": 5,
-	"displayAvatars": true,
-	"displayCount": true
+	"displayStyle": "facepile"
 };
 
 plugin.labels = {
@@ -137,8 +136,7 @@ plugin.renderers.likedBy = function(element) {
 	});
 	config.plugins.push({
 		"name": "LikeCardUI",
-		"displayAvatars": this.config.get("displayAvatars"),
-		"displayCount": this.config.get("displayCount")
+		"displayStyle": this.config.get("displayStyle")
 	});
 
 	if (item.user.is("admin")) {
@@ -307,26 +305,34 @@ if (Echo.Plugin.isDefined(plugin)) return;
 
 
 plugin.config = {
-	"displayAvatars": true,
-	"displayCount": true
+	"displayStyle": "facepile"
 };
 
 plugin.labels = {
-	"count": "+{count}"
+	"facepileCount": "+{count}",
+	"numberCount": "{count}",
+	"likeNumberTitle": "This item has {count} like",
+	"likesNumberTitle": "This item has {count} likes"
 };
 
 plugin.component.renderers.more = function(element) {
 	var pile = this.component;
+	var style = this.config.get("displayStyle");
 	element.empty();
 
-	var visible = this.config.get("displayCount") &&
-		(!this.config.get("displayAvatars") || pile._isMoreButtonVisible());
+	var visible = style === "number" || (style === "facepile" && pile._isMoreButtonVisible());
 
+	if (style === "number") {
+		element.attr("title", this.labels.get(
+			pile.get("count.total") > 1 ? "likesNumberTitle" : "likeNumberTitle",
+			{"count": pile.get("count.total")}
+		));
+	}
 	return visible
 		? element
 			.show()
-			.append(this.labels.get("count", {
-				"count": this.config.get("displayAvatars")
+			.append(this.labels.get(style + "Count", {
+				"count": style === "facepile"
 					? pile.get("count.total") - pile.get("count.visible")
 					: pile.get("count.total")
 			}))
@@ -335,7 +341,7 @@ plugin.component.renderers.more = function(element) {
 
 plugin.component.renderers.actors = function() {
 	var element = this.parentRenderer("actors", arguments);
-	return this.config.get("displayAvatars")
+	return this.config.get("displayStyle") === "facepile"
 		? element.show()
 		: element.hide();
 };

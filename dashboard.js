@@ -147,20 +147,22 @@ dashboard.vars = {
 			"desc": "If enabled, users will be able to edit their own posts. Moderators and admins will be able to edit any post."
 		}
 	}, {
-		"component": "Checkbox",
-		"name": "displayLikeCount",
-		"type": "boolean",
-		"default": true,
+		"component": "Select",
+		"name": "likesDisplayStyle",
+		"type": "string",
+		"default": "facepile",
 		"config": {
-			"title": "Display Like Count"
-		}
-	}, {
-		"component": "Checkbox",
-		"name": "displayLikeFacepile",
-		"type": "boolean",
-		"default": true,
-		"config": {
-			"title": "Display Like Facepile"
+			"title": "Likes Display Mode",
+			"options": [{
+				"title": "Hidden",
+				"value": "hidden"
+			}, {
+				"title": "Facepile",
+				"value": "facepile"
+			}, {
+				"title": "Number",
+				"value": "number"
+			}]
 		}
 	}, {
 		"component": "Select",
@@ -477,8 +479,8 @@ dashboard.config.normalizer = {
 					var items = assembleBaseECL.call(this);
 
 					items[3]["default"] = 5; // override initialItemsPerPage value
-					items[15]["items"][0]["default"] = true;
-					items[15]["items"][1]["default"] = true;
+					items[14]["items"][0]["default"] = true;
+					items[14]["items"][1]["default"] = true;
 					items.pop();
 
 					items.splice(5, 0, {
@@ -497,7 +499,7 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
-					items[15]["items"].push(component.get("premoderationECL"));
+					items[14]["items"].push(component.get("premoderationECL"));
 					items.splice(11, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
