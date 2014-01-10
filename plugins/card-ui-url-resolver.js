@@ -99,8 +99,10 @@ itemPlugin.methods._getMediaAttachments = function() {
 
 itemPlugin.methods._resizeMediaContent = function() {
 	var media = this.view.get("mediaContentContainer");
+	var attachments = this._getMediaAttachments();
 	if (media && media.is(":visible")) {
-		this.config.set("mediaWidth", media.outerWidth() * 0.9);
+		var k = attachments.length > 1 ? 0.9 : 1;
+		this.config.set("mediaWidth", media.outerWidth() * k);
 		this.view.render({"name": "mediaContent"});
 	}
 };
