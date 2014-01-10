@@ -136,26 +136,13 @@ submitPlugin.config = {
 
 submitPlugin.init = function() {
 	var self = this;
-	var item = this.component;
 	this.set("resolvedMedia", {});
 	this.set("definedMedia", []);
 	this.set("timer", null);
 
 	$.embedly.defaults.key = this.config.get("embedlyAPIKey");
 
-	Echo.Utils.safelyExecute(function() {
-		var fragment = $("<div/>").append(item.config.get("data.object.content"));
-		var text = fragment.find(".echo-item-text").html();
-		var attachments = fragment.find(".echo-item-files");
-		var media = $.map(attachments.find("div[oembed]"), function(item) {
-			return JSON.parse($(item).attr("oembed"));
-		});
-
-		if (media.length && text.length) {
-			item.set("data.object.content", fragment.find(".echo-item-text").html());
-			self.set("definedMedia", media);
-		}
-	});
+	self.set("definedMedia", this._getMediaAttachments());
 
 	this.extendTemplate("insertAfter", "content", submitPlugin.templates.preview);
 };
@@ -249,6 +236,7 @@ submitPlugin.templates.media = {
 
 submitPlugin.component.renderers.text = function(element) {
 	var self = this;
+	var item = this.component;
 	element.on("keyup paste", function() {
 		clearTimeout(self.timer);
 		self.timer = setTimeout(function() {
@@ -257,7 +245,20 @@ submitPlugin.component.renderers.text = function(element) {
 		}, 1000);
 	});
 
+	var original = item.get("data.object.content");
+
+	Echo.Utils.safelyExecute(function() {
+		var content = $("<div/>").append(item.get("data.object.content"));
+		var media = self._getMediaAttachments();
+		var text = $(".echo-item-text", content);
+		if (media.length && text.length) {
+			item.set("data.object.content", text.html());
+		}
+	});
+
 	this.parentRenderer("text", arguments);
+	item.set("data.object.content", original);
+
 	return element;
 };
 
@@ -277,6 +278,22 @@ submitPlugin.renderers.mediaContent = function(element) {
 	element.empty();
 	this.attachMedia(this.get("definedMedia"));
 	return element;
+};
+
+submitPlugin.methods._getMediaAttachments = function() {
+	var item = this.component;
+	if (this.get("content") !== item.get("data.object.content") || typeof this.get("media") === "undefined") {
+		var result = [];
+		Echo.Utils.safelyExecute(function() {
+			var content = $("<div/>").append(item.get("data.object.content"));
+			result = $("div[oembed], div[data-oemmbed]", content).map(function() {
+				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
+			}).get();
+		});
+		this.set("content", item.get("data.object.content"));
+		this.set("media", result);
+	}
+	return this.get("media", []);
 };
 
 submitPlugin.methods.getURLs = function(text) {
