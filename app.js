@@ -817,15 +817,6 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	var config = this.config.get(componentID);
 
 	var plugins = [{
-		"intentID": "Edit",
-		"name": "Edit",
-		"requestMethod": "POST",
-		"nestedPlugins": [{
-			"name": "URLResolver",
-			//TODO: We need to always enebale this plugin where but, disable url resolving if it's disabled in config
-			"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs")
-		}]
-	}, {
 		"intentID": "Like",
 		"name": "LikeCardUI",
 		"displayStyle": config.likesDisplayStyle
@@ -862,6 +853,17 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	}, {
 		"intentID": "Sharing",
 		"name": "CardUISocialSharing"
+	}, {
+		"intentID": "Edit",
+		"name": "Edit",
+		"icon": "icon-pencil", // TODO: get rid of it when new buttons protocol will be implemented
+		"requestMethod": "POST",
+		"nestedPlugins": [{
+			"name": "URLResolver",
+			//TODO: we should enable resolving through separate parameter
+			//	because it should works for submit and item as well
+			"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs")
+		}]
 	}];
 
 	return $.grep(plugins, function(plugin) {

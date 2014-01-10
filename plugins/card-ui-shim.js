@@ -343,12 +343,14 @@ plugin.component.renderers.buttons = function(element) {
 };
 
 plugin.component.renderers._button = function(element, extra) {
+	var item = this.component;
 	var template = extra.template || plugin.templates.button;
 
 	var data = {
 		"label": extra.label || "",
 		"name": extra.name,
-		"icon": extra.icon || (!extra.inner && "icon-comment")
+		"icon": item.config.get("plugins." + extra.plugin + ".icon") ||
+			extra.icon || (!extra.inner && "icon-comment")
 	};
 	var button = $(this.substitute({"template": template, "data": data}));
 	if (extra.inner) {
@@ -387,7 +389,7 @@ plugin.component.renderers._button = function(element, extra) {
 	});
 
 	if (!extra.inner) {
-		var _data = this.component.get("buttons." + extra.plugin + "." + extra.name);
+		var _data = item.get("buttons." + extra.plugin + "." + extra.name);
 		_data.element = button;
 		_data.clickableElements = clickables;
 		if (Echo.Utils.isMobileDevice()) {
