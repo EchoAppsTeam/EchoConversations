@@ -265,11 +265,13 @@ plugin.component.renderers.container = function(element) {
 	}
 
 	element = this.parentRenderer("container", arguments);
-	return this.component.view.rendered()
+	// we add wrapper if only the whole item is rendered
+	return this.component.view.rendered() && element.parent().hasClass("echo-tmp-wrapper")
 		? element
 		: element.wrap(this.substitute({
 			"template": plugin.templates.wrapper
 		}));
+
 };
 
 plugin.component.renderers._inlineButtons = function(element) {
@@ -541,6 +543,11 @@ plugin.css =
 
 	'.{plugin.class} .{class:data} { padding: 7px 0px 0px 0px; }' +
 	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
+
+	// Edit Plugin
+	'.{class:container-root} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-plugin-Edit-header { line-height: 38px; margin-left: 45px; }' +
+	'.{class:container-root} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-body { padding: 7px 0px 0px 0px; }' +
+	'.{class:container-root} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-controls { margin-bottom: 5px; }' +
 
 	itemDepthRules.join("\n");
 

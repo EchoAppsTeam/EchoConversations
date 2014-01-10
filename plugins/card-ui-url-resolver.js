@@ -24,7 +24,8 @@ itemPlugin.config = {
 };
 
 itemPlugin.vars = {
-	"media": []
+	"media": [],
+	"content": undefined
 };
 
 itemPlugin.templates.media =
@@ -34,22 +35,36 @@ itemPlugin.templates.media =
 
 itemPlugin.init = function() {
 	this.extendTemplate("insertAfter", "body", itemPlugin.templates.media);
-	this._prepareMediaContent();
 };
 
-itemPlugin.component.renderers.body = function() {
-	this._prepareMediaContent();
-	return this.parentRenderer("body", arguments);
+itemPlugin.component.renderers.body = function(element) {
+	var self = this;
+	var item = this.component;
+	var original = item.get("data.object.content");
+
+	Echo.Utils.safelyExecute(function() {
+		var content = $("<div/>").append(item.get("data.object.content"));
+		var media = self._getMediaAttachments();
+		var text = $(".echo-item-text", content);
+		if (media.length && text.length) {
+			item.set("data.object.content", text.html());
+		}
+	});
+
+	this.parentRenderer("body", arguments);
+	item.set("data.object.content", original);
+
+	return element;
 };
 
 itemPlugin.renderers.mediaContentContainer = function(element) {
-	var media = this.get("media", []);
+	var media = this._getMediaAttachments();
 	return element.addClass(this.cssPrefix + (media.length > 1 ? "multiple" : "single"));
 };
 
 itemPlugin.renderers.mediaContent = function(element) {
 	var self = this;
-	var media = this.get("media", []);
+	var media = this._getMediaAttachments();
 	element.empty();
 	$.map(media, function(item) {
 		var container = $("<div>");
@@ -66,21 +81,20 @@ itemPlugin.renderers.mediaContent = function(element) {
 	return element;
 };
 
-itemPlugin.methods._prepareMediaContent = function() {
-	var self = this;
+itemPlugin.methods._getMediaAttachments = function() {
 	var item = this.component;
-	Echo.Utils.safelyExecute(function() {
-		var fragment = $("<div/>").append(item.get("data.object.content"));
-		var attachments = fragment.find(".echo-item-files");
-		var media = $.map(attachments.find("div[oembed]"), function(item) {
-			return JSON.parse($(item).attr("oembed"));
+	if (this.get("content") !== item.get("data.object.content") || typeof this.get("media") === "undefined") {
+		var result = [];
+		Echo.Utils.safelyExecute(function() {
+			var content = $("<div/>").append(item.get("data.object.content"));
+			result = $("div[oembed], div[data-oemmbed]", content).map(function() {
+				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
+			}).get();
 		});
-		if (media.length) {
-			attachments.remove();
-			item.set("data.object.content", fragment.html());
-			self.set("media", media);
-		}
-	});
+		this.set("content", item.get("data.object.content"));
+		this.set("media", result);
+	}
+	return this.get("media", []);
 };
 
 itemPlugin.methods._resizeMediaContent = function() {
@@ -115,15 +129,33 @@ Echo.Plugin.create(itemPlugin);
 var submitPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Submit");
 
 submitPlugin.config = {
-	"apiKey": "8ded698289204c8c8348c08314a0c250",
+	"embedlyAPIKey": "5945901611864679a8761b0fcaa56f87",
 	"maxDescriptionCharacters": "200",
 	"mediaWidth": 230
 };
 
 submitPlugin.init = function() {
-	$.embedly.defaults.key = this.config.get("apiKey");
-	this.media = {};
-	this.timer = null;
+	var self = this;
+	var item = this.component;
+	this.set("resolvedMedia", {});
+	this.set("definedMedia", []);
+	this.set("timer", null);
+
+	$.embedly.defaults.key = this.config.get("embedlyAPIKey");
+
+	Echo.Utils.safelyExecute(function() {
+		var fragment = $("<div/>").append(item.config.get("data.object.content"));
+		var text = fragment.find(".echo-item-text").html();
+		var attachments = fragment.find(".echo-item-files");
+		var media = $.map(attachments.find("div[oembed]"), function(item) {
+			return JSON.parse($(item).attr("oembed"));
+		});
+
+		if (media.length && text.length) {
+			item.set("data.object.content", fragment.find(".echo-item-text").html());
+			self.set("definedMedia", media);
+		}
+	});
 
 	this.extendTemplate("insertAfter", "content", submitPlugin.templates.preview);
 };
@@ -131,10 +163,11 @@ submitPlugin.init = function() {
 submitPlugin.events = {
 	"Echo.StreamServer.Controls.Submit.onPostInit": function(topic, args) {
 		var self = this;
-		var mediaContent = $.map(this.media, function(media) {
-			if (!media.type) return null;
+		var mediaContent = $.map($.extend({}, this.get("resolvedMedia"), this.get("definedMedia")), function(media) {
+			var template = submitPlugin.templates.media[media.type];
+			if (!template) return null;
 			return self.substitute({
-				"template": submitPlugin.templates.media[media.type],
+				"template": template,
 				"data": $.extend(true, {}, media, {
 					"oembed": self.jsonEncode(media)
 				})
@@ -150,11 +183,20 @@ submitPlugin.events = {
 				"media": mediaContent.join("")
 			}
 		});
+
+		this.component.view.get("text").val(args.postData.content[0].object.content);
 	},
 	"Echo.StreamServer.Controls.Submit.onPostComplete": function(topic, args) {
-		this.media = {};
+		this.set("resolvedMedia", {});
+		this.set("definedMedia", []);
 		this.view.get("mediaContent").empty();
 		this.component.view.get("body").removeClass(this.cssPrefix + "enabledMedia");
+	},
+	"Echo.StreamServer.Controls.Submit.onReady": function() {
+		this._resizeMediaContent();
+	},
+	"Echo.StreamServer.Controls.Submit.onRender": function() {
+		this._resizeMediaContent();
 	}
 };
 
@@ -219,6 +261,24 @@ submitPlugin.component.renderers.text = function(element) {
 	return element;
 };
 
+function oembedInArray(oembed, array) {
+	var result = -1;
+	var oembedJSON = JSON.stringify(oembed);
+	$.each(array, function(i, val) {
+		if (oembedJSON === JSON.stringify(val)) {
+			result = i;
+			return false;
+		}
+	});
+	return result;
+}
+
+submitPlugin.renderers.mediaContent = function(element) {
+	element.empty();
+	this.attachMedia(this.get("definedMedia"));
+	return element;
+};
+
 submitPlugin.methods.getURLs = function(text) {
 	return text.match(/(https?:\/\/[^\s]+)/g) || [];
 };
@@ -226,8 +286,9 @@ submitPlugin.methods.getURLs = function(text) {
 submitPlugin.methods.resolveURLs = function(urls, callback) {
 	var self = this;
 	var unresolvedURLs = $.grep(urls, function(url) {
-		if(!self.media[url]) {
-			self.media[url] = {};
+		var media = self.get("resolvedMedia");
+		if (!media[url]) {
+			media[url] = {};
 			return true;
 		} else {
 			return false;
@@ -240,8 +301,23 @@ submitPlugin.methods.resolveURLs = function(urls, callback) {
 				"chars": self.config.get("maxDescriptionCharacters")
 				}
 		}).progress(function(data) {
-			self.media[data.original_url] = data;
-		}).done($.proxy(callback, this));
+			var media = self.get("resolvedMedia");
+			media[data.original_url] = data;
+		}).done(function(data) {
+			// check if resolved media already defined
+			// and try to move it in resolved media
+			var definedMedia = self.get("definedMedia");
+			data = $.grep(data, function(oembed) {
+				var index = oembedInArray(oembed, definedMedia);
+				if (~index) {
+					delete definedMedia[index];
+					return false;
+				} else {
+					return true;
+				}
+			});
+			callback(data);
+		});
 	} else {
 		callback();
 	}
@@ -259,11 +335,8 @@ submitPlugin.methods.jsonEncode = function(json) {
 submitPlugin.methods.attachMedia = function(data) {
 	if (!data) return;
 	var self = this;
-
-	var mediaContentContainer = this.view.get("mediaContentContainer");
 	var container = this.view.get("mediaContent");
 	var body = this.component.view.get("body");
-	var maxWidth = mediaContentContainer.width() * 0.9;
 
 	$.map(data, function(oembed) {
 		body.addClass(self.cssPrefix + "enabledMedia");
@@ -271,15 +344,23 @@ submitPlugin.methods.attachMedia = function(data) {
 		var card = new Echo.Conversations.NestedCard({
 			"target": html,
 			"context": self.config.get("context"),
-			"width": maxWidth,
+			"width":  self.config.get("mediaWidth"),
 			"data": oembed
 		});
 		var detachBtn = $(self.substitute({
 			"template": '<div class="{plugin.class:Close}">&times;</div>'
-		}));
-
-		detachBtn.one("click", function() {
-			self.media[oembed.original_url] = {};
+		})).one("click", function() {
+			var media = self.get("resolvedMedia");
+			if (media[oembed.original_url]) {
+				media[oembed.original_url] = {};
+			} else {
+				// remove from defined media
+				var definedMedia = self.get("definedMedia");
+				var index = oembedInArray(oembed, definedMedia);
+				if (~index) {
+					delete definedMedia[index];
+				}
+			}
 			card.destroy();
 			html.remove();
 			if (container.is(":empty")) {
@@ -287,10 +368,16 @@ submitPlugin.methods.attachMedia = function(data) {
 			}
 		});
 
-		html.append(detachBtn);
-
-		container.append(html);
+		html.append(detachBtn).appendTo(container);
 	});
+};
+
+submitPlugin.methods._resizeMediaContent = function() {
+	var media = this.view.get("mediaContentContainer");
+	if (media && media.is(":visible")) {
+		this.config.set("mediaWidth", media.outerWidth() * 0.9);
+		this.view.render({"name": "mediaContent"});
+	}
 };
 
 submitPlugin.css =

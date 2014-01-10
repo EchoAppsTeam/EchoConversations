@@ -816,7 +816,13 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 
 	var plugins = [{
 		"intentID": "Edit",
-		"name": "Edit"
+		"name": "Edit",
+		"requestMethod": "POST",
+		"nestedPlugins": [{
+			"name": "URLResolver",
+			//TODO: We need to always enebale this plugin where but, disable url resolving if it's disabled in config
+			"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs")
+		}]
 	}, {
 		"intentID": "Like",
 		"name": "LikeCardUI",
