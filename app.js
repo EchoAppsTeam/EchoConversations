@@ -11,7 +11,6 @@ conversations.config = {
 	"streamingControl": {
 		"pauseOnHover": true,
 		"displayStreamingStateHeader": false,
-		// TODO handle this parameter
 		"enablePausePlayToggle": true
 	},
 	"postComposer": {

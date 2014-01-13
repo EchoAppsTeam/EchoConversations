@@ -370,7 +370,7 @@ dashboard.config = {
 			"type": "boolean",
 			"default": true,
 			"config": {
-				"title": "Enable play/pause toggle"
+				"title": "Enable pause/play toggle"
 			}
 		}]
 	}, {
