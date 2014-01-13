@@ -212,7 +212,7 @@ submitPlugin.templates.message =
 
 submitPlugin.templates.media = {
 	"link":
-		'<div class="echo-media-item" oembed="{data:oembed}">' +
+		'<div class="echo-media-item" data-oembed="{data:oembed}">' +
 			'<div class="echo-item-article" style="width: {plugin.config:linkWidth}">' +
 				'<div class="echo-item-template-article-thumbnail" style="width: 30%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden;">' +
 					'<img src="{data:thumbnail_url}" style="width: auto; height: auto; max-height:120px; max-width:120px;" />' +
@@ -230,14 +230,14 @@ submitPlugin.templates.media = {
 		'</div>',
 
 	"photo":
-		'<div class="echo-media-item" oembed="{data:oembed}">' +
+		'<div class="echo-media-item" data-oembed="{data:oembed}">' +
 			'<a href="{data:original_url}" target="_blank">' +
 				'<img src="{data:thumbnail_url}"/>' +
 			'</a>' +
 		'</div>',
 
 	"video":
-		'<div class="echo-media-item" oembed="{data:oembed}">' +
+		'<div class="echo-media-item" data-oembed="{data:oembed}">' +
 			'<div class="echo-item-video">{data:html}</div>' +
 		'</div>'
 };
