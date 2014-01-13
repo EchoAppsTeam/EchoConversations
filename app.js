@@ -195,7 +195,7 @@ conversations.vars = {
 
 conversations.labels = {
 	"paused": "Streaming is Paused",
-	"live": "Streming is Live",
+	"live": "Streaming is Live",
 	"itemsWaiting": "({count} new items waiting)"
 };
 
