@@ -87,7 +87,7 @@ itemPlugin.methods._getMediaAttachments = function() {
 		var result = [];
 		Echo.Utils.safelyExecute(function() {
 			var content = $("<div/>").append(item.get("data.object.content"));
-			result = $("div[oembed], div[data-oemmbed]", content).map(function() {
+			result = $("div[oembed], div[data-oembed]", content).map(function() {
 				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
 			}).get();
 		});
@@ -320,7 +320,7 @@ submitPlugin.methods._getMediaAttachments = function() {
 		var result = [];
 		Echo.Utils.safelyExecute(function() {
 			var content = $("<div/>").append(item.get("data.object.content"));
-			result = $("div[oembed], div[data-oemmbed]", content).map(function() {
+			result = $("div[oembed], div[data-oembed]", content).map(function() {
 				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
 			}).get();
 		});
