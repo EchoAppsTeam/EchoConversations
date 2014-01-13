@@ -362,6 +362,8 @@ submitPlugin.methods.attachMedia = function(data) {
 	var body = this.component.view.get("body");
 
 	$.map(data, function(oembed) {
+		// TODO get rig of available types list here (move it into NestedCard?)
+		if (!~$.inArray(oembed.type, ["link", "photo", "video"])) { return false; }
 		body.addClass(self.cssPrefix + "enabledMedia");
 		var html = $("<div>");
 		var card = new Echo.Conversations.NestedCard({
