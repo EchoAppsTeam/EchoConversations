@@ -860,15 +860,31 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"requestMethod": "POST",
 		"nestedPlugins": [{
 			"name": "URLResolver",
-			//TODO: we should enable resolving through separate parameter
-			//	because it should works for submit and item as well
-			"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs")
+			// we enable resolving through separate parameter
+			// because it should works for submit and item as well
+			"resolveURLs": this._getResolverSettingForEditPlugin()
 		}]
 	}];
 
 	return $.grep(plugins, function(plugin) {
 		return !!config["display" + plugin.intentID + "Intent"];
 	});
+};
+
+conversations.methods._getResolverSettingForEditPlugin = function() {
+	var postComposer = this.config.get("postComposer.contentTypes.comments.resolveURLs");
+	var replyComposer = this.config.get("replyComposer.contentTypes.comments.resolveURLs");
+	var setting;
+	if (postComposer && replyComposer) {
+		setting = "all";
+	} else if (postComposer) {
+		setting = "only-roots";
+	} else if (replyComposer) {
+		setting = "only-children";
+	} else {
+		setting = "disabled";
+	}
+	return setting;
 };
 
 conversations.methods._isComposerVisible = function(composerID) {

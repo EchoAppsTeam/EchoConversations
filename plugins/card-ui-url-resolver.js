@@ -134,7 +134,8 @@ var submitPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Contro
 submitPlugin.config = {
 	"embedlyAPIKey": "5945901611864679a8761b0fcaa56f87",
 	"maxDescriptionCharacters": "200",
-	"mediaWidth": 230
+	"mediaWidth": 230,
+	"resolveURLs": "all" // all, disabled, only-roots, only-children
 };
 
 submitPlugin.init = function() {
@@ -244,13 +245,22 @@ submitPlugin.templates.media = {
 submitPlugin.component.renderers.text = function(element) {
 	var self = this;
 	var item = this.component;
-	element.on("keyup paste", function() {
-		clearTimeout(self.timer);
-		self.timer = setTimeout(function() {
-			var urls = self.getURLs(element.val());
-			self.resolveURLs(urls, $.proxy(self.attachMedia, self));
-		}, 1000);
-	});
+
+	function isRootItem() {
+		return item.get("data.object.id") === item.get("data.target.conversationID");
+	}
+
+	if (this.config.get("resolveURLs") === "all" ||
+			this.config.get("resolveURLs") === "only-roots" && isRootItem() ||
+			this.config.get("resolveURLs") === "only-children" && !isRootItem()) {
+		element.on("keyup paste", function() {
+			clearTimeout(self.timer);
+			self.timer = setTimeout(function() {
+				var urls = self.getURLs(element.val());
+				self.resolveURLs(urls, $.proxy(self.attachMedia, self));
+			}, 1000);
+		});
+	}
 
 	var original = item.get("data.object.content");
 
