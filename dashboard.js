@@ -89,8 +89,8 @@ dashboard.vars = {
 		"type": "boolean",
 		"default": true,
 		"config": {
-			"title": "Display source icons",
-			"desc": "If True, will display the source Icon for each post"
+			"title": "Display Source Icons",
+			"desc": "If enabled, will display the source Icon for each post"
 		}
 	}, {
 		"component": "Checkbox",
@@ -305,7 +305,7 @@ dashboard.vars = {
 			"default": false,
 			"config": {
 				"title": "Enable",
-				"desc": "If True, Posts from general users need to be manually Approved by a Moderator or Admin before being displayed to general users"
+				"desc": "If enabled, Posts from general users need to be manually Approved by a Moderator or Admin before being displayed to general users"
 			}
 		}, {
 			"component": "Checkbox",
@@ -314,7 +314,7 @@ dashboard.vars = {
 			"default": true,
 			"config": {
 				"title": "Approved User Bypass",
-				"desc": "If True, Users marked as ‘Approved’ bypass the Pre-moderation process, reducing unnecessary moderation overhead. Users who have 3 or more Posts approved are automatically marked as Approved Users"
+				"desc": "If enabled, Users marked as ‘Approved’ bypass the Pre-moderation process, reducing unnecessary moderation overhead. Users who have 3 or more Posts approved are automatically marked as Approved Users"
 			}
 		}]
 	}]
@@ -499,7 +499,7 @@ dashboard.config.normalizer = {
 						"default": true,
 						"config": {
 							"title": "Include Top Contributors",
-							"desc": "If True, Posts from users marked as ‘Top Contributors’ are automatically " +
+							"desc": "If enabled, Posts from users marked as ‘Top Contributors’ are automatically " +
 								"included in the Top Posts stream unless manually removed"
 						}
 					});
