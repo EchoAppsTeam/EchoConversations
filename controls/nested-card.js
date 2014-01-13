@@ -87,8 +87,7 @@ card.init = function() {
 };
 
 card.renderers.item = function(element) {
-	var width = this.config.get("width");
-	return element.find("> div").css("max-width", width);
+	return element.css("max-width", this._getMaxWidth());
 };
 
 card.renderers.sourceIcon = function(element) {
@@ -131,7 +130,7 @@ card.renderers.playButton = function(element) {
 
 card.renderers.videoPlaceholder = function(element) {
 	var oembed = this.get("data");
-	var maxWidth = this.config.get("width");
+	var maxWidth = this.config.get("width") - 20; // consider margins (margin: 10px)
 
 	if (!oembed.thumbnail_url) {
 		element.empty().append($(oembed.html));
@@ -178,14 +177,27 @@ card.renderers.photoLabelContainer = function(element) {
 		: element.hide();
 };
 
+card.methods._getMaxWidth = function() {
+	var maxWidth = this.config.get("width");
+	var oembed = this.get("data");
+	if (oembed.type === "photo") {
+		maxWidth = Math.min(
+			maxWidth,
+			(oembed.thumbnail_url && oembed.thumbnail_width >= maxWidth) ? oembed.thumbnail_width : oembed.width
+		);
+	}
+	return maxWidth;
+};
+
 // calculate photoLabel max-height
 var photoLabelHeight = 20 // photoLabelContainer padding
 	+ 16 // photoTitle width
 	+ 5 // photoTitle margin
 	+ 3*16; // photoDescription line-height * lines count
+
 card.css =
-	'.{class} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
 	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
+	'.{class:item} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
 	'.{class:item} .{class:sourceIcon} > img { max-width: 20px; }' +
 	'.echo-sdk-ui .{class:avatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
 
