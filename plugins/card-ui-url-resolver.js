@@ -401,7 +401,7 @@ submitPlugin.methods.attachMedia = function(data) {
 			"data": oembed
 		});
 		var detachBtn = $(self.substitute({
-			"template": '<div class="{plugin.class:Close}">&times;</div>'
+			"template": '<div class="echo-primaryFont {plugin.class:Close}">&times;</div>'
 		})).one("click", function() {
 			var media = self.get("resolvedMedia");
 			if (media[oembed.original_url]) {
