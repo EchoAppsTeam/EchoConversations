@@ -151,6 +151,9 @@ submitPlugin.init = function() {
 };
 
 submitPlugin.events = {
+	"Echo.StreamServer.Controls.Submit.onPostError": function(topic, args) {
+		this._restoreTextarea();
+	},
 	"Echo.StreamServer.Controls.Submit.onPostInit": function(topic, args) {
 		var self = this;
 		var mediaContent = $.map($.extend({}, this.get("resolvedMedia"), this.get("definedMedia")), function(media) {
@@ -173,18 +176,15 @@ submitPlugin.events = {
 				"media": mediaContent.join("")
 			}
 		});
-
-		// workflow for Edit Plugin
-		var content = this.component.view.get("text").val();
-		var clone = this.component.view.get("text").clone().val(content);
-		this.component.view.get("text").hide().val(args.postData.content[0].object.content)
-			.parent().append(clone);
+		this._replaceTextarea();
+		this.component.view.get("text").val(args.postData.content[0].object.content);
 	},
 	"Echo.StreamServer.Controls.Submit.onPostComplete": function(topic, args) {
 		this.set("resolvedMedia", {});
 		this.set("definedMedia", []);
 		this.view.get("mediaContent").empty();
 		this.component.view.get("body").removeClass(this.cssPrefix + "enabledMedia");
+		this._restoreTextarea();
 	},
 	"Echo.StreamServer.Controls.Submit.onReady": function() {
 		this._resizeMediaContent();
@@ -285,6 +285,23 @@ submitPlugin.renderers.mediaContent = function(element) {
 	element.empty();
 	this.attachMedia(this.get("definedMedia"));
 	return element;
+};
+
+submitPlugin.methods._replaceTextarea = function() {
+	// workflow for Edit Plugin
+	var content = this.component.view.get("text").val();
+	var clone = this.component.view.get("text").clone().val(content);
+	this.component.view.get("text").hide().parent().append(clone);
+	this.set("textareaClone", clone);
+};
+
+submitPlugin.methods._restoreTextarea = function() {
+	var clone = this.get("textareaClone");
+	if (clone) {
+		this.component.view.get("text").val(clone.val()).show();
+		this.set("textareaClone", null);
+		clone.remove();
+	}
 };
 
 submitPlugin.methods._getMediaAttachments = function() {
