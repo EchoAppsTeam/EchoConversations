@@ -599,7 +599,7 @@ plugin.events = {
 	"Echo.StreamServer.Controls.Submit.onSharingOnPostChange": {
 		"context": "global",
 		"handler": function() {
-			this.view.render({"name": "postButton"});
+			this.view.render({"name": "button"});
 		}
 	},
 	"Echo.StreamServer.Controls.Submit.onPostInit": function() {
