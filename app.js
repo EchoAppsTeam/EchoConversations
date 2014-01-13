@@ -1152,7 +1152,7 @@ conversations.css =
 
 	// streaming state
 	'.{class:streamingStateContainer} { text-align: left; margin-bottom: 5px; font-family: "Helvetica Neue", arial, sans-serif; }' +
-	'.{class:streamingState} { padding-left: 15px; float: right; font-size: 14px; line-height: 14px; }' +
+	'.{class:streamingState} { padding-left: 15px; float: right; font-size: 14px; line-height: 14px; color: #c6c6c6; }' +
 	'.{class:streamingState-live} { background: url({config:cdnBaseURL.sdk-assets}/images/control_play.png) no-repeat left 3px; }' +
 	'.{class:streamingState-paused} { background: url({config:cdnBaseURL.sdk-assets}/images/control_pause.png) no-repeat left 3px; }' +
 	'.{class:itemsWaiting} { font-size: 13px; color:  #c6c6c6; line-height: 14px; margin-left: 5px; }' +
