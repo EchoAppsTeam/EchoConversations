@@ -178,6 +178,11 @@ card.renderers.photoLabelContainer = function(element) {
 		: element.hide();
 };
 
+// calculate photoLabel max-height
+var photoLabelHeight = 20 // photoLabelContainer padding
+	+ 16 // photoTitle width
+	+ 5 // photoTitle margin
+	+ 3*16; // photoDescription line-height * lines count
 card.css =
 	'.{class} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
 	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
@@ -193,7 +198,7 @@ card.css =
 	'.{class:photoLabelContainer} { padding: 10px; }' +
 	'.{class:photoTitle} { margin: 0 0 5px 0; }' +
 
-	'.{class:photoLabel} { max-height: 30%; overflow: hidden; }' +
+	'.{class:photoLabel} { overflow: hidden; max-height: ' + photoLabelHeight + 'px; }' +
 	'.{class:photo}:hover .{class:photoLabel} { max-height: 100%; }' +
 	$.map(["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(propertyName) {
 		return '.{class:photoLabel} { ' + propertyName +': max-height ease 300ms}';
