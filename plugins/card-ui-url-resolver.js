@@ -115,6 +115,7 @@ itemPlugin.css =
 
 	'.{plugin.class:mediaContent} { white-space: nowrap; }' +
 	'.{plugin.class:mediaContent} > div { display: inline-block; white-space: normal; vertical-align: top; }' +
+	'.{plugin.class:single} .{plugin.class:mediaContent} > div { display: block; }' +
 	'.{plugin.class:multiple} .{plugin.class:mediaContent} > div { margin-right: 8px; }' +
 
 	// scrollbar
