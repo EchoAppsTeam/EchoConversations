@@ -150,7 +150,6 @@ plugin.init = function() {
 	this.extendTemplate("insertAsFirstChild", "container", plugin.templates.indicator);
 
 	this.set("isLiveUpdate", this.component.config.get("live"));
-	this.extendTemplate("replace", "header", plugin.templates.header);
 	this.extendTemplate("insertBefore", "frame", plugin.templates.topPostMarker);
 	this.extendTemplate("remove", "date");
 	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
@@ -181,7 +180,7 @@ plugin.init = function() {
 		content.addClass("echo-relative")
 			.prepend(this.blockers.backdrop)
 			.prepend(this.blockers.message);
-		};
+	};
 };
 
 plugin.templates.date =
@@ -263,10 +262,10 @@ plugin.component.renderers.container = function(element) {
 	if (this.get("isLiveUpdate")) {
 		element.addClass(this.cssPrefix + "liveUpdate");
 	}
+	this.parentRenderer("container", arguments);
 
-	element = this.parentRenderer("container", arguments);
-	// we add wrapper if only the whole item is rendered
-	return this.component.view.rendered() && element.parent().hasClass("echo-tmp-wrapper")
+	// we should wrap only once
+	return element.parent().hasClass(this.cssPrefix + "wrapper")
 		? element
 		: element.wrap(this.substitute({
 			"template": plugin.templates.wrapper
