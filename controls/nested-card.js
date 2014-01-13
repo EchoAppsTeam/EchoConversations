@@ -16,7 +16,7 @@ card.templates.photo =
 					'</a>' +
 					'<div class="{class:photoLabel}">' +
 						'<div class="{class:photoLabelContainer}">' +
-							'<div class="{class:title} {class:photoTitle}">' +
+							'<div class="{class:title} {class:photoTitle}" title="{data:title}">' +
 								'<a class="echo-clickable" href="{data:url}" target="_blank">{data:title}</a>' +
 							'</div>' +
 							'<div class="{class:description} {class:photoDescription}">{data:description}</div>' +
@@ -36,7 +36,7 @@ card.templates.video =
 						'<div class="{class:playButton}"></div>' +
 						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
 					'</div>' +
-					'<div class="{class:title} {class:videoTitle}">{data:title}</div>' +
+					'<div class="{class:title} {class:videoTitle}" title="{data:title}">{data:title}</div>' +
 					'<div class="{class:description} {class:videoDescription}">{data:description}</div>' +
 					'<div class="{class:sourceIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
 				'</div>' +
@@ -49,7 +49,7 @@ card.templates.link =
 						'<img src="{data:thumbnail_url}"/>' +
 					'</div>' +
 					'<div class="{class:articleTemplate}">' +
-						'<div class="{class:title} {class:articleTitle}">' +
+						'<div class="{class:title} {class:articleTitle}" title="{data:title}">' +
 							'<a href="{data:url}" target="_blank">{data:title}</a>' +
 						'</div>' +
 						'<div class="{class:articleDescriptionContainer}">' +
