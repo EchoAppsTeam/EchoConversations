@@ -500,8 +500,8 @@ plugin.css =
 	'.{plugin.class} .{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
 
-	'.{plugin.class} .{class:container-child} { padding-top: 8px; padding-bottom: 8px; margin: 0px 15px 2px 0px; }' +
-	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding-top: 8px; padding-bottom: 8px; margin: 0px 15px 2px 0px; }' +
+	'.{plugin.class} .{class:container-child} { padding-top: 8px; padding-bottom: 8px; padding-right: 0px; margin: 0px 15px 2px 0px; }' +
+	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding-top: 8px; padding-bottom: 8px; padding-right: 0px; margin: 0px 15px 2px 0px; }' +
 
 	'.{plugin.class} .{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{plugin.class} .{class:children} .{class:frame} { margin-left: 5px; }' +
