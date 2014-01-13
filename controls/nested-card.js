@@ -92,7 +92,20 @@ card.renderers.item = function(element) {
 
 card.renderers.sourceIcon = function(element) {
 	var proviredURL = element.data("url");
-	var icon = proviredURL +
+	var icon;
+	var sourceIcons = [{
+		"pattern": /http:\/\/instagram\.com/i,
+		"url": "http://cdn.echoenabled.com/images/favicons/instagram.png"
+	}];
+
+	$.map(sourceIcons, function(item) {
+		if (item.pattern.test(proviredURL)) {
+			icon = item.url;
+			return false;
+		}
+	});
+
+	icon = icon || proviredURL +
 		(proviredURL.substr(-1) === "/" ? "" : "/") +	"favicon.ico";
 
 	Echo.Utils.loadImage({
