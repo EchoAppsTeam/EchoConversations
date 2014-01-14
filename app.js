@@ -1212,6 +1212,7 @@ conversations.css =
 	'.echo-sdk-ui .{class:tabs} > li.pull-right > a { padding-right: 0px; margin-right: 0px; }' +
 	'.echo-sdk-ui .nav.{class:tabs} > li > a:hover, .echo-sdk-ui .nav.{class:tabs} > li > a:focus { background-color: transparent; border: 0px; }' +
 	'.echo-sdk-ui .{class:tabs} ul.nav { margin-bottom: 0px; }' +
+	'.echo-sdk-ui .nav.{class:tabs} .dropdown-menu { border-radius: 6px; }' +
 
 	// common
 	'.{class:container} { min-height: 200px; }' +
