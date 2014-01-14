@@ -975,7 +975,8 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 			};
 		},
 		"moderationQueue": function() {
-			var operators = "state:Untouched -user.roles:moderator,administrator -user.state:ModeratorApproved";
+			var operators = "state:Untouched -user.roles:moderator,administrator" +
+					(self._getPremoderationConfig()["approvedUserBypass"] ? " -user.state:ModeratorApproved" : "");
 			return {
 				"operators": operators,
 				"childrenOperators": operators,
@@ -990,7 +991,7 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 
 conversations.methods._assembleStates = function(componentID, ignorePremoderation) {
 	var config = this.config.get(componentID);
-	var premoderation = this.config.get("allPosts.moderation.premoderation");
+	var premoderation = this._getPremoderationConfig();
 
 	var states = premoderation.enable && !ignorePremoderation
 		? ["ModeratorApproved"]
@@ -1003,11 +1004,11 @@ conversations.methods._assembleStates = function(componentID, ignorePremoderatio
 };
 
 conversations.methods._assembleModerationOperators = function() {
-	var premoderation = this.config.get("allPosts.moderation.premoderation");
+	var premoderation = this._getPremoderationConfig();
 	if (!premoderation.enable) return "";
 
 	var operators = [];
-	if (premoderation.approvedUserByPass) {
+	if (premoderation.approvedUserBypass) {
 		operators.push("user.state:ModeratorApproved AND -state:ModeratorDeleted");
 	}
 	operators.push("(user.roles:moderator,administrator AND -state:ModeratorDeleted)");
@@ -1075,19 +1076,23 @@ conversations.methods._retrieveData = function(callback) {
 };
 
 conversations.methods._moderationQueueEnabled = function() {
-	return this.user.is("admin") && this.config.get("allPosts.moderation.premoderation.enable");
+	return this.user.is("admin") && this._getPremoderationConfig()["enable"];
 };
 
 conversations.methods._isModerationRequired = function() {
-	var config = this.config.get("allPosts.moderation.premoderation");
+	var config = this._getPremoderationConfig();
 	return config.enable &&
 		!(this.user.is("admin") || (this.user.get("state") === "ModeratorApproved" && config.approvedUserBypass));
 };
 
 conversations.methods._getSubmitMarkers = function() {
 	return this._isModerationRequired()
-		? this.config.get("allPosts.moderation.premoderation.markers")
+		? this._getPremoderationConfig()["markers"]
 		: [];
+};
+
+conversations.methods._getPremoderationConfig = function() {
+	return this.config.get("allPosts.moderation.premoderation");
 };
 
 // borrowed from Echo.App
