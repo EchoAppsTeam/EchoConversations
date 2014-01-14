@@ -170,6 +170,9 @@ card.renderers.videoPlaceholder = function(element) {
 			"height": oembed.height
 		};
 	}
+	// IE11 layout fix
+	element.parent().css("width", dimensions.width - 2);
+
 	return element.css(dimensions);
 };
 
@@ -221,7 +224,8 @@ card.css =
 	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:photo} { position: relative; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
-	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background: rgba(0, 0, 0, 0.5); filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr="#7F000000", endColorstr="#7F000000");}' +
+	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
+
 	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
 	'.{class:photoTitle} { margin: 0 0 5px 0; }' +
@@ -235,8 +239,8 @@ card.css =
 	// play button
 	'.{class:playButton} { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 10; }' +
 	'.{class:playButton}:after { content: ""; position: absolute; top: 10px; left: 20px; border-left: 30px solid #FFF; border-top: 20px solid transparent; border-bottom: 20px solid transparent; }' +
-	'.{class:playButton} { box-shadow: 0px 0px 40px #000; margin: auto; width: 60px; height: 60px; background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr="#7F000000", endColorstr="#7F000000"); }' +
-	'.{class:playButton}:hover { background-color: #3498DB; filter: progid:DXImageTransform.Microsoft.gradient(enabled = false); }' +
+	'.{class:playButton} { box-shadow: 0px 0px 40px #000; margin: auto; width: 60px; height: 60px; border-radius: 50%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.7); }' +
+	'.{class:playButton}:hover { background-color: #3498DB; }' +
 
 	// video
 	'.{class:video} { padding: 10px; }' +
