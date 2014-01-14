@@ -423,7 +423,7 @@ conversations.renderers.postComposer = function(element) {
 				"name": "CardUIShim",
 				"submitPermissions": this._getSubmitPermissions(),
 				"confirmation": {
-					"enable": this._isModerationRequired() && this.config.get("postComposer.enable")
+					"enable": this._isModerationRequired() && this.config.get("postComposer.confirmation.enable")
 				},
 				"auth": this.config.get("auth")
 			})], config.plugins),
