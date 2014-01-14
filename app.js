@@ -773,6 +773,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 
 conversations.methods._getStreamPluginList = function(componentID, overrides) {
 	var self = this;
+	var auth = this.config.get("auth");
 	var config = this.config.get(componentID);
 	var moderationExtraActions = this.config.get("topPosts.visible")
 		? this.config.get("topPosts.includeTopContributors")
@@ -781,6 +782,12 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		: [];
 
 	var plugins = [].concat(this._getConditionalStreamPluginList(componentID), [{
+		"name": "JanrainBackplaneHandler",
+		"appId": this.config.get("dependencies.Janrain.appId"),
+		"enabled": auth.enableBundledIdentity,
+		"authWidgetConfig": auth.authWidgetConfig,
+		"sharingWidgetConfig": auth.sharingWidgetConfig
+	}, {
 		"name": "CardUIShim",
 		"displayTopPostHighlight": config.displayTopPostHighlight,
 		"includeTopContributors": this.config.get("topPosts.includeTopContributors"),
