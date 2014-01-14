@@ -8,8 +8,10 @@ if (Echo.App.isDefined(card)) return;
 card.templates.photo =
 			'<div class="{class:item}">' +
 				'<div class="{class:photo}">' +
-					'<div class="{class:avatar} {class:photoAvatar}" title="{data:author_name}">' +
-						'<img src="{config:defaultAvatar}"/>{data:author_name}' +
+					'<div class="{class:photoAvatarWrapper}">' +
+						'<div class="{class:avatar} {class:photoAvatar}" title="{data:author_name}">' +
+							'<img src="{config:defaultAvatar}"/>{data:author_name}' +
+						'</div>' +
 					'</div>' +
 					'<a href="{data:url}" target="_blank">' +
 						'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
@@ -215,10 +217,11 @@ card.css =
 	'.echo-sdk-ui .{class:avatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
 
 	// photo
-	'.{class:photoAvatar} { position: absolute; padding: 12px; color: #FFF; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
+	'.{class:photoAvatarWrapper} { position: absolute; width: 100%; }' +
+	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:photo} { position: relative; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
-	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background: rgba(0, 0, 0, 0.5); }' +
+	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background: rgba(0, 0, 0, 0.5); filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr="#7F000000", endColorstr="#7F000000");}' +
 	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
 	'.{class:photoTitle} { margin: 0 0 5px 0; }' +
@@ -232,8 +235,8 @@ card.css =
 	// play button
 	'.{class:playButton} { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 10; }' +
 	'.{class:playButton}:after { content: ""; position: absolute; top: 10px; left: 20px; border-left: 30px solid #FFF; border-top: 20px solid transparent; border-bottom: 20px solid transparent; }' +
-	'.{class:playButton} { box-shadow: 0px 0px 40px #000; margin: auto; width: 60px; height: 60px; background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; }' +
-	'.{class:playButton}:hover { background-color: #3498DB; }' +
+	'.{class:playButton} { box-shadow: 0px 0px 40px #000; margin: auto; width: 60px; height: 60px; background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr="#7F000000", endColorstr="#7F000000"); }' +
+	'.{class:playButton}:hover { background-color: #3498DB; filter: progid:DXImageTransform.Microsoft.gradient(enabled = false); }' +
 
 	// video
 	'.{class:video} { padding: 10px; }' +
