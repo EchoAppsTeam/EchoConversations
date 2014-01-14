@@ -69,7 +69,7 @@ conversations.config = {
 		"replyNestingLevels": 2,
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
-		"itemTypes": ["comment"],
+		"itemTypes": ["comment", "note"],
 		"userMarkers": ["Conversations.TopContributor"],
 		"itemMarkersToAdd": ["Conversations.TopPost"],
 		"itemMarkersToRemove": ["Conversations.RemovedFromTopPosts"],
