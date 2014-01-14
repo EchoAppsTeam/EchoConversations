@@ -436,7 +436,7 @@ submitPlugin.css =
 	'.{class:body}.{plugin.class:enabledMedia} .{class:content}.{class:border} { border-bottom: none; }' +
 	'.{class:body}.{plugin.class:enabledMedia} .{plugin.class:mediaContentContainer} { overflow-y: hidden; overflow-x: auto; border: 1px solid #DEDEDE; border-top-style: dashed; background-color: #F1F1F1; padding: 10px 5px; }' +
 
-	'.{plugin.class:Close} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #D2D2D2; text-shadow: 0 0 1px #000; }' +
+	'.{plugin.class:Close} { line-height: 1; opacity: 0.5; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #D2D2D2; text-shadow: 0 0 1px #000; }' +
 	'.{plugin.class:Close}:hover { opacity: 1; filter: alpha(opacity=100); }' +
 
 	'.{plugin.class:mediaContent} { white-space: nowrap; word-wrap: normal; }' +
