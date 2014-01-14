@@ -150,6 +150,7 @@ plugin.init = function() {
 	this.extendTemplate("insertAsFirstChild", "container", plugin.templates.indicator);
 
 	this.set("isLiveUpdate", this.component.config.get("live"));
+	this.extendTemplate("replace", "sourceIcon", plugin.templates.sourceIcon);
 	this.extendTemplate("insertBefore", "frame", plugin.templates.topPostMarker);
 	this.extendTemplate("remove", "date");
 	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
@@ -212,6 +213,9 @@ plugin.templates.dropdownButtons =
 plugin.templates.indicator =
 	'<div class="{class:indicator}"></div>';
 
+plugin.templates.sourceIcon =
+	'<div class="{plugin.class:sourceIcon}"><img></div>';
+
 plugin.renderers.topPostMarker = function(element) {
 	var item = this.component;
 
@@ -236,6 +240,26 @@ plugin.renderers.topPostMarker = function(element) {
 	return visible
 		? element.show()
 		: element.hide();
+};
+
+plugin.renderers.sourceIcon = function(element) {
+	var item = this.component;
+	var source = item.get("data.source", {});
+	element.hide();
+	if (
+		item.config.get("viaLabel.icon")
+		&& source.icon
+		&& !~$.inArray(source.name, ["jskit", "echo"])
+	) {
+		var img = element.find("img");
+		return img
+			.attr("src", Echo.Utils.htmlize(source.icon))
+			.on("error", function() { element.hide(); })
+			.on("load", function() {
+				element.show();
+			});
+	}
+	return element;
 };
 
 plugin.component.renderers.indicator = function(element) {
@@ -464,7 +488,8 @@ for (var i = 0; i <= 20; i++) {
 
 plugin.css =
 	// source icon
-	'.{plugin.class} .{class:sourceIcon} { margin-right: 10px; }' +
+	'.{plugin.class:sourceIcon} { float: left; margin-right: 10px; }' +
+	'.{plugin.class:sourceIcon} > img { margin-top: 2px; height: 16px; width: 16px; }' +
 
 	// indicator
 	'.{plugin.class} .{class:container} { position: relative; }' +
