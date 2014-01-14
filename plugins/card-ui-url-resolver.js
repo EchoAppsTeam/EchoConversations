@@ -113,7 +113,7 @@ itemPlugin.css =
 
 	'.{plugin.class:multiple}.{plugin.class:mediaContentContainer} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
 
-	'.{plugin.class:mediaContent} { white-space: nowrap; }' +
+	'.{plugin.class:mediaContent} { white-space: nowrap; word-wrap: normal; }' +
 	'.{plugin.class:mediaContent} > div { display: inline-block; white-space: normal; vertical-align: top; }' +
 	'.{plugin.class:single} .{plugin.class:mediaContent} > div { display: block; }' +
 	'.{plugin.class:multiple} .{plugin.class:mediaContent} > div { margin-right: 8px; }' +
