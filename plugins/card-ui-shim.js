@@ -214,7 +214,7 @@ plugin.templates.indicator =
 	'<div class="{class:indicator}"></div>';
 
 plugin.templates.sourceIcon =
-	'<div class="{plugin.class:sourceIcon}"><img></div>';
+	'<div class="{class:sourceIcon}"><img></div>';
 
 plugin.renderers.topPostMarker = function(element) {
 	var item = this.component;
@@ -242,7 +242,7 @@ plugin.renderers.topPostMarker = function(element) {
 		: element.hide();
 };
 
-plugin.renderers.sourceIcon = function(element) {
+plugin.component.renderers.sourceIcon = function(element) {
 	var item = this.component;
 	var source = item.get("data.source", {});
 	element.hide();
@@ -488,8 +488,8 @@ for (var i = 0; i <= 20; i++) {
 
 plugin.css =
 	// source icon
-	'.{plugin.class:sourceIcon} { float: left; margin-right: 10px; }' +
-	'.{plugin.class:sourceIcon} > img { margin-top: 2px; height: 16px; width: 16px; }' +
+	'.{plugin.class} .{class:sourceIcon} { float: left; margin-right: 10px; }' +
+	'.{plugin.class} .{class:sourceIcon} > img { margin-top: 2px; height: 16px; width: 16px; }' +
 
 	// indicator
 	'.{plugin.class} .{class:container} { position: relative; }' +
