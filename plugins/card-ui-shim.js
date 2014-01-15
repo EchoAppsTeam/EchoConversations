@@ -262,6 +262,16 @@ plugin.renderers.sourceIcon = function(element) {
 	return element;
 };
 
+plugin.component.renderers.avatar = function(element) {
+	var avatarURL = this.component.config.get("data.actor.avatar");
+	if (!avatarURL) {
+		avatarURL = this.component.config.get("defaultAvatar");
+	}
+	var newImg = $("<div/>");
+	newImg.css("background-image", 'url("' + avatarURL + '")');
+	return element.append(newImg);
+};
+
 plugin.component.renderers.indicator = function(element) {
 	var transition = "background-color " + this.config.get("fadeTimeout") + "ms linear";
 	element.css({
@@ -516,7 +526,7 @@ plugin.css =
 	'.{plugin.class} .{class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
 
 	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
-	'.{plugin.class} .{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
+	'.{plugin.class} .{class:avatar} div { height: 28px; width: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%;}' +
 
 	'.{plugin.class} .{class:content} { background: #f8f8f8; border-radius: 3px; }' +
 	'.{plugin.class} .{class:buttons} { margin-left: 0px; white-space: nowrap; line-height: 20px; }' +
@@ -562,7 +572,7 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{class:footer} { padding: 8px 0px 10px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
-	'.{plugin.class} .{class:depth-0} .{class:avatar} img { height: 36px; width: 36px; border-radius: 50%;}' +
+	'.{plugin.class} .{class:depth-0} .{class:avatar} div { height: 36px; width: 36px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%;}' +
 	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 38px; margin-left: 45px;}' +
 	'.{plugin.class} .{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +

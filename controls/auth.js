@@ -72,12 +72,13 @@ auth.renderers.or = function(element) {
 };
 
 auth.renderers.avatar = function(element) {
-	this.placeImage({
-		"container": element,
-		"image": this.user.get("avatar"),
-		"defaultImage": this.config.get("defaultAvatar")
-	});
-	return element;
+	var avatarURL = this.user.get("avatar");
+	if (!avatarURL) {
+		avatarURL = this.config.get("defaultAvatar");
+	}
+	var avatar = $("<div/>");
+	avatar.css("background-image", 'url("' + avatarURL + '")');
+	return element.empty().append(avatar);
 };
 
 auth.renderers.name = function(element) {
@@ -165,14 +166,14 @@ auth.css =
 	'.{class:name} ul.nav .dropdown .dropdown-toggle { font-size: 20px; }' +
 	'.{class:name} ul.nav { margin-bottom: 3px; }' +
 	'.{class:name} ul.nav .dropdown-menu li > a { font-size: 14px; }' +
-	'.{class:avatar} img { border-radius: 50%; }' +
+	'.{class:avatar} div { border-radius: 50%; background-size:cover; display:inline-block; background-position:center; }' +
 	'.{class:login}, .{plugin.class} .{class:signup} { color: #006DCC; }' +
 	'.{class:userAnonymous} { margin: 0px 0px 7px 2px; text-align: left; }' +
 	'.{class:userLogged} { margin: 0px 0px 5px 3px; }' +
 	'.{class:name} { float: none; margin: 3px 0px 0px 15px; font-weight: normal; }' +
 	'.class:container} { float: left; }' +
 	'.{class:avatar} { float: left; width: 48px; height: 48px; border-radius: 50%; }' +
-	'.{class:avatar} > img { width: 48px; height: 48px; }';
+	'.{class:avatar} > div { width: 48px; height: 48px; background-size:cover; display:inline-block; background-position:center; }';
 
 Echo.Control.create(auth);
 

@@ -122,11 +122,13 @@ plugin.renderers.submitForm = function(element) {
 
 plugin.renderers.avatar =function(element) {
 	var item = this.component;
-	item.placeImage({
-		"container": element,
-		"image": item.user.get("avatar"),
-		"defaultImage": item.config.get("defaultAvatar")
-	});
+	var avatarURL = item.user.get("avatar");
+	if (!avatarURL) {
+		avatarURL = item.config.get("defaultAvatar");
+	}
+	var avatar = $("<div/>");
+	avatar.css("background-image", 'url("' + avatarURL + '")');
+	element.empty().append(avatar);
 	return item.get("depth") && !this.get("expanded")
 		? element.hide() : element.show();
 };
@@ -312,7 +314,7 @@ plugin.css =
 	'.{plugin.class} .{plugin.class:additionalSpacing} { padding-top: 15px; }' +
 	'.{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 28px; line-height: 28px; }' +
 	'.{plugin.class:avatar} { width: 28px; height: 28px; border-radius: 50%; margin: 1px 0px 0px 3px; }' +
-	'.{plugin.class} .{plugin.class:avatar} > img { width: 28px; height: 28px; }' +
+	'.{plugin.class} .{plugin.class:avatar} > div { width: 28px; height: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; }' +
 	'.{plugin.class:compactBorder} { margin-left: 39px; border: 1px solid #d8d8d8; }' +
 	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"].echo-secondaryColor { color: #C6C6C6 }' +
 	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"].echo-primaryFont { font-size: 12px; line-height: 24px; }' +

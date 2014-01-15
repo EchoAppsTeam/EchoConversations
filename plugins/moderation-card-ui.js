@@ -675,8 +675,8 @@ plugin.css =
 		"ModeratorDeleted": "#bf383a"
 	}, function(color, status) {
 		return [
-			'.{plugin.class} .{class:avatar}.{plugin.class:actorStatus-' + status + '} > img { border: 2px solid ' + color + '; width: 20px; height: 20px; }',
-			'.{plugin.class} .{class:depth-0} .{class:avatar}.{plugin.class:actorStatus-' + status + '} img { height: 32px; width: 32px; border-radius: 50%;}'
+			'.{plugin.class} .{class:avatar}.{plugin.class:actorStatus-' + status + '} > div { border: 2px solid ' + color + '; width: 20px; height: 20px; }',
+			'.{plugin.class} .{class:depth-0} .{class:avatar}.{plugin.class:actorStatus-' + status + '} div { height: 32px; width: 32px; border-radius: 50%;}'
 		].join("");
 	})).join("");
 
