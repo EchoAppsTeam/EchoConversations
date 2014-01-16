@@ -13,7 +13,6 @@ if (Echo.Plugin.isDefined(plugin)) return;
 plugin.init = function() {
 	var item = this.component;
 	this.set("itemStatus", item.get("data.object.status"));
-	this.extendTemplate("insertAfter", "avatar", plugin.templates.status);
 	item.addButtonSpec("ModerationCardUI", this._assembleModerateButton());
 };
 
@@ -120,15 +119,6 @@ plugin.templates.buttonLabels = {
 		'(<span>{plugin.label:unbanUser}</span>)',
 	"unbanned": '<span>{plugin.label:banUser}</span>'
 };
-
-/**
- * @echo_template
- */
-plugin.templates.status =
-	'<div class="{plugin.class:status}">' +
-		'<div class="{plugin.class:statusIcon}"></div>' +
-		'<div class="echo-clear"></div>' +
-	'</div>';
 
 plugin.component.renderers.avatar = function(element) {
 	var item = this.component;
