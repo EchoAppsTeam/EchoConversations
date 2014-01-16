@@ -136,13 +136,15 @@ plugin.events = {
 
 plugin.labels = {
 	"topPostIndicatorTitle": "Top Post",
-	"actions": "Actions"
+	"actions": "Actions",
+	"seeMore": "See more"
 };
 
 plugin.config = {
 	"fadeTimeout": 10000, // 10 seconds
 	"displayTopPostHighlight": true,
-	"includeTopContributors": true
+	"includeTopContributors": true,
+	"collapsedContentHeight": 110 //px
 };
 
 plugin.init = function() {
@@ -155,6 +157,7 @@ plugin.init = function() {
 	this.extendTemplate("remove", "date");
 	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
 	this.extendTemplate("insertAsLastChild", "expandChildren", plugin.templates.chevron);
+	this.extendTemplate("insertAfter", "body", plugin.templates.seeMore);
 	this.set("buttonsLayout", "inline");
 	this._initPageObserver();
 
@@ -215,6 +218,9 @@ plugin.templates.indicator =
 
 plugin.templates.sourceIcon =
 	'<div class="{plugin.class:sourceIcon}"><img></div>';
+
+plugin.templates.seeMore =
+	'<div class="{plugin.class:seeMore}">{plugin.label:seeMore}</div>';
 
 plugin.renderers.topPostMarker = function(element) {
 	var item = this.component;
@@ -432,6 +438,31 @@ plugin.component.renderers._button = function(element, extra) {
 	return element.append(button);
 };
 
+plugin.renderers.seeMore = function(element) {
+	var self = this;
+	var item = this.component;
+	return element.one("click", function() {
+		self.view.remove("seeMore");
+		item.view.get("body").css("max-height", "");
+	});
+};
+
+plugin.methods._checkItemContentHeight = function() {
+	var body = this.component.view.get("body");
+	var button = this.view.get("seeMore");
+
+	if (body && button) {
+		var collapsedHeight = this.config.get("collapsedContentHeight");
+		if (body.height() > collapsedHeight && !button.is(":visible")) {
+			body.css("max-height", collapsedHeight);
+			button.show();
+		} else if(body.height() < collapsedHeight && button.is(":visible")) {
+			body.css("max-height", "");
+			button.hide();
+		}
+	}
+};
+
 plugin.methods._initPageObserver = function() {
 	// TODO need to unsubscribe when item destroyed
 	var self = this;
@@ -475,6 +506,8 @@ plugin.methods._pageLayoutChange = function() {
 			item.view.render({"name": "buttons"});
 		}
 	}
+
+	this._checkItemContentHeight();
 };
 
 var cache = {};
@@ -497,6 +530,11 @@ for (var i = 0; i <= 20; i++) {
 }
 
 plugin.css =
+	// see more
+	'.{plugin.class:seeMore}:before { content: ""; display: block; height: 3px; box-shadow: 0 -3px 3px rgba(0, 0, 0, 0.08); position: relative; top: 0px; }' +
+	'.{plugin.class:seeMore} { margin-top: -8px; display: none; padding: 0 0 15px 0; border-top: 1px solid #D8D8D8; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer; color: #C6C6C6; }' +
+	'.{plugin.class:seeMore}:hover { color: #262626; }' +
+
 	// source icon
 	'.{plugin.class:sourceIcon} { float: left; margin-right: 10px; }' +
 	'.{plugin.class:sourceIcon} > img { margin-top: 2px; height: 16px; width: 16px; }' +
@@ -531,7 +569,7 @@ plugin.css =
 	'.{plugin.class} .{class:content} { background: #f8f8f8; border-radius: 3px; }' +
 	'.{plugin.class} .{class:buttons} { margin-left: 0px; white-space: nowrap; line-height: 20px; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
-	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
+	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; overflow: hidden; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
 

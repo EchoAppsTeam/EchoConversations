@@ -73,7 +73,6 @@ conversations.config = {
 		"userMarkers": ["Conversations.TopContributor"],
 		"itemMarkersToAdd": ["Conversations.TopPost"],
 		"itemMarkersToRemove": ["Conversations.RemovedFromTopPosts"],
-		"maxItemBodyCharacters": 200,
 		"sortOrderEntries": [{
 			"title": "Newest First",
 			"value": "reverseChronological"
@@ -117,7 +116,6 @@ conversations.config = {
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
 		"itemTypes": ["comment", "note"],
-		"maxItemBodyCharacters": 200,
 		"sortOrderEntries": [{
 			"title": "Newest First",
 			"value": "reverseChronological"
@@ -761,9 +759,6 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"reTag": false,
 			"viaLabel": {
 				"icon": config.displaySourceIcons
-			},
-			"limits": {
-				"maxBodyCharacters": config.maxItemBodyCharacters
 			}
 		},
 		"data": this.get("data." + componentID + "-search"),
