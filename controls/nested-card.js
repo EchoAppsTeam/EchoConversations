@@ -94,6 +94,9 @@ card.renderers.item = function(element) {
 
 card.renderers.sourceIcon = function(element) {
 	var proviredURL = element.data("url");
+
+	if (!proviredURL) return;
+
 	var icon;
 	var sourceIcons = [{
 		"pattern": /http:\/\/instagram\.com/i,
