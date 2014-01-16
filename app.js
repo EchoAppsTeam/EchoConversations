@@ -69,7 +69,7 @@ conversations.config = {
 		"replyNestingLevels": 2,
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
-		"itemTypes": ["comment", "note"],
+		"itemTypes": [],
 		"userMarkers": ["Conversations.TopContributor"],
 		"itemMarkersToAdd": ["Conversations.TopPost"],
 		"itemMarkersToRemove": ["Conversations.RemovedFromTopPosts"],
@@ -116,7 +116,7 @@ conversations.config = {
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
-		"itemTypes": ["comment", "note"],
+		"itemTypes": [],
 		"maxItemBodyCharacters": 200,
 		"sortOrderEntries": [{
 			"title": "Newest First",
@@ -329,7 +329,7 @@ conversations.templates.tabs.contentItem =
 
 conversations.templates.defaultQuery =
 	'{data:filter}:{data:targetURL} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
-	'itemsPerPage:{data:initialItemsPerPage} {data:markers} type:{data:types} ' +
+	'itemsPerPage:{data:initialItemsPerPage} {data:markers} {data:type} ' +
 	'{data:operators} children:{data:replyNestingLevels} {data:childrenOperators}';
 
 conversations.templates.topConditions = {
@@ -918,7 +918,7 @@ conversations.methods._assembleSearchQuery = function(componentID, overrides) {
 		"template": query || conversations.templates.defaultQuery,
 		"data": $.extend({}, config, {
 			"targetURL": this.config.get("targetURL"),
-			"types": config.itemTypes.join(","),
+			"type": config.itemTypes.length ? "type:" + config.itemTypes.join(",") : "",
 			"initialSortOrder": Echo.Cookie.get([componentID, "sortOrder"].join(".")) || config.initialSortOrder
 		}, args, overrides)
 	});
