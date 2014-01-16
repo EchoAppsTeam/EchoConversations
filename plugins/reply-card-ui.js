@@ -10,6 +10,7 @@ if (Echo.Plugin.isDefined(plugin)) return;
 plugin.init = function() {
 	var self = this, item = this.component;
 	this.extendTemplate("insertAsLastChild", "content", plugin.templates.form);
+	this.extendTemplate("insertAsFirstChild", "avatar", plugin.templates.avatar);
 	// insert element to add addditional spacing above the children container
 	this.extendTemplate("insertBefore", "expandChildren", plugin.templates.childrenSpacing);
 	var form = Echo.Utils.get(Echo.Variables, this._getSubmitKey());
@@ -63,7 +64,7 @@ plugin.templates.form =
 	'<div class="{plugin.class:replyForm}">' +
 		'<div class="{plugin.class:submitForm}"></div>' +
 		'<div class="{plugin.class:compactForm}">' +
-			'<div class="pull-left {plugin.class:avatar}"></div>' +
+			'<div class="pull-left {plugin.class:avatar}"><div class="{plugin.class:pluginAvatar}"></div></div>' +
 			'<div class="{plugin.class:compactContent} {plugin.class:compactBorder}">' +
 				'<input type="text" class="{plugin.class:compactField} echo-primaryFont echo-secondaryColor">' +
 			'</div>' +
@@ -120,17 +121,26 @@ plugin.renderers.submitForm = function(element) {
 		? element.show() : element.empty().hide();
 };
 
-plugin.renderers.avatar =function(element) {
+plugin.renderers.avatar = function(element) {
+	var item = this.component;
+	return item.get("depth") && !this.get("expanded")
+		? element.hide() : element.show();
+};
+
+plugin.renderers.pluginAvatar = function(element) {
 	var item = this.component;
 	var avatarURL = item.user.get("avatar");
 	if (!avatarURL) {
 		avatarURL = item.config.get("defaultAvatar");
 	}
-	var avatar = $("<div/>");
-	avatar.css("background-image", 'url("' + avatarURL + '")');
-	element.empty().append(avatar);
-	return item.get("depth") && !this.get("expanded")
-		? element.hide() : element.show();
+	element.css("background-image", 'url("' + avatarURL + '")');
+	// we have to do it because filter must work in IE8 only
+	// in other cases we will have square avatar in IE 9
+	var isIE8 = document.all && document.querySelector && !document.addEventListener;
+	if (isIE8) {
+		element.css({"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + avatarURL + "', sizingMethod='scale')"});
+	}
+	return element;
 };
 
 plugin.renderers.childrenSpacing = function(element) {

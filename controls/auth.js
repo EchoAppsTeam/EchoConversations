@@ -41,7 +41,7 @@ auth.templates.anonymous =
 
 auth.templates.logged =
 	'<div class="{class:userLogged}">' +
-		'<div class="{class:avatar}"></div>' +
+		'<div class="{class:avatar}"><div class="{class:avatarElem}"></div></div>' +
 		'<div class="{class:container}">' +
 			'<div class="{class:name}"></div>' +
 			'<div class="echo-primaryFont {class:via}"></div>' +
@@ -71,14 +71,19 @@ auth.renderers.or = function(element) {
 	return element;
 };
 
-auth.renderers.avatar = function(element) {
+auth.renderers.avatarElem = function(element) {
 	var avatarURL = this.user.get("avatar");
 	if (!avatarURL) {
 		avatarURL = this.config.get("defaultAvatar");
 	}
-	var avatar = $("<div/>");
-	avatar.css("background-image", 'url("' + avatarURL + '")');
-	return element.empty().append(avatar);
+	element.css("background-image", 'url("' + avatarURL + '")');
+	// we have to do it because filter must work in IE8 only
+	// in other cases we will have square avatar in IE 9
+	var isIE8 = document.all && document.querySelector && !document.addEventListener;
+	if (isIE8) {
+		element.css({ "filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + avatarURL + "', sizingMethod='scale')" });
+	}
+	return element;
 };
 
 auth.renderers.name = function(element) {

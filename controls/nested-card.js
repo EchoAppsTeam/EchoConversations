@@ -120,6 +120,12 @@ card.renderers.sourceIcon = function(element) {
 };
 
 card.renderers.avatar = function(element) {
+	// we have to do it because filter must work in IE8 only
+	// in other cases we will have square avatar in IE 9
+	var isIE8 = document.all && document.querySelector && !document.addEventListener;
+	if (isIE8) {
+		element.children()[0].style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.config.get("defaultAvatar") + "', sizingMethod='scale')";
+	}
 	return this.get("data.author_name") ? element : element.hide();
 };
 
