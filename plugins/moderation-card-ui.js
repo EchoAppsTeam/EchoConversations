@@ -640,7 +640,7 @@ plugin.methods._getNextRole = function(role) {
 
 plugin.css =
 	// hide switch for now
-	'.{plugin.class} .{class:modeSwitch} { width: 0px; }' +
+	'.{plugin.class} .{class:modeSwitch} { width: 0px; height: 0px; }' +
 
 	// Moderate button
 	'.echo-sdk-ui ul.{plugin.class:moderateButton} { display: inline-block; margin-bottom: 0px; }' +
