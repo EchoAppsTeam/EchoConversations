@@ -156,7 +156,8 @@ plugin.init = function() {
 	this.extendTemplate("replace", "avatar", plugin.templates.avatar);
 	this.extendTemplate("insertBefore", "frame", plugin.templates.topPostMarker);
 	this.extendTemplate("remove", "date");
-	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
+	this.extendTemplate("remove", "authorName");
+	this.extendTemplate("insertAsFirstChild", "frame", plugin.templates.header);
 	this.extendTemplate("insertAsLastChild", "expandChildren", plugin.templates.chevron);
 	this.extendTemplate("insertAfter", "body", plugin.templates.seeMore);
 	this.set("buttonsLayout", "inline");
@@ -188,8 +189,16 @@ plugin.init = function() {
 	};
 };
 
-plugin.templates.date =
-	'<div class="{class:date}"></div>';
+plugin.templates.header =
+	'<div class="{plugin.class:header}">' +
+		'<div class="{plugin.class:header-box}">' +
+			'<div class="{plugin.class:header-centered}">' +
+				'<div class="{class:authorName}"></div>' +
+				'<div class="{class:date}"></div>' +
+				'<div class="echo-clear"></div>' +
+			'</div>' +
+		'</div>' +
+	'</div>';
 
 plugin.templates.wrapper =
 	'<div class="{plugin.class:wrapper}"></div>';
@@ -273,6 +282,15 @@ plugin.renderers.sourceIcon = function(element) {
 			});
 	}
 	return element;
+};
+
+plugin.renderers.seeMore = function(element) {
+	var self = this;
+	var item = this.component;
+	return element.one("click", function() {
+		self.view.remove("seeMore");
+		item.view.get("body").css("max-height", "");
+	});
 };
 
 plugin.component.renderers.avatar = function(element) {
@@ -453,13 +471,9 @@ plugin.component.renderers._button = function(element, extra) {
 	return element.append(button);
 };
 
-plugin.renderers.seeMore = function(element) {
-	var self = this;
-	var item = this.component;
-	return element.one("click", function() {
-		self.view.remove("seeMore");
-		item.view.get("body").css("max-height", "");
-	});
+plugin.component.renderers.authorName = function(element) {
+	this.parentRenderer("authorName", arguments);
+	return element.wrapInner("<span/>");
 };
 
 plugin.methods._checkItemContentHeight = function() {
@@ -576,7 +590,7 @@ plugin.css =
 	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} .{class:indicator} { background-color: #f5ba47; }' +
 
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
-	'.{plugin.class} .{class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
+	'.{plugin.class} .{class:date} { float: left; color: #d3d3d3; line-height: 18px; }' +
 
 	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
 	'.{plugin.class} .{class:avatar} div { height: 28px; width: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%;}' +
@@ -586,7 +600,8 @@ plugin.css =
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
 	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; overflow: hidden; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
-	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
+	'.{plugin.class} .{class:authorName} { float: left; color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; max-width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; }' +
+	'.{plugin.class} .{class:authorName} span { padding-right: 5px; }' +
 
 	'.{plugin.class} .{class:container-child} { padding-top: 8px; padding-bottom: 8px; padding-right: 0px; margin: 0px 15px 2px 0px; }' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding-top: 8px; padding-bottom: 8px; padding-right: 0px; margin: 0px 15px 2px 0px; }' +
@@ -613,7 +628,7 @@ plugin.css =
 	'.{plugin.class} .{class:container}:hover .{plugin.class:buttonIcon},' +
 	'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
 
-	'.{plugin.class} .{class:depth-0} .{class:date} { line-height: 40px; }' +
+	'.{plugin.class} .{class:depth-0} .{class:date} { line-height: 20px; }' +
 	'.{plugin.class} .{plugin.class:chevron} { margin-top: 0px !important; }' +
 	'.{plugin.class} .{class:expandChildrenLabel} { margin-right: 5px; }' +
 	'.{plugin.class} .{class:expandChildren} .{class:expandChildrenLabel} { color: #D3D3D3; }' +
@@ -626,9 +641,13 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} div { height: 36px; width: 36px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%;}' +
-	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 38px; margin-left: 45px;}' +
+	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 18px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:header} { margin-left: 45px; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:header-box} { height: 36px; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:header-box}:before { content: ""; display: inline-block; height: 100%; vertical-align: middle; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:header-centered} { display: inline-block; vertical-align: middle; max-width: 100%; max-width: 95%\\9; }' +
 
 	'.{plugin.class} .{class:data} { padding: 7px 0px 0px 0px; }' +
 	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
