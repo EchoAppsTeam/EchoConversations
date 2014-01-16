@@ -256,10 +256,13 @@ plugin.renderers.sourceIcon = function(element) {
 	var item = this.component;
 	var source = item.get("data.source", {});
 	element.hide();
+	var types = $.map(item.get("data.object.objectTypes"), function(item) {
+		return item.split("/").pop();
+	});
 	if (
 		item.config.get("viaLabel.icon")
 		&& source.icon
-		&& !~$.inArray(source.name, ["jskit", "echo"])
+		&& !~$.inArray("comment", types)
 	) {
 		var img = element.find("img");
 		return img
