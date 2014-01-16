@@ -211,9 +211,14 @@ conversations.config.normalizer = {
 		return $.extend(true, {}, this.get("allPosts"), value);
 	},
 	"targetURL": function(value) {
-		return value
-			|| $("link[rel='canonical']").attr('href')
-			|| document.location.href.split("#")[0];
+		if (value) {
+			return value;
+		}
+		var pageURL = $("link[rel='canonical']").attr('href');
+		if (!pageURL || !Echo.Utils.parseURL(pageURL).domain) {
+			pageURL =  document.location.href.split("#")[0];
+		}
+		return pageURL;
 	},
 	"auth": function(value) {
 		value.buttons = !!value.hideLoginButtons ? [] : ["login", "signup"];
