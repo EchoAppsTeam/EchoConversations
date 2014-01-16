@@ -34,7 +34,7 @@ itemPlugin.templates.media =
 	'</div>';
 
 itemPlugin.init = function() {
-	this.extendTemplate("insertAfter", "body", itemPlugin.templates.media);
+	this.extendTemplate("insertAsLastChild", "data", itemPlugin.templates.media);
 };
 
 itemPlugin.component.renderers.body = function(element) {
