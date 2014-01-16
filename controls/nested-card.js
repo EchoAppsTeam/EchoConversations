@@ -222,7 +222,7 @@ card.css =
 	// photo
 	'.{class:photoAvatarWrapper} { position: absolute; width: 100%; }' +
 	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:photoAvatar} > div {background-image: url("{config:defaultAvatar}")}' +
+	'.{class:photoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
 	'.{class:photo} { position: relative; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
@@ -248,7 +248,7 @@ card.css =
 	'.{class:video} .{class:sourceIcon} > img { padding: 10px 0 0 0; }' +
 	'.{class:videoAvatar} { margin-bottom: 8px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:videoTitle} { margin: 10px 0 0 0; }' +
-	'.{class:videoAvatar} > div {background-image: url("{config:defaultAvatar}")}' +
+	'.{class:videoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
 	'.{class:videoDescription} { margin: 5px 0 0 0; }' +
 	'.{class:videoPlaceholder} { position: relative; background: #000000; }' +
 	'.{class:videoPlaceholder} img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }' +
