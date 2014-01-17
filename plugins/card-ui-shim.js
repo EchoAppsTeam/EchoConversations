@@ -213,6 +213,10 @@ plugin.templates.button =
 
 plugin.templates.topPostMarker =
 	'<i class="icon-bookmark {plugin.class:topPostMarker}" title="{plugin.label:topPostIndicatorTitle}"></i>';
+plugin.templates.compactButtons =
+	'<a title="{data:label}" class="{class:button} {class:compactButton} {class:button}-{data:name}">' +
+		'<i class="{plugin.class:buttonIcon} {data:icon}"></i>' +
+	'</a>';
 
 plugin.templates.dropdownButtons =
 	'<div class="dropdown">' +
@@ -345,11 +349,31 @@ plugin.component.renderers.container = function(element) {
 
 plugin.component.renderers._inlineButtons = function(element) {
 	var item = this.component;
-	var buttons = $.map(item.buttonsOrder, function(name) { return item.get("buttons." + name); });
+	var buttons = $.map(item.buttonsOrder, function(name) {
+		return item.get("buttons." + name);
+	});
 	$.map(buttons, function(button) {
 		if (!button || !Echo.Utils.invoke(button.visible)) {
 			return;
 		}
+		item.view.render({
+			"name": "_button",
+			"target": element,
+			"extra": button
+		});
+	});
+};
+
+plugin.component.renderers._compactButtons = function(element) {
+	var item = this.component;
+	var buttons = $.map(item.buttonsOrder, function(name) {
+		return item.get("buttons." + name);
+	});
+	$.map(buttons, function(button) {
+		if (!button || !Echo.Utils.invoke(button.visible)) {
+			return;
+		}
+		button.template = plugin.templates.compactButtons;
 		item.view.render({
 			"name": "_button",
 			"target": element,
@@ -365,7 +389,9 @@ plugin.component.renderers._dropdownButtons = function(element) {
 		"template": plugin.templates.dropdownButtons
 	}));
 
-	var buttons = $.map(item.buttonsOrder, function(name) { return self.component.get("buttons." + name); });
+	var buttons = $.map(item.buttonsOrder, function(name) {
+		return self.component.get("buttons." + name);
+	});
 
 	var closeDropdown = function(callback) {
 		return function() {
@@ -405,7 +431,7 @@ plugin.component.renderers.buttons = function(element) {
 	element.empty();
 
 	item.view.render({
-		"name": "_" + this.get("buttonsLayout") + "Buttons",
+		"name": "_" + this.get("currentButtonsState") + "Buttons",
 		"target": element
 	});
 	return element;
@@ -493,28 +519,61 @@ plugin.methods._pageLayoutChange = function() {
 	var item = this.component;
 	var footer = item.view.get("footer");
 	var buttons = item.view.get("buttons");
+	var buttonsStates = [
+		"inline",
+		"compact",
+		"dropdown"
+	];
+	if (!this.get("buttonsStates")) {
+		this.set("buttonsStates", buttonsStates);
+	}
+	//TODO: get it from dashboard
+	var configuredButtonsState = this.config.get("initialIntentsDisplayMode") ||  buttonsStates[0];
 
-	if (footer && buttons && footer.is(":visible")) {
-		var likes = footer.children("div").first();
-		var layout = this.get("buttonsLayout");
-
-		var likesWidth = likes.width();
-		var buttonsWidth = layout === "inline"
-			? buttons.width() + likesWidth + 5
-			: this.get("buttonsWidth") || (buttons.width() + likesWidth + 5);
-
-		if (layout === "inline" && footer.width() < buttonsWidth) {
-			this.set("buttonsLayout", "dropdown");
-			this.set("buttonsWidth", buttonsWidth);
+	var currentState = this.get("currentButtonsState");
+	if (!currentState) {
+		currentState = configuredButtonsState;
+		this.set("currentButtonsState", currentState);
+	}
+	if (!footer || !buttons || !footer.is(":visible")) {
+		this._checkItemContentHeight();
+		return;
+	}
+	var prevFooterWidth = this.get("prevFooterWidth") || 0;
+	if (prevFooterWidth !== footer.width() || footer.width() < buttons.width()) {
+		this.set("prevFooterWidth", footer.width());
+		var freeSpace = this._getFreeSpace(footer, buttons);
+		var index = $.inArray(currentState, buttonsStates);
+		if (freeSpace < buttons.width()) {
+			if (buttonsStates[index + 1]) {
+				currentState = buttonsStates[index + 1];
+			}
+			this.set("currentButtonsState", currentState);
 			item.view.render({"name": "buttons"});
-		} else if (layout === "dropdown" && footer.width() > buttonsWidth) {
-			this.set("buttonsWidth", 0);
-			this.set("buttonsLayout", "inline");
+		} else if (freeSpace > (2 * buttons.width())) {
+			var indexOfConfiguredState = $.inArray(configuredButtonsState, buttonsStates);
+			if (indexOfConfiguredState < index && buttonsStates[index - 1]) {
+				currentState = buttonsStates[index - 1];
+			} else {
+				currentState = configuredButtonsState;
+			}
+			this.set("currentButtonsState", currentState);
 			item.view.render({"name": "buttons"});
 		}
 	}
-
 	this._checkItemContentHeight();
+};
+
+plugin.methods._getFreeSpace = function(footer, buttons) {
+	var freeSpace = footer.width();
+	var excludes = ["echo-clear", buttons.attr("class")];
+	$.map(footer.children(), function(elem) {
+		var internalElem = $(elem);
+		if (internalElem && !~$.inArray(internalElem.attr('class'), excludes)) {
+			freeSpace -= internalElem.width();
+		}
+	});
+	return freeSpace;
 };
 
 var cache = {};
@@ -973,6 +1032,7 @@ plugin.css =
 	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{plugin.class} .{class:header} { margin-top: 10px; }' +
 	'.{plugin.class} .{class:postContainer} .dropdown-menu { min-width: 100px; }' +
+	'.{plugin.class} .{control.class:buttons} .dropdown { min-width: 77px; }' +
 	'.{plugin.class} .btn.{plugin.class:button} { padding: 3px 12px 5px 12px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
