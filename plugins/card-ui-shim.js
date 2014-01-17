@@ -190,13 +190,11 @@ plugin.init = function() {
 };
 
 plugin.templates.header =
-	'<div class="{plugin.class:header}">' +
-		'<div class="{plugin.class:header-box}">' +
-			'<div class="{plugin.class:header-centered}">' +
-				'<div class="{class:authorName}"></div>' +
-				'<div class="{class:date}"></div>' +
-				'<div class="echo-clear"></div>' +
-			'</div>' +
+	'<div class="{plugin.class:header-box}">' +
+		'<div class="{plugin.class:header-centered}">' +
+			'<div class="{class:authorName}"></div>' +
+			'<div class="{class:date}"></div>' +
+			'<div class="echo-clear"></div>' +
 		'</div>' +
 	'</div>';
 
@@ -590,7 +588,7 @@ plugin.css =
 	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} .{class:indicator} { background-color: #f5ba47; }' +
 
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
-	'.{plugin.class} .{class:date} { float: left; color: #d3d3d3; line-height: 18px; }' +
+	'.{plugin.class} .{class:date} { float: left; color: #d3d3d3; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; max-width: 100%; }' +
 
 	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
 	'.{plugin.class} .{class:avatar} div { height: 28px; width: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%;}' +
@@ -644,10 +642,9 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 18px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
-	'.{plugin.class} .{class:depth-0} .{plugin.class:header} { margin-left: 45px; }' +
-	'.{plugin.class} .{class:depth-0} .{plugin.class:header-box} { height: 36px; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:header-box} { height: 36px; margin-left: 45px; }' +
 	'.{plugin.class} .{class:depth-0} .{plugin.class:header-box}:before { content: ""; display: inline-block; height: 100%; vertical-align: middle; }' +
-	'.{plugin.class} .{class:depth-0} .{plugin.class:header-centered} { display: inline-block; vertical-align: middle; max-width: 100%; max-width: 95%\\9; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:header-centered} { display: inline-block; vertical-align: middle; max-width: 100%; max-width: 90%\\9; }' +
 
 	'.{plugin.class} .{class:data} { padding: 7px 0px 0px 0px; }' +
 	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
