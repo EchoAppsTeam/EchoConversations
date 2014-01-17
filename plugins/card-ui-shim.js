@@ -213,9 +213,11 @@ plugin.templates.button =
 
 plugin.templates.topPostMarker =
 	'<i class="icon-bookmark {plugin.class:topPostMarker}" title="{plugin.label:topPostIndicatorTitle}"></i>';
+
 plugin.templates.compactButtons =
 	'<a title="{data:label}" class="{class:button} {class:compactButton} {class:button}-{data:name}">' +
 		'<i class="{plugin.class:buttonIcon} {data:icon}"></i>' +
+		'<span class="echo-primaryFont {class:buttonCaption}"></span>' +
 	'</a>';
 
 plugin.templates.dropdownButtons =
@@ -464,7 +466,7 @@ plugin.component.renderers._button = function(element, extra) {
 			"target": button.find("span"),
 			"extraClass": this.cssPrefix + "dropdownButton",
 			"entries": $.map(entries, function(entry) { return $.extend({"handler": entry.callback}, entry); }),
-			"title": extra.label || ""
+			"title": this.get("currentButtonsState") === "inline" ? extra.label : ""
 		});
 		extra.callback = function(ev) {
 			button.find(".dropdown-toggle").dropdown("toggle");
