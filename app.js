@@ -200,9 +200,13 @@ conversations.labels = {
 
 conversations.config.normalizer = {
 	"dependencies": function(value) {
-		this.set("appkey", value.StreamServer.appkey);
-		this.set("apiBaseURL", value.StreamServer.apiBaseURL);
-		this.set("submissionProxyURL", value.StreamServer.submissionProxyURL);
+		// Parameters order in a config might be different,
+		// so we are handling all possible situations to make sure
+		// that all required params are defined.
+		var streamServer = Echo.Utils.get(value, "StreamServer", {});
+		this.set("appkey", streamServer.appkey);
+		this.set("apiBaseURL", streamServer.apiBaseURL);
+		this.set("submissionProxyURL", streamServer.submissionProxyURL);
 		return value;
 	},
 	"appkey": function(value) {
