@@ -623,7 +623,7 @@ plugin.css =
 	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown { display: inline; }' +
 	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
 
-	'.{plugin.class:topPostMarker} { float: right; position: relative; top: -19px; right: 0px; }' +
+	'.{plugin.class:topPostMarker} { float: right; position: absolute; top: -4px; right: 15px; }' +
 	'.{plugin.class} .{plugin.class:wrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
 	'.{plugin.class} .{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
 	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} .{class:indicator} { background-color: #f5ba47; }' +
