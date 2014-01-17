@@ -666,6 +666,7 @@ plugin.css =
 	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{plugin.class:buttonIcon},' +
 	'.{plugin.class} .{class:container}:hover .{plugin.class:buttonIcon},' +
 	'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
+	'.{plugin.class} .{class:compactButton} ul.dropdown-menu { left: -20px; }' +
 
 	'.{plugin.class} .{class:depth-0} .{class:date} { line-height: 20px; }' +
 	'.{plugin.class} .{plugin.class:chevron} { margin-top: 0px !important; }' +
