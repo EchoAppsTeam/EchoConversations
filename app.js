@@ -198,11 +198,6 @@ conversations.labels = {
 	"itemsWaiting": "({count} new items waiting)"
 };
 
-var getConfigValue = function(key, defaults) {
-	delete this.cache[key];
-	return this.get(key, defaults);
-};
-
 conversations.config.normalizer = {
 	"dependencies": function(value) {
 		this.set("appkey", value.StreamServer.appkey);
@@ -211,13 +206,13 @@ conversations.config.normalizer = {
 		return value;
 	},
 	"appkey": function(value) {
-		return getConfigValue.call(this, "dependencies.StreamServer.appkey", value);
+		return Echo.Utils.get(this.data, "dependencies.StreamServer.appkey", value);
 	},
 	"apiBaseURL": function(value) {
-		return getConfigValue.call(this, "dependencies.StreamServer.apiBaseURL", value);
+		return Echo.Utils.get(this.data, "dependencies.StreamServer.apiBaseURL", value);
 	},
 	"submissionProxyURL": function(value) {
-		return getConfigValue.call(this, "dependencies.StreamServer.submissionProxyURL", value);
+		return Echo.Utils.get(this.data, "dependencies.StreamServer.submissionProxyURL", value);
 	},
 	"moderationQueue": function(value) {
 		// TODO this code doesn't work if there is "moderationQueue" hash defined before "allPosts" in the app config.
