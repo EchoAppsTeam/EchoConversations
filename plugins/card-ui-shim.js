@@ -103,6 +103,9 @@ plugin.events = {
 	"Echo.StreamServer.Controls.Stream.Item.onRender": function() {
 		this._pageLayoutChange();
 	},
+	"Echo.Apps.Conversations.onAppResize": function() {
+		this._pageLayoutChange();
+	},
 	"Echo.StreamServer.Controls.Stream.onActivitiesComplete": function() {
 		this._pageLayoutChange();
 		var self = this;
@@ -161,7 +164,6 @@ plugin.init = function() {
 	this.extendTemplate("insertAsLastChild", "expandChildren", plugin.templates.chevron);
 	this.extendTemplate("insertAfter", "body", plugin.templates.seeMore);
 	this.set("buttonsLayout", "inline");
-	this._initPageObserver();
 
 	this.component.block = function(label) {
 		if (this.blocked) return;
@@ -488,25 +490,6 @@ plugin.methods._checkItemContentHeight = function() {
 			button.hide();
 		}
 	}
-};
-
-plugin.methods._initPageObserver = function() {
-	// TODO need to unsubscribe when item destroyed
-	var self = this;
-
-	// observe DOM tree and call _pageLayoutChange if something was changed
-	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-	if (MutationObserver) {
-		var observer = new MutationObserver(function(mutations) {
-			self._pageLayoutChange();
-		});
-		var config = {"childList": true, "subtree": true, "attributes": true};
-		observer.observe(document, config);
-	}
-
-	$(window).on("resize", function() {
-		self._pageLayoutChange();
-	});
 };
 
 plugin.methods._pageLayoutChange = function() {

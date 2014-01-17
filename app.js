@@ -286,6 +286,7 @@ conversations.init = function() {
 
 conversations.templates.main =
 	'<div class="{class:container}">' +
+		'<iframe class="{class:resizeFrame}"  width=100% height=100% frameBorder=0 ></iframe>' +
 		'<div class="{class:streamingStateContainer}">' +
 			'<div class="pull-right {class:itemsWaiting}"></div>' +
 			'<div class="{class:streamingState}"></div>' +
@@ -344,6 +345,18 @@ conversations.renderers.streamingStateContainer = function(element) {
 	if (!this.config.get("streamingControl.displayStreamingStateHeader")) {
 		element.hide();
 	}
+	return element;
+};
+
+conversations.renderers.resizeFrame = function(element) {
+	var self = this;
+	element.on('load', function() {
+		this.contentWindow.onresize = function() {
+			self.events.publish({
+				"topic": "onAppResize"
+			});
+		};
+	});
 	return element;
 };
 
@@ -1215,6 +1228,8 @@ conversations.css =
 	'.echo-sdk-ui .nav.{class:tabs} .dropdown-menu { border-radius: 6px; }' +
 
 	// common
+	'.{class:container} { position:relative; }' +
+	'.{class:resizeFrame} { position:absolute; z-index:-1; border:0; padding:0; }' +
 	'.{class:container} { min-height: 200px; }' +
 	'.{class:container} li > a, ' +
 	'.{class:container} .echo-primaryFont,' +
