@@ -63,6 +63,24 @@ dashboard.vars = {
 		}
 	}, {
 		"component": "Select",
+		"name": "initialIntentsDisplayMode",
+		"type": "string",
+		"default": "inline",
+		"config": {
+			"title": "Intents Initial Display Mode",
+			"options": [{
+				"title": "Full",
+				"value": "inline"
+			}, {
+				"title": "Icons only",
+				"value": "compact"
+			}, {
+				"title": "Dropdown",
+				"value": "dropdown"
+			}]
+		}
+	}, {
+		"component": "Select",
 		"name": "initialSortOrder",
 		"type": "string",
 		"default": "reverseChronological",
@@ -488,8 +506,8 @@ dashboard.config.normalizer = {
 					var items = assembleBaseECL.call(this);
 
 					items[3]["default"] = 5; // override initialItemsPerPage value
-					items[15]["items"][0]["default"] = true;
-					items[15]["items"][1]["default"] = true;
+					items[16]["items"][0]["default"] = true;
+					items[16]["items"][1]["default"] = true;
 					items.pop();
 
 					items.splice(5, 0, {
@@ -508,7 +526,7 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
-					items[15]["items"].push(component.get("premoderationECL"));
+					items[16]["items"].push(component.get("premoderationECL"));
 					items.splice(11, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
