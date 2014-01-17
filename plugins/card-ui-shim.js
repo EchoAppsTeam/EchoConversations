@@ -156,7 +156,6 @@ plugin.init = function() {
 
 	this.set("isLiveUpdate", this.component.config.get("live"));
 	this.extendTemplate("replace", "sourceIcon", plugin.templates.sourceIcon);
-	this.extendTemplate("replace", "avatar", plugin.templates.avatar);
 	this.extendTemplate("insertBefore", "frame", plugin.templates.topPostMarker);
 	this.extendTemplate("remove", "date");
 	this.extendTemplate("remove", "authorName");
@@ -232,9 +231,6 @@ plugin.templates.sourceIcon =
 plugin.templates.seeMore =
 	'<div class="{plugin.class:seeMore}">{plugin.label:seeMore}</div>';
 
-plugin.templates.avatar =
-	'<div class="{class:avatar}"><div></div></div>';
-
 plugin.renderers.topPostMarker = function(element) {
 	var item = this.component;
 
@@ -294,20 +290,21 @@ plugin.renderers.seeMore = function(element) {
 };
 
 plugin.component.renderers.avatar = function(element) {
-	var avatarURL = this.component.config.get("data.actor.avatar");
-	if (!avatarURL) {
-		avatarURL = this.component.config.get("defaultAvatar");
-	}
-	var avatarElem = element.children()[0];
-	$(avatarElem).css("background-image", "url(\"" + avatarURL + "\")");
+	this.parentRenderer("avatar", arguments);
+
+	var img = element.find("img[src]");
+	var avatar = $("<div/>").css("background-image", "url('" + img.attr("src") + "')");
+	img.replaceWith(avatar);
+
 	// we have to do it because filter must work in IE8 only
 	// in other cases we will have square avatar in IE 9
 	var isIE8 = document.all && document.querySelector && !document.addEventListener;
 	if (isIE8) {
-		$(avatarElem).css({
-			"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + avatarURL + "', sizingMethod='scale')"
+		avatar.css({
+			"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + img.attr("src") + "', sizingMethod='scale')"
 		});
 	}
+
 	return element;
 };
 
