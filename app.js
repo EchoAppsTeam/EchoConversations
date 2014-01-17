@@ -69,7 +69,7 @@ conversations.config = {
 		"replyNestingLevels": 2,
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
-		"itemTypes": ["comment", "note"],
+		"itemTypes": [],
 		"userMarkers": ["Conversations.TopContributor"],
 		"itemMarkersToAdd": ["Conversations.TopPost"],
 		"itemMarkersToRemove": ["Conversations.RemovedFromTopPosts"],
@@ -115,7 +115,7 @@ conversations.config = {
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
-		"itemTypes": ["comment", "note"],
+		"itemTypes": [],
 		"sortOrderEntries": [{
 			"title": "Newest First",
 			"value": "reverseChronological"
@@ -197,14 +197,20 @@ conversations.labels = {
 };
 
 conversations.config.normalizer = {
-	"appkey": function() {
-		return this.get("dependencies.StreamServer.appkey");
+	"dependencies": function(value) {
+		this.set("appkey", value.StreamServer.appkey);
+		this.set("apiBaseURL", value.StreamServer.apiBaseURL);
+		this.set("submissionProxyURL", value.StreamServer.submissionProxyURL);
+		return value;
 	},
-	"apiBaseURL": function() {
-		return this.get("dependencies.StreamServer.apiBaseURL");
+	"appkey": function(value) {
+		return Echo.Utils.get(this.data, "dependencies.StreamServer.appkey", value);
 	},
-	"submissionProxyURL": function() {
-		return this.get("dependencies.StreamServer.submissionProxyURL");
+	"apiBaseURL": function(value) {
+		return Echo.Utils.get(this.data, "dependencies.StreamServer.apiBaseURL", value);
+	},
+	"submissionProxyURL": function(value) {
+		return Echo.Utils.get(this.data, "dependencies.StreamServer.submissionProxyURL", value);
 	},
 	"moderationQueue": function(value) {
 		// TODO this code doesn't work if there is "moderationQueue" hash defined before "allPosts" in the app config.
@@ -333,7 +339,7 @@ conversations.templates.tabs.contentItem =
 
 conversations.templates.defaultQuery =
 	'{data:filter}:{data:targetURL} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
-	'itemsPerPage:{data:initialItemsPerPage} {data:markers} type:{data:types} ' +
+	'itemsPerPage:{data:initialItemsPerPage} {data:markers} {data:type} ' +
 	'{data:operators} children:{data:replyNestingLevels} {data:childrenOperators}';
 
 conversations.templates.topConditions = {
@@ -931,7 +937,7 @@ conversations.methods._assembleSearchQuery = function(componentID, overrides) {
 		"template": query || conversations.templates.defaultQuery,
 		"data": $.extend({}, config, {
 			"targetURL": this.config.get("targetURL"),
-			"types": config.itemTypes.join(","),
+			"type": config.itemTypes.length ? "type:" + config.itemTypes.join(",") : "",
 			"initialSortOrder": Echo.Cookie.get([componentID, "sortOrder"].join(".")) || config.initialSortOrder
 		}, args, overrides)
 	});

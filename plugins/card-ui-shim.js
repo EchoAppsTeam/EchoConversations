@@ -226,7 +226,7 @@ plugin.templates.indicator =
 	'<div class="{class:indicator}"></div>';
 
 plugin.templates.sourceIcon =
-	'<div class="{plugin.class:sourceIcon}"><img></div>';
+	'<div class="{class:sourceIcon}"><img></div>';
 
 plugin.templates.seeMore =
 	'<div class="{plugin.class:seeMore}">{plugin.label:seeMore}</div>';
@@ -257,7 +257,7 @@ plugin.renderers.topPostMarker = function(element) {
 		: element.hide();
 };
 
-plugin.renderers.sourceIcon = function(element) {
+plugin.component.renderers.sourceIcon = function(element) {
 	var item = this.component;
 	var source = item.get("data.source", {});
 	element.hide();
@@ -543,8 +543,8 @@ plugin.css =
 	'.{plugin.class:seeMore}:hover { color: #262626; }' +
 
 	// source icon
-	'.{plugin.class:sourceIcon} { float: left; margin-right: 10px; }' +
-	'.{plugin.class:sourceIcon} > img { margin-top: 2px; height: 16px; width: 16px; }' +
+	'.{plugin.class} .{class:sourceIcon} { float: left; margin-right: 10px; }' +
+	'.{plugin.class} .{class:sourceIcon} > img { margin-top: 2px; height: 16px; width: 16px; }' +
 
 	// indicator
 	'.{plugin.class} .{class:container} { position: relative; }' +
