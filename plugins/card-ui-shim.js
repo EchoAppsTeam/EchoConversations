@@ -543,18 +543,20 @@ plugin.methods._pageLayoutChange = function() {
 		this._checkItemContentHeight();
 		return;
 	}
+	var footerWidth = footer.width();
+	var buttonsWidth = buttons.width();
 	var prevFreeSpace = this.get("prevFreeSpace") || 0;
-	var freeSpace = this._getFreeSpace(footer, buttons);
-	if (prevFreeSpace !== freeSpace || footer.width() < buttons.width()) {
+	var freeSpace = footerWidth - footer.children().eq(0).width() - footer.children().eq(1).width();
+	if (prevFreeSpace !== freeSpace || footerWidth < buttonsWidth) {
 		this.set("prevFreeSpace", freeSpace);
 		var index = $.inArray(currentState, buttonsStates);
-		if (freeSpace < buttons.width()) {
+		if (freeSpace < buttonsWidth) {
 			if (buttonsStates[index + 1]) {
 				currentState = buttonsStates[index + 1];
 			}
 			this.set("currentButtonsState", currentState);
 			item.view.render({"name": "buttons"});
-		} else if (freeSpace > (2 * buttons.width())) {
+		} else if (freeSpace > (2 * buttonsWidth)) {
 			var indexOfConfiguredState = $.inArray(configuredButtonsState, buttonsStates);
 			if (indexOfConfiguredState < index && buttonsStates[index - 1]) {
 				currentState = buttonsStates[index - 1];
@@ -566,18 +568,6 @@ plugin.methods._pageLayoutChange = function() {
 		}
 	}
 	this._checkItemContentHeight();
-};
-
-plugin.methods._getFreeSpace = function(footer, buttons) {
-	var freeSpace = footer.width();
-	var excludes = ["echo-clear", buttons.attr("class")];
-	$.map(footer.children(), function(elem) {
-		var internalElem = $(elem);
-		if (internalElem && !~$.inArray(internalElem.attr('class'), excludes)) {
-			freeSpace -= internalElem.width();
-		}
-	});
-	return freeSpace;
 };
 
 var cache = {};

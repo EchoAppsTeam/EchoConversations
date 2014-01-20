@@ -292,7 +292,7 @@ conversations.init = function() {
 
 conversations.templates.main =
 	'<div class="{class:container}">' +
-		'<iframe class="{class:resizeFrame}"  width=100% height=100% frameBorder=0 ></iframe>' +
+		'<iframe class="{class:resizeFrame}"  width=100% height=0px frameBorder=0 ></iframe>' +
 		'<div class="{class:streamingStateContainer}">' +
 			'<div class="pull-right {class:itemsWaiting}"></div>' +
 			'<div class="{class:streamingState}"></div>' +
