@@ -556,7 +556,7 @@ conversations.renderers._tabs = function(element, extra) {
 
 	$.map(extra.tabs, function(tab) {
 		tab.type = tab.type || "tab"; // tab || dropdown
-		tab.id = tab.id || (tab.name + "-" + self.config.get("context"));
+		tab.id = tab.id || (tab.name + "-" + Echo.Utils.getUniqueString());
 		var li = $(self.substitute({
 			"template": tpls.navItem,
 			"data": {
