@@ -73,8 +73,7 @@ card.templates.main = function() {
 	var data = this.get("data");
 	var handlers = {
 		"link": function(data) {
-			var width = this.config.get("width");
-			return (width && data.thumbnail_width >= width)
+			return (data.thumbnail_width >= this.config.get("minArticleImageWidth"))
 				? this.templates["photo"]
 				: this.templates["link"];
 		}
@@ -87,6 +86,10 @@ card.templates.main = function() {
 card.init = function() {
 	this.render();
 	this.ready();
+};
+
+card.config = {
+	"minArticleImageWidth": 250
 };
 
 card.renderers.sourceIcon = function(element) {
@@ -166,7 +169,12 @@ card.renderers.videoPlaceholder = function(element) {
  *  Photo
  */
 card.renderers.photoThumbnail = function(element) {
-	return element.attr("src", this.get("data.url"));
+	if (this.get("data.type") === "link") {
+		element.attr("src", this.get("data.thumbnail_url"));
+	} else {
+		element.attr("src", this.get("data.url"));
+	}
+	return element;
 };
 
 card.renderers.photoLabelContainer = function(element) {
