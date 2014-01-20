@@ -26,9 +26,19 @@ itemPlugin.component.renderers.body = function(element) {
 	Echo.Utils.safelyExecute(function() {
 		var content = $("<div/>").append(item.get("data.object.content"));
 		var media = self._getMediaAttachments();
+
 		var text = $(".echo-item-text", content);
+
 		if (media.length && text.length) {
 			item.set("data.object.content", text.html());
+		} else if (media.length && !text.length) {
+			// TODO: this situation shoud not be processed separately
+			// this is fix for situation then we have 2 pictures (1st in article,
+			// 2nd in photo).
+			$.map(content.children(".echo-item-files").first().children("div[oembed], div[data-oembed]"), function(card) {
+				card.remove();
+			});
+			item.set("data.object.content", content.html());
 		}
 	});
 
