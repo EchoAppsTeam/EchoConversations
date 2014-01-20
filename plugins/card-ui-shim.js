@@ -692,6 +692,7 @@ plugin.css =
 	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
 
 	// Edit Plugin
+	'.echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-metadataContainer { display: none !important; }' +
 	'.{class:depth-0} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-plugin-Edit-header { line-height: 38px; margin-left: 45px; }' +
 	'.{class:depth-0} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-body { padding: 7px 0px 0px 0px; }' +
 	'.{class:depth-0} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-controls { margin-bottom: 5px; }' +
