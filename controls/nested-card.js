@@ -26,7 +26,7 @@ card.templates.photo =
 					'</div>' +
 				'</div>' +
 			'</div>' +
-			'<div class="{class:sourceIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
+			'<div class="{class:sourceIcon}"></div>' +
 		'</div>' +
 	'</div>';
 
@@ -43,7 +43,7 @@ card.templates.video =
 				'</div>' +
 				'<div class="{class:title} {class:videoTitle}" title="{data:title}">{data:title}</div>' +
 				'<div class="{class:description} {class:videoDescription}">{data:description}</div>' +
-				'<div class="{class:sourceIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
+				'<div class="{class:sourceIcon}"></div>' +
 			'</div>' +
 		'</div>' +
 	'</div>';
@@ -64,7 +64,7 @@ card.templates.link =
 					'</div>' +
 				'</div>' +
 				'<div class="echo-clear"></div>' +
-				'<div class="{class:sourceIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
+				'<div class="{class:sourceIcon}"></div>' +
 			'</div>' +
 		'</div>' +
 	'</div>';
@@ -83,6 +83,8 @@ card.templates.main = function() {
 		: this.templates[data.type];
 };
 
+card.sourceIcons = {};
+
 card.init = function() {
 	this.render();
 	this.ready();
@@ -93,9 +95,9 @@ card.config = {
 };
 
 card.renderers.sourceIcon = function(element) {
-	var proviredURL = element.data("url");
+	var oembed = this.get("data");
 
-	if (!proviredURL) return;
+	if (!oembed.provider_url) return;
 
 	var icon;
 	var sourceIcons = [{
@@ -104,22 +106,32 @@ card.renderers.sourceIcon = function(element) {
 	}];
 
 	$.map(sourceIcons, function(item) {
-		if (item.pattern.test(proviredURL)) {
+		if (item.pattern.test(oembed.provider_url)) {
 			icon = item.url;
 			return false;
 		}
 	});
 
-	icon = icon || proviredURL +
-		(proviredURL.substr(-1) === "/" ? "" : "/") + "favicon.ico";
+	icon = icon || oembed.provider_url +
+		(oembed.provider_url.substr(-1) === "/" ? "" : "/") + "favicon.ico";
 
-	Echo.Utils.loadImage({
-		"image": icon,
-		"onerror": $.noop,
-		"onload": function() {
-			$(this).attr("title", element.data("name")).appendTo(element);
-		}
-	});
+	if (typeof card.sourceIcons[icon] === "undefined") {
+		Echo.Utils.loadImage({
+			"image": icon,
+			"onerror": function() {
+				card.sourceIcons[icon] = false;
+			},
+			"onload": function() {
+				$(this).attr("title", oembed.provider_name).appendTo(element);
+				card.sourceIcons[icon] = true;
+			}
+		});
+	} else if (card.sourceIcons[icon]) {
+		$("<img/>").attr({
+			"src": icon,
+			"title": oembed.provider_name
+		}).appendTo(element);
+	}
 };
 
 card.renderers.avatar = function(element) {
@@ -193,7 +205,7 @@ card.css =
 	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:item} { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; }' +
 	'.{class:border} { white-space: normal; word-break: break-word; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; }' +
-	'.{class:item} .{class:sourceIcon} > img { max-width: 20px; }' +
+	'.{class:item} .{class:sourceIcon} > img { width: 18px; height: 18px; }' +
 	'.echo-sdk-ui .{class:avatar} > div { width: 28px; height: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; margin-right: 6px; }' +
 	'.{class:description} { overflow: hidden; }' +
 
