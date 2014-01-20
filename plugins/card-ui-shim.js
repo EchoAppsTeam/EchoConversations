@@ -106,6 +106,9 @@ plugin.events = {
 	"Echo.Apps.Conversations.onAppResize": function() {
 		this._pageLayoutChange();
 	},
+	"Echo.StreamServer.Controls.FacePile.onRender" : function() {
+		this._pageLayoutChange();
+	},
 	"Echo.StreamServer.Controls.Stream.onActivitiesComplete": function() {
 		this._pageLayoutChange();
 		var self = this;
@@ -510,7 +513,7 @@ plugin.methods._checkItemContentHeight = function() {
 		if (body.height() > collapsedHeight && !button.is(":visible")) {
 			body.css("max-height", collapsedHeight);
 			button.show();
-		} else if(body.height() < collapsedHeight && button.is(":visible")) {
+		} else if (body.height() < collapsedHeight && button.is(":visible")) {
 			body.css("max-height", "");
 			button.hide();
 		}
@@ -529,7 +532,6 @@ plugin.methods._pageLayoutChange = function() {
 	if (!this.get("buttonsStates")) {
 		this.set("buttonsStates", buttonsStates);
 	}
-	//TODO: get it from dashboard
 	var configuredButtonsState = this.config.get("initialIntentsDisplayMode") ||  buttonsStates[0];
 
 	var currentState = this.get("currentButtonsState");
@@ -541,10 +543,10 @@ plugin.methods._pageLayoutChange = function() {
 		this._checkItemContentHeight();
 		return;
 	}
-	var prevFooterWidth = this.get("prevFooterWidth") || 0;
-	if (prevFooterWidth !== footer.width() || footer.width() < buttons.width()) {
-		this.set("prevFooterWidth", footer.width());
-		var freeSpace = this._getFreeSpace(footer, buttons);
+	var prevFreeSpace = this.get("prevFreeSpace") || 0;
+	var freeSpace = this._getFreeSpace(footer, buttons);
+	if (prevFreeSpace !== freeSpace || footer.width() < buttons.width()) {
+		this.set("prevFreeSpace", freeSpace);
 		var index = $.inArray(currentState, buttonsStates);
 		if (freeSpace < buttons.width()) {
 			if (buttonsStates[index + 1]) {
