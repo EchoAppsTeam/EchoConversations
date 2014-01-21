@@ -26,7 +26,7 @@ itemPlugin.component.renderers.body = function(element) {
 	var needToRemoveCards  = false;
 
 	$.map(item.config.get("data.object.objectTypes"), function(type) {
-		if (type && /\/(article|photo)$/.test(type)) {
+		if (type && /\/(article|image)$/.test(type)) {
 			needToRemoveCards = true;
 		}
 	});
