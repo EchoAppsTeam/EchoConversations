@@ -91,7 +91,9 @@ card.init = function() {
 };
 
 card.config = {
-	"minArticleImageWidth": 250
+	// we display aricle via different layouts
+	// according to thumbnail image width
+	"minArticleImageWidth": 320
 };
 
 card.renderers.sourceIcon = function(element) {

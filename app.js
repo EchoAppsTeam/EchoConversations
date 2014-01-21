@@ -1237,7 +1237,7 @@ conversations.css =
 	// common
 	'.{class:container} { position:relative; }' +
 	'.{class:resizeFrame} { position:absolute; z-index:-1; border:0; padding:0; }' +
-	'.{class:container} { min-height: 200px; }' +
+	'.{class:container} { min-height: 200px; min-width: 320px; }' +
 	'.{class:container} li > a, ' +
 	'.{class:container} .echo-primaryFont,' +
 	'.{class:container} .echo-secondaryFont,' +
