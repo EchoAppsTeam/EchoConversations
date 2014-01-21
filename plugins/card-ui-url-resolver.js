@@ -23,14 +23,14 @@ itemPlugin.component.renderers.body = function(element) {
 	var item = this.component;
 	var original = item.get("data.object.content");
 
-	var isArticle = false;
+	var needToRemoveCards  = false;
 
 	$.map(item.config.get("data.object.objectTypes"), function(type) {
-		if (type && /\/article$/.test(type)) {
-			isArticle = true;
+		if (type && /\/(article|photo)$/.test(type)) {
+			needToRemoveCards = true;
 		}
 	});
-	if (isArticle) {
+	if (needToRemoveCards) {
 		var content = $(original);
 		$.map(content.children("div[oembed], div[data-oembed]"), function(child) {
 			child.remove();
@@ -45,7 +45,7 @@ itemPlugin.component.renderers.body = function(element) {
 		var text = $(".echo-item-text", content);
 		if (media.length && text.length) {
 			item.set("data.object.content", text.html());
-		} else if (isArticle && !text.length) {
+		} else if (needToRemoveCards && !text.length) {
 			// TODO: This is handler for situation then we have
 			// <media:content type="image/jpeg" ...> in article.
 			// In this case we shelln`t display any attachments
