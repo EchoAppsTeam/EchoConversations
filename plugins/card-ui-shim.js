@@ -594,7 +594,7 @@ for (var i = 0; i <= 20; i++) {
 plugin.css =
 	// see more
 	'.{plugin.class:seeMore}:before { content: ""; display: block; height: 3px; box-shadow: 0 -3px 3px rgba(0, 0, 0, 0.08); position: relative; top: 0px; }' +
-	'.{plugin.class:seeMore} { margin-top: -8px; display: none; padding: 0 0 15px 0; border-top: 1px solid #D8D8D8; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer; color: #C6C6C6; }' +
+	'.{plugin.class:seeMore} { margin-top: -8px; display: none; padding: 0 0 15px 0; border-top: 1px solid #D8D8D8; text-align: center; font-size: 12px; cursor: pointer; color: #C6C6C6; }' +
 	'.{plugin.class:seeMore}:hover { color: #262626; }' +
 
 	// source icon
