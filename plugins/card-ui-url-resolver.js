@@ -23,26 +23,38 @@ itemPlugin.component.renderers.body = function(element) {
 	var item = this.component;
 	var original = item.get("data.object.content");
 
+	var isArticle = false;
+
+	$.map(item.config.get("data.object.objectTypes"), function(type) {
+		if (type && /\/article$/.test(type)) {
+			isArticle = true;
+		}
+	});
+	if (isArticle) {
+		var content = $(original);
+		$.map(content.children("div[oembed], div[data-oembed]"), function(child) {
+			child.remove();
+		});
+		original = content.html();
+	}
+
 	Echo.Utils.safelyExecute(function() {
-		var content = $("<div/>").append(item.get("data.object.content"));
+		var content = $("<div/>").append(original);
 		var media = self._getMediaAttachments();
 
 		var text = $(".echo-item-text", content);
-
 		if (media.length && text.length) {
 			item.set("data.object.content", text.html());
-		} else if (media.length && !text.length) {
-			// TODO: this situation shoud not be processed separately
-			// this is fix for situation then we have 2 pictures (1st in article,
-			// 2nd in photo).
-			$.map(content.children(".echo-item-files").first().children("div[oembed], div[data-oembed]"), function(card) {
-				card.remove();
-			});
+		} else if (isArticle && !text.length) {
+			// TODO: This is handler for situation then we have
+			// <media:content type="image/jpeg" ...> in article.
+			// In this case we shelln`t display any attachments
 			item.set("data.object.content", content.html());
 		}
 	});
 
 	this.parentRenderer("body", arguments);
+
 	item.set("data.object.content", original);
 
 	return element;
