@@ -469,12 +469,14 @@ plugin.component.renderers._button = function(element, extra) {
 			"target": button.find("span"),
 			"extraClass": this.cssPrefix + "dropdownButton",
 			"entries": $.map(entries, function(entry) { return $.extend({"handler": entry.callback}, entry); }),
-			"title": this.get("currentButtonsState") === "inline" ? extra.label : ""
+			"title": this.get("currentButtonsState") !== "compact" ? extra.label : ""
 		});
 		extra.callback = function(ev) {
 			button.find(".dropdown-toggle").dropdown("toggle");
 			ev.preventDefault();
 		};
+	} else if (this.get("currentButtonsState") === "compact") {
+		button.children("span").first().css("display", "none");
 	}
 
 	if (!clickables.length) {
