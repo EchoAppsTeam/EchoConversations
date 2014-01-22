@@ -119,7 +119,7 @@ submitPlugin.init = function() {
 
 	// TODO: get this option from dashboard in future
 	// for postComposer and replyComposer.
-	var isAttachmentTurnedOn = true;
+	var isAttachmentTurnedOn = this.config.get("filePicker.visible") || false;
 	if (isAttachmentTurnedOn) {
 		this.extendTemplate("insertAsFirstChild", "controls", submitPlugin.templates.attach);
 	}
@@ -283,20 +283,32 @@ submitPlugin.renderers.attach = function(element) {
 	var self = this;
 	element.on({
 		"click": function(event) {
-			var filepickerKey = window.filepicker.apikey;
-			window.filepicker.setKey("A1NF2faTCRd2YwXtOBNLUz");//self.component.config.get("dependencies.FilePicker.key"));
-			window.filepicker.pick({
-				"mimetype": "image/*",
-				"container": "modal"
-			}, function(InkBlob) {
-				window.filepicker.setKey(filepickerKey);
-				self.events.publish({
-					"topic": "onURLsAdded",
-					"data": {"urls":[InkBlob.url]}
+			window.filepicker.setKey(self.config.get("filePicker.key"));
+			var sources = self.config.get("filePicker.sources")
+				? self.config.get("filePicker.sources").replace(" ", "").toUpperCase().split(",")
+				: undefined;
+			try {
+				window.filepicker.pickMultiple({
+					"mimetype": "image/*",
+					"container": "modal",
+					"services": sources
+				}, function(InkBlob) {
+					self.events.publish({
+						"topic": "onURLsAdded",
+						"data": {
+							"urls": $.map(InkBlob, function(picture) {
+								return picture.url;
+							})
+						}
+					});
+				}, function(FPError) { });
+			} catch(e) {
+				Echo.Utils.log({
+					"message": e.toString(),
+					"component": "FilePicker",
+					"type": "error"
 				});
-			}, function(FPError) {
-				window.filepicker.setKey(filepickerKey);
-			});
+			}
 		}
 	});
 	return element;

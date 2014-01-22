@@ -434,7 +434,12 @@ conversations.renderers.postComposer = function(element) {
 			"markers": this._getSubmitMarkers(),
 			"plugins": this._mergeSpecsByName([{
 				"name": "URLResolver",
-				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs")
+				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs"),
+				"filePicker": {
+					"key": this.config.get("dependencies.filePickerApiKey"),
+				"visible": this.config.get("postComposer.contentTypes.comments.attachments.visible"),
+				"sources": this.config.get("postComposer.contentTypes.comments.attachments.sources")
+				}
 			}, {
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
@@ -861,7 +866,12 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"requestMethod": "POST",
 		"nestedPlugins": this._mergeSpecsByName([{
 			"name": "URLResolver",
-			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs")
+			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs"),
+			"filePicker": {
+				"key": this.config.get("dependencies.filePickerApiKey"),
+				"visible": this.config.get("replyComposer.contentTypes.comments.attachments.visible"),
+				"sources": this.config.get("replyComposer.contentTypes.comments.attachments.sources")
+			}
 		}, {
 			"name": "JanrainBackplaneHandler",
 			"appId": this.config.get("dependencies.Janrain.appId"),
@@ -888,7 +898,12 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"name": "URLResolver",
 			// we enable resolving through separate parameter
 			// because it should works for submit and item as well
-			"resolveURLs": this._getResolverSettingForEditPlugin()
+			"resolveURLs": this._getResolverSettingForEditPlugin(),
+			"filePicker": {
+				"key": this.config.get("dependencies.filePickerApiKey"),
+				"visible": this.config.get("postComposer.contentTypes.comments.attachments.visible"),
+				"sources": this.config.get("postComposer.contentTypes.comments.attachments.sources")
+			}
 		}]
 	}];
 
