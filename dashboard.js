@@ -216,6 +216,7 @@ dashboard.vars = {
 		"items": [{
 			"component": "Checkbox",
 			"name": "displayCommunityFlaggedPosts",
+			"type": "boolean",
 			"default": false,
 			"config": {
 				"title": "Display Community Flagged Posts"
@@ -223,6 +224,7 @@ dashboard.vars = {
 		}, {
 			"component": "Checkbox",
 			"name": "displaySystemFlaggedPosts",
+			"type": "boolean",
 			"default": false,
 			"config": {
 				"title": "Display System Flagged Posts"
