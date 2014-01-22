@@ -357,10 +357,16 @@ conversations.renderers.streamingStateContainer = function(element) {
 conversations.renderers.resizeFrame = function(element) {
 	var self = this;
 	element.on('load', function() {
+		var counter;
 		this.contentWindow.onresize = function() {
-			self.events.publish({
-				"topic": "onAppResize"
-			});
+			if (counter) {
+				clearTimeout(counter);
+			}
+			counter = setTimeout(function() {
+				self.events.publish({
+					"topic": "onAppResize"
+				});
+			}, 20);
 		};
 	});
 	return element;

@@ -30,18 +30,19 @@ itemPlugin.component.renderers.body = function(element) {
 			needToRemoveCards = true;
 		}
 	});
+
+	var content = $("<div/>").append(original);
+
 	if (needToRemoveCards) {
-		var content = $(original);
-		$.map(content.children("div[oembed], div[data-oembed]"), function(child) {
+		var truncatedContent = $(original);
+		$.map(truncatedContent.children("div[oembed], div[data-oembed]"), function(child) {
 			child.remove();
 		});
-		original = content.html();
+		content = $("<div/>").append(truncatedContent);
 	}
 
 	Echo.Utils.safelyExecute(function() {
-		var content = $("<div/>").append(original);
 		var media = self._getMediaAttachments();
-
 		var text = $(".echo-item-text", content);
 		if (media.length && text.length) {
 			item.set("data.object.content", text.html());
