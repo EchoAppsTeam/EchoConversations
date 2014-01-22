@@ -73,7 +73,6 @@ conversations.config = {
 		"userMarkers": ["Conversations.TopContributor"],
 		"itemMarkersToAdd": ["Conversations.TopPost"],
 		"itemMarkersToRemove": ["Conversations.RemovedFromTopPosts"],
-		"maxItemBodyCharacters": 200,
 		"sortOrderEntries": [{
 			"title": "Newest First",
 			"value": "reverseChronological"
@@ -117,7 +116,6 @@ conversations.config = {
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
 		"itemTypes": [],
-		"maxItemBodyCharacters": 200,
 		"sortOrderEntries": [{
 			"title": "Newest First",
 			"value": "reverseChronological"
@@ -223,9 +221,14 @@ conversations.config.normalizer = {
 		return $.extend(true, {}, this.get("allPosts"), value);
 	},
 	"targetURL": function(value) {
-		return value
-			|| $("link[rel='canonical']").attr('href')
-			|| document.location.href.split("#")[0];
+		if (value) {
+			return value;
+		}
+		var pageURL = $("link[rel='canonical']").attr('href');
+		if (!pageURL || !Echo.Utils.parseURL(pageURL).domain) {
+			pageURL =  document.location.href.split("#")[0];
+		}
+		return pageURL;
 	},
 	"auth": function(value) {
 		value.buttons = !!value.hideLoginButtons ? [] : ["login", "signup"];
@@ -293,6 +296,7 @@ conversations.init = function() {
 
 conversations.templates.main =
 	'<div class="{class:container}">' +
+		'<iframe class="{class:resizeFrame}"  width=100% height=100% frameBorder=0 ></iframe>' +
 		'<div class="{class:streamingStateContainer}">' +
 			'<div class="pull-right {class:itemsWaiting}"></div>' +
 			'<div class="{class:streamingState}"></div>' +
@@ -351,6 +355,18 @@ conversations.renderers.streamingStateContainer = function(element) {
 	if (!this.config.get("streamingControl.displayStreamingStateHeader")) {
 		element.hide();
 	}
+	return element;
+};
+
+conversations.renderers.resizeFrame = function(element) {
+	var self = this;
+	element.on('load', function() {
+		this.contentWindow.onresize = function() {
+			self.events.publish({
+				"topic": "onAppResize"
+			});
+		};
+	});
 	return element;
 };
 
@@ -560,7 +576,7 @@ conversations.renderers._tabs = function(element, extra) {
 
 	$.map(extra.tabs, function(tab) {
 		tab.type = tab.type || "tab"; // tab || dropdown
-		tab.id = tab.id || (tab.name + "-" + self.config.get("context"));
+		tab.id = tab.id || (tab.name + "-" + Echo.Utils.getUniqueString());
 		var li = $(self.substitute({
 			"template": tpls.navItem,
 			"data": {
@@ -771,9 +787,6 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"reTag": false,
 			"viaLabel": {
 				"icon": config.displaySourceIcons
-			},
-			"limits": {
-				"maxBodyCharacters": config.maxItemBodyCharacters
 			}
 		},
 		"data": this.get("data." + componentID + "-search"),
@@ -801,7 +814,8 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"name": "CardUIShim",
 		"displayTopPostHighlight": config.displayTopPostHighlight,
 		"includeTopContributors": this.config.get("topPosts.includeTopContributors"),
-		"topMarkers": this.config.get("topMarkers")
+		"topMarkers": this.config.get("topMarkers"),
+		"initialIntentsDisplayMode": this.config.get(componentID + ".initialIntentsDisplayMode")
 	}, {
 		"name": "ItemEventsProxy",
 		"onAdd": function() {
@@ -1225,7 +1239,9 @@ conversations.css =
 	'.echo-sdk-ui .nav.{class:tabs} .dropdown-menu { border-radius: 6px; }' +
 
 	// common
-	'.{class:container} { min-height: 200px; }' +
+	'.{class:container} { position:relative; }' +
+	'.{class:resizeFrame} { position:absolute; z-index:-1; border:0; padding:0; }' +
+	'.{class:container} { min-height: 200px; min-width: 320px; }' +
 	'.{class:container} li > a, ' +
 	'.{class:container} .echo-primaryFont,' +
 	'.{class:container} .echo-secondaryFont,' +

@@ -13,7 +13,6 @@ if (Echo.Plugin.isDefined(plugin)) return;
 plugin.init = function() {
 	var item = this.component;
 	this.set("itemStatus", item.get("data.object.status"));
-	this.extendTemplate("insertAfter", "avatar", plugin.templates.status);
 	item.addButtonSpec("ModerationCardUI", this._assembleModerateButton());
 };
 
@@ -120,15 +119,6 @@ plugin.templates.buttonLabels = {
 		'(<span>{plugin.label:unbanUser}</span>)',
 	"unbanned": '<span>{plugin.label:banUser}</span>'
 };
-
-/**
- * @echo_template
- */
-plugin.templates.status =
-	'<div class="{plugin.class:status}">' +
-		'<div class="{plugin.class:statusIcon}"></div>' +
-		'<div class="echo-clear"></div>' +
-	'</div>';
 
 plugin.component.renderers.avatar = function(element) {
 	var item = this.component;
@@ -650,7 +640,7 @@ plugin.methods._getNextRole = function(role) {
 
 plugin.css =
 	// hide switch for now
-	'.{plugin.class} .{class:modeSwitch} { width: 0px; }' +
+	'.{plugin.class} .{class:modeSwitch} { width: 0px; height: 0px; }' +
 
 	// Moderate button
 	'.echo-sdk-ui ul.{plugin.class:moderateButton} { display: inline-block; margin-bottom: 0px; }' +
@@ -675,8 +665,8 @@ plugin.css =
 		"ModeratorDeleted": "#bf383a"
 	}, function(color, status) {
 		return [
-			'.{plugin.class} .{class:avatar}.{plugin.class:actorStatus-' + status + '} > img { border: 2px solid ' + color + '; width: 20px; height: 20px; }',
-			'.{plugin.class} .{class:depth-0} .{class:avatar}.{plugin.class:actorStatus-' + status + '} img { height: 32px; width: 32px; border-radius: 50%;}'
+			'.{plugin.class} .{class:avatar}.{plugin.class:actorStatus-' + status + '} > div { border: 2px solid ' + color + '; width: 20px; height: 20px; }',
+			'.{plugin.class} .{class:depth-0} .{class:avatar}.{plugin.class:actorStatus-' + status + '} div { height: 32px; width: 32px; border-radius: 50%;}'
 		].join("");
 	})).join("");
 

@@ -6,69 +6,74 @@ var card = Echo.App.manifest("Echo.Conversations.NestedCard");
 if (Echo.App.isDefined(card)) return;
 
 card.templates.photo =
-			'<div class="{class:item}">' +
-				'<div class="{class:photo}">' +
-					'<div class="{class:photoAvatarWrapper}">' +
-						'<div class="{class:avatar} {class:photoAvatar}" title="{data:author_name}">' +
-							'<img src="{config:defaultAvatar}"/>{data:author_name}' +
-						'</div>' +
-					'</div>' +
-					'<a href="{data:url}" target="_blank">' +
-						'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
-					'</a>' +
-					'<div class="{class:photoLabel}">' +
-						'<div class="{class:photoLabelContainer}">' +
-							'<div class="{class:title} {class:photoTitle}" title="{data:title}">' +
-								'<a class="echo-clickable" href="{data:url}" target="_blank">{data:title}</a>' +
-							'</div>' +
-							'<div class="{class:description} {class:photoDescription}">{data:description}</div>' +
-						'</div>' +
+	'<div class="{class:item}">' +
+		'<div class="{class:border}">' +
+			'<div class="{class:photo}">' +
+				'<div class="{class:photoAvatarWrapper}">' +
+					'<div class="{class:avatar} {class:photoAvatar}" title="{data:author_name}">' +
+						'<div></div>{data:author_name}' +
 					'</div>' +
 				'</div>' +
-				'<div class="{class:sourceIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
-			'</div>';
+				'<a href="{data:url}" target="_blank">' +
+					'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
+				'</a>' +
+				'<div class="{class:photoLabel}">' +
+					'<div class="{class:photoLabelContainer}">' +
+						'<div class="{class:title} {class:photoTitle}" title="{data:title}">' +
+							'<a class="echo-clickable" href="{data:url}" target="_blank">{data:title}</a>' +
+						'</div>' +
+						'<div class="{class:description} {class:photoDescription}">{data:description}</div>' +
+					'</div>' +
+				'</div>' +
+			'</div>' +
+			'<div class="{class:sourceIcon}"></div>' +
+		'</div>' +
+	'</div>';
 
 card.templates.video =
-			'<div class="{class:item}">' +
-				'<div class="{class:video}">' +
-					'<div class="{class:avatar} {class:videoAvatar}" title="{data:author_name}">' +
-						'<img src="{config:defaultAvatar}"/>{data:author_name}' +
-					'</div>' +
-					'<div class="{class:videoPlaceholder}">' +
-						'<div class="{class:playButton}"></div>' +
-						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
-					'</div>' +
-					'<div class="{class:title} {class:videoTitle}" title="{data:title}">{data:title}</div>' +
-					'<div class="{class:description} {class:videoDescription}">{data:description}</div>' +
-					'<div class="{class:sourceIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
+	'<div class="{class:item}">' +
+		'<div class="{class:border}">' +
+			'<div class="{class:video}">' +
+				'<div class="{class:avatar} {class:videoAvatar}" title="{data:author_name}">' +
+					'<div></div>{data:author_name}' +
 				'</div>' +
-			'</div>';
+				'<div class="{class:videoPlaceholder}">' +
+					'<div class="{class:playButton}"></div>' +
+					'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
+				'</div>' +
+				'<div class="{class:title} {class:videoTitle}" title="{data:title}">{data:title}</div>' +
+				'<div class="{class:description} {class:videoDescription}">{data:description}</div>' +
+				'<div class="{class:sourceIcon}"></div>' +
+			'</div>' +
+		'</div>' +
+	'</div>';
 
 card.templates.link =
-			'<div class="{class:item}">' +
-				'<div class="{class:article}">' +
-					'<div class="{class:articleThumbnail}">' +
-						'<img src="{data:thumbnail_url}"/>' +
-					'</div>' +
-					'<div class="{class:articleTemplate}">' +
-						'<div class="{class:title} {class:articleTitle}" title="{data:title}">' +
-							'<a href="{data:url}" target="_blank">{data:title}</a>' +
-						'</div>' +
-						'<div class="{class:articleDescriptionContainer}">' +
-							'<div class="{class:articleDescription}">{data:description}</div>' +
-						'</div>' +
-					'</div>' +
-					'<div class="echo-clear"></div>' +
-					'<div class="{class:sourceIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
+	'<div class="{class:item}">' +
+		'<div class="{class:border}">' +
+			'<div class="{class:article}">' +
+				'<div class="{class:articleThumbnail}">' +
+					'<img src="{data:thumbnail_url}"/>' +
 				'</div>' +
-			'</div>';
+				'<div class="{class:articleTemplate}">' +
+					'<div class="{class:title} {class:articleTitle}" title="{data:title}">' +
+						'<a href="{data:url}" target="_blank">{data:title}</a>' +
+					'</div>' +
+					'<div class="{class:articleDescriptionContainer}">' +
+						'<div class="{class:articleDescription}">{data:description}</div>' +
+					'</div>' +
+				'</div>' +
+				'<div class="echo-clear"></div>' +
+				'<div class="{class:sourceIcon}"></div>' +
+			'</div>' +
+		'</div>' +
+	'</div>';
 
 card.templates.main = function() {
 	var data = this.get("data");
 	var handlers = {
 		"link": function(data) {
-			var width = this.config.get("width");
-			return (width && data.thumbnail_width >= width)
+			return (data.thumbnail_width >= this.config.get("minArticleImageWidth"))
 				? this.templates["photo"]
 				: this.templates["link"];
 		}
@@ -78,22 +83,24 @@ card.templates.main = function() {
 		: this.templates[data.type];
 };
 
-card.config = {
-	"width": 340
-};
+card.sourceIcons = {};
 
 card.init = function() {
-	// TODO handle situation when thumbnail_url is not defined
 	this.render();
 	this.ready();
 };
 
-card.renderers.item = function(element) {
-	return element.css("max-width", this._getMaxWidth());
+card.config = {
+	// we display aricle via different layouts
+	// according to thumbnail image width
+	"minArticleImageWidth": 320
 };
 
 card.renderers.sourceIcon = function(element) {
-	var proviredURL = element.data("url");
+	var oembed = this.get("data");
+
+	if (!oembed.provider_url) return;
+
 	var icon;
 	var sourceIcons = [{
 		"pattern": /http:\/\/instagram\.com/i,
@@ -101,25 +108,41 @@ card.renderers.sourceIcon = function(element) {
 	}];
 
 	$.map(sourceIcons, function(item) {
-		if (item.pattern.test(proviredURL)) {
+		if (item.pattern.test(oembed.provider_url)) {
 			icon = item.url;
 			return false;
 		}
 	});
 
-	icon = icon || proviredURL +
-		(proviredURL.substr(-1) === "/" ? "" : "/") +	"favicon.ico";
+	icon = icon || oembed.provider_url +
+		(oembed.provider_url.substr(-1) === "/" ? "" : "/") + "favicon.ico";
 
-	Echo.Utils.loadImage({
-		"image": icon,
-		"onerror": $.noop,
-		"onload": function() {
-			$(this).attr("title", element.data("name")).appendTo(element);
-		}
-	});
+	if (typeof card.sourceIcons[icon] === "undefined") {
+		Echo.Utils.loadImage({
+			"image": icon,
+			"onerror": function() {
+				card.sourceIcons[icon] = false;
+			},
+			"onload": function() {
+				$(this).attr("title", oembed.provider_name).appendTo(element);
+				card.sourceIcons[icon] = true;
+			}
+		});
+	} else if (card.sourceIcons[icon]) {
+		$("<img/>").attr({
+			"src": icon,
+			"title": oembed.provider_name
+		}).appendTo(element);
+	}
 };
 
 card.renderers.avatar = function(element) {
+	// we have to do it because filter must work in IE8 only
+	// in other cases we will have square avatar in IE 9
+	var isIE8 = document.all && document.querySelector && !document.addEventListener;
+	if (isIE8) {
+		element.children()[0].style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.config.get("defaultAvatar") + "', sizingMethod='scale')";
+	}
 	return this.get("data.author_name") ? element : element.hide();
 };
 
@@ -145,66 +168,33 @@ card.renderers.playButton = function(element) {
 
 card.renderers.videoPlaceholder = function(element) {
 	var oembed = this.get("data");
-	var maxWidth = this.config.get("width") - 20; // consider margins (margin: 10px)
 
 	if (!oembed.thumbnail_url) {
 		element.empty().append($(oembed.html));
 	}
-	//TODO: calc height/width
-	var ratio, dimensions;
-	if (oembed.thumbnail_width) {
-		ratio = maxWidth / oembed.thumbnail_width;
-		dimensions = {
-			"width": maxWidth,
-			"height": oembed.thumbnail_height * ratio
-		};
-	} else if (maxWidth < oembed.width) {
-		ratio = maxWidth / oembed.width;
-		dimensions = {
-			"width": maxWidth,
-			"height": oembed.height * ratio
-		};
-	} else {
-		dimensions = {
-			"width": oembed.width,
-			"height": oembed.height
-		};
-	}
-	// IE11 layout fix
-	element.parent().css("width", dimensions.width - 2);
 
-	return element.css(dimensions);
+	return element.css({
+		"width": oembed.width,
+		"padding-bottom": oembed.height / oembed.width * 100 + "%"
+	});
 };
 
 /**
  *  Photo
  */
 card.renderers.photoThumbnail = function(element) {
-	var width = this.config.get("width");
-	var oembed = this.get("data");
-	var thumbnail = oembed.thumbnail_url && oembed.thumbnail_width >= width
-		? oembed.thumbnail_url
-		: oembed.url;
-
-	return element.attr("src", thumbnail);
+	if (this.get("data.type") === "link") {
+		element.attr("src", this.get("data.thumbnail_url"));
+	} else {
+		element.attr("src", this.get("data.url"));
+	}
+	return element;
 };
 
 card.renderers.photoLabelContainer = function(element) {
 	return this.get("data.description") || this.get("data.title")
 		? element
 		: element.hide();
-};
-
-card.methods._getMaxWidth = function() {
-	var maxWidth = this.config.get("width");
-	var oembed = this.get("data");
-	if (oembed.type === "photo") {
-		maxWidth = Math.min(
-			maxWidth,
-			(oembed.thumbnail_url && oembed.thumbnail_width >= maxWidth) ? oembed.thumbnail_width : oembed.width
-		);
-	}
-	return maxWidth;
 };
 
 // calculate photoLabel max-height
@@ -215,16 +205,20 @@ var photoLabelHeight = 20 // photoLabelContainer padding
 
 card.css =
 	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:item} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
-	'.{class:item} .{class:sourceIcon} > img { max-width: 20px; }' +
-	'.echo-sdk-ui .{class:avatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
+	'.{class:item} { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; }' +
+	'.{class:border} { white-space: normal; word-break: break-word; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; }' +
+	'.{class:item} .{class:sourceIcon} > img { width: 18px; height: 18px; }' +
+	'.echo-sdk-ui .{class:avatar} > div { width: 28px; height: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; margin-right: 6px; }' +
+	'.{class:description} { overflow: hidden; }' +
 
 	// photo
 	'.{class:photoAvatarWrapper} { position: absolute; width: 100%; }' +
 	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
+	'.{class:photoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
 	'.{class:photo} { position: relative; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
+	'.{class:photo} > a { display: block; max-height: 350px; overflow: hidden; }' +
 
 	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
@@ -247,22 +241,21 @@ card.css =
 	'.{class:video} .{class:sourceIcon} > img { padding: 10px 0 0 0; }' +
 	'.{class:videoAvatar} { margin-bottom: 8px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:videoTitle} { margin: 10px 0 0 0; }' +
+	'.{class:videoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
 	'.{class:videoDescription} { margin: 5px 0 0 0; }' +
-	'.{class:videoPlaceholder} { position: relative; background: #000000; }' +
-	'.{class:videoPlaceholder} img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }' +
 
-	// TODO: fix video resizing
-	//'.{class:videoPlaceholder} { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
-	'.{class:videoPlaceholder} > iframe { width: 100%; height: 100%; }' +
-	'.{class:videoPlaceholder} > video { width: 100%; height: 100%; }' +
-	'.{class:videoPlaceholder} > object { width: 100%; height: 100%; }' +
+	'.{class:videoPlaceholder} img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }' +
+	'.{class:videoPlaceholder} { max-width: 100%; position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; background: #000000; overflow: hidden; }' +
+	'.{class:videoPlaceholder} > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.{class:videoPlaceholder} > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+	'.{class:videoPlaceholder} > object { position: absolute; top: 0; left: 0; width: 100%;100 height: 100%; }' +
 
 	// article
 	'.{class:article} { padding: 10px; min-width: 200px; }' +
 	'.{class:article} .{class:sourceIcon} > img { padding: 10px 0 0 0; }' +
 	'.{class:article} .{class:articleTitle} > a { color: #42474A; font-weight: bold; }' +
 	'.{class:article} .{class:articleTitle} > a:hover { color: #42474A; }' +
-	'.{class:articleTitle} { padding: 0 0 5px 0; margin-left: 10px; margin-right: 15px; }' +
+	'.{class:articleTitle} { padding: 0 0 5px 0; margin-left: 10px; }' +
 	'.{class:articleDescription} { margin-left: 10px; font-size: 13px; line-height: 16px; }' +
 	'.{class:articleThumbnail} { width: 30%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden; }' +
 	'.{class:articleThumbnail} img { width: auto; height: auto; max-height:120px; max-width:120px; }' +

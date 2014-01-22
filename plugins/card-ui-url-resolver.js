@@ -7,34 +7,15 @@
  */
 var itemPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Stream.Item");
 
-itemPlugin.events = {
-	"Echo.StreamServer.Controls.Stream.onReady": function() {
-		this._resizeMediaContent();
-	},
-	"Echo.StreamServer.Controls.Stream.Item.onRender": function() {
-		this._resizeMediaContent();
-	},
-	"Echo.StreamServer.Controls.Stream.Item.onReady": function() {
-		this._resizeMediaContent();
-	}
-};
-
-itemPlugin.config = {
-	"mediaWidth": 340
-};
-
 itemPlugin.vars = {
 	"media": [],
 	"content": undefined
 };
 
-itemPlugin.templates.media =
-	'<div class="{plugin.class:mediaContentContainer}">' +
-		'<div class="{plugin.class:mediaContent}"></div>' +
-	'</div>';
+itemPlugin.templates.media = '<div class="{plugin.class:mediaContent}"></div>';
 
 itemPlugin.init = function() {
-	this.extendTemplate("insertAfter", "body", itemPlugin.templates.media);
+	this.extendTemplate("insertAsLastChild", "data", itemPlugin.templates.media);
 };
 
 itemPlugin.component.renderers.body = function(element) {
@@ -42,43 +23,50 @@ itemPlugin.component.renderers.body = function(element) {
 	var item = this.component;
 	var original = item.get("data.object.content");
 
+	var isArticle = false;
+
+	$.map(item.config.get("data.object.objectTypes"), function(type) {
+		if (type && /\/article$/.test(type)) {
+			isArticle = true;
+		}
+	});
+	if (isArticle) {
+		var content = $(original);
+		$.map(content.children("div[oembed], div[data-oembed]"), function(child) {
+			child.remove();
+		});
+		original = content.html();
+	}
+
 	Echo.Utils.safelyExecute(function() {
-		var content = $("<div/>").append(item.get("data.object.content"));
+		var content = $("<div/>").append(original);
 		var media = self._getMediaAttachments();
+
 		var text = $(".echo-item-text", content);
 		if (media.length && text.length) {
 			item.set("data.object.content", text.html());
+		} else if (isArticle && !text.length) {
+			// TODO: This is handler for situation then we have
+			// <media:content type="image/jpeg" ...> in article.
+			// In this case we shelln`t display any attachments
+			item.set("data.object.content", content.html());
 		}
 	});
 
 	this.parentRenderer("body", arguments);
+
 	item.set("data.object.content", original);
 
 	return element;
 };
 
-itemPlugin.renderers.mediaContentContainer = function(element) {
-	var media = this._getMediaAttachments();
-	return element.addClass(this.cssPrefix + (media.length > 1 ? "multiple" : "single"));
-};
-
 itemPlugin.renderers.mediaContent = function(element) {
-	var self = this;
 	var media = this._getMediaAttachments();
-	element.empty();
-	$.map(media, function(item) {
-		var container = $("<div>");
-		new Echo.Conversations.NestedCard({
-			"target": container,
-			"data": item,
-			"context": self.config.get("context"),
-			"width": self.config.get("mediaWidth"),
-			"ready": function() {
-				element.append(container);
-			}
-		});
-	});
-	return element;
+	new Echo.Conversations.MediaContainer(this.config.assemble({
+		"target": element.empty(),
+		"data": media
+	}));
+	return element.addClass(this.cssPrefix + (media.length > 1 ? "multiple" : "single"));
 };
 
 itemPlugin.methods._getMediaAttachments = function() {
@@ -97,31 +85,11 @@ itemPlugin.methods._getMediaAttachments = function() {
 	return this.get("media", []);
 };
 
-itemPlugin.methods._resizeMediaContent = function() {
-	var media = this.view.get("mediaContentContainer");
-	var attachments = this._getMediaAttachments();
-	if (media && media.is(":visible")) {
-		var k = attachments.length > 1 ? 0.9 : 1;
-		this.config.set("mediaWidth", media.outerWidth() * k);
-		this.view.render({"name": "mediaContent"});
-	}
-};
-
 itemPlugin.css =
-	'.{plugin.class:mediaContentContainer} { overflow-y: hidden; overflow-x: auto; margin-bottom: 5px; }' +
-	'.{class:depth-0} .{plugin.class:multiple}.{plugin.class:mediaContentContainer} { margin-left: -16px; margin-right: -16px; }' +
-
-	'.{plugin.class:multiple}.{plugin.class:mediaContentContainer} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
-
-	'.{plugin.class:mediaContent} { white-space: nowrap; word-wrap: normal; }' +
-	'.{plugin.class:mediaContent} > div { display: inline-block; white-space: normal; vertical-align: top; }' +
-	'.{plugin.class:single} .{plugin.class:mediaContent} > div { display: block; }' +
-	'.{plugin.class:multiple} .{plugin.class:mediaContent} > div { margin-right: 8px; }' +
-
-	// scrollbar
-	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar { height: 10px; }' +
-	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
-	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }';
+	'.{class:depth-0} .{plugin.class:mediaContent}.{plugin.class:multiple} { margin-left: -16px; margin-right: -16px; }' +
+	'.{class:depth-0} .{plugin.class:mediaContent} { margin-bottom: 0px; }' +
+	'.{plugin.class:mediaContent}.{plugin.class:multiple} > div { border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
+	'.{plugin.class:mediaContent} { margin-bottom: 8px; }';
 
 Echo.Plugin.create(itemPlugin);
 
@@ -134,7 +102,6 @@ var submitPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Contro
 submitPlugin.config = {
 	"embedlyAPIKey": "5945901611864679a8761b0fcaa56f87",
 	"maxDescriptionCharacters": "200",
-	"mediaWidth": 230,
 	"resolveURLs": "all" // all, disabled, only-roots, only-children
 };
 
@@ -186,12 +153,6 @@ submitPlugin.events = {
 		this.view.get("mediaContent").empty();
 		this.component.view.get("body").removeClass(this.cssPrefix + "enabledMedia");
 		this._restoreTextarea();
-	},
-	"Echo.StreamServer.Controls.Submit.onReady": function() {
-		this._resizeMediaContent();
-	},
-	"Echo.StreamServer.Controls.Submit.onRender": function() {
-		this._resizeMediaContent();
 	}
 };
 
@@ -200,10 +161,7 @@ submitPlugin.dependencies = [{
 	"loaded": function() { return !!$.fn.embedly; }
 }];
 
-submitPlugin.templates.preview =
-	'<div class="{plugin.class:mediaContentContainer}">' +
-		'<div class="{plugin.class:mediaContent}"></div>' +
-	'</div>';
+submitPlugin.templates.preview = '<div class="{plugin.class:mediaContent}"></div>';
 
 submitPlugin.templates.message =
   '<div class="echo-item-text">{data:text}</div>' +
@@ -424,28 +382,23 @@ submitPlugin.methods.attachMedia = function(data) {
 	});
 };
 
-submitPlugin.methods._resizeMediaContent = function() {
-	var media = this.view.get("mediaContentContainer");
-	if (media && media.is(":visible")) {
-		this.config.set("mediaWidth", media.outerWidth() * 0.9);
-		this.view.render({"name": "mediaContent"});
-	}
-};
-
 submitPlugin.css =
 	'.{class:body}.{plugin.class:enabledMedia} .{class:content}.{class:border} { border-bottom: none; }' +
-	'.{class:body}.{plugin.class:enabledMedia} .{plugin.class:mediaContentContainer} { overflow-y: hidden; overflow-x: auto; border: 1px solid #DEDEDE; border-top-style: dashed; background-color: #F1F1F1; padding: 10px 5px; }' +
+	'.{class:body}.{plugin.class:enabledMedia} .{plugin.class:mediaContent} { overflow: auto; border: 1px solid #DEDEDE; border-top-style: dashed; background-color: #F1F1F1; padding: 10px 5px; }' +
 
 	'.{plugin.class:Close} { line-height: 1; opacity: 0.5; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #D2D2D2; text-shadow: 0 0 1px #000; }' +
 	'.{plugin.class:Close}:hover { opacity: 1; filter: alpha(opacity=100); }' +
+	'.{plugin.class:mediaContent} .echo-conversations-nestedcard-videoAvatar { margin-right: 20px; }' +
+	'.{plugin.class:mediaContent} .echo-conversations-nestedcard-articleTitle { margin-right: 15px; }' +
+	'.{plugin.class:mediaContent} .echo-conversations-nestedcard-photoAvatar { margin-right: 15px; }' +
 
 	'.{plugin.class:mediaContent} { white-space: nowrap; word-wrap: normal; }' +
-	'.{plugin.class:mediaContent} > div { display: inline-block; white-space: normal; margin-right: 8px; position: relative; vertical-align: top; }' +
+	'.{plugin.class:mediaContent} > div { display: inline-block; white-space: normal; margin-right: 8px; position: relative; vertical-align: top; max-width: 90%; }' +
 
 	// scrollbar
-	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar { height: 10px; }' +
-	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
-	'.{plugin.class:mediaContentContainer}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }';
+	'.{plugin.class:mediaContent}::-webkit-scrollbar { height: 10px; }' +
+	'.{plugin.class:mediaContent}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
+	'.{plugin.class:mediaContent}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }';
 
 Echo.Plugin.create(submitPlugin);
 

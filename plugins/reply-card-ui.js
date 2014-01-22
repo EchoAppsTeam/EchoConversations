@@ -63,7 +63,7 @@ plugin.templates.form =
 	'<div class="{plugin.class:replyForm}">' +
 		'<div class="{plugin.class:submitForm}"></div>' +
 		'<div class="{plugin.class:compactForm}">' +
-			'<div class="pull-left {plugin.class:avatar}"></div>' +
+			'<div class="pull-left {plugin.class:avatar}"><div></div></div>' +
 			'<div class="{plugin.class:compactContent} {plugin.class:compactBorder}">' +
 				'<input type="text" class="{plugin.class:compactField} echo-primaryFont echo-secondaryColor">' +
 			'</div>' +
@@ -120,13 +120,20 @@ plugin.renderers.submitForm = function(element) {
 		? element.show() : element.empty().hide();
 };
 
-plugin.renderers.avatar =function(element) {
+plugin.renderers.avatar = function(element) {
 	var item = this.component;
-	item.placeImage({
-		"container": element,
-		"image": item.user.get("avatar"),
-		"defaultImage": item.config.get("defaultAvatar")
-	});
+	var avatarURL = item.user.get("avatar");
+	if (!avatarURL) {
+		avatarURL = item.config.get("defaultAvatar");
+	}
+	var avatarElem = element.children()[0];
+	$(avatarElem).css("background-image", 'url("' + avatarURL + '")');
+	// we have to do it because filter must work in IE8 only
+	// in other cases we will have square avatar in IE 9
+	var isIE8 = document.all && document.querySelector && !document.addEventListener;
+	if (isIE8) {
+		$(avatarElem).css({"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + avatarURL + "', sizingMethod='scale')"});
+	}
 	return item.get("depth") && !this.get("expanded")
 		? element.hide() : element.show();
 };
@@ -312,7 +319,7 @@ plugin.css =
 	'.{plugin.class} .{plugin.class:additionalSpacing} { padding-top: 15px; }' +
 	'.{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 28px; line-height: 28px; }' +
 	'.{plugin.class:avatar} { width: 28px; height: 28px; border-radius: 50%; margin: 1px 0px 0px 3px; }' +
-	'.{plugin.class} .{plugin.class:avatar} > img { width: 28px; height: 28px; }' +
+	'.{plugin.class} .{plugin.class:avatar} > div { width: 28px; height: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; }' +
 	'.{plugin.class:compactBorder} { margin-left: 39px; border: 1px solid #d8d8d8; }' +
 	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"].echo-secondaryColor { color: #C6C6C6 }' +
 	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"].echo-primaryFont { font-size: 12px; line-height: 24px; }' +

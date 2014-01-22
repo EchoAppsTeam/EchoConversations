@@ -103,6 +103,12 @@ plugin.events = {
 	"Echo.StreamServer.Controls.Stream.Item.onRender": function() {
 		this._pageLayoutChange();
 	},
+	"Echo.Apps.Conversations.onAppResize": function() {
+		this._pageLayoutChange();
+	},
+	"Echo.StreamServer.Controls.FacePile.onRender" : function() {
+		this._pageLayoutChange();
+	},
 	"Echo.StreamServer.Controls.Stream.onActivitiesComplete": function() {
 		this._pageLayoutChange();
 		var self = this;
@@ -136,13 +142,15 @@ plugin.events = {
 
 plugin.labels = {
 	"topPostIndicatorTitle": "Top Post",
-	"actions": "Actions"
+	"actions": "Actions",
+	"seeMore": "See more"
 };
 
 plugin.config = {
 	"fadeTimeout": 10000, // 10 seconds
 	"displayTopPostHighlight": true,
-	"includeTopContributors": true
+	"includeTopContributors": true,
+	"collapsedContentHeight": 110 //px
 };
 
 plugin.init = function() {
@@ -153,10 +161,11 @@ plugin.init = function() {
 	this.extendTemplate("replace", "sourceIcon", plugin.templates.sourceIcon);
 	this.extendTemplate("insertBefore", "frame", plugin.templates.topPostMarker);
 	this.extendTemplate("remove", "date");
-	this.extendTemplate("insertAfter", "authorName", plugin.templates.date);
+	this.extendTemplate("remove", "authorName");
+	this.extendTemplate("insertAsFirstChild", "frame", plugin.templates.header);
 	this.extendTemplate("insertAsLastChild", "expandChildren", plugin.templates.chevron);
+	this.extendTemplate("insertAfter", "body", plugin.templates.seeMore);
 	this.set("buttonsLayout", "inline");
-	this._initPageObserver();
 
 	this.component.block = function(label) {
 		if (this.blocked) return;
@@ -184,8 +193,14 @@ plugin.init = function() {
 	};
 };
 
-plugin.templates.date =
-	'<div class="{class:date}"></div>';
+plugin.templates.header =
+	'<div class="{plugin.class:header-box}">' +
+		'<div class="{plugin.class:header-centered}">' +
+			'<div class="{class:authorName}"></div>' +
+			'<div class="{class:date}"></div>' +
+			'<div class="echo-clear"></div>' +
+		'</div>' +
+	'</div>';
 
 plugin.templates.wrapper =
 	'<div class="{plugin.class:wrapper}"></div>';
@@ -202,6 +217,12 @@ plugin.templates.button =
 plugin.templates.topPostMarker =
 	'<i class="icon-bookmark {plugin.class:topPostMarker}" title="{plugin.label:topPostIndicatorTitle}"></i>';
 
+plugin.templates.compactButtons =
+	'<a title="{data:label}" class="{class:button} {class:compactButton} {class:button}-{data:name}">' +
+		'<i class="{plugin.class:buttonIcon} {data:icon}"></i>' +
+		'<span class="echo-primaryFont {class:buttonCaption}"></span>' +
+	'</a>';
+
 plugin.templates.dropdownButtons =
 	'<div class="dropdown">' +
 		'<a class="dropdown-toggle {class:button}" data-toggle="dropdown" href="#">' +
@@ -215,6 +236,9 @@ plugin.templates.indicator =
 
 plugin.templates.sourceIcon =
 	'<div class="{class:sourceIcon}"><img></div>';
+
+plugin.templates.seeMore =
+	'<div class="{plugin.class:seeMore}">{plugin.label:seeMore}</div>';
 
 plugin.renderers.topPostMarker = function(element) {
 	var item = this.component;
@@ -246,10 +270,13 @@ plugin.component.renderers.sourceIcon = function(element) {
 	var item = this.component;
 	var source = item.get("data.source", {});
 	element.hide();
+	var types = $.map(item.get("data.object.objectTypes"), function(item) {
+		return item.split("/").pop();
+	});
 	if (
 		item.config.get("viaLabel.icon")
 		&& source.icon
-		&& !~$.inArray(source.name, ["jskit", "echo"])
+		&& !~$.inArray("comment", types)
 	) {
 		var img = element.find("img");
 		return img
@@ -259,6 +286,34 @@ plugin.component.renderers.sourceIcon = function(element) {
 				element.show();
 			});
 	}
+	return element;
+};
+
+plugin.renderers.seeMore = function(element) {
+	var self = this;
+	var item = this.component;
+	return element.one("click", function() {
+		self.view.remove("seeMore");
+		item.view.get("body").css("max-height", "");
+	});
+};
+
+plugin.component.renderers.avatar = function(element) {
+	this.parentRenderer("avatar", arguments);
+
+	var img = element.find("img[src]");
+	var avatar = $("<div/>").css("background-image", "url('" + img.attr("src") + "')");
+	img.replaceWith(avatar);
+
+	// we have to do it because filter must work in IE8 only
+	// in other cases we will have square avatar in IE 9
+	var isIE8 = document.all && document.querySelector && !document.addEventListener;
+	if (isIE8) {
+		avatar.css({
+			"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + img.attr("src") + "', sizingMethod='scale')"
+		});
+	}
+
 	return element;
 };
 
@@ -299,11 +354,31 @@ plugin.component.renderers.container = function(element) {
 
 plugin.component.renderers._inlineButtons = function(element) {
 	var item = this.component;
-	var buttons = $.map(item.buttonsOrder, function(name) { return item.get("buttons." + name); });
+	var buttons = $.map(item.buttonsOrder, function(name) {
+		return item.get("buttons." + name);
+	});
 	$.map(buttons, function(button) {
 		if (!button || !Echo.Utils.invoke(button.visible)) {
 			return;
 		}
+		item.view.render({
+			"name": "_button",
+			"target": element,
+			"extra": button
+		});
+	});
+};
+
+plugin.component.renderers._compactButtons = function(element) {
+	var item = this.component;
+	var buttons = $.map(item.buttonsOrder, function(name) {
+		return item.get("buttons." + name);
+	});
+	$.map(buttons, function(button) {
+		if (!button || !Echo.Utils.invoke(button.visible)) {
+			return;
+		}
+		button.template = plugin.templates.compactButtons;
 		item.view.render({
 			"name": "_button",
 			"target": element,
@@ -319,7 +394,9 @@ plugin.component.renderers._dropdownButtons = function(element) {
 		"template": plugin.templates.dropdownButtons
 	}));
 
-	var buttons = $.map(item.buttonsOrder, function(name) { return self.component.get("buttons." + name); });
+	var buttons = $.map(item.buttonsOrder, function(name) {
+		return self.component.get("buttons." + name);
+	});
 
 	var closeDropdown = function(callback) {
 		return function() {
@@ -359,7 +436,7 @@ plugin.component.renderers.buttons = function(element) {
 	element.empty();
 
 	item.view.render({
-		"name": "_" + this.get("buttonsLayout") + "Buttons",
+		"name": "_" + this.get("currentButtonsState") + "Buttons",
 		"target": element
 	});
 	return element;
@@ -392,12 +469,14 @@ plugin.component.renderers._button = function(element, extra) {
 			"target": button.find("span"),
 			"extraClass": this.cssPrefix + "dropdownButton",
 			"entries": $.map(entries, function(entry) { return $.extend({"handler": entry.callback}, entry); }),
-			"title": extra.label || ""
+			"title": this.get("currentButtonsState") !== "compact" ? extra.label : ""
 		});
 		extra.callback = function(ev) {
 			button.find(".dropdown-toggle").dropdown("toggle");
 			ev.preventDefault();
 		};
+	} else if (this.get("currentButtonsState") === "compact") {
+		button.children("span").first().css("display", "none");
 	}
 
 	if (!clickables.length) {
@@ -422,49 +501,75 @@ plugin.component.renderers._button = function(element, extra) {
 	return element.append(button);
 };
 
-plugin.methods._initPageObserver = function() {
-	// TODO need to unsubscribe when item destroyed
-	var self = this;
+plugin.component.renderers.authorName = function(element) {
+	this.parentRenderer("authorName", arguments);
+	return element.wrapInner("<span/>");
+};
 
-	// observe DOM tree and call _pageLayoutChange if something was changed
-	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-	if (MutationObserver) {
-		var observer = new MutationObserver(function(mutations) {
-			self._pageLayoutChange();
-		});
-		var config = {"childList": true, "subtree": true, "attributes": true};
-		observer.observe(document, config);
+plugin.methods._checkItemContentHeight = function() {
+	var body = this.component.view.get("body");
+	var button = this.view.get("seeMore");
+
+	if (body && button) {
+		var collapsedHeight = this.config.get("collapsedContentHeight");
+		if (body.height() > collapsedHeight && !button.is(":visible")) {
+			body.css("max-height", collapsedHeight);
+			button.show();
+		} else if (body.height() < collapsedHeight && button.is(":visible")) {
+			body.css("max-height", "");
+			button.hide();
+		}
 	}
-
-	$(window).on("resize", function() {
-		self._pageLayoutChange();
-	});
 };
 
 plugin.methods._pageLayoutChange = function() {
 	var item = this.component;
 	var footer = item.view.get("footer");
 	var buttons = item.view.get("buttons");
+	var buttonsStates = [
+		"inline",
+		"compact",
+		"dropdown"
+	];
+	if (!this.get("buttonsStates")) {
+		this.set("buttonsStates", buttonsStates);
+	}
+	var configuredButtonsState = this.config.get("initialIntentsDisplayMode") ||  buttonsStates[0];
 
-	if (footer && buttons && footer.is(":visible")) {
-		var likes = footer.children("div").first();
-		var layout = this.get("buttonsLayout");
-
-		var likesWidth = likes.width();
-		var buttonsWidth = layout === "inline"
-			? buttons.width() + likesWidth + 5
-			: this.get("buttonsWidth") || (buttons.width() + likesWidth + 5);
-
-		if (layout === "inline" && footer.width() < buttonsWidth) {
-			this.set("buttonsLayout", "dropdown");
-			this.set("buttonsWidth", buttonsWidth);
+	var currentState = this.get("currentButtonsState");
+	if (!currentState) {
+		currentState = configuredButtonsState;
+		this.set("currentButtonsState", currentState);
+	}
+	if (!footer || !buttons || !footer.is(":visible")) {
+		this._checkItemContentHeight();
+		return;
+	}
+	var footerWidth = footer.width();
+	var buttonsWidth = buttons.width();
+	var prevFreeSpace = this.get("prevFreeSpace") || 0;
+	var freeSpace = footerWidth - footer.children().eq(0).width() - footer.children().eq(1).width();
+	if (prevFreeSpace !== freeSpace || footerWidth < buttonsWidth) {
+		this.set("prevFreeSpace", freeSpace);
+		var index = $.inArray(currentState, buttonsStates);
+		if (freeSpace < buttonsWidth) {
+			if (buttonsStates[index + 1]) {
+				currentState = buttonsStates[index + 1];
+			}
+			this.set("currentButtonsState", currentState);
 			item.view.render({"name": "buttons"});
-		} else if (layout === "dropdown" && footer.width() > buttonsWidth) {
-			this.set("buttonsWidth", 0);
-			this.set("buttonsLayout", "inline");
+		} else if (freeSpace > (2 * buttonsWidth)) {
+			var indexOfConfiguredState = $.inArray(configuredButtonsState, buttonsStates);
+			if (indexOfConfiguredState < index && buttonsStates[index - 1]) {
+				currentState = buttonsStates[index - 1];
+			} else {
+				currentState = configuredButtonsState;
+			}
+			this.set("currentButtonsState", currentState);
 			item.view.render({"name": "buttons"});
 		}
 	}
+	this._checkItemContentHeight();
 };
 
 var cache = {};
@@ -487,6 +592,11 @@ for (var i = 0; i <= 20; i++) {
 }
 
 plugin.css =
+	// see more
+	'.{plugin.class:seeMore}:before { content: ""; display: block; height: 3px; box-shadow: 0 -3px 3px rgba(0, 0, 0, 0.08); position: relative; top: 0px; }' +
+	'.{plugin.class:seeMore} { margin-top: -8px; display: none; padding: 0 0 15px 0; border-top: 1px solid #D8D8D8; text-align: center; font-size: 12px; cursor: pointer; color: #C6C6C6; }' +
+	'.{plugin.class:seeMore}:hover { color: #262626; }' +
+
 	// source icon
 	'.{plugin.class} .{class:sourceIcon} { float: left; margin-right: 10px; }' +
 	'.{plugin.class} .{class:sourceIcon} > img { margin-top: 2px; height: 16px; width: 16px; }' +
@@ -507,23 +617,24 @@ plugin.css =
 	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown { display: inline; }' +
 	'.{plugin.class} .{plugin.class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
 
-	'.{plugin.class:topPostMarker} { float: right; position: relative; top: -19px; right: 0px; }' +
+	'.{plugin.class:topPostMarker} { float: right; position: absolute; top: -4px; right: 15px; }' +
 	'.{plugin.class} .{plugin.class:wrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
 	'.{plugin.class} .{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
 	'.{plugin.class} .{class:container}.{plugin.class:liveUpdate} .{class:indicator} { background-color: #f5ba47; }' +
 
 	'.{plugin.class} .echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
-	'.{plugin.class} .{class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
+	'.{plugin.class} .{class:date} { float: left; color: #d3d3d3; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; max-width: 100%; }' +
 
 	'.{plugin.class} .{class:avatar} { height: 28px; width: 28px; margin-left: 3px; }' +
-	'.{plugin.class} .{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
+	'.{plugin.class} .{class:avatar} div { height: 28px; width: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%;}' +
 
 	'.{plugin.class} .{class:content} { background: #f8f8f8; border-radius: 3px; }' +
 	'.{plugin.class} .{class:buttons} { margin-left: 0px; white-space: nowrap; line-height: 20px; }' +
 	'.{plugin.class} .{class:metadata} { margin-bottom: 8px; }' +
-	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
+	'.{plugin.class} .{class:body} { padding-top: 0px; margin-bottom: 8px; overflow: hidden; }' +
 	'.{plugin.class} .{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
-	'.{plugin.class} .{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
+	'.{plugin.class} .{class:authorName} { float: left; color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; max-width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; }' +
+	'.{plugin.class} .{class:authorName} span { padding-right: 5px; }' +
 
 	'.{plugin.class} .{class:container-child} { padding-top: 8px; padding-bottom: 8px; padding-right: 0px; margin: 0px 15px 2px 0px; }' +
 	'.{plugin.class} .{class:content} .{class:container-child-thread} { padding-top: 8px; padding-bottom: 8px; padding-right: 0px; margin: 0px 15px 2px 0px; }' +
@@ -549,8 +660,9 @@ plugin.css =
 	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{plugin.class:buttonIcon},' +
 	'.{plugin.class} .{class:container}:hover .{plugin.class:buttonIcon},' +
 	'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
+	'.{plugin.class} .{class:compactButton} ul.dropdown-menu { left: -20px; }' +
 
-	'.{plugin.class} .{class:depth-0} .{class:date} { line-height: 40px; }' +
+	'.{plugin.class} .{class:depth-0} .{class:date} { line-height: 20px; }' +
 	'.{plugin.class} .{plugin.class:chevron} { margin-top: 0px !important; }' +
 	'.{plugin.class} .{class:expandChildrenLabel} { margin-right: 5px; }' +
 	'.{plugin.class} .{class:expandChildren} .{class:expandChildrenLabel} { color: #D3D3D3; }' +
@@ -562,15 +674,19 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{class:footer} { padding: 8px 0px 10px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
-	'.{plugin.class} .{class:depth-0} .{class:avatar} img { height: 36px; width: 36px; border-radius: 50%;}' +
-	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 38px; margin-left: 45px;}' +
+	'.{plugin.class} .{class:depth-0} .{class:avatar} div { height: 36px; width: 36px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%;}' +
+	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 18px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:header-box} { height: 36px; margin-left: 45px; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:header-box}:before { content: ""; display: inline-block; height: 100%; vertical-align: middle; }' +
+	'.{plugin.class} .{class:depth-0} .{plugin.class:header-centered} { display: inline-block; vertical-align: middle; max-width: 100%; max-width: 90%\\9; }' +
 
 	'.{plugin.class} .{class:data} { padding: 7px 0px 0px 0px; }' +
 	'.{plugin.class} .{class:content} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
 
 	// Edit Plugin
+	'.echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-metadataContainer { display: none !important; }' +
 	'.{class:depth-0} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-plugin-Edit-header { line-height: 38px; margin-left: 45px; }' +
 	'.{class:depth-0} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-body { padding: 7px 0px 0px 0px; }' +
 	'.{class:depth-0} .echo-streamserver-controls-submit-plugin-Edit .echo-streamserver-controls-submit-controls { margin-bottom: 5px; }' +
@@ -914,6 +1030,7 @@ plugin.css =
 	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{plugin.class} .{class:header} { margin-top: 10px; }' +
 	'.{plugin.class} .{class:postContainer} .dropdown-menu { min-width: 100px; }' +
+	'.{plugin.class} .{control.class:buttons} .dropdown { min-width: 77px; }' +
 	'.{plugin.class} .btn.{plugin.class:button} { padding: 3px 12px 5px 12px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
 
