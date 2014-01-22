@@ -116,11 +116,24 @@ submitPlugin.init = function() {
 	self.set("definedMedia", this._getMediaAttachments());
 
 	this.extendTemplate("insertAfter", "content", submitPlugin.templates.preview);
+
+	// TODO: get this option from dashboard in future
+	// for postComposer and replyComposer.
+	var isAttachmentTurnedOn = true;
+	if (isAttachmentTurnedOn) {
+		this.extendTemplate("insertAsFirstChild", "controls", submitPlugin.templates.attach);
+	}
+
 };
 
 submitPlugin.events = {
 	"Echo.StreamServer.Controls.Submit.onPostError": function(topic, args) {
 		this._restoreTextarea();
+	},
+	//TODO: remove this subscription then postComposer will be implemented
+	"Echo.StreamServer.Controls.Submit.Plugins.URLResolver.onURLsAdded": function(topic, args) {
+		var urls = args.urls || [];
+		this.resolveURLs(urls, $.proxy(this.attachMedia, this));
 	},
 	"Echo.StreamServer.Controls.Submit.onPostInit": function(topic, args) {
 		var self = this;
@@ -159,6 +172,11 @@ submitPlugin.events = {
 submitPlugin.dependencies = [{
 	"url": "{%= baseURL %}/third-party/jquery.embedly.js",
 	"loaded": function() { return !!$.fn.embedly; }
+}, {
+	"url": "//api.filepicker.io/v1/filepicker.js",
+	"loaded": function() {
+		return !!(window.filepicker && window.filepicker.pick);
+	}
 }];
 
 submitPlugin.templates.preview = '<div class="{plugin.class:mediaContent}"></div>';
@@ -199,6 +217,12 @@ submitPlugin.templates.media = {
 			'<div class="echo-item-video">{data:html}</div>' +
 		'</div>'
 };
+
+submitPlugin.templates.attach =
+	'<div class="{plugin.class:attach}">' +
+		'<img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" />' +
+	'</div>';
+
 
 submitPlugin.component.renderers.text = function(element) {
 	var self = this;
@@ -254,6 +278,30 @@ submitPlugin.renderers.mediaContent = function(element) {
 	this.attachMedia(this.get("definedMedia"));
 	return element;
 };
+
+submitPlugin.renderers.attach = function(element) {
+	var self = this;
+	element.on({
+		"click": function(event) {
+			var filepickerKey = window.filepicker.apikey;
+			window.filepicker.setKey("A1NF2faTCRd2YwXtOBNLUz");//self.component.config.get("dependencies.FilePicker.key"));
+			window.filepicker.pick({
+				"mimetype": "image/*",
+				"container": "modal"
+			}, function(InkBlob) {
+				window.filepicker.setKey(filepickerKey);
+				self.events.publish({
+					"topic": "onURLsAdded",
+					"data": {"urls":[InkBlob.url]}
+				});
+			}, function(FPError) {
+				window.filepicker.setKey(filepickerKey);
+			});
+		}
+	});
+	return element;
+};
+
 
 submitPlugin.methods._replaceTextarea = function() {
 	// workflow for Edit Plugin
@@ -398,8 +446,9 @@ submitPlugin.css =
 	// scrollbar
 	'.{plugin.class:mediaContent}::-webkit-scrollbar { height: 10px; }' +
 	'.{plugin.class:mediaContent}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
-	'.{plugin.class:mediaContent}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }';
+	'.{plugin.class:mediaContent}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }' +
 
+	'.{plugin.class:attach} { margin: 5px; float: left; }';
 Echo.Plugin.create(submitPlugin);
 
 })(Echo.jQuery);
