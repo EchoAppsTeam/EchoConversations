@@ -70,9 +70,6 @@ conversations.config = {
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
 		"itemTypes": [],
-		"userMarkers": ["Conversations.TopContributor"],
-		"itemMarkersToAdd": ["Conversations.TopPost"],
-		"itemMarkersToRemove": ["Conversations.RemovedFromTopPosts"],
 		"sortOrderEntries": [{
 			"title": "Newest First",
 			"value": "reverseChronological"
@@ -176,11 +173,8 @@ conversations.config = {
 		}
 	},
 	"topMarkers": {
-		"posts": {
-			"add": "Conversations.TopPost",
-			"remove": "Conversations.RemovedFromTopPosts"
-		},
-		"contributor": "Conversations.TopContributor"
+		"item": "Conversations.TopPost",
+		"user": "Conversations.TopContributor"
 	}
 };
 
@@ -249,21 +243,6 @@ conversations.events = {
 		if (allPosts && allPosts.config.get("context") === data.context) {
 			this.set("activitiesCount", data.count);
 			this.view.render({"name": "itemsWaiting"});
-		}
-	},
-	// TODO move this login into moderation plugin.
-	"Echo.StreamServer.Controls.Stream.Item.Plugins.ModerationCardUI.onUserUpdate": function(_, args) {
-		var self = this;
-		if (args.refresh) {
-			$.map(["allPosts", "topPosts", "moderationQueue"], function(section) {
-				$.map(["", "Counter"], function(element) {
-					var component = self.getComponent(section + element);
-					if (component) {
-						component.config.remove("data");
-						component.refresh();
-					}
-				});
-			});
 		}
 	},
 	"Echo.StreamServer.Controls.Counter.onUpdate": function(_, data) {
@@ -341,11 +320,6 @@ conversations.templates.defaultQuery =
 	'{data:filter}:{data:targetURL} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
 	'itemsPerPage:{data:initialItemsPerPage} {data:markers} {data:type} ' +
 	'{data:operators} children:{data:replyNestingLevels} {data:childrenOperators}';
-
-conversations.templates.topConditions = {
-	"onlyPosts": "markers:{data:itemMarkersToAdd} -markers:{data:itemMarkersToRemove}",
-	"contributors": "(user.markers:{data:userMarkers} OR markers:{data:itemMarkersToAdd}) -markers:{data:itemMarkersToRemove}"
-};
 
 conversations.renderers.streamingStateContainer = function(element) {
 	if (!this.config.get("streamingControl.displayStreamingStateHeader")) {
@@ -808,9 +782,9 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"sharingWidgetConfig": auth.sharingWidgetConfig
 	}, {
 		"name": "CardUIShim",
+		"topMarker": this.config.get("topMarkers.item"),
 		"displayTopPostHighlight": config.displayTopPostHighlight,
 		"includeTopContributors": this.config.get("topPosts.includeTopContributors"),
-		"topMarkers": this.config.get("topMarkers"),
 		"initialIntentsDisplayMode": this.config.get(componentID + ".initialIntentsDisplayMode")
 	}, {
 		"name": "ItemEventsProxy",
@@ -853,7 +827,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"intentID": "Reply",
 		"name": "ReplyCardUI",
 		// TODO: pass markers through data
-		"extraMarkers": this._getSubmitMarkers(),
+		"extraMarkers": this._getSubmitMarkers(["topPost"]),
 		"enabled": this._isComposerVisible("replyComposer"),
 		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
 		"pauseTimeout": +this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout"),
@@ -963,16 +937,14 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 					return self._operatorsToString(acc);
 				})(),
 				"filter": "childrenof",
-				"markers": self.substitute({
-					"template": conversations.templates.topConditions[
-						config.includeTopContributors ? "contributors" : "onlyPosts"
-					],
-					"data": {
-						"userMarkers": config.userMarkers.join(","),
-						"itemMarkersToAdd": config.itemMarkersToAdd.join(","),
-						"itemMarkersToRemove": config.itemMarkersToRemove.join(",")
-					}
-				})
+				"markers": (function() {
+					var markers = [].concat(
+						config.itemMarkers,
+						self.config.get("topMarkers.item")
+					);
+					return markers.length
+						? "markers:" + markers.join(",") : "";
+				})()
 			};
 		},
 		"allPosts": function() {
@@ -1112,10 +1084,25 @@ conversations.methods._isModerationRequired = function() {
 		!(this.user.is("admin") || (this.user.get("state") === "ModeratorApproved" && config.approvedUserBypass));
 };
 
-conversations.methods._getSubmitMarkers = function() {
-	return this._isModerationRequired()
-		? this._getPremoderationConfig()["markers"]
-		: [];
+conversations.methods._getSubmitMarkers = function(excludes) {
+	var self = this;
+	excludes = excludes || [];
+	var groups = {
+		"topPost": function() {
+			return ~$.inArray(self.config.get("topMarkers.user"), self.user.get("markers", []))
+				? self.config.get("topMarkers.item") : [];
+		},
+		"premoderation": function() {
+			return self._isModerationRequired()
+				? self._getPremoderationConfig()["markers"] : [];
+		}
+	};
+	var markers = Echo.Utils.foldl([], groups, function(handler, acc, key) {
+		if (!~$.inArray(key, excludes)) {
+			acc.push(handler());
+		}
+	});
+	return Array.prototype.concat.apply([], markers);
 };
 
 conversations.methods._getPremoderationConfig = function() {

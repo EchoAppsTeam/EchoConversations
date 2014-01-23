@@ -23,11 +23,8 @@ plugin.config = {
 	"extraActions": ["topPost", "topContributor"],
 	"userActions": ["approveUser", "ban", "permissions"],
 	"topMarkers": {
-		"posts": {
-			"add": "Conversations.TopPost",
-			"remove": "Conversations.RemovedFromTopPosts"
-		},
-		"contributor": "Conversations.TopContributor"
+		"item": "Conversations.TopPost",
+		"user": "Conversations.TopContributor"
 	}
 };
 
@@ -296,14 +293,14 @@ plugin.methods._assembleButton = function(name) {
 plugin.methods._assembleTopContributorButton = function(name) {
 	var self = this, item = this.component;
 
-	if (
-		item.get("depth")
-		|| item.get("data.actor.id") === item.user.config.get("fakeIdentityURL")
-	) {
+	var disabled = item.get("depth") ||
+		item.get("data.actor.id") === item.user.config.get("fakeIdentityURL");
+
+	if (disabled) {
 		return false;
 	}
 
-	var marker = this.config.get("topMarkers").contributor;
+	var marker = this.config.get("topMarkers.user");
 	var userMarkers = item.get("data.actor.markers", []);
 	var action = ~$.inArray(marker, userMarkers) ? "remove" : "add";
 
@@ -312,7 +309,7 @@ plugin.methods._assembleTopContributorButton = function(name) {
 		"visible": true,
 		"callback": function() {
 			item.block(self.labels.get(
-				((action === "add") ? "adding" : "removing") + name
+				(action === "add" ? "adding" : "removing") + name
 			));
 			var markers = (function() {
 				if (action === "add") {
@@ -337,8 +334,7 @@ plugin.methods._assembleTopContributorButton = function(name) {
 					self._publishUserUpdateEvent({
 						"item": item,
 						"field": "markers",
-						"value": markers,
-						"refresh": true
+						"value": markers
 					});
 					item.unblock();
 				},
@@ -364,60 +360,26 @@ plugin.methods._assembleTopPostButton = function(name) {
 		return false;
 	}
 
-	var markers = this.config.get("topMarkers");
+	var marker = this.config.get("topMarkers.item");
 	var itemMarkers = item.get("data.object.markers", []);
-	var userMarkers = item.get("data.actor.markers", []);
-
-	var states = {
-		"added": ~$.inArray(markers.posts.add, itemMarkers),
-		"removed": ~$.inArray(markers.posts.remove, itemMarkers),
-		"contributor": ~$.inArray(markers.contributor, userMarkers)
-	};
-
-	// TODO: simplify this heavy logic if it's possible
-	var action = ~$.inArray("topContributor", this.config.get("extraActions"))
-		? (((states.added || states.contributor) && !states.removed) ? "remove" : "add")
-		: (states.added && !states.removed ? "remove" : "add");
-
-	var assembleActivities = function() {
-		var activities = [];
-		states.added && activities.push({
-			"verb": "unmark",
-			"content": markers.posts.add
-		});
-		states.removed && activities.push({
-			"verb": "unmark",
-			"content": markers.posts.remove
-		});
-		action === "add" && activities.push({
-			"verb": "mark",
-			"content": markers.posts.add
-		});
-		action === "remove" && activities.push({
-			"verb": "mark",
-			"content": markers.posts.remove
-		});
-		return activities;
-	};
+	var action = ~$.inArray(marker, itemMarkers) ? "remove" : "add";
 
 	return {
 		"label": this.labels.get(action + name + "Button"),
 		"visible": true,
 		"callback": function() {
 			item.block(self.labels.get(
-				((action === "add") ? "adding" : "removing") + name
+				(action === "add" ? "adding" : "removing") + name
 			));
-			var content = $.map(assembleActivities(), function(activity) {
-				return {
-					"verbs": ["http://activitystrea.ms/schema/1.0/" + activity.verb],
-					"targets": [{"id": item.get("data.object.id")}],
-					"object": {
-						"content": activity.content
-					}
-				};
-			});
+			var activity = {
+				"verbs": ["http://activitystrea.ms/schema/1.0/" + (action === "add" ? "mark" : "unmark")],
+				"targets": [{"id": item.get("data.object.id")}],
+				"object": {
+					"content": marker
+				}
+			};
 			self._sendRequest({
-				"content": content,
+				"content": activity,
 				"appkey": item.config.get("appkey"),
 				"sessionID": item.user.get("sessionID"),
 				"target-query": item.config.get("parent.query")
@@ -607,8 +569,7 @@ plugin.methods._publishUserUpdateEvent = function(data) {
 		"data": {
 			"item": data.item,
 			"field": data.field,
-			"value": data.value,
-			"refresh": data.refresh
+			"value": data.value
 		},
 		"global": false,
 		"propagation": false
