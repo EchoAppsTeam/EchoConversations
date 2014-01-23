@@ -105,6 +105,10 @@ submitPlugin.config = {
 	"resolveURLs": "all" // all, disabled, only-roots, only-children
 };
 
+submitPlugin.labels = {
+	"attachTitle": "Click to add attachments"
+};
+
 submitPlugin.init = function() {
 	var self = this;
 	this.set("resolvedMedia", {});
@@ -281,6 +285,7 @@ submitPlugin.renderers.mediaContent = function(element) {
 
 submitPlugin.renderers.attach = function(element) {
 	var self = this;
+	element.children("img").attr("title", this.labels.get("attachTitle"));
 	element.on({
 		"click": function(event) {
 			window.filepicker.setKey(self.config.get("filePicker.key"));
@@ -460,7 +465,7 @@ submitPlugin.css =
 	'.{plugin.class:mediaContent}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
 	'.{plugin.class:mediaContent}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }' +
 
-	'.{plugin.class:attach} { margin: 5px; float: left; }';
+	'.{plugin.class:attach} { margin: 5px; float: left; cursor: pointer; }';
 Echo.Plugin.create(submitPlugin);
 
 })(Echo.jQuery);
