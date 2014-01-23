@@ -176,11 +176,6 @@ submitPlugin.events = {
 submitPlugin.dependencies = [{
 	"url": "{%= baseURL %}/third-party/jquery.embedly.js",
 	"loaded": function() { return !!$.fn.embedly; }
-}, {
-	"url": "//api.filepicker.io/v1/filepicker.js",
-	"loaded": function() {
-		return !!(window.filepicker && window.filepicker.pick);
-	}
 }];
 
 submitPlugin.templates.preview = '<div class="{plugin.class:mediaContent}"></div>';
@@ -288,32 +283,37 @@ submitPlugin.renderers.attach = function(element) {
 	element.children("img").attr("title", this.labels.get("attachTitle"));
 	element.on({
 		"click": function(event) {
-			window.filepicker.setKey(self.config.get("filePicker.key"));
-			var sources = self.config.get("filePicker.sources")
-				? self.config.get("filePicker.sources").replace(" ", "").toUpperCase().split(",")
-				: undefined;
-			try {
-				window.filepicker.pickMultiple({
-					"mimetype": "image/*",
-					"container": "modal",
-					"services": sources
-				}, function(InkBlob) {
-					self.events.publish({
-						"topic": "onURLsAdded",
-						"data": {
-							"urls": $.map(InkBlob, function(picture) {
-								return picture.url;
-							})
-						}
+			var callback = function() {
+				window.filepicker.setKey(self.config.get("filePicker.key"));
+				var sources = self.config.get("filePicker.sources")
+					? self.config.get("filePicker.sources").replace(" ", "").toUpperCase().split(",")
+					: undefined;
+				try {
+					window.filepicker.pickMultiple({
+						"mimetype": "image/*",
+						"container": "modal",
+						"services": sources
+					}, function(InkBlob) {
+						self.events.publish({
+							"topic": "onURLsAdded",
+							"data": {
+								"urls": $.map(InkBlob, function(picture) {
+									return picture.url;
+								})
+							}
+						});
+					}, function(FPError) { });
+				} catch(e) {
+					Echo.Utils.log({
+						"message": e.toString(),
+						"component": "FilePicker",
+						"type": "error"
 					});
-				}, function(FPError) { });
-			} catch(e) {
-				Echo.Utils.log({
-					"message": e.toString(),
-					"component": "FilePicker",
-					"type": "error"
-				});
-			}
+				}
+			};
+			Echo.Loader.download([{
+				"url": "//api.filepicker.io/v1/filepicker.js"
+			}], callback);
 		}
 	});
 	return element;
