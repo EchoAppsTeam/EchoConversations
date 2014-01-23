@@ -302,7 +302,9 @@ plugin.component.renderers.avatar = function(element) {
 	this.parentRenderer("avatar", arguments);
 
 	var img = element.find("img[src]");
-	var avatar = $("<div/>").css("background-image", "url('" + img.attr("src") + "')");
+	var defaultAvatar = this.component.config.get("defaultAvatar");
+
+	var avatar = $("<div/>").css("background-image", "url('" + img.attr("src") + "'), url('" + defaultAvatar + "')");
 	img.replaceWith(avatar);
 
 	// we have to do it because filter must work in IE8 only
@@ -310,7 +312,7 @@ plugin.component.renderers.avatar = function(element) {
 	var isIE8 = document.all && document.querySelector && !document.addEventListener;
 	if (isIE8) {
 		avatar.css({
-			"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + img.attr("src") + "', sizingMethod='scale')"
+			"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + defaultAvatar + "', sizingMethod='scale'), progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + img.attr("src") + "', sizingMethod='scale')"
 		});
 	}
 
@@ -674,7 +676,7 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{class:footer} { padding: 8px 0px 10px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
-	'.{plugin.class} .{class:depth-0} .{class:avatar} div { height: 36px; width: 36px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%;}' +
+	'.{plugin.class} .{class:depth-0} .{class:avatar} div { height: 36px; width: 36px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 18px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
