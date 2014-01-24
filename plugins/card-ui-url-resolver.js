@@ -375,7 +375,6 @@ submitPlugin.methods._setResolvedMedia = function(resolvedMedia) {
 
 submitPlugin.methods._getDefinedMedia = function() {
 	var key = this._getUniqueFormKey();
-	console.log(key);
 	if (!submitPlugin.mediaContent[key]) {
 		submitPlugin.mediaContent[key] = {};
 	}
@@ -387,7 +386,6 @@ submitPlugin.methods._getDefinedMedia = function() {
 
 submitPlugin.methods._getResolvedMedia = function() {
 	var key = this._getUniqueFormKey();
-	console.log(key);
 	if (!submitPlugin.mediaContent[key]) {
 		submitPlugin.mediaContent[key] = {};
 	}
