@@ -147,10 +147,11 @@ plugin.labels = {
 };
 
 plugin.config = {
-	"topMarker": "Conversations.TopPost",
+	"topPost": {
+		"visible": true,
+		"marker": "Conversations.TopPost"
+	},
 	"fadeTimeout": 10000, // 10 seconds
-	"displayTopPostHighlight": true,
-	"includeTopContributors": true,
 	"collapsedContentHeight": 110 //px
 };
 
@@ -244,8 +245,8 @@ plugin.templates.seeMore =
 plugin.renderers.topPostMarker = function(element) {
 	var item = this.component;
 
-	var visible = this.config.get("displayTopPostHighlight") && !item.get("depth")
-		&& ~$.inArray(this.config.get("topMarker"), item.get("data.object.markers", []));
+	var visible = this.config.get("topPost.visible") && !item.get("depth")
+		&& ~$.inArray(this.config.get("topPost.marker"), item.get("data.object.markers", []));
 
 	return visible
 		? element.show()

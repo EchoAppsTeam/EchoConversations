@@ -782,9 +782,11 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"sharingWidgetConfig": auth.sharingWidgetConfig
 	}, {
 		"name": "CardUIShim",
-		"topMarker": this.config.get("topMarkers.item"),
+		"topPost": {
+			"visible": config.displayTopPostHighlight,
+			"marker": this.config.get("topMarkers.item")
+		},
 		"displayTopPostHighlight": config.displayTopPostHighlight,
-		"includeTopContributors": this.config.get("topPosts.includeTopContributors"),
 		"initialIntentsDisplayMode": this.config.get(componentID + ".initialIntentsDisplayMode")
 	}, {
 		"name": "ItemEventsProxy",
