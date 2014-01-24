@@ -806,7 +806,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 			: ["topPost"]
 		: [];
 
-	var plugins = [].concat(this._getConditionalStreamPluginList(componentID), [{
+	var plugins = [].concat([{
 		"name": "JanrainBackplaneHandler",
 		"appId": this.config.get("dependencies.Janrain.appId"),
 		"enabled": auth.enableBundledIdentity,
@@ -818,6 +818,8 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"includeTopContributors": this.config.get("topPosts.includeTopContributors"),
 		"topMarkers": this.config.get("topMarkers"),
 		"initialIntentsDisplayMode": this.config.get(componentID + ".initialIntentsDisplayMode")
+	}, {
+		"name": "TweetDisplay"
 	}, {
 		"name": "ItemEventsProxy",
 		"onAdd": function() {
@@ -839,7 +841,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"moreButton": true
 	}, {
 		"name": "URLResolver"
-	}]);
+	}], this._getConditionalStreamPluginList(componentID));
 
 	return this._mergeSpecsByName(plugins, config.plugins);
 };
