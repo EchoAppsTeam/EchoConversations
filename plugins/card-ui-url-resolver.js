@@ -112,11 +112,11 @@ itemPlugin.css =
 	'.{plugin.class:video} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
 	'.{plugin.class:video} .{plugin.class:mediaContent} .echo-conversations-nestedcard-item { display: block; }' +
 	'.{plugin.class:video} .{plugin.class:mediaContent} .echo-conversations-nestedcard-video { padding: 0px; }' +
-	'.{class:content} { overflow: hidden; }' +
 
 	'.{plugin.class:photo}.{class:container}.{class:depth-0} { padding-top: 0; }' +
 	'.{plugin.class:photo} .{plugin.class:mediaContent} { margin: 0 -16px; }' +
 	'.{plugin.class:photo} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
+	'.{plugin.class:photo} .echo-conversations-nestedcard-photoContainer { border-top-left-radius: 3px; border-top-right-radius: 3px; }' +
 	'.{plugin.class:photo} .{class:data} { padding-top: 0; }' +
 	'.{plugin.class:photo} .{class:authorName} { color: #FFFFFF; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); }' +
 	'.{plugin.class:photo} .{class:date} { text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); padding-right: 1px; }' +
