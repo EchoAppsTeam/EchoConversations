@@ -776,10 +776,10 @@ plugin.templates.attach =
 
 plugin.templates.postButton =
 	'<div class="{class:postButton} btn-group">' +
-		'<button class="btn btn-primary {plugin.class:button}"></button>' +
-		'<button class="btn btn-primary dropdown-toggle {plugin.class:switchSharing}" data-toggle="dropdown">' +
+		'<div class="btn btn-primary {plugin.class:button}"></div>' +
+		'<div class="btn btn-primary dropdown-toggle {plugin.class:switchSharing}" data-toggle="dropdown">' +
 			'<span class="caret"></span>' +
-		'</button>' +
+		'</div>' +
 		'<ul class="dropdown-menu pull-right">' +
 			'<li><a href="#" class="{plugin.class:switchToPost}">{plugin.label:post}</a></li>' +
 			'<li><a href="#" class="{plugin.class:switchToPostAndShare}">{plugin.label:postAndShare}</a></li>' +
@@ -1032,6 +1032,7 @@ plugin.css =
 	'.{plugin.class} .{class:container} { padding: 20px 20px 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{plugin.class} .{class:header} { margin-top: 10px; }' +
 	'.{plugin.class} .{class:postContainer} .dropdown-menu { min-width: 100px; }' +
+	'.{plugin.class} .{class:postButton} { font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; }' +
 	'.{plugin.class} .{control.class:buttons} .dropdown { min-width: 77px; }' +
 	'.{plugin.class} .btn.{plugin.class:button} { padding: 3px 12px 5px 12px; }' +
 	'.{plugin.class:attach} { margin: 5px; float: left; }';
