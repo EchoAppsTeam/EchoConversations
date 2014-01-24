@@ -308,6 +308,41 @@ dashboard.vars = {
 					"title": "Resolve URLs",
 					"desc": "If enabled, resolves URLs found in the comment body to rich attached content"
 				}
+			}, {
+				"component": "Group",
+				"name": "attachments",
+				"type": "object",
+				"config": {
+					"title": "Attachments"
+				},
+				"items": [{
+					"component": "Checkbox",
+					"name": "visible",
+					"type": "boolean",
+					"default": false,
+					"config": {
+						"title": "Visible",
+						"desc": "If enabled, users can submit Comments with attachments (Resolve URLs enabled required)"
+					}
+				}, {
+					"component": "Input",
+					"name": "sources",
+					"type": "string",
+					"default": "",
+					"config": {
+						"title": "Uploading sources",
+						"desc": "Here can be specified list of attachment sources, check filepicker.io documentation for full information",
+						"data": {
+							"sample": "COMPUTER, INSTAGRAM, FACEBOOK, FLICKR, DROPBOX, PICASA, EVERNOTE, FTP, GITHUB, BOX, GOOGLE_DRIVE, SKYDRIVE, WEBDAV, GMAIL, IMAGE_SEARCH, URL, VIDEO, WEBCAM"
+						}
+					}
+				}, {//TODO: make it using templates and renderer
+					"component": "TextField",
+					"name": "sourcesHelp",
+						"config": {
+							"data": { "value": "<a href=\"//developers.inkfilepicker.com/docs/web/#pick\" target=\"_blank\">Documentation</a>"}
+						}
+                }]
 			}]
 		}]
 	}],
@@ -478,6 +513,15 @@ dashboard.config = {
 			"config": {
 				"title": "Janrain application ID",
 				"validators": ["required"],
+				"options": []
+			}
+		}, {
+			"component": "Input",
+			"name": "filePickerApiKey",
+			"type": "string",
+			"config": {
+				"title": "Filepicker api key",
+				"desc": "Specifies the Filepicker api key for this instance",
 				"options": []
 			}
 		}]

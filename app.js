@@ -192,9 +192,13 @@ conversations.labels = {
 
 conversations.config.normalizer = {
 	"dependencies": function(value) {
-		this.set("appkey", value.StreamServer.appkey);
-		this.set("apiBaseURL", value.StreamServer.apiBaseURL);
-		this.set("submissionProxyURL", value.StreamServer.submissionProxyURL);
+		// Parameters order in a config might be different,
+		// so we are handling all possible situations to make sure
+		// that all required params are defined.
+		var streamServer = Echo.Utils.get(value, "StreamServer", {});
+		this.set("appkey", streamServer.appkey);
+		this.set("apiBaseURL", streamServer.apiBaseURL);
+		this.set("submissionProxyURL", streamServer.submissionProxyURL);
 		return value;
 	},
 	"appkey": function(value) {
@@ -414,7 +418,12 @@ conversations.renderers.postComposer = function(element) {
 			"markers": this._getSubmitMarkers(),
 			"plugins": this._mergeSpecsByName([{
 				"name": "URLResolver",
-				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs")
+				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs"),
+				"filePicker": {
+					"key": this.config.get("dependencies.filePickerApiKey"),
+				"visible": this.config.get("postComposer.contentTypes.comments.attachments.visible"),
+				"sources": this.config.get("postComposer.contentTypes.comments.attachments.sources")
+				}
 			}, {
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
@@ -845,7 +854,12 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"requestMethod": "POST",
 		"nestedPlugins": this._mergeSpecsByName([{
 			"name": "URLResolver",
-			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs")
+			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs"),
+			"filePicker": {
+				"key": this.config.get("dependencies.filePickerApiKey"),
+				"visible": this.config.get("replyComposer.contentTypes.comments.attachments.visible"),
+				"sources": this.config.get("replyComposer.contentTypes.comments.attachments.sources")
+			}
 		}, {
 			"name": "JanrainBackplaneHandler",
 			"appId": this.config.get("dependencies.Janrain.appId"),
@@ -872,7 +886,12 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"name": "URLResolver",
 			// we enable resolving through separate parameter
 			// because it should works for submit and item as well
-			"resolveURLs": this._getResolverSettingForEditPlugin()
+			"resolveURLs": this._getResolverSettingForEditPlugin(),
+			"filePicker": {
+				"key": this.config.get("dependencies.filePickerApiKey"),
+				"visible": this.config.get("postComposer.contentTypes.comments.attachments.visible"),
+				"sources": this.config.get("postComposer.contentTypes.comments.attachments.sources")
+			}
 		}]
 	}];
 

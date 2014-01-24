@@ -93,7 +93,16 @@ card.init = function() {
 card.config = {
 	// we display aricle via different layouts
 	// according to thumbnail image width
-	"minArticleImageWidth": 320
+	"minArticleImageWidth": 320,
+	"sourceIcons": {
+		"predefined": [{
+			"pattern": /http:\/\/instagram\.com/i,
+			"url": "http://cdn.echoenabled.com/images/favicons/instagram.png"
+		}],
+		"forbidden": [{
+			"pattern": /\/\/www\.filepicker\.io/i
+		}]
+	}
 };
 
 card.renderers.sourceIcon = function(element) {
@@ -102,12 +111,8 @@ card.renderers.sourceIcon = function(element) {
 	if (!oembed.provider_url) return;
 
 	var icon;
-	var sourceIcons = [{
-		"pattern": /http:\/\/instagram\.com/i,
-		"url": "http://cdn.echoenabled.com/images/favicons/instagram.png"
-	}];
 
-	$.map(sourceIcons, function(item) {
+	$.map(this.config.get("sourceIcons.predefined"), function(item) {
 		if (item.pattern.test(oembed.provider_url)) {
 			icon = item.url;
 			return false;
@@ -116,6 +121,12 @@ card.renderers.sourceIcon = function(element) {
 
 	icon = icon || oembed.provider_url +
 		(oembed.provider_url.substr(-1) === "/" ? "" : "/") + "favicon.ico";
+
+	$.map(this.config.get("sourceIcons.forbidden"), function(item) {
+		if (item.pattern.test(icon)) {
+			card.sourceIcons[icon] = false;
+		}
+	});
 
 	if (typeof card.sourceIcons[icon] === "undefined") {
 		Echo.Utils.loadImage({

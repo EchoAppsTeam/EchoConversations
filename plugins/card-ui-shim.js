@@ -756,11 +756,6 @@ plugin.labels = {
 
 plugin.templates.auth = '<div class="{plugin.class:auth}"></div>';
 
-plugin.templates.attach =
-	'<div class="{plugin.class:attach}">' +
-		'<img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" />' +
-	'</div>';
-
 plugin.templates.postButton =
 	'<div class="{class:postButton} btn-group">' +
 		'<div class="btn btn-primary {plugin.class:button}"></div>' +
@@ -810,11 +805,6 @@ plugin.init = function() {
 	});
 
 	submit.config.set("actionString", this.config.get("contentTypes.comments.prompt"));
-
-// 	Note: let's keep the "attach" icon hidden for now,
-//		as there is no functionality associated with it..
-//
-//	this.extendTemplate("insertAsFirstChild", "controls", plugin.templates.attach);
 };
 
 plugin.renderers.confirmation = function(element) {
@@ -1021,8 +1011,7 @@ plugin.css =
 	'.{plugin.class} .{class:postContainer} .dropdown-menu { min-width: 100px; }' +
 	'.{plugin.class} .{class:postButton} { font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; }' +
 	'.{plugin.class} .{control.class:buttons} .dropdown { min-width: 77px; }' +
-	'.{plugin.class} .btn.{plugin.class:button} { padding: 3px 12px 5px 12px; }' +
-	'.{plugin.class:attach} { margin: 5px; float: left; }';
+	'.{plugin.class} .btn.{plugin.class:button} { padding: 3px 12px 5px 12px; }';
 
 Echo.Plugin.create(plugin);
 

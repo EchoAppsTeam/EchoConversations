@@ -106,26 +106,44 @@ submitPlugin.config = {
 	"resolveURLs": "all" // all, disabled, only-roots, only-children
 };
 
+submitPlugin.definedMedia = [];
+submitPlugin.resolvedMedia = {};
+
+submitPlugin.labels = {
+	"attachTitle": "Click to add attachments"
+};
+
 submitPlugin.init = function() {
-	var self = this;
-	this.set("resolvedMedia", {});
-	this.set("definedMedia", []);
+	//this.set("resolvedMedia", {});
+	//this.set("definedMedia", []);
 	this.set("timer", null);
 
 	$.embedly.defaults.key = this.config.get("embedlyAPIKey");
 
-	self.set("definedMedia", this._getMediaAttachments());
-
+	submitPlugin.definedMedia = this._getMediaAttachments();
 	this.extendTemplate("insertAfter", "content", submitPlugin.templates.preview);
+
+	// TODO: get this option from dashboard in future
+	// for postComposer and replyComposer.
+	var isAttachmentTurnedOn = this.config.get("filePicker.visible") || false;
+	if (isAttachmentTurnedOn) {
+		this.extendTemplate("insertAsFirstChild", "controls", submitPlugin.templates.attach);
+	}
+
 };
 
 submitPlugin.events = {
 	"Echo.StreamServer.Controls.Submit.onPostError": function(topic, args) {
 		this._restoreTextarea();
 	},
+	//TODO: remove this subscription then postComposer will be implemented
+	"Echo.StreamServer.Controls.Submit.Plugins.URLResolver.onURLsAdded": function(topic, args) {
+		var urls = args.urls || [];
+		this.resolveURLs(urls, $.proxy(this.attachMedia, this));
+	},
 	"Echo.StreamServer.Controls.Submit.onPostInit": function(topic, args) {
 		var self = this;
-		var mediaContent = $.map($.extend({}, this.get("resolvedMedia"), this.get("definedMedia")), function(media) {
+		var mediaContent = $.map($.extend({}, submitPlugin.resolvedMedia, submitPlugin.definedMedia), function(media) {
 			var template = submitPlugin.templates.media[media.type];
 			if (!template) return null;
 			return self.substitute({
@@ -149,8 +167,8 @@ submitPlugin.events = {
 		this.component.view.get("text").val(args.postData.content[0].object.content);
 	},
 	"Echo.StreamServer.Controls.Submit.onPostComplete": function(topic, args) {
-		this.set("resolvedMedia", {});
-		this.set("definedMedia", []);
+		submitPlugin.resolvedMedia = {};
+		submitPlugin.definedMedia = [];
 		this.view.get("mediaContent").empty();
 		this.component.view.get("body").removeClass(this.cssPrefix + "enabledMedia");
 		this._restoreTextarea();
@@ -200,6 +218,12 @@ submitPlugin.templates.media = {
 			'<div class="echo-item-video">{data:html}</div>' +
 		'</div>'
 };
+
+submitPlugin.templates.attach =
+	'<div class="{plugin.class:attach}">' +
+		'<img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" />' +
+	'</div>';
+
 
 submitPlugin.component.renderers.text = function(element) {
 	var self = this;
@@ -252,9 +276,52 @@ function oembedInArray(oembed, array) {
 
 submitPlugin.renderers.mediaContent = function(element) {
 	element.empty();
-	this.attachMedia(this.get("definedMedia"));
+	this.attachMedia(submitPlugin.definedMedia);
+	this.attachMedia(submitPlugin.resolvedMedia);
 	return element;
 };
+
+submitPlugin.renderers.attach = function(element) {
+	var self = this;
+	element.children("img").attr("title", this.labels.get("attachTitle"));
+	element.on({
+		"click": function(event) {
+			var callback = function() {
+				window.filepicker.setKey(self.config.get("filePicker.key"));
+				var sources = self.config.get("filePicker.sources")
+					? self.config.get("filePicker.sources").replace(" ", "").toUpperCase().split(",")
+					: undefined;
+				try {
+					window.filepicker.pickMultiple({
+						"mimetype": "image/*",
+						"container": "modal",
+						"services": sources
+					}, function(InkBlob) {
+						self.events.publish({
+							"topic": "onURLsAdded",
+							"data": {
+								"urls": $.map(InkBlob, function(picture) {
+									return picture.url;
+								})
+							}
+						});
+					}, function(FPError) { });
+				} catch(e) {
+					Echo.Utils.log({
+						"message": e.toString(),
+						"component": "FilePicker",
+						"type": "error"
+					});
+				}
+			};
+			Echo.Loader.download([{
+				"url": "//api.filepicker.io/v1/filepicker.js"
+			}], callback);
+		}
+	});
+	return element;
+};
+
 
 submitPlugin.methods._replaceTextarea = function() {
 	// workflow for Edit Plugin
@@ -296,7 +363,7 @@ submitPlugin.methods.getURLs = function(text) {
 submitPlugin.methods.resolveURLs = function(urls, callback) {
 	var self = this;
 	var unresolvedURLs = $.grep(urls, function(url) {
-		var media = self.get("resolvedMedia");
+		var media = submitPlugin.resolvedMedia;
 		if (!media[url]) {
 			media[url] = {};
 			return true;
@@ -311,12 +378,12 @@ submitPlugin.methods.resolveURLs = function(urls, callback) {
 				"chars": self.config.get("maxDescriptionCharacters")
 				}
 		}).progress(function(data) {
-			var media = self.get("resolvedMedia");
+			var media = submitPlugin.resolvedMedia;
 			media[data.original_url] = data;
 		}).done(function(data) {
 			// check if resolved media already defined
 			// and try to move it in resolved media
-			var definedMedia = self.get("definedMedia");
+			var definedMedia = submitPlugin.definedMedia;
 			data = $.grep(data, function(oembed) {
 				var index = oembedInArray(oembed, definedMedia);
 				if (~index) {
@@ -362,12 +429,12 @@ submitPlugin.methods.attachMedia = function(data) {
 		var detachBtn = $(self.substitute({
 			"template": '<div class="echo-primaryFont {plugin.class:Close}">&times;</div>'
 		})).one("click", function() {
-			var media = self.get("resolvedMedia");
+			var media = submitPlugin.resolvedMedia;
 			if (media[oembed.original_url]) {
 				media[oembed.original_url] = {};
 			} else {
 				// remove from defined media
-				var definedMedia = self.get("definedMedia");
+				var definedMedia = submitPlugin.definedMedia;
 				var index = oembedInArray(oembed, definedMedia);
 				if (~index) {
 					delete definedMedia[index];
@@ -399,8 +466,9 @@ submitPlugin.css =
 	// scrollbar
 	'.{plugin.class:mediaContent}::-webkit-scrollbar { height: 10px; }' +
 	'.{plugin.class:mediaContent}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
-	'.{plugin.class:mediaContent}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }';
+	'.{plugin.class:mediaContent}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }' +
 
+	'.{plugin.class:attach} { margin: 5px; float: left; cursor: pointer; }';
 Echo.Plugin.create(submitPlugin);
 
 })(Echo.jQuery);
