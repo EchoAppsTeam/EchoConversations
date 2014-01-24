@@ -407,7 +407,7 @@ conversations.renderers.postComposer = function(element) {
 	this.initComponent({
 		"id": "postComposer",
 		"component": "Echo.StreamServer.Controls.Submit",
-		"config": {
+		"config": $.extend(true, {
 			"appkey": ssConfig.appkey,
 			"apiBaseURL": ssConfig.apiBaseURL,
 			"submissionProxyURL": ssConfig.submissionProxyURL,
@@ -416,6 +416,17 @@ conversations.renderers.postComposer = function(element) {
 			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
 			"markers": this._getSubmitMarkers(),
+			"data": {
+				"object": {
+					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
+				}
+			},
+			"ready": function() {
+				this.view.get("text").on("change", function() {
+					Echo.Utils.set(Echo.Variables, targetURL, $(this).val());
+				});
+			}
+		}, this.config.get("postComposer"), {
 			"plugins": this._mergeSpecsByName([{
 				"name": "URLResolver",
 				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs"),
@@ -437,18 +448,8 @@ conversations.renderers.postComposer = function(element) {
 					"enable": this._isModerationRequired() && this.config.get("postComposer.confirmation.enable")
 				},
 				"auth": this.config.get("auth")
-			})], config.plugins),
-			"data": {
-				"object": {
-					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
-				}
-			},
-			"ready": function() {
-				this.view.get("text").on("change", function() {
-					Echo.Utils.set(Echo.Variables, targetURL, $(this).val());
-				});
-			}
-		}
+			})], config.plugins)
+		})
 	});
 	return element;
 };
@@ -842,16 +843,17 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	}, {
 		"intentID": "CommunityFlag",
 		"name": "CommunityFlagCardUI"
-	}, {
+	}, $.extend(true, {
+		"requestMethod": "POST"
+	}, this.config.get("replyComposer"), {
 		"intentID": "Reply",
 		"name": "ReplyCardUI",
+		"enabled": this._isComposerVisible("replyComposer"),
+		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
+		"pauseTimeout": +this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout"),
+		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
 		// TODO: pass markers through data
 		"extraMarkers": this._getSubmitMarkers(["topPost"]),
-		"enabled": this._isComposerVisible("replyComposer"),
-		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
-		"pauseTimeout": +this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout"),
-		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
-		"requestMethod": "POST",
 		"nestedPlugins": this._mergeSpecsByName([{
 			"name": "URLResolver",
 			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs"),
@@ -874,7 +876,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			},
 			"submitPermissions": this._getSubmitPermissions()
 		})], this.config.get("replyComposer.plugins"))
-	}, {
+	}), {
 		"intentID": "Sharing",
 		"name": "CardUISocialSharing"
 	}, {
