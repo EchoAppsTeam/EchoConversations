@@ -106,21 +106,17 @@ submitPlugin.config = {
 	"resolveURLs": "all" // all, disabled, only-roots, only-children
 };
 
-submitPlugin.definedMedia = [];
-submitPlugin.resolvedMedia = {};
 
 submitPlugin.labels = {
 	"attachTitle": "Click to add attachments"
 };
 
 submitPlugin.init = function() {
-	//this.set("resolvedMedia", {});
-	//this.set("definedMedia", []);
 	this.set("timer", null);
 
 	$.embedly.defaults.key = this.config.get("embedlyAPIKey");
 
-	submitPlugin.definedMedia = this._getMediaAttachments();
+	this._setDefinedMedia(this._getMediaAttachments());
 	this.extendTemplate("insertAfter", "content", submitPlugin.templates.preview);
 
 	// TODO: get this option from dashboard in future
@@ -143,7 +139,7 @@ submitPlugin.events = {
 	},
 	"Echo.StreamServer.Controls.Submit.onPostInit": function(topic, args) {
 		var self = this;
-		var mediaContent = $.map($.extend({}, submitPlugin.resolvedMedia, submitPlugin.definedMedia), function(media) {
+		var mediaContent = $.map($.extend({}, self._getResolvedMedia(), self._getDefinedMedia()), function(media) {
 			var template = submitPlugin.templates.media[media.type];
 			if (!template) return null;
 			return self.substitute({
@@ -167,8 +163,8 @@ submitPlugin.events = {
 		this.component.view.get("text").val(args.postData.content[0].object.content);
 	},
 	"Echo.StreamServer.Controls.Submit.onPostComplete": function(topic, args) {
-		submitPlugin.resolvedMedia = {};
-		submitPlugin.definedMedia = [];
+		this._setResolvedMedia({});
+		this._setDefinedMedia([]);
 		this.view.get("mediaContent").empty();
 		this.component.view.get("body").removeClass(this.cssPrefix + "enabledMedia");
 		this._restoreTextarea();
@@ -276,8 +272,8 @@ function oembedInArray(oembed, array) {
 
 submitPlugin.renderers.mediaContent = function(element) {
 	element.empty();
-	this.attachMedia(submitPlugin.definedMedia);
-	this.attachMedia(submitPlugin.resolvedMedia);
+	this.attachMedia(this._getDefinedMedia());
+	this.attachMedia(this._getResolvedMedia());
 	return element;
 };
 
@@ -322,6 +318,60 @@ submitPlugin.renderers.attach = function(element) {
 	return element;
 };
 
+submitPlugin.mediaContent = {};
+
+submitPlugin.methods._setDefinedMedia = function(definedMedia) {
+	var key = this._getUniqueFormKey();
+	if (!submitPlugin.mediaContent[key]) {
+		submitPlugin.mediaContent[key] = {};
+	}
+	submitPlugin.mediaContent[key].definedMedia = definedMedia;
+};
+
+submitPlugin.methods._setResolvedMedia = function(resolvedMedia) {
+	var key = this._getUniqueFormKey();
+	if (!submitPlugin.mediaContent[key]) {
+		submitPlugin.mediaContent[key] = {};
+	}
+	submitPlugin.mediaContent[key].resolvedMedia = resolvedMedia;
+};
+
+submitPlugin.methods._getDefinedMedia = function() {
+	var key = this._getUniqueFormKey();
+	console.log(key);
+	if (!submitPlugin.mediaContent[key]) {
+		submitPlugin.mediaContent[key] = {};
+	}
+	if (!submitPlugin.mediaContent[key].definedMedia) {
+		submitPlugin.mediaContent[key].definedMedia = [];
+	}
+	return submitPlugin.mediaContent[key].definedMedia;
+};
+
+submitPlugin.methods._getResolvedMedia = function() {
+	var key = this._getUniqueFormKey();
+	console.log(key);
+	if (!submitPlugin.mediaContent[key]) {
+		submitPlugin.mediaContent[key] = {};
+	}
+	if (!submitPlugin.mediaContent[key].resolvedMedia) {
+		submitPlugin.mediaContent[key].resolvedMedia = {};
+	}
+	return submitPlugin.mediaContent[key].resolvedMedia;
+};
+
+submitPlugin.methods._getUniqueFormKey = function() {
+	var key = "app-";
+	var item = this.component;
+	if (item.data.unique) {
+		key += item.data.unique;
+	} else if (item.config.get("intentID")) {
+		key += item.config.get("intentID") + item.config.get("targetURL");
+	} else {
+		key += "rootItem";
+	}
+	return key;
+};
 
 submitPlugin.methods._replaceTextarea = function() {
 	// workflow for Edit Plugin
@@ -363,7 +413,7 @@ submitPlugin.methods.getURLs = function(text) {
 submitPlugin.methods.resolveURLs = function(urls, callback) {
 	var self = this;
 	var unresolvedURLs = $.grep(urls, function(url) {
-		var media = submitPlugin.resolvedMedia;
+		var media = self._getResolvedMedia();
 		if (!media[url]) {
 			media[url] = {};
 			return true;
@@ -378,16 +428,17 @@ submitPlugin.methods.resolveURLs = function(urls, callback) {
 				"chars": self.config.get("maxDescriptionCharacters")
 				}
 		}).progress(function(data) {
-			var media = submitPlugin.resolvedMedia;
+			var media = self._getResolvedMedia();
 			media[data.original_url] = data;
 		}).done(function(data) {
 			// check if resolved media already defined
 			// and try to move it in resolved media
-			var definedMedia = submitPlugin.definedMedia;
+			var definedMedia = self._getDefinedMedia();
 			data = $.grep(data, function(oembed) {
 				var index = oembedInArray(oembed, definedMedia);
 				if (~index) {
 					delete definedMedia[index];
+					self._setDefinedMedia(definedMedia);
 					return false;
 				} else {
 					return true;
@@ -429,15 +480,16 @@ submitPlugin.methods.attachMedia = function(data) {
 		var detachBtn = $(self.substitute({
 			"template": '<div class="echo-primaryFont {plugin.class:Close}">&times;</div>'
 		})).one("click", function() {
-			var media = submitPlugin.resolvedMedia;
+			var media = self._getResolvedMedia();
 			if (media[oembed.original_url]) {
 				media[oembed.original_url] = {};
 			} else {
 				// remove from defined media
-				var definedMedia = submitPlugin.definedMedia;
+				var definedMedia = self._getDefinedMedia();
 				var index = oembedInArray(oembed, definedMedia);
 				if (~index) {
 					delete definedMedia[index];
+					self._setDefinedMedia(definedMedia);
 				}
 			}
 			card.destroy();
