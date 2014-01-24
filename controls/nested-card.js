@@ -14,9 +14,9 @@ card.templates.photo =
 						'<div></div>{data:author_name}' +
 					'</div>' +
 				'</div>' +
-				'<a href="{data:url}" target="_blank">' +
+				'<div class="{class:photoContainer}" href="{data:url}" target="_blank">' +
 					'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
-				'</a>' +
+				'</div>' +
 				'<div class="{class:photoLabel}">' +
 					'<div class="{class:photoLabelContainer}">' +
 						'<div class="{class:title} {class:photoTitle}" title="{data:title}">' +
@@ -98,6 +98,9 @@ card.config = {
 		"forbidden": [{
 			"pattern": /\/\/www\.filepicker\.io/i
 		}]
+	},
+	"photo": {
+		"maxHeight": 350
 	},
 	"displaySourceIcon": true,
 	"displayAuthor": true
@@ -206,6 +209,26 @@ card.renderers.photoThumbnail = function(element) {
 	}).attr("src", thumbnail);
 };
 
+card.renderers.photoContainer = function(element) {
+	var expanded = this.cssPrefix + "expanded";
+
+	var collapsedHeight = this.config.get("photo.maxHeight");
+	var expandedHeight = this.get("data.height");
+
+	return element
+		.css("max-height", collapsedHeight)
+		.on("click", function(e) {
+			if (element.hasClass(expanded)) {
+				element.removeClass(expanded);
+				element.css("max-height", collapsedHeight);
+			} else {
+				element.addClass(expanded);
+				element.css("max-height", expandedHeight);
+			}
+			e.preventDefault();
+		});
+};
+
 card.renderers.photoLabelContainer = function(element) {
 	// calculate photoLabel max-height
 	var photoLabelHeight = 20 // photoLabelContainer padding
@@ -246,6 +269,12 @@ card.methods.getRenderType = function() {
 		: defaultType;
 };
 
+var transition = function(value) {
+	return $.map(["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(propertyName) {
+		return propertyName +': ' + value;
+	}).join(";");
+};
+
 card.css =
 	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:item} { text-align: left; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; }' +
@@ -262,7 +291,8 @@ card.css =
 	'.{class:photo} { position: relative; left: 0; top: 0; zoom: 1; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
-	'.{class:photo} > a { display: block; max-height: 350px; overflow: hidden; }' +
+	'.{class:photoContainer} { display: block; overflow: hidden; }' +
+	'.{class:photoContainer} { ' + transition('max-height ease 500ms') + '; }' +
 
 	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
@@ -270,9 +300,7 @@ card.css =
 
 	'.{class:photoLabel} { overflow: hidden; }' +
 	'.{class:photo}:hover .{class:photoLabel} { max-height: 100% !important; }' +
-	$.map(["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(propertyName) {
-		return '.{class:photoLabel} { ' + propertyName +': max-height ease 300ms}';
-	}).join("") +
+	'.{class:photoLabel} { ' + transition('max-height ease 300ms') + '; }' +
 
 	// play button
 	'.{class:playButton} { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 10; }' +
