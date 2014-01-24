@@ -128,7 +128,7 @@ conversations.config = {
 		}],
 		"moderation": {
 			"displayCommunityFlaggedPosts": false,
-			"displaySystemFlaggedPosts": false,
+			"displaySystemFlaggedPosts": true,
 			"premoderation": {
 				"enable": false,
 				"approvedUserBypass": true,
