@@ -801,6 +801,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 			"visible": config.displayTopPostHighlight,
 			"marker": this.config.get("topMarkers.item")
 		},
+		"collapsedContentHeight": this.config.get(componentID + ".collapsedContentHeight"),
 		"displayTopPostHighlight": config.displayTopPostHighlight,
 		"initialIntentsDisplayMode": this.config.get(componentID + ".initialIntentsDisplayMode")
 	}, {

@@ -501,7 +501,8 @@ plugin.methods._checkItemContentHeight = function() {
 
 	if (body && button) {
 		var collapsedHeight = this.config.get("collapsedContentHeight");
-		if (body.height() > collapsedHeight && !button.is(":visible")) {
+		var coeffToShow = 1.2; // we don`t need to hide text if it`s height <= 120% of collapsedHeight
+		if (body.height() > collapsedHeight * coeffToShow && !button.is(":visible")) {
 			body.css("max-height", collapsedHeight);
 			button.show();
 		} else if (body.height() < collapsedHeight && button.is(":visible")) {
