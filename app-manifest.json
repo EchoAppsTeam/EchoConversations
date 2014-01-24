@@ -2,7 +2,7 @@
 	"id": "{%=manifest.id%}",
 	"name": "{%=manifest.name%}",
 	"description": "Echo conversations reference app",
-	"app_version": "1.3.7",
+	"app_version": "{%=packageVersions.stable%}",
 	"cloudapp_protocol_version": "1.0.0",
 	"developer": {
 		"id": "echo",
