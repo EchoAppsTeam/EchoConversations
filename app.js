@@ -238,6 +238,9 @@ conversations.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.js"
 }, {
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.css"
+}, {
+	"url": "{%= baseURL %}/third-party/jquery.embedly.js",
+	"loaded": function() { return !!$.fn.embedly; }
 }];
 
 conversations.events = {
