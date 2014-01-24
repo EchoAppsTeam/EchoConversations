@@ -818,15 +818,15 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 			overrides.onItemDelete && overrides.onItemDelete();
 		}
 	}, {
-		"name": "ModerationCardUI",
-		"extraActions": moderationExtraActions,
-		"topMarkers": this.config.get("topMarkers")
-	}, {
 		"name": "ItemsRollingWindow",
 		"moreButton": true
 	}, {
 		"name": "URLResolver"
-	}], this._getConditionalStreamPluginList(componentID));
+	}], this._getConditionalStreamPluginList(componentID), [{
+		"name": "ModerationCardUI",
+		"extraActions": moderationExtraActions,
+		"topMarkers": this.config.get("topMarkers")
+	}]);
 
 	return this._mergeSpecsByName(plugins, config.plugins);
 };
