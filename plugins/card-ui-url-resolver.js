@@ -76,7 +76,7 @@ itemPlugin.renderers.mediaContent = function(element) {
 };
 
 itemPlugin.methods._getItemRenderType = function() {
-	var availableTypes = ["article", "photo", "video"];
+	var availableTypes = ["article", "image", "video"];
 	var result;
 	$.each(this.component.get("data.object.objectTypes", []), function(i, objectType) {
 		var type = (objectType.match("[^/]+$") || []).pop();
