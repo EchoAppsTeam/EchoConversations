@@ -14,7 +14,7 @@ card.templates.photo =
 						'<div></div>{data:author_name}' +
 					'</div>' +
 				'</div>' +
-				'<div class="{class:photoContainer}" href="{data:url}" target="_blank">' +
+				'<div class="{class:photoContainer}">' +
 					'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
 				'</div>' +
 				'<div class="{class:photoLabel}">' +
@@ -79,6 +79,15 @@ card.labels = {
 	"noMediaAvailable": "No media available"
 };
 
+
+card.events = {
+	"Echo.Apps.Conversations.onAppResize": function() {
+		if (this.getRenderType() === "photo") {
+			this.view.render({"name": "photoContainer"});
+		}
+	}
+};
+
 card.sourceIcons = {};
 
 card.init = function() {
@@ -98,9 +107,6 @@ card.config = {
 		"forbidden": [{
 			"pattern": /\/\/www\.filepicker\.io/i
 		}]
-	},
-	"photo": {
-		"maxHeight": 350
 	},
 	"displaySourceIcon": true,
 	"displayAuthor": true
@@ -204,7 +210,7 @@ card.renderers.photoThumbnail = function(element) {
 
 	return element.on("error", function() {
 		element.replaceWith(self.substitute({
-			"template": '<div class="{class:noMediaAvailable}">{label:noMediaAvailable}</div>'
+			"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
 		}));
 	}).attr("src", thumbnail);
 };
@@ -212,21 +218,33 @@ card.renderers.photoThumbnail = function(element) {
 card.renderers.photoContainer = function(element) {
 	var expanded = this.cssPrefix + "expanded";
 
-	var collapsedHeight = this.config.get("photo.maxHeight");
-	var expandedHeight = this.get("data.height");
+	var oembed = this.get("data");
+	var thumbnailWidth = this.view.get("photoThumbnail").width();
+	var expandedHeight = oembed.height;
+	var collapsedHeight = (thumbnailWidth || oembed.width) * 9 / 16;
 
-	return element
-		.css("max-height", collapsedHeight)
-		.on("click", function(e) {
-			if (element.hasClass(expanded)) {
-				element.removeClass(expanded);
-				element.css("max-height", collapsedHeight);
-			} else {
-				element.addClass(expanded);
-				element.css("max-height", expandedHeight);
-			}
-			e.preventDefault();
-		});
+
+	//calc height using aspect ratio 16:9
+	if (!element.hasClass(expanded)) {
+		if (oembed.height > collapsedHeight) {
+			element.css("max-height", collapsedHeight);
+			element.addClass("echo-clickable");
+			element.off("click").on("click", function() {
+				if (element.hasClass(expanded)) {
+					element.removeClass(expanded);
+					element.css("max-height", collapsedHeight);
+				} else {
+					element.addClass(expanded);
+					element.css("max-height", expandedHeight);
+				}
+			});
+		} else {
+			element.css("max-height", "");
+			element.removeClass("echo-clickable");
+		}
+	}
+
+	return element;
 };
 
 card.renderers.photoLabelContainer = function(element) {
@@ -284,7 +302,8 @@ card.css =
 	'.{class:description} { overflow: hidden; }' +
 
 	// photo
-	'.{class:photo} .{class:noMediaAvailable} { min-height: 145px; padding: 75px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; vertical-align: middle; text-decoration: none; }' +
+	'.{class:photo} .{class:noMediaAvailable} { position: relative; min-height: 145px; padding: 75px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
+	'.{class:photo} .{class:noMediaAvailable} span { position: absolute; top: 0; right: 0; bottom: 0; left: 0; margin: auto; }' +
 	'.{class:photoAvatarWrapper} { position: absolute; width: 100%; }' +
 	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:photoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
