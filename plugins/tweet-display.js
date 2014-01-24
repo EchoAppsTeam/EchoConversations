@@ -59,6 +59,8 @@ plugin.init = function() {
 	item.config.set("contentTransformations", config);
 	item.config.set("plugins.LikeCardUI.enabled", false);
 	item.config.set("plugins.ReplyCardUI.enabled", false);
+	item.config.set("plugins.CardUISocialSharing.enabled", false);
+	item.config.set("plugins.CommunityFlagCardUI.enabled", false);
 	// icon must be visible to show that the item is from Twitter
 	item.config.set("viaLabel.icon", true);
 
@@ -192,7 +194,7 @@ plugin.component.renderers.authorName = function(element) {
 			Echo.Utils.hyperlink({
 				"href": item.get("data.actor.id")
 			}, {
-				"openInNewWindow": item.config.get("openLinksInNewWindow"),
+				"openInNewWindow": true,
 				"skipEscaping": true
 			})
 		);
@@ -207,7 +209,7 @@ plugin.component.renderers.avatar = function(element) {
 		Echo.Utils.hyperlink({
 			"href": item.get("data.actor.id")
 		}, {
-			"openInNewWindow": item.config.get("openLinksInNewWindow"),
+			"openInNewWindow": true,
 			"skipEscaping": true
 		})
 	);
@@ -240,7 +242,7 @@ plugin.renderers.tweetUserName = function(element) {
 		"caption": "@" + this._extractTwitterID(),
 		"class": "echo-streamserver-controls-stream-item-authorName"
 	}, {
-		"openInNewWindow": item.config.get("openLinksInNewWindow"),
+		"openInNewWindow": true,
 		"skipEscaping": true
 	}));
 };
@@ -253,7 +255,7 @@ plugin.renderers.tweetDate = function(element) {
 		"class": "echo-secondaryFont echo-secondaryColor",
 		"title": this._getTweetTime(true)
 	}, {
-		"openInNewWindow": item.config.get("openLinksInNewWindow"),
+		"openInNewWindow": true,
 		"skipEscaping": true
 	}));
 };
@@ -274,7 +276,7 @@ plugin.methods._assembleButton = function(name) {
 					'<i class="{plugin.class:buttonIcon} icon-{data:name}"></i>' +
 					'<span class="echo-primaryFont {class:buttonCaption}">{data:label}</span>'
 			}, {
-				"openInNewWindow": item.config.get("openLinksInNewWindow"),
+				"openInNewWindow": true,
 				"skipEscaping": true
 			}),
 			"visible": id && plugin._isTweet()
