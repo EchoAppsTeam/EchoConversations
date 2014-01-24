@@ -14,9 +14,9 @@ card.templates.photo =
 						'<div></div>{data:author_name}' +
 					'</div>' +
 				'</div>' +
-				'<a href="{data:url}" target="_blank">' +
+				'<div class="{class:photoContainer}" href="{data:url}" target="_blank">' +
 					'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
-				'</a>' +
+				'</div>' +
 				'<div class="{class:photoLabel}">' +
 					'<div class="{class:photoLabelContainer}">' +
 						'<div class="{class:title} {class:photoTitle}" title="{data:title}">' +
@@ -37,9 +37,11 @@ card.templates.video =
 				'<div class="{class:avatar} {class:videoAvatar}" title="{data:author_name}">' +
 					'<div></div>{data:author_name}' +
 				'</div>' +
-				'<div class="{class:videoPlaceholder}">' +
-					'<div class="{class:playButton}"></div>' +
-					'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
+				'<div class="{class:videoWrapper}">' +
+					'<div class="{class:videoPlaceholder}">' +
+						'<div class="{class:playButton}"></div>' +
+						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
+					'</div>' +
 				'</div>' +
 				'<div class="{class:title} {class:videoTitle}" title="{data:title}">{data:title}</div>' +
 				'<div class="{class:description} {class:videoDescription}">{data:description}</div>' +
@@ -70,17 +72,11 @@ card.templates.link =
 	'</div>';
 
 card.templates.main = function() {
-	var data = this.get("data");
-	var handlers = {
-		"link": function(data) {
-			return (data.thumbnail_width >= this.config.get("minArticleImageWidth"))
-				? this.templates["photo"]
-				: this.templates["link"];
-		}
-	};
-	return handlers[data.type]
-		? handlers[data.type].call(this, data)
-		: this.templates[data.type];
+	return this.templates[this.getRenderType()];
+};
+
+card.labels = {
+	"noMediaAvailable": "No media available"
 };
 
 card.sourceIcons = {};
@@ -102,13 +98,18 @@ card.config = {
 		"forbidden": [{
 			"pattern": /\/\/www\.filepicker\.io/i
 		}]
-	}
+	},
+	"photo": {
+		"maxHeight": 350
+	},
+	"displaySourceIcon": true,
+	"displayAuthor": true
 };
 
 card.renderers.sourceIcon = function(element) {
 	var oembed = this.get("data");
 
-	if (!oembed.provider_url) return;
+	if (!oembed.provider_url || !this.config.get("displaySourceIcon")) return;
 
 	var icon;
 
@@ -154,7 +155,9 @@ card.renderers.avatar = function(element) {
 	if (isIE8) {
 		element.children()[0].style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.config.get("defaultAvatar") + "', sizingMethod='scale')";
 	}
-	return this.get("data.author_name") ? element : element.hide();
+	return this.get("data.author_name") && this.config.get("displayAuthor")
+		? element
+		: element.hide();
 };
 
 card.renderers.title = function(element) {
@@ -194,52 +197,110 @@ card.renderers.videoPlaceholder = function(element) {
  *  Photo
  */
 card.renderers.photoThumbnail = function(element) {
-	if (this.get("data.type") === "link") {
-		element.attr("src", this.get("data.thumbnail_url"));
-	} else {
-		element.attr("src", this.get("data.url"));
-	}
-	return element;
+	var self = this;
+	var thumbnail = this.get("data.type") === "link"
+		? this.get("data.thumbnail_url")
+		: this.get("data.url");
+
+	return element.on("error", function() {
+		element.replaceWith(self.substitute({
+			"template": '<div class="{class:noMediaAvailable}">{label:noMediaAvailable}</div>'
+		}));
+	}).attr("src", thumbnail);
+};
+
+card.renderers.photoContainer = function(element) {
+	var expanded = this.cssPrefix + "expanded";
+
+	var collapsedHeight = this.config.get("photo.maxHeight");
+	var expandedHeight = this.get("data.height");
+
+	return element
+		.css("max-height", collapsedHeight)
+		.on("click", function(e) {
+			if (element.hasClass(expanded)) {
+				element.removeClass(expanded);
+				element.css("max-height", collapsedHeight);
+			} else {
+				element.addClass(expanded);
+				element.css("max-height", expandedHeight);
+			}
+			e.preventDefault();
+		});
 };
 
 card.renderers.photoLabelContainer = function(element) {
+	// calculate photoLabel max-height
+	var photoLabelHeight = 20 // photoLabelContainer padding
+		+ 2*16; // photoDescription line-height * lines count
+
+	if (this.get("data.title")) {
+		photoLabelHeight += 16 // photoTitle width
+			+ 5; // photoTitle margin
+	}
+	this.view.get("photoLabel").css("max-height", photoLabelHeight);
+
 	return this.get("data.description") || this.get("data.title")
 		? element
 		: element.hide();
 };
 
-// calculate photoLabel max-height
-var photoLabelHeight = 20 // photoLabelContainer padding
-	+ 16 // photoTitle width
-	+ 5 // photoTitle margin
-	+ 3*16; // photoDescription line-height * lines count
+/**
+ *  Link
+ */
+card.renderers.article = function(element) {
+	if (!this.get("data.thumbnail_url")) {
+		element.addClass(this.cssPrefix + "withoutPhoto");
+	}
+	return element;
+};
+
+card.methods.getRenderType = function() {
+	var defaultType = this.get("data.type");
+	var handlers = {
+		"link": function(data) {
+			return this.config.get("data.thumbnail_width") >= this.config.get("minArticleImageWidth")
+				? "photo"
+				: "link";
+		}
+	};
+	return handlers[defaultType]
+		? handlers[defaultType].call(this)
+		: defaultType;
+};
+
+var transition = function(value) {
+	return $.map(["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(propertyName) {
+		return propertyName +': ' + value;
+	}).join(";");
+};
 
 card.css =
 	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:item} { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; }' +
+	'.{class:item} { text-align: left; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; }' +
 	'.{class:border} { white-space: normal; word-break: break-word; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; }' +
 	'.{class:item} .{class:sourceIcon} > img { width: 18px; height: 18px; }' +
 	'.echo-sdk-ui .{class:avatar} > div { width: 28px; height: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; margin-right: 6px; }' +
 	'.{class:description} { overflow: hidden; }' +
 
 	// photo
+	'.{class:photo} .{class:noMediaAvailable} { min-height: 145px; padding: 75px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; vertical-align: middle; text-decoration: none; }' +
 	'.{class:photoAvatarWrapper} { position: absolute; width: 100%; }' +
 	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:photoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
-	'.{class:photo} { position: relative; }' +
+	'.{class:photo} { position: relative; left: 0; top: 0; zoom: 1; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
-	'.{class:photo} > a { display: block; max-height: 350px; overflow: hidden; }' +
+	'.{class:photoContainer} { display: block; overflow: hidden; }' +
+	'.{class:photoContainer} { ' + transition('max-height ease 500ms') + '; }' +
 
 	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
 	'.{class:photoTitle} { margin: 0 0 5px 0; }' +
 
-	'.{class:photoLabel} { overflow: hidden; max-height: ' + photoLabelHeight + 'px; }' +
-	'.{class:photo}:hover .{class:photoLabel} { max-height: 100%; }' +
-	$.map(["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(propertyName) {
-		return '.{class:photoLabel} { ' + propertyName +': max-height ease 300ms}';
-	}).join("") +
+	'.{class:photoLabel} { overflow: hidden; }' +
+	'.{class:photo}:hover .{class:photoLabel} { max-height: 100% !important; }' +
+	'.{class:photoLabel} { ' + transition('max-height ease 300ms') + '; }' +
 
 	// play button
 	'.{class:playButton} { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 10; }' +
@@ -254,9 +315,9 @@ card.css =
 	'.{class:videoTitle} { margin: 10px 0 0 0; }' +
 	'.{class:videoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
 	'.{class:videoDescription} { margin: 5px 0 0 0; }' +
-
+	'.{class:videoWrapper} { background: #000; }' +
 	'.{class:videoPlaceholder} img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }' +
-	'.{class:videoPlaceholder} { max-width: 100%; position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; background: #000000; overflow: hidden; }' +
+	'.{class:videoPlaceholder} { max-width: 100%; position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px auto; background: #000000; overflow: hidden; }' +
 	'.{class:videoPlaceholder} > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
 	'.{class:videoPlaceholder} > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
 	'.{class:videoPlaceholder} > object { position: absolute; top: 0; left: 0; width: 100%;100 height: 100%; }' +
@@ -266,11 +327,15 @@ card.css =
 	'.{class:article} .{class:sourceIcon} > img { padding: 10px 0 0 0; }' +
 	'.{class:article} .{class:articleTitle} > a { color: #42474A; font-weight: bold; }' +
 	'.{class:article} .{class:articleTitle} > a:hover { color: #42474A; }' +
-	'.{class:articleTitle} { padding: 0 0 5px 0; margin-left: 10px; }' +
+	'.{class:articleTitle} { margin-left: 10px; margin-top: 0px; line-height: 10px; }' +
 	'.{class:articleDescription} { margin-left: 10px; font-size: 13px; line-height: 16px; }' +
 	'.{class:articleThumbnail} { width: 30%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden; }' +
 	'.{class:articleThumbnail} img { width: auto; height: auto; max-height:120px; max-width:120px; }' +
-	'.{class:articleTemplate} { width: 70%; float: left; }';
+	'.{class:articleTemplate} { width: 70%; float: left; }' +
+	'.{class:article}.{class:withoutPhoto} .{class:articleTitle} { margin-left: 0px; }' +
+	'.{class:article}.{class:withoutPhoto} .{class:articleDescription} { margin-left: 0px; }' +
+	'.{class:article}.{class:withoutPhoto} .{class:articleThumbnail} { display: none; }' +
+	'.{class:article}.{class:withoutPhoto} .{class:articleTemplate} { width: 100%; }';
 
 Echo.App.create(card);
 

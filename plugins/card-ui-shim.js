@@ -593,7 +593,7 @@ plugin.css =
 
 	// indicator
 	'.{plugin.class} .{class:container} { position: relative; }' +
-	'.{plugin.class} .{class:indicator} { position: absolute; left: 0px; top: 0px; bottom: 0px; width: 4px; background-color: transperent; z-index: 10; }' +
+	'.{plugin.class} .{class:indicator} { position: absolute; left: 0px; top: 0px; bottom: 0px; width: 4px; background-color: transparent; z-index: 10; }' +
 
 	// TODO: get rid of this item styles (introduced for DS generated items)
 	'.{plugin.class} .{class:body} .echo-item-video { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +

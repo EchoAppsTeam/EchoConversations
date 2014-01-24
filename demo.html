@@ -8,10 +8,31 @@
 
 <script type="text/javascript" src="http://cdn.echoenabled.com/sdk/v3/loader.js"></script>
 
-<div class="echo-canvas"  data-canvas-id="ilya-mikhailov/q6vpc4pxba" data-canvas-mode="dev" style="margin: 0px auto; width: 50%; max-width: 440px;"></div>
+<div id="container" style="margin: 0px auto; width: 50%; max-width: 440px;"></div>
 
 <script type="text/javascript">
-	Echo.Loader.init();
+	Echo.Loader.initApplication({
+		"script": "{%=baseURL%}/app.js",
+		"component": "Echo.Apps.Conversations",
+		"backplane": {
+		"serverBaseURL": "https://api.echoenabled.com/v1",
+			"busName": "jskit"
+		},
+		"config": {
+			"target": document.getElementById("container"),
+			"targetURL": "http://echoplatform.com/test/conversations",
+			"streamingControl": {
+				"displayStreamingStateHeader": true
+			},
+			"auth": {
+				"allowAnonymousSubmission": true
+			},
+			"dependencies": {
+				"Janrain": {"appId": "echo"},
+				"StreamServer": {"appkey": "echo.jssdk.demo.aboutecho.com"}
+			}
+		}
+	});
 </script>
 
 </body>

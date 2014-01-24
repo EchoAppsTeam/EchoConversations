@@ -21,35 +21,23 @@ itemPlugin.init = function() {
 itemPlugin.component.renderers.body = function(element) {
 	var self = this;
 	var item = this.component;
+
 	var original = item.get("data.object.content");
-
-	var needToRemoveCards  = false;
-
-	$.map(item.config.get("data.object.objectTypes"), function(type) {
-		if (type && /\/(article|image)$/.test(type)) {
-			needToRemoveCards = true;
-		}
-	});
-
 	var content = $("<div/>").append(original);
+	var media = self._getMediaAttachments();
+	$("div[oembed], div[data-oembed]", content).remove();
 
-	if (needToRemoveCards) {
-		var truncatedContent = $(original);
-		$.map(truncatedContent.children("div[oembed], div[data-oembed]"), function(child) {
-			child.remove();
-		});
-		content = $("<div/>").append(truncatedContent);
+	// hide all item content if item type is article, photo or video
+	// and item has media attachments
+	if (media.length && this._getItemRenderType()) {
+		element.hide();
 	}
 
 	Echo.Utils.safelyExecute(function() {
-		var media = self._getMediaAttachments();
 		var text = $(".echo-item-text", content);
 		if (media.length && text.length) {
 			item.set("data.object.content", text.html());
-		} else if (needToRemoveCards && !text.length) {
-			// TODO: This is handler for situation then we have
-			// <media:content type="image/jpeg" ...> in article.
-			// In this case we shelln`t display any attachments
+		} else if (media.length) {
 			item.set("data.object.content", content.html());
 		}
 	});
@@ -62,12 +50,43 @@ itemPlugin.component.renderers.body = function(element) {
 };
 
 itemPlugin.renderers.mediaContent = function(element) {
+	var self = this;
+	var item = this.component;
 	var media = this._getMediaAttachments();
+	var type = this._getItemRenderType();
+	var cardConfig = media.length && type
+		? { "displaySourceIcon": false, "displayAuthor": false }
+		: {};
+
 	new Echo.Conversations.MediaContainer(this.config.assemble({
 		"target": element.empty(),
-		"data": media
+		"data": media,
+		"card": cardConfig,
+		"ready": function() {
+			if (media.length && item.isRoot() && type) {
+				var cardType = this.cards[0].getRenderType();
+				item.view.get("container").addClass(self.cssPrefix + cardType);
+			}
+		}
 	}));
+
+
+
 	return element.addClass(this.cssPrefix + (media.length > 1 ? "multiple" : "single"));
+};
+
+itemPlugin.methods._getItemRenderType = function() {
+	var availableTypes = ["article", "image", "video"];
+	var result;
+	$.each(this.component.get("data.object.objectTypes", []), function(i, objectType) {
+		var type = (objectType.match("[^/]+$") || []).pop();
+		if (~$.inArray(type, availableTypes)) {
+			result = type;
+			return false;
+		}
+	});
+
+	return result;
 };
 
 itemPlugin.methods._getMediaAttachments = function() {
@@ -90,6 +109,23 @@ itemPlugin.css =
 	'.{class:depth-0} .{plugin.class:mediaContent}.{plugin.class:multiple} { margin-left: -16px; margin-right: -16px; }' +
 	'.{class:depth-0} .{plugin.class:mediaContent} { margin-bottom: 0px; }' +
 	'.{plugin.class:mediaContent}.{plugin.class:multiple} > div { border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
+	'.{plugin.class:video} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
+	'.{plugin.class:video} .{plugin.class:mediaContent} .echo-conversations-nestedcard-item { display: block; }' +
+	'.{plugin.class:video} .{plugin.class:mediaContent} .echo-conversations-nestedcard-video { padding: 0px; }' +
+
+	'.{plugin.class:photo}.{class:container}.{class:depth-0} { padding-top: 0; }' +
+	'.{plugin.class:photo} .{plugin.class:mediaContent} { margin: 0 -16px; text-align: center; background: #000; }' +
+	'.{plugin.class:photo} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
+	'.{plugin.class:photo} .echo-conversations-nestedcard-photoContainer { border-top-left-radius: 3px; border-top-right-radius: 3px; }' +
+	'.{plugin.class:photo} .{class:data} { padding-top: 0; }' +
+	'.{plugin.class:photo} .{class:authorName} { color: #FFFFFF; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); }' +
+	'.{plugin.class:photo} .{class:date} { text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); padding-right: 1px; }' +
+	'.{plugin.class:photo} .{class:avatar-wrapper} { z-index: 10; position: absolute; top: 15px; }' +
+	'.{plugin.class:photo} .echo-streamserver-controls-stream-item-plugin-CardUIShim-header-box { z-index: 10; position: absolute; top: 15px; }' +
+
+	'.{plugin.class:link} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
+	'.{plugin.class:link} .{plugin.class:mediaContent} .echo-conversations-nestedcard-article { padding: 0px; }' +
+
 	'.{plugin.class:mediaContent} { margin-bottom: 8px; }';
 
 Echo.Plugin.create(itemPlugin);
@@ -231,7 +267,8 @@ submitPlugin.component.renderers.text = function(element) {
 
 	if (this.config.get("resolveURLs") === "all" ||
 			this.config.get("resolveURLs") === "only-roots" && isRootItem() ||
-			this.config.get("resolveURLs") === "only-children" && !isRootItem()) {
+			this.config.get("resolveURLs") === "only-children" && !isRootItem()
+	) {
 		element.on("keyup paste", function() {
 			clearTimeout(self.timer);
 			self.timer = setTimeout(function() {
@@ -407,7 +444,14 @@ submitPlugin.methods._getMediaAttachments = function() {
 };
 
 submitPlugin.methods.getURLs = function(text) {
-	return text.match(/(https?:\/\/[^\s]+)/g) || [];
+	var reURL = /(https?:\/\/)\S+\.\S{2,}|(https?:\/\/)?\S+\.\w{2,}\/\S*/;
+	var reSearch = new RegExp(reURL.source, "g"); // add global modificator
+	return $.map(text.match(reSearch) || [], function(url) {
+		var matches = url.match(reURL);
+		return (!matches[1] && !matches[2])
+			? "http://" + url
+			: url;
+	});
 };
 
 submitPlugin.methods.resolveURLs = function(urls, callback) {

@@ -9,6 +9,10 @@ media.templates.main = function() {
 	return '<div class="{class:container}"></div>';
 };
 
+media.vars = {
+	"cards": []
+};
+
 media.init = function() {
 	this.render();
 	this.ready();
@@ -31,8 +35,8 @@ media.renderers.container = function(element) {
 
 		config.parent = this.itemParentConfig;
 
-		$.map(media, function(item) {
-			new Echo.Conversations.NestedCard($.extend({
+		this.cards = $.map(media, function(item) {
+			return new Echo.Conversations.NestedCard($.extend({
 				"data": item
 			}, config));
 		});
