@@ -1232,6 +1232,7 @@ conversations.css =
 	'.echo-sdk-ui .nav.{class:tabs} .dropdown-menu { border-radius: 6px; }' +
 
 	// common
+	'.{class:container} .echo-control-message { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{class:container} { position:relative; }' +
 	'.{class:resizeFrame} { position:absolute; z-index:-1; border:0; padding:0; }' +
 	'.{class:container} { min-height: 200px; min-width: 320px; }' +
