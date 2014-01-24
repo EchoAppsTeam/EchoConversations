@@ -358,7 +358,7 @@ submitPlugin.methods._getMediaAttachments = function() {
 
 submitPlugin.methods.getURLs = function(text) {
 	var reURL = /(https?:\/\/)\S+\.\S{2,}|(https?:\/\/)?\S+\.\w{2,}\/\S*/;
-	var reSearch = new RegExp(reURL.source, "g"); // add global identificator
+	var reSearch = new RegExp(reURL.source, "g"); // add global modificator
 	return $.map(text.match(reSearch) || [], function(url) {
 		var matches = url.match(reURL);
 		return (!matches[1] && !matches[2])
