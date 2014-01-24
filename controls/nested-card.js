@@ -75,6 +75,10 @@ card.templates.main = function() {
 	return this.templates[this.getRenderType()];
 };
 
+card.labels = {
+	"noMediaAvailable": "No media available"
+};
+
 card.sourceIcons = {};
 
 card.init = function() {
@@ -190,12 +194,16 @@ card.renderers.videoPlaceholder = function(element) {
  *  Photo
  */
 card.renderers.photoThumbnail = function(element) {
-	if (this.get("data.type") === "link") {
-		element.attr("src", this.get("data.thumbnail_url"));
-	} else {
-		element.attr("src", this.get("data.url"));
-	}
-	return element;
+	var self = this;
+	var thumbnail = this.get("data.type") === "link"
+		? this.get("data.thumbnail_url")
+		: this.get("data.url");
+
+	return element.on("error", function() {
+		element.replaceWith(self.substitute({
+			"template": '<div class="{class:noMediaAvailable}">{label:noMediaAvailable}</div>'
+		}));
+	}).attr("src", thumbnail);
 };
 
 card.renderers.photoLabelContainer = function(element) {
@@ -247,6 +255,7 @@ card.css =
 	'.{class:description} { overflow: hidden; }' +
 
 	// photo
+	'.{class:photo} .{class:noMediaAvailable} { min-height: 145px; padding: 75px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; vertical-align: middle; text-decoration: none; }' +
 	'.{class:photoAvatarWrapper} { position: absolute; width: 100%; }' +
 	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:photoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
