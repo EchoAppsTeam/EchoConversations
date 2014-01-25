@@ -121,7 +121,7 @@ itemPlugin.css =
 	'.{plugin.class:photo} .{class:authorName} { color: #FFFFFF; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); }' +
 	'.{plugin.class:photo} .{class:date} { text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); padding-right: 1px; }' +
 	'.{plugin.class:photo} .{class:avatar-wrapper} { z-index: 10; position: absolute; top: 15px; }' +
-	'.{plugin.class:photo} .echo-streamserver-controls-stream-item-plugin-CardUIShim-header-box { z-index: 10; position: absolute; top: 15px; }' +
+	'.{plugin.class:photo} .echo-streamserver-controls-stream-item-plugin-CardUIShim-header-box { z-index: 10; position: relative; top: 50px; margin-top: -35px; }' +
 
 	'.{plugin.class:link} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
 	'.{plugin.class:link} .{plugin.class:mediaContent} .echo-conversations-nestedcard-article { padding: 0px; }' +
