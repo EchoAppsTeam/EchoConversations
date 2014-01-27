@@ -303,7 +303,6 @@ card.css =
 
 	// photo
 	'.{class:photo} .{class:noMediaAvailable} { position: relative; min-height: 145px; padding: 75px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
-	'.{class:photo} .{class:noMediaAvailable} span { position: absolute; top: 0; right: 0; bottom: 0; left: 0; margin: auto; }' +
 	'.{class:photoAvatarWrapper} { position: absolute; width: 100%; }' +
 	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:photoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
