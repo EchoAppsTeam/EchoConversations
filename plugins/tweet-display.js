@@ -174,6 +174,9 @@ plugin.enabled = function() {
 plugin.events = {
 	"Echo.StreamServer.Controls.Stream.Item.onRender": function(topic, args) {
 		window.twttr && window.twttr.widgets && window.twttr.widgets.load();
+		$.map(this.component.buttons[this.name], function(name) {
+			name.element.unbind("click");
+		});
 	}
 };
 
@@ -271,7 +274,7 @@ plugin.methods._assembleButton = function(name) {
 			"label": plugin.labels.get(name),
 			"template": Echo.Utils.hyperlink({
 				"href": "https://twitter.com/intent/" + name + "?in_reply_to=" + id + "&tweet_id=" + id,
-				"class": "{class:button} {class:button}-{data:name}",
+				"class": "{class:button} intentControl {class:button}-{data:name}",
 				"caption":
 					'<i class="{plugin.class:buttonIcon} icon-{data:name}"></i>' +
 					'<span class="echo-primaryFont {class:buttonCaption}">{data:label}</span>'
