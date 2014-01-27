@@ -26,7 +26,7 @@ card.templates.photo =
 					'</div>' +
 				'</div>' +
 			'</div>' +
-			'<div class="{class:sourceIcon}"></div>' +
+			'<a class="{class:sourceIcon}" target="_blank"></a>' +
 		'</div>' +
 	'</div>';
 
@@ -45,7 +45,7 @@ card.templates.video =
 				'</div>' +
 				'<div class="{class:title} {class:videoTitle}" title="{data:title}">{data:title}</div>' +
 				'<div class="{class:description} {class:videoDescription}">{data:description}</div>' +
-				'<div class="{class:sourceIcon}"></div>' +
+				'<a class="{class:sourceIcon}" target="_blank"></a>' +
 			'</div>' +
 		'</div>' +
 	'</div>';
@@ -66,7 +66,7 @@ card.templates.link =
 					'</div>' +
 				'</div>' +
 				'<div class="echo-clear"></div>' +
-				'<div class="{class:sourceIcon}"></div>' +
+				'<a class="{class:sourceIcon}" target="_blank"></a>' +
 			'</div>' +
 		'</div>' +
 	'</div>';
@@ -152,6 +152,10 @@ card.renderers.sourceIcon = function(element) {
 			"title": oembed.provider_name
 		}).appendTo(element);
 	}
+	if (oembed.original_url) {
+		element.attr("href", oembed.original_url);
+	}
+	return element;
 };
 
 card.renderers.avatar = function(element) {
