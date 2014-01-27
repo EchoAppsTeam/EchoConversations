@@ -283,8 +283,13 @@ submitPlugin.component.renderers.text = function(element) {
 		var content = $("<div/>").append(item.get("data.object.content"));
 		var media = self._getMediaAttachments();
 		var text = $(".echo-item-text", content);
+
+		$("div[oembed], div[data-oembed]", content).remove();
+
 		if (media.length && text.length) {
 			item.set("data.object.content", text.html());
+		} else if (media.length) {
+			item.set("data.object.content", content.text());
 		}
 	});
 
