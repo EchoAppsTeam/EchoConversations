@@ -311,7 +311,7 @@ card.css =
 	'.{class:photo} { position: relative; left: 0; top: 0; zoom: 1; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
-	'.{class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; }' +
+	'.{class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; min-height: 120px; }' +
 
 	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
