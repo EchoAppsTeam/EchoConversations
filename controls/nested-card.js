@@ -222,30 +222,28 @@ card.renderers.photoThumbnail = function(element) {
 card.renderers.photoContainer = function(element) {
 	var expanded = this.cssPrefix + "expanded";
 
-	var oembed = this.get("data");
+	var oembed = this.get("data", {});
 	var thumbnailWidth = this.view.get("photoThumbnail").width();
 	var expandedHeight = oembed.height;
 	var collapsedHeight = (thumbnailWidth || oembed.width) * 9 / 16;
 
-
 	//calc height using aspect ratio 16:9
-	if (!element.hasClass(expanded)) {
-		if (oembed.height > collapsedHeight) {
-			element.css("max-height", collapsedHeight);
-			element.addClass("echo-clickable");
-			element.off("click").on("click", function() {
-				if (element.hasClass(expanded)) {
-					element.removeClass(expanded);
-					element.css("max-height", collapsedHeight);
-				} else {
-					element.addClass(expanded);
-					element.css("max-height", expandedHeight);
-				}
+	if (!element.hasClass(expanded) && oembed.height > collapsedHeight) {
+		var transitionCss = Echo.Utils.foldl({}, ["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(key, acc) {
+			acc[key] = 'max-height ease 500ms';
+		});
+
+		element.addClass("echo-clickable");
+		element
+			.css("max-height", 250)
+			.one("click", function() {
+				element.css(transitionCss);
+				element.css("max-height", expandedHeight);
+				element.removeClass("echo-clickable");
+				element.addClass(expanded);
 			});
-		} else {
-			element.css("max-height", "");
-			element.removeClass("echo-clickable");
-		}
+	} else {
+		element.css("max-height", expandedHeight);
 	}
 
 	return element;
@@ -314,7 +312,6 @@ card.css =
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
 	'.{class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; }' +
-	'.{class:photoContainer} { ' + transition('max-height ease 500ms') + '; }' +
 
 	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
