@@ -516,14 +516,20 @@ dashboard.config = {
 				"options": []
 			}
 		}, {
-			"component": "Input",
-			"name": "filePickerApiKey",
-			"type": "string",
-			"config": {
-				"title": "Filepicker api key",
-				"desc": "Specifies the Filepicker api key for this instance",
-				"options": []
-			}
+			"component": "Fieldset",
+			"name": "FilePicker",
+			"type": "object",
+			"items": [{
+				"component": "Input",
+				"name": "apiKey",
+				"type": "string",
+				"default": "AFLWUBllDRwWZl7sQO1V1z",
+				"config": {
+					"title": "FilePicker API key",
+					"desc": "Specifies the Filepicker api key for this instance",
+					"options": []
+				}
+			}]
 		}]
 	}]
 };

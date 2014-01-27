@@ -20,7 +20,11 @@ conversations.config = {
 			"comments": {
 				"visible": true,
 				"prompt": "What's on your mind?",
-				"resolveURLs": true
+				"resolveURLs": true,
+				"attachments": {
+					"visible": false,
+					"sources": ""
+				}
 			}
 		},
 		"confirmation": {
@@ -39,7 +43,12 @@ conversations.config = {
 			"comments": {
 				"visible": true,
 				"prompt": "What's on your mind?",
-				"resolveURLs": true
+				"resolveURLs": true,
+				"attachments": {
+					"visible": false,
+					"sources": ""
+				}
+
 			}
 		},
 		"confirmation": {
@@ -53,6 +62,7 @@ conversations.config = {
 		"visible": true,
 		"label": "Top Posts",
 		"queryOverride": "",
+		"collapsedContentHeight": 110, // px
 		"initialItemsPerPage": 5,
 		"initialSortOrder": "reverseChronological",
 		"includeTopContributors": true,
@@ -96,6 +106,7 @@ conversations.config = {
 		"visible": true,
 		"label": "All Posts",
 		"queryOverride": "",
+		"collapsedContentHeight": 110, // px
 		"initialItemsPerPage": 15,
 		"initialSortOrder": "reverseChronological",
 		"displaySourceIcons": true,
@@ -170,6 +181,9 @@ conversations.config = {
 					"URL": "//live.echoenabled.com/v1/"
 				}
 			}
+		},
+		"FilePicker": {
+			"apiKey": "AFLWUBllDRwWZl7sQO1V1z"
 		}
 	},
 	"topMarkers": {
@@ -434,7 +448,7 @@ conversations.renderers.postComposer = function(element) {
 				"name": "URLResolver",
 				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs"),
 				"filePicker": {
-					"key": this.config.get("dependencies.filePickerApiKey"),
+					"key": this.config.get("dependencies.FilePicker.apiKey"),
 				"visible": this.config.get("postComposer.contentTypes.comments.attachments.visible"),
 				"sources": this.config.get("postComposer.contentTypes.comments.attachments.sources")
 				}
@@ -862,7 +876,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"name": "URLResolver",
 			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs"),
 			"filePicker": {
-				"key": this.config.get("dependencies.filePickerApiKey"),
+				"key": this.config.get("dependencies.FilePicker.apiKey"),
 				"visible": this.config.get("replyComposer.contentTypes.comments.attachments.visible"),
 				"sources": this.config.get("replyComposer.contentTypes.comments.attachments.sources")
 			}
