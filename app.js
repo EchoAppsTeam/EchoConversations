@@ -1229,7 +1229,7 @@ conversations.methods._triggerCounterUpdateEvent = function(data) {
 };
 
 conversations.css =
-	'.{class:streamHeader} { padding: 5px 0px; }' +
+	'.{class:streamHeader} { padding: 5px 0px; position: relative; z-index: 20; }' +
 	'.{class:streamTitle} { font-size: 14px; }' +
 	'.{class:streamCounter} { font-size: 14px; }' +
 
