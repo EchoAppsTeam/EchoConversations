@@ -64,7 +64,7 @@ plugin.init = function() {
 	// icon must be visible to show that the item is from Twitter
 	item.config.set("viaLabel.icon", true);
 
-	this.extendTemplate("insertBefore", "authorName", plugin.templates.date);
+	this.extendTemplate("replace", "date", plugin.templates.date);
 	this.extendTemplate("replace", "authorName", plugin.templates.username);
 	item.addButtonSpec(this.name, this._assembleButton("tweet"));
 	item.addButtonSpec(this.name, this._assembleButton("retweet"));
@@ -321,7 +321,6 @@ plugin.methods._extractTwitterID = function() {
 
 plugin.css =
 	".{plugin.class} .{class:avatar} a img { border: 0px; }" +
-	".{plugin.class} .{class:date} { display: none; }" +
 	".{plugin.class} .{class:data} a { text-decoration: none; }" +
 	".{plugin.class} .{class:data} a:hover { text-decoration: underline; }" +
 	".{plugin.class} .{class:modeSwitch} { margin-left: 6px; }" +
