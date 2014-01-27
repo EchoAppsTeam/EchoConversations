@@ -58,7 +58,7 @@ media.css =
 
 	// single cards
 	'.{class:container}.{class:single-card} { padding: 0px; border: 0px; }' +
-	'.{class:container}.{class:single-card} > div { max-width: 100%; }' +
+	'.{class:container}.{class:single-card} > div { max-width: 100%; display: block; }' +
 	'.{class:container}.{class:single-card} > div > div { margin-right: 0; }' +
 
 	// scrollbar
