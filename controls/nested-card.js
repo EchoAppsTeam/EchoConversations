@@ -349,7 +349,7 @@ card.css =
 	'.{class:article} .{class:sourceIcon} > img { padding: 10px 0 0 0; }' +
 	'.{class:article} .{class:articleTitle} > a { color: #42474A; font-weight: bold; }' +
 	'.{class:article} .{class:articleTitle} > a:hover { color: #42474A; }' +
-	'.{class:articleTitle} { margin-left: 10px; margin-top: 0px; line-height: 10px; }' +
+	'.{class:articleTitle} { margin-left: 10px; margin-top: 0px; line-height: 16px; }' +
 	'.{class:articleDescription} { margin-left: 10px; font-size: 13px; line-height: 16px; }' +
 	'.{class:articleThumbnail} { width: 30%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden; }' +
 	'.{class:articleThumbnail} img { width: auto; height: auto; max-height:120px; max-width:120px; }' +
