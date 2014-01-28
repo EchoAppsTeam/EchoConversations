@@ -175,7 +175,9 @@ plugin.events = {
 	"Echo.StreamServer.Controls.Stream.Item.onRender": function(topic, args) {
 		window.twttr && window.twttr.widgets && window.twttr.widgets.load();
 		$.map(this.component.buttons[this.name], function(name) {
-			name.element.unbind("click");
+			if (name && name.element) {
+				name.element.unbind("click");
+			}
 		});
 	}
 };
