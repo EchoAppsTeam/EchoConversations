@@ -908,7 +908,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			// because it should works for submit and item as well
 			"resolveURLs": this._getResolverSettingForEditPlugin(),
 			"filePicker": {
-				"key": this.config.get("dependencies.filePickerApiKey"),
+				"key": this.config.get("dependencies.FilePicker.apiKey"),
 				"visible": this.config.get("postComposer.contentTypes.comments.attachments.visible"),
 				"sources": this.config.get("postComposer.contentTypes.comments.attachments.sources")
 			}
