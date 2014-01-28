@@ -2,7 +2,7 @@
 	"version": 1,
 	"manifest": {
 		"id": "echo-conversations",
-		"name": "Conversations (Beta)"
+		"name": "Conversations"
 	},
 	"baseURL": "//cdn.echoenabled.com/apps/echo/conversations/v{%=packageVersions.stable%}"
 }
