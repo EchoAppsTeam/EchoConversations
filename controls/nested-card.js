@@ -76,7 +76,8 @@ card.templates.main = function() {
 };
 
 card.labels = {
-	"noMediaAvailable": "No media available"
+	"noMediaAvailable": "No media available",
+	"clickToExpand": "Click to expand"
 };
 
 
@@ -239,14 +240,15 @@ card.renderers.photoContainer = function(element) {
 			acc[key] = 'max-height ease 500ms';
 		});
 
-		element.addClass("echo-clickable");
-		element
+		element.addClass("echo-clickable")
+			.attr("title", this.labels.get("clickToExpand"))
 			.css("max-height", 250)
 			.one("click", function() {
-				element.css(transitionCss);
-				element.css("max-height", expandedHeight);
-				element.removeClass("echo-clickable");
-				element.addClass(expanded);
+				element.css(transitionCss)
+					.css("max-height", expandedHeight)
+					.removeClass("echo-clickable")
+					.addClass(expanded)
+					.attr("title", "");
 			});
 	} else {
 		element.css("max-height", expandedHeight);
