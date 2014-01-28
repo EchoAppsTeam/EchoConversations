@@ -211,12 +211,18 @@ card.renderers.photoThumbnail = function(element) {
 	var thumbnail = this.get("data.type") === "link"
 		? this.get("data.thumbnail_url")
 		: this.get("data.url");
-
-	return element.on("error", function() {
-		element.replaceWith(self.substitute({
+	// we are to create empty img tag because of IE.
+	// If we have an empty src attribute it triggers
+	// error event all the time.
+	var img = $("<img />");
+	img.attr("class", element.attr("class"))
+	.attr("title", element.attr("title"))
+	.error(function(e) {
+		img.replaceWith(self.substitute({
 			"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
 		}));
 	}).attr("src", thumbnail);
+	return element.replaceWith(img);
 };
 
 card.renderers.photoContainer = function(element) {
