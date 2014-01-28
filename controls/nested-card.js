@@ -166,7 +166,7 @@ card.renderers.avatar = function(element) {
 	if (isIE8) {
 		element.children()[0].style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.config.get("defaultAvatar") + "', sizingMethod='scale')";
 	}
-	return this.get("data.author_name") && this.config.get("displayAuthor")
+	return this.displayAuthor()
 		? element
 		: element.hide();
 };
@@ -268,9 +268,15 @@ card.renderers.photoLabelContainer = function(element) {
 	}
 	this.view.get("photoLabel").css("max-height", photoLabelHeight);
 
-	return this.get("data.description") || this.get("data.title")
-		? element
-		: element.hide();
+	if (!this.get("data.description") && !this.get("data.title")) {
+		element.hide();
+	} else {
+		this.view.get("photoContainer").css({
+			"min-height": (this.displayAuthor() ? 55 : 0) + photoLabelHeight,
+			"min-width": 200
+		});
+	}
+	return element;
 };
 
 /**
@@ -281,6 +287,10 @@ card.renderers.article = function(element) {
 		element.addClass(this.cssPrefix + "withoutPhoto");
 	}
 	return element;
+};
+
+card.methods.displayAuthor = function() {
+	return this.get("data.author_name") && this.config.get("displayAuthor");
 };
 
 card.methods.getRenderType = function() {
@@ -319,7 +329,7 @@ card.css =
 	'.{class:photo} { position: relative; left: 0; top: 0; zoom: 1; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
-	'.{class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; min-height: 120px; }' +
+	'.{class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; }' +
 
 	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
