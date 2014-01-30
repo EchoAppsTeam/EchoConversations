@@ -276,7 +276,7 @@ card.config.normalizer = {
 		entry.object.content_type = entry.object.content_type || "text";
 		entry.object.accumulators = entry.object.accumulators || {};
 		$.each(["repliesCount", "flagsCount", "likesCount"], function(i, name) {
-			entry.object.accumulators[name] = parseInt(entry.object.accumulators[name] || "0");
+			entry.object.accumulators[name] = parseInt(entry.object.accumulators[name] || "0", 10);
 		});
 		entry.object.context = entry.object.context || [];
 		entry.object.flags = entry.object.flags || [];
@@ -408,8 +408,8 @@ card.templates.mainHeader =
 									'<span class="{class:textToggleTruncated} echo-linkColor echo-clickable"></span>' +
 								'</div>' +
 								'<div class="{class:mediaContentContainer}">' +
-                					'<div class="{class:mediaContent}"></div>' +
-        						'</div>' +
+									'<div class="{class:mediaContent}"></div>' +
+								'</div>' +
 							'</div>' +
 							'<div class="{class:metadata}"></div>' +
 							'<div class="{class:footer} echo-secondaryColor echo-secondaryFont">' +
@@ -531,7 +531,7 @@ card.methods.template = function() {
 		? this.templates.childrenTop
 		: this.templates.childrenBottom
 	) +
-	this.templates.mainFooter
+	this.templates.mainFooter;
 };
 
 /**
@@ -637,7 +637,6 @@ card.renderers.container = function(element) {
 		: element.wrap(this.substitute({
 			"template": this._manifest("templates").wrapper
 		}));
-	return element;
 };
 
 /**
@@ -697,7 +696,7 @@ card.renderers.wrapper = function(element) {
  * @echo_renderer
  */
 card.renderers.avatar = function(element) {
-	this.placeImage({ 
+	this.placeImage({
 		"container": element,
 		"image": this.get("data.actor.avatar"),
 		"defaultImage": this.config.get("defaultAvatar")
@@ -1228,7 +1227,7 @@ card.renderers._dropdownButtons = function(element) {
 			});
 			if (button.entries) {
 				menuItem.addClass("dropdown-submenu");
-				assembleItems(menuItem, button.entries, true);
+				assembleCards(menuItem, button.entries, true);
 			}
 			menu.append(menuItem);
 		});
@@ -1459,8 +1458,8 @@ card.methods.block = function(label) {
 			"template": '<div class="{class:blocker-message}">{data:label}</div>',
 			"data": {"label": label}
 		})).css({
-			"left": ((parseInt(width) - 200)/2) + 'px',
-			"top": ((parseInt(height) - 20)/2) + 'px'
+			"left": ((parseInt(width, 10) - 200)/2) + 'px',
+			"top": ((parseInt(height, 10) - 20)/2) + 'px'
 		})
 	};
 	content.addClass("echo-relative")
@@ -1648,7 +1647,7 @@ card.methods._sortButtons = function() {
 	// if buttons order is not specified in application config, use default order
 	if (!requiredOrder) {
 		this.config.set("buttonsOrder", defaultOrder);
-	} else if (requiredOrder != defaultOrder) {
+	} else if (requiredOrder !== defaultOrder) {
 		var push = function(name, acc, pos) {
 			if (!self.get("buttons." + name)) return;
 			acc.push(name);
@@ -1661,7 +1660,7 @@ card.methods._sortButtons = function() {
 			if (/^(.*)\./.test(name)) {
 				push(name, acc);
 			} else {
-				var re = new RegExp("^" + name + "\.");
+				var re = new RegExp("^" + name + "\\.");
 				$.map(defaultOrder, function(n, i) {
 					if (n && n.match(re)) {
 						push(n, acc, i);
@@ -1772,7 +1771,7 @@ card.methods._sortButtons = function() {
 
 	var _autoLinking = function(text, extra) {
 		extra.textBeforeAutoLinking = text;
-		var self = this, url;
+		var url;
 		if (extra.source && extra.source !== "jskit" && extra.source !== "echo") {
 			url = this.depth
 				? this.get("data.target.id")

@@ -137,11 +137,11 @@ stream.config = {
 	 * <a href="http://echoplatform.com/streamserver/docs/rest-api/items-api/search/" target="_blank">"search" API</a>
 	 * method specification.
 	 *
-	 * 	new Echo.CardCollection({
-	 * 		"target": document.getElementById("echo-stream"),
-	 * 		"appkey": "echo.jssdk.demo.aboutecho.com",
-	 * 		"query" : "childrenof:http://example.com/test/*"
-	 * 	});
+	 *		new Echo.CardCollection({
+	 *			"target": document.getElementById("echo-stream"),
+	 *			"appkey": "echo.jssdk.demo.aboutecho.com",
+	 *			"query" : "childrenof:http://example.com/test/*"
+	 *		});
 	 */
 	"query": "",
 
@@ -210,16 +210,16 @@ stream.config = {
 	 * "More" button) are sorted only for that page and not for the whole list
 	 * of items.
 	 *
-	 * 	// sorting items in the content lexicographical order
-	 * 	var stream = new Echo.CardCollection({
-	 * 		...
-	 * 		"itemsComparator": function(listedItem, newItem, sort) {
-	 * 			return listedItem.get("data.object.content") > newItem.get("data.object.content")
-	 * 				? 1;
-	 * 				: -1;
-	 * 		},
-	 * 		...
-	 * 	});
+	 *		// sorting items in the content lexicographical order
+	 *		var stream = new Echo.CardCollection({
+	 *			...
+	 *			"itemsComparator": function(listedItem, newItem, sort) {
+	 *				return listedItem.get("data.object.content") > newItem.get("data.object.content")
+	 *					? 1;
+	 *					: -1;
+	 *			},
+	 *			...
+	 *		});
 	 *
 	 * @cfg {Echo.Card} itemsComparator.listedItem
 	 * Item from the list which is compared with new item.
@@ -501,7 +501,7 @@ stream.templates.main =
  * @echo_renderer
  */
 stream.renderers.body = function(element) {
-	var self = this, request = this.lastRequest;
+	var request = this.lastRequest;
 	if (!request) {
 		return element;
 	}
@@ -742,7 +742,6 @@ stream.methods._requestChildrenItems = function(unique) {
 			}));
 		},
 		"onData": function(data) {
-			var items = {};
 			item.set("data.nextPageAfter", data.nextPageAfter);
 			item.set("data.hasMoreChildren", data.hasMoreChildren);
 			data.entries = self._actualizeChildrenList(item, data.entries);
@@ -1018,15 +1017,15 @@ stream.methods._extractTimeframeConfig = function(data) {
 	var getComparator = function(value) {
 		var match = value.match(/^(<|>)(.*)$/);
 		var operation = match[1];
-		var value = match[2].match(/^'([0-9]+) seconds ago'$/);
+		value = match[2].match(/^'([0-9]+) seconds ago'$/);
 		var getTS = value
 			? function() { return Math.floor((new Date()).getTime() / 1000) - value[1]; }
 			: function() { return match[2]; };
 		if (operation === '<') {
-			return function(ts) { return ts < getTS(); }
+			return function(ts) { return ts < getTS(); };
 		}
 		if (operation === '>') {
-			return function(ts) { return ts > getTS(); }
+			return function(ts) { return ts > getTS(); };
 		}
 	};
 	var timeframe = Echo.Utils.foldl([], ["before", "after"], function(key, acc) {
@@ -1074,7 +1073,7 @@ stream.methods._appendRootItems = function(items, container) {
 stream.methods._constructChildrenSearchQuery = function(item) {
 	// depth for item children request
 	var depth = this.config.get("children.maxDepth") - item.get("depth") - 1;
-	var additionalItems = parseInt(this.config.get("children.additionalItemsPerPage"));
+	var additionalItems = parseInt(this.config.get("children.additionalItemsPerPage"), 10);
 	var pageAfter = item.getNextPageAfter();
 	var filter = this.config.get("children.filter");
 	var filterQuery = !filter || filter === "()" ? "" : filter + " ";
@@ -1082,7 +1081,7 @@ stream.methods._constructChildrenSearchQuery = function(item) {
 		"childrenof": item.get("data.object.id"),
 		"children": depth,
 		"childrenItemsPerPage": depth
-			? parseInt(this.config.get("children.itemsPerPage"))
+			? parseInt(this.config.get("children.itemsPerPage"), 10)
 			: 0,
 		"itemsPerPage": additionalItems,
 		"sortOrder": this.config.get("children.sortOrder"),
@@ -1093,12 +1092,12 @@ stream.methods._constructChildrenSearchQuery = function(item) {
 		return acc += (typeof value !== "undefined"
 			? predicate + ":" + value + " "
 			: ""
-		); 
+		);
 	}) + filterQuery;
 };
 
 stream.methods._handleInitialResponse = function(data, visualizer) {
-	var self = this, items = {}, roots = [];
+	var self = this, roots = [];
 	this.config.get("target").show();
 	this.nextSince = data.nextSince || 0;
 	this.nextPageAfter = data.nextPageAfter;
@@ -1264,7 +1263,7 @@ stream.methods._spotUpdates.add = function(item, options) {
 	// if we are trying to add an item which already exists,
 	// we should change the operation to "replace"
 	var _item = this.items[item.get("data.unique")];
-	if (_item && _item.view.rendered() && options.priority != "high") {
+	if (_item && _item.view.rendered() && options.priority !== "high") {
 		this._applySpotUpdates("replace", item, {"priority": "highest"});
 
 		return;
@@ -1300,7 +1299,7 @@ stream.methods._spotUpdates.replace = function(item, options) {
 		var container = $.extend([], items);
 		container.splice(oldIdx, 1);
 		var newIdx = this._getItemProjectedIndex(item, container, sort);
-		if (oldIdx != newIdx) {
+		if (oldIdx !== newIdx) {
 			this._applySpotUpdates("remove", item, {
 				"keepChildren": true,
 				"priority": "high"
@@ -1349,7 +1348,6 @@ stream.methods._spotUpdates.remove = function(item, options) {
 };
 
 stream.methods._spotUpdates.animate.add = function(item) {
-	var self = this;
 	this.activities.animations++;
 	if (this.timeouts.slide) {
 		// we should specify the element height explicitly
@@ -1579,7 +1577,7 @@ stream.methods._placeChildItems = function(parent, children) {
 		: parent.view.get("children");
 	var action = targetItemIdx >= 0
 		? "insertAfter"
-		: this.config.get("children.sortOrder") != "chronological" 
+		: this.config.get("children.sortOrder") !== "chronological"
 			? "prependTo"
 			: "appendTo";
 	itemsWrapper[action]($(targetItemDom));
@@ -1593,7 +1591,7 @@ stream.methods._placeChildItems = function(parent, children) {
 			"height": "show",
 			"marginTop": "show",
 			"marginBottom": "show",
-			"paddingTop": "show", 
+			"paddingTop": "show",
 			"paddingBottom": "show"
 		}, {
 			"duration": this.config.get("children.itemsSlideTimeout"),
@@ -1692,14 +1690,14 @@ stream.methods._addItemToList = function(items, item, sort) {
 };
 
 stream.methods._applyStructureUpdates = function(action, item, options) {
-	var self = this;
+	var parent, self = this;
 	options = options || {};
 	switch (action) {
 		case "add":
 			// adding item into the list
 			this.items[item.get("data.unique")] = item;
 			if (!item.isRoot()) {
-				var parent = this._getParentItem(item);
+				parent = this._getParentItem(item);
 
 				// avoiding problem with missing parent
 				if (!parent) {
@@ -1724,7 +1722,7 @@ stream.methods._applyStructureUpdates = function(action, item, options) {
 				? this.threads
 				: this.items[item.get("data.parentUnique")].get("children");
 			if (!item.isRoot() && container.length === 1) {
-				var parent = this._getParentItem(item);
+				parent = this._getParentItem(item);
 				if (parent) parent.set("threading", false);
 			}
 			container.splice(this._getItemListIndex(item, container), 1);
@@ -1756,7 +1754,7 @@ stream.methods._normalizeEntry = function(entry) {
 	entry.object.content_type = entry.object.content_type || "text";
 	entry.object.accumulators = entry.object.accumulators || {};
 	$.each(["repliesCount", "flagsCount", "likesCount"], function(i, name) {
-		entry.object.accumulators[name] = parseInt(entry.object.accumulators[name] || "0");
+		entry.object.accumulators[name] = parseInt(entry.object.accumulators[name] || "0", 10);
 	});
 	entry.object.context = entry.object.context || [];
 	entry.object.flags = entry.object.flags || [];
