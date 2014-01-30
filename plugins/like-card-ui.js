@@ -111,6 +111,7 @@ plugin.renderers.likedBy = function(element) {
 		return element.hide();
 	}
 
+	var visibleUsersCount = this.config.get("likesPerPage");
 	var youLike = false;
 	var userId = item.user.get("identityUrl");
 	var users = item.get("data.object.likes");
@@ -127,12 +128,8 @@ plugin.renderers.likedBy = function(element) {
 			"itemsPerPage": this.config.get("likesPerPage"),
 			"entries": users
 		},
-		"initialUsersCount": this.config.get("likesPerPage"),
-		"totalUsersCount": item.get("data.object.accumulators.likesCount"),
-		"item": {
-			"avatar": true,
-			"text": false
-		}
+		"initialUsersCount": visibleUsersCount,
+		"totalUsersCount": item.get("data.object.accumulators.likesCount")
 	});
 	config.plugins.push({
 		"name": "LikeCardUI",
@@ -245,24 +242,20 @@ plugin.methods._requestLoginPrompt = function() {
 };
 
 plugin.methods._assembleButton = function(name) {
-	var self = this;
+	var plugin = this;
 	var callback = function() {
 		var item = this;
-
 		var buttonHandler = function() {
-			var buttonNode = item.get("buttons." + self.name + "." + name + ".element");
-			buttonNode.off("click");
-			$("." + item.cssPrefix + "buttonCaption", buttonNode)
+			item.get("buttons." + plugin.name + "." + name + ".element")
+				.off("click")
+				.find("." + item.cssPrefix + "buttonCaption")
 				.empty()
-				.append(self.labels.get(name.toLowerCase() + "Processing"));
-			self._sendActivity(name, item);
+				.append(plugin.labels.get(name.toLowerCase() + "Processing"));
+			plugin._sendActivity(name, item);
 		};
-
 		if (!item.user.is("logged")) {
-			self.deferredActivity = function() {
-				buttonHandler();
-			};
-			self._requestLoginPrompt();
+			plugin.deferredActivity = buttonHandler;
+			plugin._requestLoginPrompt();
 		} else {
 			buttonHandler();
 		}
@@ -276,8 +269,9 @@ plugin.methods._assembleButton = function(name) {
 		return {
 			"name": name,
 			"icon": "icon-heart",
-			"label": self.labels.get(name.toLowerCase() + "Control"),
+			"label": plugin.labels.get(name.toLowerCase() + "Control"),
 			"visible": action === name,
+			"once": item.user.is("logged"),
 			"callback": callback
 		};
 	};
@@ -302,7 +296,6 @@ Echo.Plugin.create(plugin);
 var plugin = Echo.Plugin.manifest("LikeCardUI", "Echo.StreamServer.Controls.FacePile");
 
 if (Echo.Plugin.isDefined(plugin)) return;
-
 
 plugin.config = {
 	"displayStyle": "facepile"
@@ -440,8 +433,8 @@ plugin.component.renderers.avatar = function() {
 };
 
 plugin.css =
-	'.{plugin.class:pale} { opacity: 0.2; }' +
-	'.{plugin.class:adminUnlike} { cursor: pointer; position: absolute; top: 3px; left: 4px; opacity: 0.8; }';
+	'.{plugin.class:adminUnlike} { cursor: pointer; position: absolute; top: 3px; left: 4px; opacity: 0.8; }' +
+	'.{plugin.class:pale} { opacity: 0.2; }';
 
 Echo.Plugin.create(plugin);
 

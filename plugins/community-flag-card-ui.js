@@ -34,6 +34,7 @@ var plugin = Echo.Plugin.manifest("CommunityFlagCardUI", "Echo.StreamServer.Cont
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
+	this.extendTemplate("insertAsLastChild", "data", plugin.templates.main);
 	this.component.addButtonSpec("CommunityFlagCardUI", this._assembleButton("Flag"));
 	this.component.addButtonSpec("CommunityFlagCardUI", this._assembleButton("Unflag"));
 };
@@ -115,8 +116,8 @@ plugin.methods._assembleButton = function(name) {
 	var plugin = this;
 	var callback = function() {
 		var item = this;
-		var buttonNode = item.get("buttons." + plugin.name + "." + name + ".element");
-		$("." + item.cssPrefix + "buttonCaption", buttonNode)
+		item.get("buttons." + plugin.name + "." + name + ".element")
+			.find("." + item.cssPrefix + "buttonCaption")
 			.empty()
 			.append(plugin.labels.get(name.toLowerCase() + "Processing"));
 		var activity = {

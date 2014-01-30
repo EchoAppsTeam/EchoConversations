@@ -28,7 +28,7 @@ conversations.config = {
 			}
 		},
 		"confirmation": {
-			"enable": true,
+			"enabled": true,
 			"message": "Thanks, your post has been submitted for review",
 			"timeout": 5000,
 			"hidingTimeout": 300
@@ -252,9 +252,6 @@ conversations.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.js"
 }, {
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.css"
-}, {
-	"url": "{%= baseURL %}/third-party/jquery.embedly.js",
-	"loaded": function() { return !!$.fn.embedly; }
 }];
 
 conversations.events = {
@@ -411,8 +408,6 @@ conversations.renderers.content = function(element) {
 };
 
 conversations.renderers.postComposer = function(element) {
-	var config = this.config.get("postComposer");
-
 	if (!this._isComposerVisible("postComposer")) {
 		return element;
 	}
@@ -423,7 +418,7 @@ conversations.renderers.postComposer = function(element) {
 
 	this.initComponent({
 		"id": "postComposer",
-		"component": "Echo.StreamServer.Controls.Submit",
+		"component": "Echo.StreamServer.Controls.SubmitComposer",
 		"config": $.extend(true, {
 			"appkey": ssConfig.appkey,
 			"apiBaseURL": ssConfig.apiBaseURL,
@@ -433,6 +428,21 @@ conversations.renderers.postComposer = function(element) {
 			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
 			"markers": this._getSubmitMarkers(),
+			"confirmation": {
+				"enabled": this._isModerationRequired() && this.config.get("postComposer.confirmation.enabled")
+			},
+			"auth": this.config.get("auth"),
+			"submitPermissions": this._getSubmitPermissions(),
+			"plugins": this._mergeSpecsByName([{
+				"name": "URLResolver",
+				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs")
+			}, {
+				"name": "JanrainBackplaneHandler",
+				"appId": this.config.get("dependencies.Janrain.appId"),
+				"enabled": enableBundledIdentity,
+				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
+				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
+			}], this.config.get("postComposer.plugins")),
 			"data": {
 				"object": {
 					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
@@ -443,30 +453,7 @@ conversations.renderers.postComposer = function(element) {
 					Echo.Utils.set(Echo.Variables, targetURL, $(this).val());
 				});
 			}
-		}, this.config.get("postComposer"), {
-			"plugins": this._mergeSpecsByName([{
-				"name": "URLResolver",
-				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs"),
-				"filePicker": {
-					"key": this.config.get("dependencies.FilePicker.apiKey"),
-				"visible": this.config.get("postComposer.contentTypes.comments.attachments.visible"),
-				"sources": this.config.get("postComposer.contentTypes.comments.attachments.sources")
-				}
-			}, {
-				"name": "JanrainBackplaneHandler",
-				"appId": this.config.get("dependencies.Janrain.appId"),
-				"enabled": enableBundledIdentity,
-				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
-				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
-			}, $.extend(true, this.config.get("postComposer"), {
-				"name": "CardUIShim",
-				"submitPermissions": this._getSubmitPermissions(),
-				"confirmation": {
-					"enable": this._isModerationRequired() && this.config.get("postComposer.confirmation.enable")
-				},
-				"auth": this.config.get("auth")
-			})], config.plugins)
-		})
+		}, this.config.get("postComposer"))
 	});
 	return element;
 };
@@ -857,21 +844,27 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	var plugins = [{
 		"intentID": "Like",
 		"name": "LikeCardUI",
+		"item": {
+			"avatar": true,
+			"text": false
+		},
 		"displayStyle": config.likesDisplayStyle
 	}, {
 		"intentID": "CommunityFlag",
-		"name": "CommunityFlagCardUI"
+		"name": "CommunityFlagCardUI",
+		"showUserList": false
 	}, $.extend(true, {
-		"requestMethod": "POST"
-	}, this.config.get("replyComposer"), {
 		"intentID": "Reply",
 		"name": "ReplyCardUI",
 		"enabled": this._isComposerVisible("replyComposer"),
-		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
-		"pauseTimeout": +this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout"),
 		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
-		// TODO: pass markers through data
-		"extraMarkers": this._getSubmitMarkers(["topPost"]),
+		"pauseTimeout": +(this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout")),
+		"requestMethod": "POST",
+		"auth": this.config.get("auth"),
+		"confirmation": {
+			"enabled": this._isModerationRequired() && this.config.get("replyComposer.confirmation.enabled")
+		},
+		"submitPermissions": this._getSubmitPermissions(),
 		"nestedPlugins": this._mergeSpecsByName([{
 			"name": "URLResolver",
 			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs"),
@@ -886,15 +879,8 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"enabled": auth.enableBundledIdentity,
 			"authWidgetConfig": auth.authWidgetConfig,
 			"sharingWidgetConfig": auth.sharingWidgetConfig
-		}, $.extend(true, this.config.get("replyComposer"), {
-			"name": "CardUIShim",
-			"auth": this.config.get("auth"),
-			"confirmation": {
-				"enable": this._isModerationRequired() && this.config.get("replyComposer.confirmation.enable")
-			},
-			"submitPermissions": this._getSubmitPermissions()
-		})], this.config.get("replyComposer.plugins"))
-	}), {
+		}], this.config.get("replyComposer.plugins"))
+	}, this.config.get("replyComposer")), {
 		"intentID": "Sharing",
 		"name": "CardUISocialSharing"
 	}, {

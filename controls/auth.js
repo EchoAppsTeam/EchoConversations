@@ -1,12 +1,103 @@
 (function($) {
 "use strict";
 
+/**
+ * @class Echo.IdentityServer.Controls.CardUIAuth
+ * Echo Auth control displays the user login status and allows them to sign in using different social identities.
+ *
+ * 	var identityManager = {
+ * 		"title": "Title of the auth area"
+ * 		"width": 400,
+ * 		"height": 240,
+ * 		"url": "http://example.com/auth"
+ * 	};
+ *
+ * 	new Echo.IdentityServer.Controls.CardUIAuth({
+ * 		"target": document.getElementById("echo-auth"),
+ * 		"appkey": "echo.jssdk.demo.aboutecho.com",
+ * 		"identityManager": {
+ * 			"login": identityManager,
+ * 			"signup": identityManager
+ * 		}
+ * 	});
+ *
+ * More information regarding the possible ways of the Control initialization
+ * can be found in the [“How to initialize Echo components”](#!/guide/how_to_initialize_components-section-initializing-an-app) guide.
+ *
+ * @extends Echo.Control
+ *
+ * @package identityserver/controls.pack.js
+ * @package identityserver.pack.js
+ *
+ * @constructor
+ * Auth constructor initializing Echo.IdentityServer.Controls.CardUIAuth class.
+ *
+ * @param {Object} config
+ * Configuration options.
+ */
 var auth = Echo.Control.manifest("Echo.StreamServer.Controls.CardUIAuth");
 
 if (Echo.Control.isDefined(auth)) return;
 
+/** @hide @cfg submissionProxyURL */
+/** @hide @method placeImage */
+/** @hide @method getRelativeTime */
+/** @hide @echo_label justNow */
+/** @hide @echo_label today */
+/** @hide @echo_label yesterday */
+/** @hide @echo_label lastWeek */
+/** @hide @echo_label lastMonth */
+/** @hide @echo_label secondAgo */
+/** @hide @echo_label secondsAgo */
+/** @hide @echo_label minuteAgo */
+/** @hide @echo_label minutesAgo */
+/** @hide @echo_label hourAgo */
+/** @hide @echo_label hoursAgo */
+/** @hide @echo_label dayAgo */
+/** @hide @echo_label daysAgo */
+/** @hide @echo_label weekAgo */
+/** @hide @echo_label weeksAgo */
+/** @hide @echo_label monthAgo */
+/** @hide @echo_label monthsAgo */
+/** @hide @echo_label loading */
+/** @hide @echo_label retrying */
+/** @hide @echo_label error_busy */
+/** @hide @echo_label error_timeout */
+/** @hide @echo_label error_waiting */
+/** @hide @echo_label error_view_limit */
+/** @hide @echo_label error_view_update_capacity_exceeded */
+/** @hide @echo_label error_result_too_large */
+/** @hide @echo_label error_wrong_query */
+/** @hide @echo_label error_incorrect_appkey */
+/** @hide @echo_label error_internal_error */
+/** @hide @echo_label error_quota_exceeded */
+/** @hide @echo_label error_incorrect_user_id */
+/** @hide @echo_label error_unknown */
+
+/**
+ * @echo_event Echo.IdentityServer.Controls.CardUIAuth.onReady
+ * Triggered when the app initialization is finished completely.
+ */
+/**
+ * @echo_event Echo.IdentityServer.Controls.CardUIAuth.onRefresh
+ * Triggered when the app is refreshed. For example after the user
+ * login/logout action or as a result of the "refresh" function call.
+ */
+/**
+ * @echo_event Echo.IdentityServer.Controls.CardUIAuth.onRender
+ * Triggered when the app is rendered.
+ */
+/**
+ * @echo_event Echo.IdentityServer.Controls.CardUIAuth.onRerender
+ * Triggered when the app is rerendered.
+ */
+
 auth.config = {
 	"buttons": ["login", "signup"],
+	/**
+	 * @cfg {String} infoMessages
+	 * Customizes the look and feel of info messages, for example "loading" and "error".
+	 */
 	"infoMessages": {"enabled": false}
 };
 
@@ -18,16 +109,43 @@ auth.dependencies = [{
 }];
 
 auth.labels = {
+	/**
+	 * @echo_label
+	 */
 	"edit": "Edit",
+	/**
+	 * @echo_label
+	 */
 	"login": "Login",
+	/**
+	 * @echo_label
+	 */
 	"logout": "Logout",
+	/**
+	 * @echo_label
+	 */
 	"loggingOut": "Logging out...",
-	"switchIdentity": "Switch Identity",
+	/**
+	 * @echo_label
+	 */
 	"or": "or",
-	"via": "via",
-	"signup": "signup"
+	/**
+	 * @echo_label
+	 */
+	"signup": "signup",
+	/**
+	 * @echo_label
+	 */
+	"switchIdentity": "Switch Identity",
+	/**
+	 * @echo_label
+	 */
+	"via": "via"
 };
 
+/**
+ * @echo_template
+ */
 auth.templates.anonymous =
 	'<div class="{class:userAnonymous}">' +
 		'<span class="{class:login} echo-linkColor echo-clickable">' +
@@ -39,6 +157,9 @@ auth.templates.anonymous =
 		'</span>' +
 	'</div>';
 
+/**
+ * @echo_template
+ */
 auth.templates.logged =
 	'<div class="{class:userLogged}">' +
 		'<div class="{class:avatar}"><div class="{class:avatarElem}"></div></div>' +
@@ -49,18 +170,30 @@ auth.templates.logged =
 		'<div class="echo-clear"></div>' +
 	'</div>';
 
+/**
+ * @echo_renderer
+ */
 auth.renderers.via = function(element) {
 	return element.append(this.labels.get("via") + " " + this._detectAuthProvider());
 };
 
+/**
+ * @echo_renderer
+ */
 auth.renderers.login = function(element) {
 	return this._assembleIdentityControl("login", element);
 };
 
+/**
+ * @echo_renderer
+ */
 auth.renderers.signup = function(element) {
 	return this._assembleIdentityControl("signup", element);
 };
 
+/**
+ * @echo_renderer
+ */
 auth.renderers.or = function(element) {
 	var buttons = this.config.get("buttons");
 	if (!~$.inArray("login", buttons) ||
@@ -71,6 +204,9 @@ auth.renderers.or = function(element) {
 	return element;
 };
 
+/**
+ * @echo_renderer
+ */
 auth.renderers.avatarElem = function(element) {
 	var avatarURL = this.user.get("avatar");
 	if (!avatarURL) {
@@ -86,6 +222,9 @@ auth.renderers.avatarElem = function(element) {
 	return element;
 };
 
+/**
+ * @echo_renderer
+ */
 auth.renderers.name = function(element) {
 	var auth = this, isSwitchAssembled = false;
 
@@ -121,6 +260,12 @@ auth.renderers.name = function(element) {
 	return element;
 };
 
+/**
+ * Method to define which template should be used for general rendering procedure.
+ *
+ * @return {String}
+ * Control template.
+ */
 auth.methods.template = function() {
 	return this.templates[this.user.is("logged") ? "logged" : "anonymous"];
 };
