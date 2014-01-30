@@ -17,6 +17,7 @@ module.exports = function(grunt) {
 	var sources = {
 		"js": [
 			"app.js",
+			"sdk-derived/**/*.js",
 			"controls/*.js",
 			"plugins/*.js",
 			"dashboard.js",
@@ -129,9 +130,16 @@ module.exports = function(grunt) {
 			"dashboard": {
 				"src": [
 					"<%= dirs.build %>/dashboard.js",
-					"<%= dirs.build%>/dashboard/*.js"
+					"<%= dirs.build %>/dashboard/*.js"
 				],
 				"dest": "<%= dirs.build %>/dashboard.js"
+			},
+			"streamserver.pack": {
+				"src": [
+					"<%= dirs.build %>/sdk-derived/controls/*.js",
+					"<%= dirs.build %>/sdk-derived/plugins/*.js"
+				],
+				"dest": "<%= dirs.build %>/streamserver.pack.js"
 			},
 			"app": {
 				"src": [
@@ -160,7 +168,7 @@ module.exports = function(grunt) {
 				"jshintrc": ".jshintrc"
 			},
 			"grunt": ["Gruntfile.js", "grunt/**/*.js"],
-			"sources": ["<%= sources.js %>"]
+			"source": ["<%= sources.js %>"]
 		},
 		"release": {
 			"options": {
