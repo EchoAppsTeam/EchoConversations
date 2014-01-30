@@ -2,8 +2,8 @@
 "use strict";
 
 /**
- * @class Echo.StreamServer.Controls.Submit.Plugins.URLResolver
- * Extends Stream Item control to enable url media resoving.
+ * @class Echo.StreamServer.Controls.Stream.Item.Plugins.URLResolver
+ * Extends Stream Item control to enable media URL resolving.
  */
 var itemPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Stream.Item");
 
@@ -21,7 +21,6 @@ itemPlugin.init = function() {
 itemPlugin.component.renderers.body = function(element) {
 	var self = this;
 	var item = this.component;
-
 	var original = item.get("data.object.content");
 	var content = $("<div/>").append(original);
 	var media = self._getMediaAttachments();
@@ -43,7 +42,6 @@ itemPlugin.component.renderers.body = function(element) {
 	});
 
 	this.parentRenderer("body", arguments);
-
 	item.set("data.object.content", original);
 
 	return element;
