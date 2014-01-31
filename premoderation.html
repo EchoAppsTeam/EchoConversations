@@ -1,28 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Echo Conversations v{%=packageVersions.stable%} Demo</title>
+	<title>Echo Conversations v{%=packageVersions.stable%} Demo (premoderation mode is enabled)</title>
 </head>
 
 <body>
 
-<script type="text/javascript" src="http://cdn.echoenabled.com/sdk/v3/loader.js"></script>
+	<script type="text/javascript" src="http://cdn.echoenabled.com/sdk/v3/loader.js"></script>
 
-<div id="container" style="margin: 0px auto; width: 50%; max-width: 440px;"></div>
+	<div class="echo-canvas" data-canvas-id="echo/c996p4ynqs" data-canvas-mode="dev" style="margin: 0px auto; width: 50%; max-width: 440px;"></div>
 
-<script type="text/javascript">
-	Echo.Loader.initApplication({
-		"script": "{%=baseURL%}/app.js",
-		"component": "Echo.Apps.Conversations",
-		"backplane": {
-			"serverBaseURL": "https://api.echoenabled.com/v1",
-			"busName": "jskit"
-		},
-		"config": {
-			"target": document.getElementById("container"),
-			"targetURL": "http://echoplatform.com/test/conversations",
+	<script type="text/javascript">
+
+		Echo.Loader.override("echo/c996p4ynqs", "2ghkabb5s0", {
 			"streamingControl": {
 				"displayStreamingStateHeader": true
+			},
+			"postComposer": {
+				"contentTypes": {
+					"comments": {
+						"attachments": {"visible": true}
+					}
+				}
+			},
+			"replyComposer": {
+				"contentTypes": {
+					"comments": {
+						"attachments": {"visible": true}
+					}
+				}
 			},
 			"auth": {
 				"allowAnonymousSubmission": true
@@ -34,14 +40,12 @@
 						"approvedUserBypass": true
 					}
 				}
-			},
-			"dependencies": {
-				"Janrain": {"appId": "echo"},
-				"StreamServer": {"appkey": "echo.jssdk.demo.aboutecho.com"}
 			}
-		}
-	});
-</script>
+		});
+
+		Echo.Loader.init();
+
+	</script>
 
 </body>
 </html>
