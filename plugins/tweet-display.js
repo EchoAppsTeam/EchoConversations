@@ -4,7 +4,7 @@
 var $ = jQuery;
 
 /**
- * @class Echo.StreamServer.Controls.Stream.Item.Plugins.TweetDisplay
+ * @class Echo.StreamServer.Controls.Stream.Item.Plugins.TweetDisplayCardUI
  * Adds the Twitter intents controls into the item UI and updates the
  * item UI to look and behave like a Twitter item. The item UI update includes:
  *
@@ -24,7 +24,7 @@ var $ = jQuery;
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
- * 			"name": "TweetDisplay"
+ * 			"name": "TweetDisplayCardUI"
  * 		}]
  * 	});
  *
@@ -32,7 +32,7 @@ var $ = jQuery;
  * work correctly. If {@link Echo.StreamServer.Controls.Stream.Plugins.PinboardVisualization PinboardVisualization}
  * plugin is also enabled in the Stream then this plugin must be placed right after it.
  *
- * <b>Note</b>: if TweetDisplay plugin is added to the stream then Reply and
+ * <b>Note</b>: if TweetDisplayCardUI plugin is added to the stream then Reply and
  * Like plugins will be disabled for tweet items. Moreover Reply control is
  * renamed with Comment on non-tweet items to avoid possible confusion.
  *
@@ -44,7 +44,7 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("TweetDisplay", "Echo.StreamServer.Controls.Stream.Item");
+var plugin = Echo.Plugin.manifest("TweetDisplayCardUI", "Echo.StreamServer.Controls.Stream.Item");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 

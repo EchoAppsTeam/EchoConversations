@@ -823,7 +823,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"displayTopPostHighlight": config.displayTopPostHighlight,
 		"initialIntentsDisplayMode": this.config.get(componentID + ".initialIntentsDisplayMode")
 	}, {
-		"name": "TweetDisplay"
+		"name": "TweetDisplayCardUI"
 	}, {
 		"name": "ItemEventsProxy",
 		"onAdd": function() {
