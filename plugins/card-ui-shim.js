@@ -666,7 +666,7 @@ plugin.css =
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} div { height: 36px; width: 36px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 18px; }' +
-	'.{plugin.class} .{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
+	'.{plugin.class} .{class:depth-0} .{class:frame} { margin-left: -58px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:childrenMarker} { display: none; }' +
 	'.{plugin.class} .{class:depth-0} .{plugin.class:header-box} { height: 36px; margin-right: 18px; margin-left: 45px; }' +
 	'.{plugin.class} .{class:depth-0} .{plugin.class:header-box}:before { content: ""; display: inline-block; height: 100%; vertical-align: middle; }' +

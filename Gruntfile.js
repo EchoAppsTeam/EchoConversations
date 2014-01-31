@@ -136,6 +136,7 @@ module.exports = function(grunt) {
 			},
 			"streamserver.pack": {
 				"src": [
+					"<%= dirs.build %>/sdk-derived/url-resolver.js",
 					"<%= dirs.build %>/sdk-derived/controls/*.js",
 					"<%= dirs.build %>/sdk-derived/plugins/*.js"
 				],

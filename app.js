@@ -248,6 +248,9 @@ conversations.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js",
 	"control": "Echo.StreamServer.Controls.Stream"
 }, {
+	"url": "{%= baseURL %}/streamserver.pack.js",
+	"control": "Echo.StreamServer.Controls.SubmitComposer"
+}, {
 	"loaded": function() { return !!Echo.GUI; },
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.js"
 }, {
@@ -415,11 +418,14 @@ conversations.renderers.postComposer = function(element) {
 	var targetURL = this.config.get("targetURL");
 	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	var ssConfig = this.config.get("dependencies.StreamServer");
+	var postComposer = $.extend(true, {}, this.config.get("postComposer"));
+	var plugins = postComposer.plugins;
+	delete postComposer.plugins;
 
 	this.initComponent({
 		"id": "postComposer",
 		"component": "Echo.StreamServer.Controls.SubmitComposer",
-		"config": $.extend(true, {
+		"config": $.extend(true, postComposer, {
 			"appkey": ssConfig.appkey,
 			"apiBaseURL": ssConfig.apiBaseURL,
 			"submissionProxyURL": ssConfig.submissionProxyURL,
@@ -429,31 +435,33 @@ conversations.renderers.postComposer = function(element) {
 			"infoMessages": {"enabled": false},
 			"markers": this._getSubmitMarkers(),
 			"confirmation": {
-				"enabled": this._isModerationRequired() && this.config.get("postComposer.confirmation.enabled")
+				"enabled": this._isModerationRequired() && postComposer.confirmation.enabled
 			},
 			"auth": this.config.get("auth"),
 			"submitPermissions": this._getSubmitPermissions(),
-			"plugins": this._mergeSpecsByName([{
+			"plugins": this._mergeSpecsByName([/*{
 				"name": "URLResolver",
 				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs")
+			},*/ {
+				"name": "LinkComposer"
 			}, {
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
 				"enabled": enableBundledIdentity,
 				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
 				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
-			}], this.config.get("postComposer.plugins")),
+			}], plugins),
 			"data": {
 				"object": {
 					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
 				}
 			},
 			"ready": function() {
-				this.view.get("text").on("change", function() {
+				/*this.view.get("text").on("change", function() {
 					Echo.Utils.set(Echo.Variables, targetURL, $(this).val());
-				});
+				});*/
 			}
-		}, this.config.get("postComposer"))
+		})
 	});
 	return element;
 };
@@ -840,6 +848,9 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	var auth = this.config.get("auth");
 	var config = this.config.get(componentID);
+	var replyComposer = $.extend(true, {}, this.config.get("replyComposer"));
+	var composerPlugins = replyComposer.plugins;
+	delete replyComposer.plugins;
 
 	var plugins = [{
 		"intentID": "Like",
@@ -853,19 +864,19 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"intentID": "CommunityFlag",
 		"name": "CommunityFlagCardUI",
 		"showUserList": false
-	}, $.extend(true, {
+	}, $.extend(true, replyComposer, {
 		"intentID": "Reply",
-		"name": "ReplyCardUI",
+		"name": "ReplySC",
 		"enabled": this._isComposerVisible("replyComposer"),
 		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
-		"pauseTimeout": +(this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout")),
+		"pauseTimeout": +(this._isModerationRequired() && replyComposer.confirmation.timeout),
 		"requestMethod": "POST",
 		"auth": this.config.get("auth"),
 		"confirmation": {
-			"enabled": this._isModerationRequired() && this.config.get("replyComposer.confirmation.enabled")
+			"enabled": this._isModerationRequired() && replyComposer.confirmation.enabled
 		},
 		"submitPermissions": this._getSubmitPermissions(),
-		"nestedPlugins": this._mergeSpecsByName([{
+		"nestedPlugins": this._mergeSpecsByName([/*{
 			"name": "URLResolver",
 			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs"),
 			"filePicker": {
@@ -873,22 +884,24 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 				"visible": this.config.get("replyComposer.contentTypes.comments.attachments.visible"),
 				"sources": this.config.get("replyComposer.contentTypes.comments.attachments.sources")
 			}
+		}, */{
+			"name": "LinkComposer"
 		}, {
 			"name": "JanrainBackplaneHandler",
 			"appId": this.config.get("dependencies.Janrain.appId"),
 			"enabled": auth.enableBundledIdentity,
 			"authWidgetConfig": auth.authWidgetConfig,
 			"sharingWidgetConfig": auth.sharingWidgetConfig
-		}], this.config.get("replyComposer.plugins"))
-	}, this.config.get("replyComposer")), {
+		}], composerPlugins)
+	}), {
 		"intentID": "Sharing",
 		"name": "CardUISocialSharing"
 	}, {
 		"intentID": "Edit",
-		"name": "Edit",
+		"name": "EditSC",
 		"icon": "icon-pencil", // TODO: get rid of it when new buttons protocol will be implemented
 		"requestMethod": "POST",
-		"nestedPlugins": [{
+		"nestedPlugins": [/*{
 			"name": "URLResolver",
 			// we enable resolving through separate parameter
 			// because it should works for submit and item as well
@@ -898,6 +911,8 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 				"visible": this.config.get("postComposer.contentTypes.comments.attachments.visible"),
 				"sources": this.config.get("postComposer.contentTypes.comments.attachments.sources")
 			}
+		}*/{
+			"name": "LinkComposer"
 		}]
 	}];
 
