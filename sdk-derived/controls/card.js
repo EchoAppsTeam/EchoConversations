@@ -77,7 +77,6 @@ card.dependencies = [{
 card.events = {
 	"Echo.Card.onRender": function() {
 		this._pageLayoutChange();
-		this._resizeMediaContent();
 	},
 	"Echo.CardsCollection.onActivitiesComplete": function() {
 		this._pageLayoutChange();
@@ -107,18 +106,11 @@ card.events = {
 				$(document).on("scroll", fade).on("resize", fade);
 			}
 		}
-	},
-	"Echo.CardsCollection.onReady": function() {
-		this._resizeMediaContent();
-	},
-	"Echo.Card.onReady": function() {
-		this._resizeMediaContent();
 	}
 };
 
 card.init = function() {
 	this.timestamp = Echo.Utils.timestampFromW3CDTF(this.get("data.object.published"));
-	this._prepareMediaContent();
 	this.ready();
 	if (!this.config.get("manualRendering")) {
 		this.render();
@@ -308,7 +300,8 @@ card.vars = {
 	"buttonSpecs": {},
 	"buttons": {},
 	"buttonsLayout": "inline",
-	"media": []
+	"media": [],
+	"content": undefined
 };
 
 card.labels = {
@@ -837,26 +830,26 @@ card.renderers.textToggleTruncated = function(element) {
  */
 card.renderers.body = function(element) {
 	var self = this;
-	var original = this.get("data.object.content");
-	var content = $("<div/>").append(original);
-	var media = this._getMediaAttachments();
-	$("div[oembed], div[data-oembed]", content).remove();
+	var itemContent = this.get("data.object.content");
+	var media = self._getMediaAttachments();
+
+	Echo.Utils.safelyExecute(function() {
+		var content = $("<div/>").append(itemContent);
+		var text = $(".echo-item-text", content);
+		if (media.length && text.length) {
+			itemContent = text.html();
+		} else if (media.length) {
+			itemContent = content.html();
+		}
+	});
 
 	// hide all item content if item type is article, photo or video
 	// and item has media attachments
 	if (media.length && this._getItemRenderType()) {
-		element.hide();
+		return element.hide();
 	}
 
-	Echo.Utils.safelyExecute(function() {
-		var text = $(".echo-item-text", content);
-		if (media.length && text.length) {
-			self.set("data.object.content", text.html());
-		} else if (media.length) {
-			self.set("data.object.content", content.html());
-		}
-	});
-	var data = [this.get("data.object.content"), {
+	var data = [itemContent, {
 		"source": this.get("data.source.name"),
 		"limits": this.config.get("limits"),
 		"contentTransformations": this.config.get("contentTransformations." + this.get("data.object.content_type"), {}),
@@ -875,7 +868,6 @@ card.renderers.body = function(element) {
 	Echo.Utils.safelyExecute(textElement.append, text, textElement);
 	this.view.get("textEllipses")[!truncated || this.textExpanded ? "hide" : "show"]();
 	this.view.get("textToggleTruncated")[truncated || this.textExpanded ? "show" : "hide"]();
-	this.set("data.object.content", original);
 	return element;
 };
 
@@ -1012,7 +1004,7 @@ card.renderers._childrenContainer = function(element, config) {
 };
 
 card.renderers.mediaContentContainer = function(element) {
-	var media = this.get("media", []);
+	var media = this._getMediaAttachments();
 	return element.addClass(this.cssPrefix + (media.length > 1 ? "multiple" : "single"));
 };
 
@@ -1265,28 +1257,20 @@ card.methods._transitionSupported = function() {
 	return cache.transitionSupported;
 };
 
-card.methods._prepareMediaContent = function() {
+card.methods._getMediaAttachments = function() {
 	var self = this;
-	Echo.Utils.safelyExecute(function() {
-		var fragment = $("<div/>").append(self.get("data.object.content"));
-		var attachments = fragment.find(".echo-card-files");
-		var media = $.map(attachments.find("div[oembed]"), function(item) {
-			return JSON.parse($(item).attr("oembed"));
+	//TODO: get rid of "content" and clean "media" if item content was updated
+	if (this.get("content") !== this.get("data.object.content") || typeof this.get("media") === "undefined") {
+		var result = [];
+		Echo.Utils.safelyExecute(function() {
+			var content = $("<div/>").append(self.get("data.object.content"));
+			result = $("div[oembed], div[data-oembed]", content).map(function() {
+				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
+			}).get();
 		});
-		if (media.length) {
-			attachments.remove();
-			self.set("data.object.content", fragment.html());
-			self.set("media", media);
-		}
-	});
-};
-
-card.methods._resizeMediaContent = function() {
-	var media = this.view.get("mediaContentContainer");
-	if (media && media.is(":visible")) {
-		this.config.set("mediaWidth", media.outerWidth() * 0.9);
-		this.view.render({"name": "mediaContent"});
+		this.set("media", result);
 	}
+	return this.get("media", []);
 };
 
 card.methods._getItemRenderType = function() {
