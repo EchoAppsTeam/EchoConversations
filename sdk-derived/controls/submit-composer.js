@@ -464,8 +464,10 @@ composer.templates.main =
 		'</div>' +
 		'<div class="{class:controls}">' +
 			'<div class="{class:postButtonWrapper}">' +
-				'<button class="btn btn-primary {class:postButton}"></button>' +
-				'<button class="btn btn-primary dropdown-toggle {class:postButtonSwitcher}" data-toggle="dropdown"><span class="caret"></span></button>' +
+				'<div class="btn btn-primary {class:postButton}"></div>' +
+				'<div class="btn btn-primary dropdown-toggle {class:postButtonSwitcher}" data-toggle="dropdown">' +
+					'<span class="caret"></span>' +
+				'</div>' +
 				'<ul class="dropdown-menu pull-right">' +
 					'<li><a href="#" class="{class:switchToPost}">{label:post}</a></li>' +
 					'<li><a href="#" class="{class:switchToPostAndShare}">{label:postAndShare}</a></li>' +
@@ -715,11 +717,10 @@ composer.renderers.postButtonWrapper = function(element) {
  * @echo_renderer
  */
 composer.renderers.postButtonSwitcher = function(element) {
-	var action = this.config.get("displaySharingOnPost")
-		? "show"
-		: "hide";
-	element[action]();
-	action = this.postButtonState === "disabled"
+	if (!this.config.get("displaySharingOnPost")) {
+		element.hide();
+	}
+	var action = this.postButtonState === "disabled"
 		? "addClass"
 		: "removeClass";
 	return element[action]("disabled");
@@ -1239,6 +1240,7 @@ composer.methods._isAutoSharingEnabled = function(state) {
 };
 
 composer.methods._share = function(data) {
+	// XXX: garantee that first element is "post" and ignore "update"
 	var item = data.postData.content[0];
 	var payload = {
 		"origin": "item",
@@ -1388,12 +1390,12 @@ composer.css =
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"] { width: 100%; border: 0; padding: 0px; outline: 0; box-shadow: none; margin-bottom: 0px; }' +
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"]:focus { outline: 0; box-shadow: none; }' +
 	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 0px 1px; }' +
-	'.{class:controls} { margin: 0px; padding: 5px; border: 1px solid #dedede; background-color: transparent; }' +
+	'.{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; background-color: transparent; }' +
 	'.{class:confirmation} { margin-bottom: 10px; display: none; }' +
 	'.{class:attachers} { display: none; margin: 5px; float: left; }' +
-	'.{class:postButtonWrapper} { float: right; }' +
+	'.{class:postButtonWrapper} { float: right; font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; }' +
 	'.{class:postButtonWrapper} .dropdown-menu { min-width: 100px; }' +
-	'.{class:postButton} { padding: 3px 12px 5px 12px; }' +
+	'.{class:postButtonWrapper} .{class:postButton}.btn { padding: 3px 12px 5px 12px; }' +
 	'.{class:tagsContainer} { display: none !important; }' +
 	'.{class:markersContainer} { display: none !important; }' +
 	'.{class:border} { border: 1px solid #d2d2d2; }' +
