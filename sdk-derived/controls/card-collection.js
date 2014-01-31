@@ -445,6 +445,11 @@ stream.labels = {
 	"newItems": "new items"
 };
 
+stream.dependencies = [{
+	"loaded": function() { return !!Echo.Card; },
+	"url": "{%=baseURL%}/sdk-derived/controls/card.js"
+}];
+
 stream.events = {
 	"Echo.CardCollection.onItemsRenderingComplete": function() {
 		this.view.render({"name": "more"});

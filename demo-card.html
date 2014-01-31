@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Echo Card Demo</title>
+</head>
+
+<body>
+
+<script type="text/javascript" src="http://cdn.echoenabled.com/sdk/v3/loader.js"></script>
+
+<div id="container" style="margin: 0px auto; width: 50%; max-width: 440px;"></div>
+
+<script type="text/javascript">
+	Echo.Loader.initApplication({
+		"script": "{%=baseURL%}/streamserver.pack.js",
+		"component": "Echo.Card",
+		"backplane": {
+			"serverBaseURL": "https://api.echoenabled.com/v1",
+			"busName": "jskit"
+		},
+		"config": {
+			"target": document.getElementById("container"),
+			"appkey": "echo.jssdk.demo.aboutecho.com",
+			"parent": {
+				"children": {
+					"maxDepth": 2
+				}
+			},
+			"plugins": [{
+				"name": "Reply"
+			}, {
+				"name": "Like"
+			}],
+			"data": {
+				"id": "http://js-kit.com/activities/post/6afd6175b85557e5a36243378501608c",
+				"actor": {
+					"links": [],
+					"objectTypes": [
+						"http://activitystrea.ms/schema/1.0/person"
+					],
+					"id": "https://google.com/accounts/o8/id?id=AItOawnK3Z2lM9uKgGFM7qD4hsx4ms0U0bJQCVw",
+					"title": "chris.saad",
+					"status": "ModeratorApproved",
+					"markers": [],
+					"roles": []
+				},
+				"object": {
+					"id": "http://echoplatform.com/ECHO/item/1389105911-43-785",
+					"objectTypes": [
+						"http://activitystrea.ms/schema/1.0/comment"
+					],
+					"permalink": "",
+					"context": [
+						{
+							"uri": "http://echoplatform.com/test/conversations"
+						}
+					],
+					"content": "<div class=\"echo-item-text\">How are you? \n\nhttp://www.youtube.com/watch?v=WH8mwZDlTNM\nhttp://www.youtube.com/watch?v=NnKmKn9YbX0\n</div><div class=\"echo-item-files\"><div class=\"echo-media-item\" oembed=\"{&quot;provider_url&quot;:&quot;http://youtube.com&quot;,&quot;description&quot;:&quot;SUBSCRIBE for more series like this: http://bit.ly/CrackleSub Episode Synopsis: Jerry Seinfeld (Seinfeld) and his special guest, Louis C.K. (Louie), drive a 1959 Fiat Jolly to Louie&#39;s boat for some&quot;,&quot;title&quot;:&quot;Louis C.K.: Comedy, Sex and The Blues Numbers | Comedians in Cars Getting Coffee | Crackle&quot;,&quot;thumbnail_width&quot;:480,&quot;height&quot;:480,&quot;width&quot;:854,&quot;html&quot;:&quot;&lt;iframe class=\\&quot;embedly-embed\\&quot; src=\\&quot;//cdn.embedly.com/widgets/media.html?src=http%3A%2F%2Fwww.youtube.com%2Fembed%2FWH8mwZDlTNM&amp;url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DWH8mwZDlTNM&amp;image=http%3A%2F%2Fi.ytimg.com%2Fvi%2FWH8mwZDlTNM%2Fhqdefault.jpg&amp;key=8ded698289204c8c8348c08314a0c250&amp;type=text%2Fhtml&amp;schema=youtube\\&quot; width=\\&quot;854\\&quot; height=\\&quot;480\\&quot; scrolling=\\&quot;no\\&quot; frameborder=\\&quot;0\\&quot; allowfullscreen&gt;&lt;/iframe&gt;&quot;,&quot;url&quot;:&quot;http://www.youtube.com/watch?v=WH8mwZDlTNM&quot;,&quot;version&quot;:&quot;1.0&quot;,&quot;provider_name&quot;:&quot;YouTube&quot;,&quot;thumbnail_url&quot;:&quot;http://i.ytimg.com/vi/WH8mwZDlTNM/hqdefault.jpg&quot;,&quot;type&quot;:&quot;video&quot;,&quot;thumbnail_height&quot;:360,&quot;original_url&quot;:&quot;http://www.youtube.com/watch?v=WH8mwZDlTNM&quot;,&quot;invalid&quot;:false}\"><div class=\"echo-item-video\"><iframe src=\"//cdn.embedly.com/widgets/media.html?src=http%3A%2F%2Fwww.youtube.com%2Fembed%2FWH8mwZDlTNM&url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DWH8mwZDlTNM&image=http%3A%2F%2Fi.ytimg.com%2Fvi%2FWH8mwZDlTNM%2Fhqdefault.jpg&key=8ded698289204c8c8348c08314a0c250&type=text%2Fhtml&schema=youtube\" width=\"854\" height=\"480\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\"></iframe></div></div><div class=\"echo-media-item\" oembed=\"{&quot;provider_url&quot;:&quot;http://youtube.com&quot;,&quot;description&quot;:&quot;Starting in 2014 Crackle movies &amp; shows will be available only at http://bit.ly/CrackleDotCom. Create a free Crackle account for full access here: http://bit.ly/CrackleSignUp&quot;,&quot;title&quot;:&quot;Chris Rock: Kids Need Bullying | Comedians In Cars Getting Coffee | Crackle&quot;,&quot;thumbnail_width&quot;:480,&quot;height&quot;:480,&quot;width&quot;:854,&quot;html&quot;:&quot;&lt;iframe class=\\&quot;embedly-embed\\&quot; src=\\&quot;//cdn.embedly.com/widgets/media.html?src=http%3A%2F%2Fwww.youtube.com%2Fembed%2FNnKmKn9YbX0&amp;url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DNnKmKn9YbX0&amp;image=http%3A%2F%2Fi.ytimg.com%2Fvi%2FNnKmKn9YbX0%2Fhqdefault.jpg&amp;key=8ded698289204c8c8348c08314a0c250&amp;type=text%2Fhtml&amp;schema=youtube\\&quot; width=\\&quot;854\\&quot; height=\\&quot;480\\&quot; scrolling=\\&quot;no\\&quot; frameborder=\\&quot;0\\&quot; allowfullscreen&gt;&lt;/iframe&gt;&quot;,&quot;url&quot;:&quot;http://www.youtube.com/watch?v=NnKmKn9YbX0&quot;,&quot;version&quot;:&quot;1.0&quot;,&quot;provider_name&quot;:&quot;YouTube&quot;,&quot;thumbnail_url&quot;:&quot;http://i.ytimg.com/vi/NnKmKn9YbX0/hqdefault.jpg&quot;,&quot;type&quot;:&quot;video&quot;,&quot;thumbnail_height&quot;:360,&quot;original_url&quot;:&quot;http://www.youtube.com/watch?v=NnKmKn9YbX0&quot;,&quot;invalid&quot;:false}\"><div class=\"echo-item-video\"><iframe src=\"//cdn.embedly.com/widgets/media.html?src=http%3A%2F%2Fwww.youtube.com%2Fembed%2FNnKmKn9YbX0&url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DNnKmKn9YbX0&image=http%3A%2F%2Fi.ytimg.com%2Fvi%2FNnKmKn9YbX0%2Fhqdefault.jpg&key=8ded698289204c8c8348c08314a0c250&type=text%2Fhtml&schema=youtube\" width=\"854\" height=\"480\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\"></iframe></div></div></div>",
+					"content_type": "html",
+					"status": "Untouched",
+					"published": "2014-01-07T14:45:11Z"
+				},
+				"source": {
+					"name": "jskit",
+					"uri": "http://aboutecho.com/",
+					"icon": "http://cdn.js-kit.com/images/echo.png"
+				},
+				"provider": {
+					"name": "echo",
+					"uri": "http://aboutecho.com/",
+					"icon": "http://cdn.echoenabled.com/images/echo.png"
+				},
+				"verbs": [
+					"http://activitystrea.ms/schema/1.0/post"
+				],
+				"postedTime": "2014-01-07T14:45:11Z",
+				"targets": [
+					{
+						"id": "http://echoplatform.com/test/conversations",
+						"conversationID": "http://echoplatform.com/ECHO/item/1389105911-43-785"
+					}
+				],
+				"pageAfter": "1389105911.0063739",
+				"hasMoreChildren": "false"
+			}
+		}
+	});
+</script>
+</body>
+</html>

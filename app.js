@@ -246,7 +246,7 @@ conversations.config.normalizer = {
 
 conversations.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js",
-	"control": "Echo.StreamServer.Controls.Stream"
+	"control": "Echo.StreamServer.Controls.Counter"
 }, {
 	"url": "{%= baseURL %}/streamserver.pack.js",
 	"control": "Echo.StreamServer.Controls.SubmitComposer"
@@ -258,7 +258,7 @@ conversations.dependencies = [{
 }];
 
 conversations.events = {
-	"Echo.StreamServer.Controls.Stream.onActivitiesCountChange": function(_, data) {
+	"Echo.CardCollection.onActivitiesCountChange": function(_, data) {
 		var allPosts = this.getComponent("allPosts");
 		// display activities for 'allPosts' section only.
 		if (allPosts && allPosts.config.get("context") === data.context) {
@@ -494,7 +494,7 @@ conversations.renderers.topPosts = function(element) {
 	if (this.config.get("topPosts.visible")) {
 		this.initComponent({
 			"id": "topPosts",
-			"component": "Echo.StreamServer.Controls.Stream",
+			"component": "Echo.CardCollection",
 			"config": this._assembleStreamConfig("topPosts", {
 				"onItemAdd": function() {
 					self.view.render({"name": "topPostsContainer"});
@@ -555,7 +555,7 @@ conversations.renderers._allPosts = function(element, extra) {
 	});
 	var component = this.initComponent({
 		"id": "allPosts",
-		"component": "Echo.StreamServer.Controls.Stream",
+		"component": "Echo.CardCollection",
 		"config": this._assembleStreamConfig("allPosts", {
 			"target": $("<div>")
 		})
@@ -613,7 +613,7 @@ conversations.renderers._tabs = function(element, extra) {
 			}));
 			var component = self.initComponent({
 				"id": tab.name,
-				"component": "Echo.StreamServer.Controls.Stream",
+				"component": "Echo.CardCollection",
 				"config": self._assembleStreamConfig(tab.name, {
 					"target": $("<div>")
 				})
@@ -808,7 +808,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"enabled": auth.enableBundledIdentity,
 		"authWidgetConfig": auth.authWidgetConfig,
 		"sharingWidgetConfig": auth.sharingWidgetConfig
-	}, {
+	}, /*{
 		"name": "CardUIShim",
 		"topPost": {
 			"visible": config.displayTopPostHighlight,
@@ -817,7 +817,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"collapsedContentHeight": this.config.get(componentID + ".collapsedContentHeight"),
 		"displayTopPostHighlight": config.displayTopPostHighlight,
 		"initialIntentsDisplayMode": this.config.get(componentID + ".initialIntentsDisplayMode")
-	}, {
+	}, */{
 		"name": "TweetDisplay"
 	}, {
 		"name": "ItemEventsProxy",
@@ -834,9 +834,9 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 	}, {
 		"name": "ItemsRollingWindow",
 		"moreButton": true
-	}, {
+	}/*, {
 		"name": "URLResolver"
-	}], this._getConditionalStreamPluginList(componentID), [{
+	}*/], this._getConditionalStreamPluginList(componentID), [{
 		"name": "ModerationCardUI",
 		"extraActions": moderationExtraActions,
 		"topMarkers": this.config.get("topMarkers")

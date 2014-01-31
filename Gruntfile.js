@@ -28,6 +28,8 @@ module.exports = function(grunt) {
 		],
 		"demo": [
 			"demo.html",
+			"demo-card.html",
+			"demo-card-collection.html",
 			"premoderation.html"
 		]
 	};
