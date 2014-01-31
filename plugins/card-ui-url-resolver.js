@@ -67,9 +67,6 @@ itemPlugin.renderers.mediaContent = function(element) {
 			}
 		}
 	}));
-
-
-
 	return element.addClass(this.cssPrefix + (media.length > 1 ? "multiple" : "single"));
 };
 

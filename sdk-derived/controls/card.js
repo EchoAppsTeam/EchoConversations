@@ -52,6 +52,12 @@ card.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.js"
 }, {
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.css"
+}, {
+	"loaded": function() { return Echo.Conversations.NestedCard; },
+	"url": "{%= baseURL %}/controls/nested-card.js"
+}, {
+	"loaded": function() { return Echo.Conversations.MediaContainer; },
+	"url": "{%= baseURL %}/controls/media-container.js"
 }];
 
 /**
@@ -471,60 +477,6 @@ card.templates.dropdownButtons =
 		'</a>' +
 	'</div>';
 
-card.templates.photo =
-	'<div class="{class:card}">' +
-		'<div class="{class:photo}">' +
-			'<div class="{class:mediaAvatar} {class:photoAvatar}" title="{data:author_name}">' +
-				'<img src="{config:defaultAvatar}"/>{data:author_name}' +
-			'</div>' +
-			'<a href="{data:url}" target="_blank">' +
-				'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
-			'</a>' +
-			'<div class="{class:photoLabel}">' +
-				'<div class="{class:photoLabelContainer}">' +
-					'<div class="{class:title} {class:mediaTitle} {class:photoTitle}">{data:title}</div>' +
-					'<div class="{class:mediaDescription} {class:photoDescription}">{data:description}</div>' +
-				'</div>' +
-			'</div>' +
-		'</div>' +
-		'<div class="{class:sourceMediaIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
-	'</div>';
-
-card.templates.video =
-	'<div class="{class:card}">' +
-		'<div class="{class:video}">' +
-			'<div class="{class:mediaAvatar} {class:videoAvatar}" title="{data:author_name}">' +
-				'<img src="{config:defaultAvatar}"/>{data:author_name}' +
-			'</div>' +
-			'<div class="{class:videoPlaceholder}">' +
-				'<div class="{class:playButton}"></div>' +
-				'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
-			'</div>' +
-			'<div class="{class:title} {class:mediaTitle} {class:videoTitle}">{data:title}</div>' +
-			'<div class="{class:mediaDescription} {class:videoDescription}">{data:description}</div>' +
-			'<div class="{class:sourceMediaIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
-		'</div>' +
-	'</div>';
-
-card.templates.link =
-	'<div class="{class:card}">' +
-		'<div class="{class:article}">' +
-			'<div class="{class:articleThumbnail}">' +
-				'<img src="{data:thumbnail_url}"/>' +
-			'</div>' +
-			'<div class="{class:articleTemplate}">' +
-				'<div class="{class:title} {class:articleTitle}">' +
-					'<a href="{data:url}" target="_blank">{data:title}</a>' +
-				'</div>' +
-				'<div class="{class:articleDescriptionContainer}">' +
-					'<div class="{class:articleDescription}">{data:description}</div>' +
-				'</div>' +
-			'</div>' +
-			'<div class="echo-clear"></div>' +
-			'<div class="{class:sourceMediaIcon}" data-url="{data:provider_url}" data-name="{data:provider_name}"></div>' +
-		'</div>' +
-	'</div>';
-
 card.methods.template = function() {
 	return this.templates.mainHeader +
 	(this.config.get("parent.children.sortOrder") === "chronological"
@@ -885,7 +837,25 @@ card.renderers.textToggleTruncated = function(element) {
  */
 card.renderers.body = function(element) {
 	var self = this;
-	this._prepareMediaContent();
+	var original = this.get("data.object.content");
+	var content = $("<div/>").append(original);
+	var media = this._getMediaAttachments();
+	$("div[oembed], div[data-oembed]", content).remove();
+
+	// hide all item content if item type is article, photo or video
+	// and item has media attachments
+	if (media.length && this._getItemRenderType()) {
+		element.hide();
+	}
+
+	Echo.Utils.safelyExecute(function() {
+		var text = $(".echo-item-text", content);
+		if (media.length && text.length) {
+			self.set("data.object.content", text.html());
+		} else if (media.length) {
+			self.set("data.object.content", content.html());
+		}
+	});
 	var data = [this.get("data.object.content"), {
 		"source": this.get("data.source.name"),
 		"limits": this.config.get("limits"),
@@ -905,6 +875,7 @@ card.renderers.body = function(element) {
 	Echo.Utils.safelyExecute(textElement.append, text, textElement);
 	this.view.get("textEllipses")[!truncated || this.textExpanded ? "hide" : "show"]();
 	this.view.get("textToggleTruncated")[truncated || this.textExpanded ? "show" : "hide"]();
+	this.set("data.object.content", original);
 	return element;
 };
 
@@ -937,67 +908,6 @@ card.renderers.mediaTitle = function(element, extra) {
 
 card.renderers.mediaDescription = function(element, extra) {
 	return extra.data.description ? element : element.hide();
-};
-
-/**
- * Video
- */
-card.renderers.playButton = function(element, extra) {
-	var self = this;
-	var oembed = extra.data;
-	element.on("click", function() {
-		self.get("videoPlaceholder").empty().append($(oembed.html));
-	});
-	return element;
-};
-
-card.renderers.videoPlaceholder = function(element, extra) {
-	var oembed = extra.data;
-	var maxWidth = extra.width;
-
-	if (!oembed.thumbnail_url) {
-		element.empty().append($(oembed.html));
-	}
-	//TODO: calc height/width
-	var ratio, dimensions;
-	if (oembed.thumbnail_width) {
-		ratio = maxWidth / oembed.thumbnail_width;
-		dimensions = {
-			"width": maxWidth,
-			"height": oembed.thumbnail_height * ratio
-		};
-	} else if (maxWidth < oembed.width) {
-		ratio = maxWidth / oembed.width;
-		dimensions = {
-			"width": maxWidth,
-			"height": oembed.height * ratio
-		};
-	} else {
-		dimensions = {
-			"width": oembed.width,
-			"height": oembed.height
-		};
-	}
-	return element.css(dimensions);
-};
-
-/**
- *  Photo
- */
-card.renderers.photoThumbnail = function(element, extra) {
-	var width = extra.width;
-	var oembed = extra.data;
-	var thumbnail = oembed.thumbnail_url && oembed.thumbnail_width >= width
-		? oembed.thumbnail_url
-		: oembed.url;
-
-	return element.attr("src", thumbnail);
-};
-
-card.renderers.photoLabelContainer = function(element, extra) {
-	return extra.data.description || extra.data.title
-		? element
-		: element.hide();
 };
 
 /**
@@ -1108,30 +1018,24 @@ card.renderers.mediaContentContainer = function(element) {
 
 card.renderers.mediaContent = function(element) {
 	var self = this;
-	var media = this.get("media", []);
-	element.empty();
-	$.map(media, function(card) {
-		var container = $("<div>");
-		var template = self._manifest("templates")[card.type];
-		var view = new Echo.View({
-			"cssPrefix": self.get("cssPrefix"),
-			"template": template,
-			"data": card,
-			"substitutions": self._getSubstitutionInstructions(),
-			"renderers": Echo.Utils.foldl({}, ["playButton", "videoPlaceholder", "photoThumbnail", "photoLabelContainer", "mediaAvatar", "mediaTitle", "mediaDescription", "card", "sourceMediaIcon"], function(renderer, acc, name) {
-				var data = {"width": self.config.get("mediaWidth"), "data": card};
-				acc[renderer] = function(el) {
-					self._manifest("renderers")[renderer].call(view, el, data);
-				};
-			})
-		});
-		element.append(
-			container.append(
-				view.render()
-			)
-		);
+	var media = this._getMediaAttachments();
+	var type = this._getItemRenderType();
+	var cardConfig = media.length && type
+		? { "displaySourceIcon": false, "displayAuthor": false }
+		: {};
+
+	new Echo.Conversations.MediaContainer({
+		"target": element.empty(),
+		"data": media,
+		"card": cardConfig,
+		"ready": function() {
+			if (media.length && self.isRoot() && type) {
+				var cardType = this.cards[0].getRenderType();
+				self.view.get("container").addClass(self.cssPrefix + cardType);
+			}
+		}
 	});
-	return element;
+	return element.addClass(this.cssPrefix + (media.length > 1 ? "multiple" : "single"));
 };
 
 card.renderers._extraField = function(element, extra) {
@@ -1383,6 +1287,36 @@ card.methods._resizeMediaContent = function() {
 		this.config.set("mediaWidth", media.outerWidth() * 0.9);
 		this.view.render({"name": "mediaContent"});
 	}
+};
+
+card.methods._getItemRenderType = function() {
+	var availableTypes = ["article", "image", "video"];
+	var result;
+	$.each(this.get("data.object.objectTypes", []), function(i, objectType) {
+		var type = (objectType.match("[^/]+$") || []).pop();
+		if (~$.inArray(type, availableTypes)) {
+			result = type;
+			return false;
+		}
+	});
+
+	return result;
+};
+
+card.methods._getMediaAttachments = function() {
+	var self = this;
+	if (this.get("content") !== this.get("data.object.content") || typeof this.get("media") === "undefined") {
+		var result = [];
+		Echo.Utils.safelyExecute(function() {
+			var content = $("<div/>").append(self.get("data.object.content"));
+			result = $("div[oembed], div[data-oembed]", content).map(function() {
+				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
+			}).get();
+		});
+		this.set("content", this.get("data.object.content"));
+		this.set("media", result);
+	}
+	return this.get("media", []);
 };
 
 /**
