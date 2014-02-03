@@ -42,7 +42,9 @@ media.renderers.container = function(element) {
 		});
 
 		if (media.length === 1) {
-			element.addClass(this.cssPrefix + "single-card");
+			element.addClass(this.cssPrefix + "single");
+		} else {
+			element.addClass(this.cssPrefix + "multiple");
 		}
 	} else {
 		element.hide();
@@ -57,9 +59,9 @@ media.css =
 	'.{class:container} > div > div { margin-right: 8px; }' +
 
 	// single cards
-	'.{class:container}.{class:single-card} { padding: 0px; border: 0px; }' +
-	'.{class:container}.{class:single-card} > div { max-width: 100%; display: block; }' +
-	'.{class:container}.{class:single-card} > div > div { margin-right: 0; }' +
+	'.{class:container}.{class:single} { padding: 0px; border: 0px; }' +
+	'.{class:container}.{class:single} > div { max-width: 100%; display: block; }' +
+	'.{class:container}.{class:single} > div > div { margin-right: 0; }' +
 
 	// scrollbar
 	'.{class:container}::-webkit-scrollbar { height: 10px; }' +
