@@ -812,19 +812,10 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"name": "TopPostIndicator",
 		"enabled": config.displayTopPostHighlight,
 		"marker": this.config.get("topMarkers.item")
-	}, /*{
-		"name": "CardUIShim",
-		"topPost": {
-			"visible": config.displayTopPostHighlight,
-			"marker": this.config.get("topMarkers.item")
-		},
-		"collapsedContentHeight": this.config.get(componentID + ".collapsedContentHeight"),
-		"displayTopPostHighlight": config.displayTopPostHighlight,
-		"initialIntentsDisplayMode": this.config.get(componentID + ".initialIntentsDisplayMode")
-	}, */{
+	}, {
 		"name": "TweetDisplay"
 	}, {
-		"name": "ItemEventsProxy",
+		"name": "CardEventsProxy",
 		"onAdd": function() {
 			var counter = self.getComponent(componentID + "Counter");
 			counter && counter.request.liveUpdates.start(true);
@@ -838,9 +829,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 	}, {
 		"name": "CardsRollingWindow",
 		"moreButton": true
-	}/*, {
-		"name": "URLResolver"
-	}*/], this._getConditionalStreamPluginList(componentID), [{
+	}], this._getConditionalStreamPluginList(componentID), [{
 		"name": "Moderation",
 		"extraActions": moderationExtraActions,
 		"topMarkers": this.config.get("topMarkers")
@@ -880,15 +869,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"enabled": this._isModerationRequired() && replyComposer.confirmation.enabled
 		},
 		"submitPermissions": this._getSubmitPermissions(),
-		"nestedPlugins": this._mergeSpecsByName([/*{
-			"name": "URLResolver",
-			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs"),
-			"filePicker": {
-				"key": this.config.get("dependencies.FilePicker.apiKey"),
-				"visible": this.config.get("replyComposer.contentTypes.comments.attachments.visible"),
-				"sources": this.config.get("replyComposer.contentTypes.comments.attachments.sources")
-			}
-		}, */{
+		"nestedPlugins": this._mergeSpecsByName([{
 			"name": "LinkComposer"
 		}, {
 			"name": "JanrainBackplaneHandler",
@@ -905,17 +886,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"name": "Edit",
 		"icon": "icon-pencil", // TODO: get rid of it when new buttons protocol will be implemented
 		"requestMethod": "POST",
-		"nestedPlugins": [/*{
-			"name": "URLResolver",
-			// we enable resolving through separate parameter
-			// because it should works for submit and item as well
-			"resolveURLs": this._getResolverSettingForEditPlugin(),
-			"filePicker": {
-				"key": this.config.get("dependencies.FilePicker.apiKey"),
-				"visible": this.config.get("postComposer.contentTypes.comments.attachments.visible"),
-				"sources": this.config.get("postComposer.contentTypes.comments.attachments.sources")
-			}
-		}*/{
+		"nestedPlugins": [{
 			"name": "LinkComposer"
 		}]
 	}];

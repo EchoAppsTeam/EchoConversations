@@ -457,7 +457,7 @@ stream.events = {
 	},
 	"Echo.Card.onAdd": function(topic, data) {
 		var self = this;
-		var item = this.items[data.item.data.unique];
+		var item = this.items[data.card.data.unique];
 		item.config.get("target").hide();
 		this.queueActivity({
 			"action": "animation",
@@ -473,7 +473,7 @@ stream.events = {
 	},
 	"Echo.Card.onDelete": function(topic, data) {
 		var self = this;
-		var item = this.items[data.item.data.unique];
+		var item = this.items[data.card.data.unique];
 		this.queueActivity({
 			"action": "animation",
 			"item": item,
