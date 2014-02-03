@@ -895,7 +895,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		}], composerPlugins)
 	}), {
 		"intentID": "Sharing",
-		"name": "CardUISocialSharing"
+		"name": "SocialSharing"
 	}, {
 		"intentID": "Edit",
 		"name": "EditSC",
