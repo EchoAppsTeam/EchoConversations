@@ -53,10 +53,10 @@ card.dependencies = [{
 }, {
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.css"
 }, {
-	"loaded": function() { return Echo.Conversations.NestedCard; },
+	"loaded": function() { return !!Echo.Conversations.NestedCard; },
 	"url": "{%= baseURL %}/controls/nested-card.js"
 }, {
-	"loaded": function() { return Echo.Conversations.MediaContainer; },
+	"loaded": function() { return !!Echo.Conversations.MediaContainer; },
 	"url": "{%= baseURL %}/controls/media-container.js"
 }];
 
