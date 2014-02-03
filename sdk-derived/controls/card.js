@@ -876,32 +876,6 @@ card.renderers.card = function(element, extra) {
 	return element.find("> div").css("max-width", width);
 };
 
-card.renderers.sourceMediaIcon = function(element) {
-	var proviredURL = element.data("url") || "";
-	var icon = proviredURL +
-		(proviredURL.substr(-1) === "/" ? "" : "/") +	"favicon.ico";
-
-	Echo.Utils.loadImage({
-		"image": icon,
-		"onerror": $.noop,
-		"onload": function() {
-			$(this).attr("title", element.data("name")).appendTo(element);
-		}
-	});
-};
-
-card.renderers.mediaAvatar = function(element, extra) {
-	return extra.data.author_name ? element : element.hide();
-};
-
-card.renderers.mediaTitle = function(element, extra) {
-	return extra.data.title ? element : element.hide();
-};
-
-card.renderers.mediaDescription = function(element, extra) {
-	return extra.data.description ? element : element.hide();
-};
-
 /**
  * @echo_renderer
  */
