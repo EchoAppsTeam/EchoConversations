@@ -808,6 +808,10 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"enabled": auth.enableBundledIdentity,
 		"authWidgetConfig": auth.authWidgetConfig,
 		"sharingWidgetConfig": auth.sharingWidgetConfig
+	}, {
+		"name": "TopPostIndicator",
+		"enabled": config.displayTopPostHighlight,
+		"marker": this.config.get("topMarkers.item")
 	}, /*{
 		"name": "CardUIShim",
 		"topPost": {

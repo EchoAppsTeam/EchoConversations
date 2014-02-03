@@ -239,16 +239,7 @@ card.config = {
 		"text": false
 	},
 	"fadeTimeout": 10000, // 10 seconds
-	"displayTopPostHighlight": true,
-	"includeTopContributors": true,
 	"mediaWidth": 340,
-	"topMarkers": {
-		"posts": {
-			"add": "Conversations.TopPost",
-			"remove": "Conversations.RemovedFromTopPosts"
-		},
-		"contributor": "Conversations.TopContributor"
-	},
 	"manualRendering": false
 };
 
@@ -353,7 +344,6 @@ card.labels = {
 	 * @echo_label
 	 */
 	"re": "Re",
-	"topPostIndicatorTitle": "Top Post",
 	"actions": "Actions"
 };
 
@@ -393,7 +383,6 @@ card.templates.mainHeader =
 			'<div class="{class:wrapper}">' +
 				'<div class="{class:subwrapper}">' +
 					'<div class="{class:subcontainer}">' +
-						'<i class="icon-bookmark {class:topPostMarker}" title="{label:topPostIndicatorTitle}"></i>' +
 						'<div class="{class:frame}">' +
 							'<div class="{class:header-container}">' +
 								'<div class="{class:header-centered}">' +
@@ -509,33 +498,6 @@ card.renderers.indicator = function(element) {
 		"-webkit-transition": transition
 	});
 	return element;
-};
-
-/**
- * @echo_renderer
- */
-card.renderers.topPostMarker = function(element) {
-	if (!this.config.get("displayTopPostHighlight") || !!this.get("depth")) {
-		return element.hide();
-	}
-
-	var markers = this.config.get("topMarkers");
-	var itemMarkers = this.get("data.object.markers", []);
-	var userMarkers = this.get("data.actor.markers", []);
-
-	var states = {
-		"added": ~$.inArray(markers.posts.add, itemMarkers),
-		"removed": ~$.inArray(markers.posts.remove, itemMarkers),
-		"contributor": ~$.inArray(markers.contributor, userMarkers)
-	};
-
-	var visible = this.config.get("includeTopContributors")
-		? (((states.added || states.contributor) && !states.removed) ? true : false)
-                : (states.added && !states.removed ? true : false);
-
-	return visible
-		? element.show()
-		: element.hide();
 };
 
 /**
@@ -1793,7 +1755,6 @@ card.css =
 	'.{class:dropdownButton} { display: inline; margin-left: 0px; }' +
 	'.{class:dropdownButton} > .dropdown { display: inline; }' +
 	'.{class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
-	'.{class:topPostMarker} { float: right; position: relative; top: -19px; right: 0px; }' +
 	'.{class:containerWrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
 	'.{class:container} { border-left: 4px solid transparent; background: #ffffff; position: relative; }' +
 	'.{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
