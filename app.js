@@ -246,7 +246,7 @@ conversations.config.normalizer = {
 
 conversations.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js",
-	"control": "Echo.StreamServer.Controls.Counter"
+	"control": "Echo.StreamServer.API"
 }, {
 	"url": "{%= baseURL %}/streamserver.pack.js",
 	"control": "Echo.StreamServer.Controls.SubmitComposer"
@@ -266,7 +266,7 @@ conversations.events = {
 			this.view.render({"name": "itemsWaiting"});
 		}
 	},
-	"Echo.StreamServer.Controls.Counter.onUpdate": function(_, data) {
+	"Echo.StreamServer.Controls.PostCounter.onUpdate": function(_, data) {
 		var app = this;
 		$.each(["allPosts", "topPosts", "moderationQueue"], function(k, componentName) {
 			var component = app.getComponent(componentName + "Counter");
@@ -714,13 +714,13 @@ conversations.renderers._streamTitle = function(element, extra) {
 	if (config.displayCounter) {
 		this.initComponent({
 			"id": extra.id + "Counter",
-			"component": "Echo.StreamServer.Controls.Counter",
+			"component": "Echo.StreamServer.Controls.PostCounter",
 			"config": {
 				"target": view.get("streamCounter"),
 				"infoMessages": {
 					"layout": "compact"
 				},
-				"plugins": [{"name": "CounterCardUI"}],
+				"plugins": [{"name": "CountVisualization"}],
 				"query": this._assembleCounterQuery(extra.id),
 				"data": this.get("data." + extra.id + "-count")
 			}
