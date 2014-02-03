@@ -119,7 +119,7 @@ if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
 	this.extendTemplate("insertAfter", "postButtonWrapper", plugin.templates.cancel);
-	this.extendTemplate("replace", "userInfo", plugin.templates.header);
+	this.extendTemplate("replace", "header", plugin.templates.header);
 	this.component.labels.set({
 		"post": this.labels.get("post"),
 		"posting": this.labels.get("posting")
