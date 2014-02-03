@@ -1885,66 +1885,14 @@ card.css =
 
 	'.{class:data} { padding: 7px 0px 0px 0px; }' +
 	'.{class:content} .{class:depth-0} { padding: 15px 16px 0px 12px; }' +
-	'.{class:mediaContentContainer} { overflow-y: hidden; overflow-x: auto; margin-bottom: 5px; }' +
-	'.{class:depth-0} .{class:multiple}.{class:mediaContentContainer} { margin-left: -16px; margin-right: -16px; }' +
-
-	'.{class:multiple}.{class:mediaContentContainer} { padding: 8px; border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
-
-	'.{class:mediaContent} { white-space: nowrap; }' +
-	'.{class:mediaContent} > div { display: inline-block; white-space: normal; vertical-align: top; }' +
-	'.{class:multiple} .{class:mediaContent} > div { margin-right: 8px; }' +
-
-	// scrollbar
-	'.{class:mediaContentContainer}::-webkit-scrollbar { height: 10px; }' +
-	'.{class:mediaContentContainer}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
-	'.{class:mediaContentContainer}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }' +
 	'.{class} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
-	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:card} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
-	'.{class:card} .{class:sourceMediaIcon} > img { max-width: 20px; }' +
-
-	// photo
-	'.{class:photoAvatar} { position: absolute; padding: 12px; color: #FFF; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:photo} { position: relative; }' +
-	'.{class:photo} + .{class:sourceMediaIcon} > img { padding: 10px; }' +
-	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background: rgba(0, 0, 0, 0.5); }' +
-	'.{class:photoLabelContainer} { padding: 10px; }' +
-	'.{class:photoTitle} { margin: 0 0 5px 0; }' +
-
-	// play button
-	'.{class:playButton} { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 10; }' +
-	'.{class:playButton}:after { content: ""; position: absolute; top: 10px; left: 20px; border-left: 30px solid #FFF; border-top: 20px solid transparent; border-bottom: 20px solid transparent; }' +
-	'.{class:playButton} { box-shadow: 0px 0px 40px #000; margin: auto; width: 60px; height: 60px; background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; }' +
-	'.{class:playButton}:hover { background-color: #3498DB; }' +
-
-	// video
-	'.{class:video} { padding: 10px; }' +
-	'.{class:video} .{class:sourceMediaIcon} > img { padding: 10px 0 0 0; }' +
-	'.{class:videoAvatar} { margin-bottom: 8px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:videoTitle} { margin: 10px 0 0 0; }' +
-	'.{class:videoDescription} { margin: 5px 0 0 0; }' +
-	'.{class:videoPlaceholder} { position: relative; background: #000000; }' +
-	'.{class:videoPlaceholder} img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }' +
-
-	// TODO: fix video resizing
-	//'.{class:videoPlaceholder} { position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px; }' +
-	'.{class:videoPlaceholder} > iframe { width: 100%; height: 100%; }' +
-	'.{class:videoPlaceholder} > video { width: 100%; height: 100%; }' +
-	'.{class:videoPlaceholder} > object { width: 100%; height: 100%; }' +
-
-	// article
-	'.{class:article} { padding: 10px; min-width: 200px; }' +
-	'.{class:article} .{class:sourceMediaIcon} > img { padding: 10px 0 0 0; }' +
-	'.{class:article} .{class:articleTitle} > a { color: #42474A; font-weight: bold; }' +
-	'.{class:article} .{class:articleTitle} > a:hover { color: #42474A; }' +
-	'.{class:articleTitle} { padding: 0 0 5px 0; margin-left: 10px; margin-right: 15px; }' +
-	'.{class:articleDescription} { margin-left: 10px; font-size: 13px; line-height: 16px; }' +
-	'.{class:articleThumbnail} { width: 30%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden; }' +
-	'.{class:expandChildren} .echo-app-message { padding: 0; border:none; border-radius: 0; }' +
-	'.{class:articleThumbnail} img { width: auto; height: auto; max-height:120px; max-width:120px; }' +
-	'.{class:articleTemplate} { width: 70%; float: left; }' +
 	'.{class} { margin: 0px 0px 10px 0px; padding: 0px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; background: #ffffff; }' +
-	'.{class:children} .{class} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; background: #f8f8f8; }' +
+
+	// Nested card css
+	'.{class:depth-0} .{class:mediaContent}.{class:multiple} { margin-left: -16px; margin-right: -16px; }' +
+	'.{class:depth-0} .{class:mediaContent} { margin-bottom: 0px; }' +
+	'.{class:mediaContent}.{class:multiple} > div { border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
+
 	cardDepthRules.join("\n");
 
 Echo.Control.create(card);

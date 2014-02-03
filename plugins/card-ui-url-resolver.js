@@ -101,9 +101,6 @@ itemPlugin.methods._getMediaAttachments = function() {
 };
 
 itemPlugin.css =
-	'.{class:depth-0} .{plugin.class:mediaContent}.{plugin.class:multiple} { margin-left: -16px; margin-right: -16px; }' +
-	'.{class:depth-0} .{plugin.class:mediaContent} { margin-bottom: 0px; }' +
-	'.{plugin.class:mediaContent}.{plugin.class:multiple} > div { border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
 	'.{plugin.class:video} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
 	'.{plugin.class:video} .{plugin.class:mediaContent} .echo-conversations-nestedcard-video { padding: 0px; }' +
 
