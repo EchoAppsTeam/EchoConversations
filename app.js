@@ -832,7 +832,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 			overrides.onItemDelete && overrides.onItemDelete();
 		}
 	}, {
-		"name": "ItemsRollingWindow",
+		"name": "CardsRollingWindow",
 		"moreButton": true
 	}/*, {
 		"name": "URLResolver"
