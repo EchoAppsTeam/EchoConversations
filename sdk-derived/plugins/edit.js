@@ -4,13 +4,13 @@
 var $ = jQuery;
 
 /**
- * @class Echo.StreamServer.Controls.Stream.Item.Plugins.Edit
+ * @class Echo.Card.Plugins.Edit
  * Adds extra “Edit” button to each item in the Echo Stream control
  * which allows to edit the content and some metadata of the item.
  * This button will appear either for the users with
  * administrative privileges or for editing of personal comments.
  *
- * 	new Echo.StreamServer.Controls.Stream({
+ * 	new Echo.CardCollection({
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
@@ -26,16 +26,16 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("EditSC", "Echo.StreamServer.Controls.Stream.Item");
+var plugin = Echo.Plugin.manifest("Edit", "Echo.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	this.component.addButtonSpec("EditSC", this._assembleButton());
+	this.component.addButtonSpec("Edit", this._assembleButton());
 };
 
 $.map(["Complete", "Error"], function(action) {
-	plugin.events["Echo.StreamServer.Controls.SubmitComposer.Plugins.EditSC.onEdit" + action] =
+	plugin.events["Echo.StreamServer.Controls.SubmitComposer.Plugins.Edit.onEdit" + action] =
 		function(topic, args) {
 			this.component.render();
 		};
@@ -76,7 +76,7 @@ plugin.methods._assembleButton = function() {
 				config["parent"] = plugin.component.config.getAsHash();
 				config["targetQuery"] = plugin.config.get("query", "");
 				config.plugins.push({
-					"name": "EditSC"
+					"name": "Edit"
 				});
 				new Echo.StreamServer.Controls.SubmitComposer(config);
 				item.config.get("target").get(0).scrollIntoView(true);
@@ -113,7 +113,7 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("EditSC", "Echo.StreamServer.Controls.SubmitComposer");
+var plugin = Echo.Plugin.manifest("Edit", "Echo.StreamServer.Controls.SubmitComposer");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -154,15 +154,15 @@ plugin.labels = {
 };
 
 /**
- * @echo_event Echo.StreamServer.Controls.Submit.Plugins.Edit.onEditInit
+ * @echo_event Echo.StreamServer.Controls.SubmitComposer.Plugins.Edit.onEditInit
  * Triggered when edit operation was started
  */
 /**
- * @echo_event Echo.StreamServer.Controls.Submit.Plugins.Edit.onEditComplete
+ * @echo_event Echo.StreamServer.Controls.SubmitComposer.Plugins.Edit.onEditComplete
  * Triggered when edit operation is finished
  */
 /**
- * @echo_event Echo.StreamServer.Controls.Submit.Plugins.Edit.onEditError
+ * @echo_event Echo.StreamServer.Controls.SubmitComposer.Plugins.Edit.onEditError
  * Triggered if edit operation failed
  */
 $.map(["Init", "Complete", "Error"], function(action) {

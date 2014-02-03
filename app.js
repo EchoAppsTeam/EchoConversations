@@ -841,7 +841,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 	}/*, {
 		"name": "URLResolver"
 	}*/], this._getConditionalStreamPluginList(componentID), [{
-		"name": "ModerationCardUI",
+		"name": "Moderation",
 		"extraActions": moderationExtraActions,
 		"topMarkers": this.config.get("topMarkers")
 	}]);
@@ -870,7 +870,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"showUserList": false
 	}, $.extend(true, replyComposer, {
 		"intentID": "Reply",
-		"name": "ReplySC",
+		"name": "Reply",
 		"enabled": this._isComposerVisible("replyComposer"),
 		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
 		"pauseTimeout": +(this._isModerationRequired() && replyComposer.confirmation.timeout),
@@ -902,7 +902,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"name": "SocialSharing"
 	}, {
 		"intentID": "Edit",
-		"name": "EditSC",
+		"name": "Edit",
 		"icon": "icon-pencil", // TODO: get rid of it when new buttons protocol will be implemented
 		"requestMethod": "POST",
 		"nestedPlugins": [/*{

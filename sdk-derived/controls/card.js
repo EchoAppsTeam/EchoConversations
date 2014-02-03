@@ -645,24 +645,13 @@ card.renderers.childrenByCurrentActorLive = function(element, config) {
  * @echo_renderer
  */
 card.renderers.buttons = function(element) {
-	var self = this;
 	this._assembleButtons();
 	this._sortButtons();
 	element.empty();
-	$.map(this.buttonsOrder, function(name) {
-		var data = self.get("buttons." + name);
-		if (!data || !data.name || !data.visible()) {
-			return;
-		}
-		self.view.render({
-			"name": "_buttonsDelimiter",
-			"target": element
-		});
-		self.view.render({
-			"name": "_button",
-			"target": element,
-			"extra": data
-		});
+
+	this.view.render({
+		"name": "_" + this.get("buttonsLayout") + "Buttons",
+		"target": element
 	});
 	return element;
 };
@@ -1064,18 +1053,6 @@ card.renderers._dropdownButtons = function(element) {
 	})(elem, buttons);
 
 	return element.append(elem);
-};
-
-card.renderers.buttons = function(element) {
-	this._assembleButtons();
-	this._sortButtons();
-	element.empty();
-
-	this.view.render({
-		"name": "_" + this.get("buttonsLayout") + "Buttons",
-		"target": element
-	});
-	return element;
 };
 
 card.renderers._button = function(element, extra) {

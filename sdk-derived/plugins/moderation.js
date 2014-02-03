@@ -4,16 +4,16 @@
 var $ = jQuery;
 
 /**
- * @class Echo.StreamServer.Controls.Stream.Item.Plugins.ModerationCardUI
+ * @class Echo.Card.Plugins.Moderation
  */
-var plugin = Echo.Plugin.manifest("ModerationCardUI", "Echo.StreamServer.Controls.Stream.Item");
+var plugin = Echo.Plugin.manifest("Moderation", "Echo.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
 	var item = this.component;
 	this.set("itemStatus", item.get("data.object.status"));
-	item.addButtonSpec("ModerationCardUI", this._assembleModerateButton());
+	item.addButtonSpec("Moderation", this._assembleModerateButton());
 };
 
 plugin.config = {
@@ -73,7 +73,7 @@ plugin.labels = {
 };
 
 plugin.events = {
-	"Echo.StreamServer.Controls.Stream.Item.onRerender": function() {
+	"Echo.Card.onRerender": function() {
 		var item = this.component;
 		if (item.user.is("admin")) {
 			var element = item.view.get("container");
@@ -101,7 +101,7 @@ plugin.events = {
 			}
 		}
 	},
-	"Echo.StreamServer.Controls.Stream.Plugins.ModerationCardUI.onUserUpdate": function(topic, args) {
+	"Echo.CardCollection.Plugins.Moderation.onUserUpdate": function(topic, args) {
 		var target = this.component;
 		var source = args.item;
 		if (target.get("data.actor.id") !== source.data.actor.id) return;
@@ -638,10 +638,10 @@ Echo.Plugin.create(plugin);
 (function() {
 "use strict";
 
-var plugin = Echo.Plugin.manifest("ModerationCardUI", "Echo.StreamServer.Controls.Stream");
+var plugin = Echo.Plugin.manifest("Moderation", "Echo.CardCollection");
 
 plugin.events = {
-	"Echo.StreamServer.Controls.Stream.Item.Plugins.ModerationCardUI.onUserUpdate": function(topic, args) {
+	"Echo.Card.Plugins.Moderation.onUserUpdate": function(topic, args) {
 		this.events.publish({
 			"topic": "onUserUpdate",
 			"data": args,
@@ -651,4 +651,5 @@ plugin.events = {
 };
 
 Echo.Plugin.create(plugin);
+
 })(Echo.jQuery);
