@@ -4,7 +4,7 @@
 var $ = jQuery;
 
 /**
- * @class Echo.StreamServer.Controls.Stream.Item.Plugins.TweetDisplay
+ * @class Echo.Card.Plugins.TweetDisplay
  * Adds the Twitter intents controls into the item UI and updates the
  * item UI to look and behave like a Twitter item. The item UI update includes:
  *
@@ -20,7 +20,7 @@ var $ = jQuery;
  * To enable this plugin should be taken add the corresponding section into the
  * Echo Stream configuration parameter plugins:
  *
- * 	new Echo.StreamServer.Controls.Stream({
+ * 	new Echo.CardCollection({
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
@@ -44,7 +44,7 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("TweetDisplay", "Echo.StreamServer.Controls.Stream.Item");
+var plugin = Echo.Plugin.manifest("TweetDisplay", "Echo.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -57,10 +57,10 @@ plugin.init = function() {
 	});
 
 	item.config.set("contentTransformations", config);
-	item.config.set("plugins.LikeCardUI.enabled", false);
-	item.config.set("plugins.ReplyCardUI.enabled", false);
-	item.config.set("plugins.CardUISocialSharing.enabled", false);
-	item.config.set("plugins.CommunityFlagCardUI.enabled", false);
+	item.config.set("plugins.Like.enabled", false);
+	item.config.set("plugins.Reply.enabled", false);
+	item.config.set("plugins.SocialSharing.enabled", false);
+	item.config.set("plugins.CommunityFlag.enabled", false);
 	// icon must be visible to show that the item is from Twitter
 	item.config.set("viaLabel.icon", true);
 
@@ -172,7 +172,7 @@ plugin.enabled = function() {
 };
 
 plugin.events = {
-	"Echo.StreamServer.Controls.Stream.Item.onRender": function(topic, args) {
+	"Echo.Card.onRender": function(topic, args) {
 		window.twttr && window.twttr.widgets && window.twttr.widgets.load();
 		$.map(this.component.buttons[this.name], function(name) {
 			if (name && name.element) {
