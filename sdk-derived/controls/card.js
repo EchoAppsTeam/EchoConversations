@@ -395,10 +395,14 @@ card.templates.mainHeader =
 					'<div class="{class:subcontainer}">' +
 						'<i class="icon-bookmark {class:topPostMarker}" title="{label:topPostIndicatorTitle}"></i>' +
 						'<div class="{class:frame}">' +
+							'<div class="{class:header-container}">' +
+								'<div class="{class:header-centered}">' +
+									'<div class="{class:authorName}"></div>' +
+									'<div class="{class:date}"></div>' +
+									'<div class="echo-clear"></div>' +
+								'</div>' +
+							'</div>' +
 							'<div class="{class:modeSwitch} echo-clickable"></div>' +
-							'<div class="{class:authorName} echo-linkColor"></div>' +
-							'<div class="{class:date}"></div>' +
-							'<div class="echo-clear"></div>' +
 							'<div class="{class:data}">' +
 								'<div class="{class:re}"></div>' +
 								'<div class="{class:body} echo-primaryColor"> ' +
@@ -406,9 +410,7 @@ card.templates.mainHeader =
 									'<span class="{class:textEllipses}">...</span>' +
 									'<span class="{class:textToggleTruncated} echo-linkColor echo-clickable"></span>' +
 								'</div>' +
-								'<div class="{class:mediaContentContainer}">' +
-									'<div class="{class:mediaContent}"></div>' +
-								'</div>' +
+								'<div class="{class:mediaContent}"></div>' +
 							'</div>' +
 							'<div class="{class:metadata}"></div>' +
 							'<div class="{class:footer} echo-secondaryColor echo-secondaryFont">' +
@@ -977,11 +979,6 @@ card.renderers._childrenContainer = function(element, config) {
 	return element;
 };
 
-card.renderers.mediaContentContainer = function(element) {
-	var media = this._getMediaAttachments();
-	return element.addClass(this.cssPrefix + (media.length > 1 ? "multiple" : "single"));
-};
-
 card.renderers.mediaContent = function(element) {
 	var self = this;
 	var media = this._getMediaAttachments();
@@ -1001,7 +998,7 @@ card.renderers.mediaContent = function(element) {
 			}
 		}
 	});
-	return element.addClass(this.cssPrefix + (media.length > 1 ? "multiple" : "single"));
+	return element;
 };
 
 card.renderers._extraField = function(element, extra) {
@@ -1798,12 +1795,12 @@ card.css =
 	'.{class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
 	'.{class:topPostMarker} { float: right; position: relative; top: -19px; right: 0px; }' +
 	'.{class:containerWrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
-	'.{class:container} { border-left: 4px solid transparent; background: #ffffff; }' +
+	'.{class:container} { border-left: 4px solid transparent; background: #ffffff; position: relative; }' +
 	'.{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
 	'.{class:container}.{class:liveUpdate} { border-left: 4px solid #f5ba47; }' +
 
 	'.echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
-	'.{class:date} { float: left; color: #d3d3d3; margin-left: 5px; line-height: 18px; }' +
+	'.{class:date} { float: left; color: #d3d3d3; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; max-width: 100%; }' +
 
 	'.{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
 
@@ -1812,7 +1809,8 @@ card.css =
 	'.{class:metadata} { margin-bottom: 8px; }' +
 	'.{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
 	'.{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
-	'.{class:authorName} { color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; }' +
+	'.{class:authorName} { float: left; color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; max-width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; }' +
+	'.{class:authorName}:after { content: ""; display: inline; padding-right: 5px; }' +
 
 	'.{class:container-child} { padding: 12px 0px 10px 16px; margin: 0px 15px 2px 0px; }' +
 	'.{class:content} .{class:container-child-thread} { padding: 12px 0px 10px 8px; margin: 0px 15px 2px 0px; }' +
@@ -1853,9 +1851,14 @@ card.css =
 	'.{class:depth-0} .{class:body} { padding-top: 0px; }' +
 	'.{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
 	'.{class:depth-0} .{class:avatar} img { height: 36px; width: 36px; border-radius: 50%;}' +
-	'.{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 38px; margin-left: 45px;}' +
+	'.{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 18px; }' +
 	'.{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
 	'.{class:depth-0} .{class:childrenMarker} { display: none; }' +
+
+	'.{class:depth-0} .{class:header-container} { height: 36px; margin-right: 18px; margin-left: 45px; }' +
+	'.{class:depth-0} .{class:header-container}:before { content: ""; display: inline-block; height: 100%; vertical-align: middle; }' +
+	'.{class:depth-0} .{class:header-centered} { display: inline-block; vertical-align: middle; max-width: 100%; max-width: 90%\\9; }' +
+	'.{class:depth-0} .{class:date} { line-height: 18px; }' +
 
 	'.{class:data} { padding: 7px 0px 0px 0px; }' +
 	'.{class:content} .{class:depth-0} { padding: 15px 16px 0px 12px; }' +
@@ -1863,9 +1866,29 @@ card.css =
 	'.{class} { margin: 0px 0px 10px 0px; padding: 0px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; background: #ffffff; }' +
 
 	// Nested card css
-	'.{class:depth-0} .{class:mediaContent}.{class:multiple} { margin-left: -16px; margin-right: -16px; }' +
+	'.{class:depth-0} .{class:mediaContent} .echo-conversations-mediacontainer-multiple { margin-left: -16px; margin-right: -16px; }' +
+	'.{class:mediaContent} .echo-conversations-mediacontainer-multiple { border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
 	'.{class:depth-0} .{class:mediaContent} { margin-bottom: 0px; }' +
-	'.{class:mediaContent}.{class:multiple} > div { border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
+	'.{class:video} .{class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
+	'.{class:video} .{class:mediaContent} .echo-conversations-nestedcard-video { padding: 0px; }' +
+
+	'.{class:photo}.{class:container}.{class:depth-0} { padding-top: 0; }' +
+	'.{class:photo} .{plugin.class:mediaContent} { margin: 0 -16px; }' +
+	'.{class:photo} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
+	'.{class:photo} .echo-conversations-nestedcard-photoContainer { border-top-left-radius: 3px; border-top-right-radius: 3px; }' +
+	'.{class:photo} .{class:data} { padding-top: 0; }' +
+	'.{class:photo} .{class:authorName} { color: #FFFFFF; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); }' +
+	'.{class:photo} .{class:date} { text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); padding-right: 1px; }' +
+	'.{class:photo} .{class:avatar-wrapper} { z-index: 10; position: absolute; top: 15px; }' +
+	'.{class:photo} .{class:header-container} { z-index: 10; position: relative; top: 50px; margin-top: -36px; }' +
+
+	'.{class:link} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
+	'.{class:link} .{plugin.class:mediaContent} .echo-conversations-nestedcard-article { padding: 0px; }' +
+
+	'.{class:mediaContent} { margin-bottom: 8px; }' +
+
+	// hide switch for now
+	'.{class:modeSwitch} { width: 0px; height: 0px; }' +
 
 	cardDepthRules.join("\n");
 
