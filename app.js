@@ -62,7 +62,7 @@ conversations.config = {
 		"visible": true,
 		"label": "Top Posts",
 		"queryOverride": "",
-		"collapsedContentHeight": 110, // px
+		"maxItemBodyHeight": 110, // px
 		"initialItemsPerPage": 5,
 		"initialSortOrder": "reverseChronological",
 		"includeTopContributors": true,
@@ -106,7 +106,7 @@ conversations.config = {
 		"visible": true,
 		"label": "All Posts",
 		"queryOverride": "",
-		"collapsedContentHeight": 110, // px
+		"maxItemBodyHeight": 110, // px
 		"initialItemsPerPage": 15,
 		"initialSortOrder": "reverseChronological",
 		"displaySourceIcons": true,
@@ -782,6 +782,9 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"emptyStream": config.noPostsMessage
 		},
 		"item": {
+			"limits": {
+				"maxBodyHeight": config.maxItemBodyHeight
+			},
 			"reTag": false,
 			"viaLabel": {
 				"icon": config.displaySourceIcons

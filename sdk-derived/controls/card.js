@@ -197,6 +197,7 @@ card.config = {
 	"limits": {
 		"maxBodyCharacters": undefined,
 		"maxBodyLines": undefined,
+		"maxBodyHeight": undefined,
 		"maxBodyLinkLength": 50,
 		"maxMarkerLength": 16,
 		"maxReLinkLength": 30,
@@ -344,7 +345,8 @@ card.labels = {
 	 * @echo_label
 	 */
 	"re": "Re",
-	"actions": "Actions"
+	"actions": "Actions",
+	"seeMore": "See more"
 };
 
 card.templates.metadata = {
@@ -399,6 +401,7 @@ card.templates.mainHeader =
 									'<span class="{class:textEllipses}">...</span>' +
 									'<span class="{class:textToggleTruncated} echo-linkColor echo-clickable"></span>' +
 								'</div>' +
+								'<div class="{class:seeMore}">{label:seeMore}</div>' +
 								'<div class="{class:mediaContent}"></div>' +
 							'</div>' +
 							'<div class="{class:metadata}"></div>' +
@@ -824,9 +827,12 @@ card.renderers.body = function(element) {
 	return element;
 };
 
-card.renderers.card = function(element, extra) {
-	var width = extra.width;
-	return element.find("> div").css("max-width", width);
+card.renderers.seeMore = function(element) {
+	var self = this;
+	return element.one("click", function() {
+		self.view.remove("seeMore");
+		self.view.get("body").css("max-height", "");
+	});
 };
 
 /**
@@ -1150,6 +1156,31 @@ card.methods._pageLayoutChange = function() {
 			this.set("buttonsWidth", 0);
 			this.set("buttonsLayout", "inline");
 			this.view.render({"name": "buttons"});
+		}
+	}
+	this._checkItemContentHeight();
+};
+
+card.methods._checkItemContentHeight = function() {
+	var body = this.view.get("body");
+	var text = this.view.get("text");
+	var button = this.view.get("seeMore");
+
+	if (body && button) {
+		var maxBodyHeight = this.config.get("limits.maxBodyHeight");
+		var lineHeight = parseInt(text.css("line-height"), 10);
+		var fontSize = parseInt(text.css("font-size"), 10);
+
+		var lineCount = Math.round(maxBodyHeight / lineHeight);
+		var realMaxHeight = lineCount * lineHeight - fontSize / 2;
+		var coeffToShow = 1.2; // we don't need to hide text if it's height <= 120% of maxBodyHeight
+
+		if (body.height() > realMaxHeight * coeffToShow && !button.is(":visible")) {
+			body.css("max-height", realMaxHeight);
+			button.show();
+		} else if (body.height() < realMaxHeight && button.is(":visible")) {
+			body.css("max-height", "");
+			button.hide();
 		}
 	}
 };
@@ -1745,12 +1776,15 @@ card.css =
 	'.{class:content} { background: #f8f8f8; border-radius: 3px; }' +
 	'.{class:buttons} { margin-left: 0px; white-space: nowrap; }' +
 	'.{class:metadata} { margin-bottom: 8px; }' +
-	'.{class:body} { padding-top: 0px; margin-bottom: 8px; }' +
+	'.{class:body} { padding-top: 0px; margin-bottom: 8px; overflow: hidden; }' +
 	'.{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{class:authorName} { float: left; color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; max-width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; }' +
 	'.{class:authorName}:after { content: ""; display: inline; padding-right: 5px; }' +
 
-	'.{class:container-child} { padding: 12px 0px 10px 16px; margin: 0px 15px 2px 0px; }' +
+	'.{class:container-child} { padding-bottom: 8px; padding-right: 0px; margin: 0px 15px 2px 0px; }' +
+	'.{class:children} .{class} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; background: #F8F8F8; }' +
+	'.{class:children} .{class} { padding-top: 0px; background: none; border: none; }' +
+
 	'.{class:content} .{class:container-child-thread} { padding: 12px 0px 10px 8px; margin: 0px 15px 2px 0px; }' +
 
 	'.{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
@@ -1811,8 +1845,8 @@ card.css =
 	'.{class:video} .{class:mediaContent} .echo-conversations-nestedcard-video { padding: 0px; }' +
 
 	'.{class:photo}.{class:container}.{class:depth-0} { padding-top: 0; }' +
-	'.{class:photo} .{plugin.class:mediaContent} { margin: 0 -16px; }' +
-	'.{class:photo} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
+	'.{class:photo} .{class:mediaContent} { margin: 0 -16px; }' +
+	'.{class:photo} .{class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
 	'.{class:photo} .echo-conversations-nestedcard-photoContainer { border-top-left-radius: 3px; border-top-right-radius: 3px; }' +
 	'.{class:photo} .{class:data} { padding-top: 0; }' +
 	'.{class:photo} .{class:authorName} { color: #FFFFFF; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); }' +
@@ -1824,6 +1858,11 @@ card.css =
 	'.{class:link} .{plugin.class:mediaContent} .echo-conversations-nestedcard-article { padding: 0px; }' +
 
 	'.{class:mediaContent} { margin-bottom: 8px; }' +
+
+	// see more
+	'.{class:seeMore}:before { content: ""; display: block; height: 3px; box-shadow: 0 -3px 3px rgba(0, 0, 0, 0.08); position: relative; top: 0px; }' +
+	'.{class:seeMore} { margin-top: -8px; display: none; padding: 0 0 15px 0; border-top: 1px solid #D8D8D8; text-align: center; font-size: 12px; cursor: pointer; color: #C6C6C6; }' +
+	'.{class:seeMore}:hover { color: #262626; }' +
 
 	// hide switch for now
 	'.{class:modeSwitch} { width: 0px; height: 0px; }' +
