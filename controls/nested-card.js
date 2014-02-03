@@ -235,9 +235,14 @@ card.renderers.photoContainer = function(element) {
 	var thumbnailWidth = this.view.get("photoThumbnail").width();
 	var expandedHeight = oembed.height;
 	var collapsedHeight = (thumbnailWidth || oembed.width) * 9 / 16;
-
-	//calc height using aspect ratio 16:9
-	if (!element.hasClass(expanded) && oembed.height > collapsedHeight) {
+	var imageWidth = oembed.width;
+	var imageHeight = oembed.height;
+	if (!imageWidth || !imageHeight) {
+		imageWidth = oembed.thumbnail_width;
+		imageHeight = oembed.thumbnail_height;
+	}
+	// calc height using aspect ratio 16:9 if image has ratio 1:2
+	if (!element.hasClass(expanded) && oembed.height > collapsedHeight && imageHeight >= 2 * imageWidth) {
 		var transitionCss = Echo.Utils.foldl({}, ["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(key, acc) {
 			acc[key] = 'max-height ease 500ms';
 		});
