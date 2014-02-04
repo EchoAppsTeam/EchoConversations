@@ -431,6 +431,15 @@ dashboard.config = {
 				"desc": "Specify a width (in px) which the App may not exceed.",
 				"options": []
 			}
+		}, {
+			"component": "Input",
+			"name": "maximumMediaWidth",
+			"type": "number",
+			"config": {
+				"title": "Maximum media width",
+				"desc": "Specify a media content width (in px) which the App may not exceed.",
+				"options": []
+			}
 		}]
 	}, {
 		"component": "Group",

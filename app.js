@@ -193,7 +193,8 @@ conversations.config = {
 	"presentation": {
 		"minimumWidth": 320,
 		"maximumHeight": undefined,
-		"maximumWidth": undefined
+		"maximumWidth": undefined,
+		"maximumMediaWidth": undefined
 	}
 };
 
@@ -406,6 +407,7 @@ conversations.renderers.itemsWaiting = function(element) {
 };
 
 conversations.renderers.container = function(element) {
+	var self = this;
 	var presentationParams = this.config.get("presentation");
 	element.css({
 		"min-width": presentationParams.minimumWidth + "px",
@@ -413,6 +415,18 @@ conversations.renderers.container = function(element) {
 		"max-height": presentationParams.maximumHeight + "px",
 		"overflow-y": "auto"
 	});
+	var containerCounter;
+	this._addEvent(element.get(0), this._getEventName("scroll"), function() {
+		if (containerCounter) {
+			clearTimeout(containerCounter);
+		}
+		containerCounter = setTimeout(function() {
+			self.events.publish({
+				"topic": "onAppViewScroll"
+			});
+		}, 100);
+	});
+	this._addAppViewEvents();
 	return element;
 
 };
@@ -857,7 +871,8 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"name": "ItemsRollingWindow",
 		"moreButton": true
 	}, {
-		"name": "URLResolver"
+		"name": "URLResolver",
+		"presentation": this.config.get("presentation")
 	}], this._getConditionalStreamPluginList(componentID), [{
 		"name": "ModerationCardUI",
 		"extraActions": moderationExtraActions,
@@ -1243,6 +1258,45 @@ conversations.methods._triggerInitialCounterUpdateEvents = function(data) {
 conversations.methods._triggerCounterUpdateEvent = function(data) {
 	var callback = this.config.get(data.component + ".events.onPostCountUpdate");
 	callback && callback(data.count);
+};
+
+conversations.methods._addAppViewEvents = function() {
+	var self = this;
+	var windowCouner;
+	this._addEvent(window, this._getEventName("scroll"), function() {
+		if (windowCouner) {
+			clearTimeout(windowCouner);
+		}
+		windowCouner = setTimeout(function() {
+			self.events.publish({
+				"topic": "onAppViewScroll"
+			});
+		}, 100);
+	});
+	this._addEvent(window, this._getEventName("resize"), function() {
+		if (windowCouner) {
+			clearTimeout(windowCouner);
+		}
+		windowCouner = setTimeout(function() {
+			self.events.publish({
+				"topic": "onAppViewResize"
+			});
+		}, 100);
+	});
+};
+
+conversations.methods._addEvent = function(owner, eventName, handler) {
+	var addFunc = owner.addEventListener || owner.attachEvent;
+	addFunc.call(owner, eventName, handler);
+};
+
+conversations.methods._removeEvent = function(owner, eventName, handler) {
+	var removeFunc = owner.removeEventListener || owner.detachEvent;
+	removeFunc.call(owner, eventName, handler);
+};
+
+conversations.methods._getEventName = function(name) {
+	return window.addEventListener ? name : "on" + name;
 };
 
 conversations.css =

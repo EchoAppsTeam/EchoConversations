@@ -57,7 +57,7 @@ itemPlugin.renderers.mediaContent = function(element) {
 	var cardConfig = media.length && type
 		? { "displaySourceIcon": false, "displayAuthor": false }
 		: {};
-
+	cardConfig.maximumMediaWidth = this.config.get("presentation.maximumMediaWidth");
 	new Echo.Conversations.MediaContainer(this.config.assemble({
 		"target": element.empty(),
 		"data": media,

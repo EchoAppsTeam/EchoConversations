@@ -15,7 +15,7 @@ card.templates.photo =
 					'</div>' +
 				'</div>' +
 				'<div class="{class:photoContainer}">' +
-					'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
+					'<img class="{class:photoThumbnail}" title="{data:title}"/>' +
 				'</div>' +
 				'<div class="{class:photoLabel}">' +
 					'<div class="{class:photoLabelContainer}">' +
@@ -77,7 +77,8 @@ card.templates.main = function() {
 
 card.labels = {
 	"noMediaAvailable": "No media available",
-	"clickToExpand": "Click to expand"
+	"clickToExpand": "Click to expand",
+	"loading": "Loading media..."
 };
 
 
@@ -110,7 +111,8 @@ card.config = {
 		}]
 	},
 	"displaySourceIcon": true,
-	"displayAuthor": true
+	"displayAuthor": true,
+	"maximumMediaWidth": undefined
 };
 
 card.renderers.sourceIcon = function(element) {
@@ -212,20 +214,66 @@ card.renderers.photoThumbnail = function(element) {
 	var thumbnail = this.get("data.type") === "link"
 		? this.get("data.thumbnail_url")
 		: this.get("data.url");
-	// we are to create empty img tag because of IE.
-	// If we have an empty src attribute it triggers
-	// error event all the time.
-	var img = $("<img />");
-	img.attr("class", element.attr("class"));
-	if (element.attr("title")) {
-		img.attr("title", element.attr("title"));
+
+	var imagePlaceholder = $(self.substitute({
+		"template": '<div class="{class:mediaLoading}"><img src="http://cdn.echoenabled.com/sdk/v3.0.16/images/loading.gif"><span>{label:loading}<span></div>'
+	}));
+	function showImage(element) {
+		element.load(function(e) {
+			element.css("min-height", element.height());
+			imagePlaceholder.hide();
+			element.show(500, function() {
+				element.css("min-height", 0);
+			});
+		}).error(function(e) {
+			imagePlaceholder.replaceWith(self.substitute({
+				"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
+			}));
+		}).attr("src", thumbnail);
 	}
-	img.error(function(e) {
-		img.replaceWith(self.substitute({
-			"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
-		}));
-	}).attr("src", thumbnail);
-	return element.replaceWith(img);
+
+	function init(event) {
+		element.hide();
+		if (self._isInViewport(imagePlaceholder)) {
+			event && self._onViewportChange("unsubscribe", init);
+			showImage(element);
+		} else if (typeof(event) !== "string") {
+			self._onViewportChange("subscribe", init);
+		}
+	}
+
+	element.parent().prepend(imagePlaceholder);
+	imagePlaceholder.children("img").first().load(init);
+	element.css("max-width", this.config.get("maximumMediaWidth"));
+	return element;
+};
+
+card.methods._isInViewport = function(canvas) {
+	var viewportHeight = document.documentElement.clientHeight || document.body.clientHeight;
+	var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+	return ((scrollTop + viewportHeight >= canvas.offset().top) && (canvas.offset().top > 0));
+};
+
+card.methods._onViewportChange = function(action, handler) {
+	if (action === "subscribe") {
+		this.events.subscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewScroll",
+			"handler": handler
+		});
+		this.events.subscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewResize",
+			"handler": handler
+		});
+	} else if (action === "unsubscribe") {
+		this.events.unsubscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewScroll",
+			"handler": handler
+		});
+		this.events.unsubscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewResize",
+			"handler": handler
+		});
+	}
 };
 
 card.renderers.photoContainer = function(element) {
@@ -279,7 +327,7 @@ card.renderers.photoLabelContainer = function(element) {
 		element.hide();
 	} else {
 		this.view.get("photoContainer").css({
-			"min-height": (this.displayAuthor() ? 55 : 0) + photoLabelHeight,
+			"min-height": 55 + (this.displayAuthor() ? 55 : 0) + photoLabelHeight, // first number is added for default item avatar
 			"min-width": 200
 		});
 	}
@@ -329,14 +377,16 @@ card.css =
 	'.{class:description} { overflow: hidden; }' +
 
 	// photo
-	'.{class:photo} .{class:noMediaAvailable} { position: relative; min-height: 145px; padding: 75px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
+	'.{class:photo} .{class:noMediaAvailable} { position: relative; min-height: 120px; padding: 100px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
+	'.{class:photo} .{class:mediaLoading} { position: relative; padding: 125px 0px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
+	'.{class:photo} .{class:mediaLoading}>span { padding: 0 10px; margin: 0 auto; }' +
 	'.{class:photoAvatarWrapper} { position: absolute; width: 100%; }' +
 	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:photoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
 	'.{class:photo} { position: relative; left: 0; top: 0; zoom: 1; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
-	'.{class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; }' +
+	'.{class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; min-height: 60px; }' +
 
 	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
