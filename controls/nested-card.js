@@ -40,7 +40,7 @@ card.templates.video =
 				'<div class="{class:videoWrapper}">' +
 					'<div class="{class:videoPlaceholder}">' +
 						'<div class="{class:playButton}"></div>' +
-						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
+						'<img title="{data:title}"/>' +
 					'</div>' +
 				'</div>' +
 				'<div class="{class:title} {class:videoTitle}" title="{data:title}">{data:title}</div>' +
@@ -74,6 +74,11 @@ card.templates.link =
 card.templates.main = function() {
 	return this.templates[this.getRenderType()];
 };
+
+card.templates.mediaPlaceholder =
+	'<div class="{class:mediaPlaceholder}">' +
+		'<div><img src="http://cdn.echoenabled.com/sdk/v3.0.16/images/loading.gif"><span>{label:loading}<span></div>' +
+	'</div>';
 
 card.labels = {
 	"noMediaAvailable": "No media available",
@@ -195,10 +200,44 @@ card.renderers.playButton = function(element) {
 
 card.renderers.videoPlaceholder = function(element) {
 	var oembed = this.get("data");
+	var self = this;
+	var loadingPlaceholder = $(self.substitute({
+		"template": self.templates.mediaPlaceholder
+	}));
 
-	if (!oembed.thumbnail_url) {
-		element.empty().append($(oembed.html));
+	function showVideoPlaceholder(element) {
+		element.load(function(e) {
+			element.css("min-width", element.width());
+			loadingPlaceholder.hide();
+			element.show(500, function() {
+				self.view.get("playButton").show();
+				element.css("min-width", "");
+			});
+		}).error(function(e) {
+			loadingPlaceholder.replaceWith(self.substitute({
+				"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
+			}));
+		});
+
+		if (!oembed.thumbnail_url) {
+			element.empty().append($(oembed.html));
+		} else {
+			element.attr("src", oembed.thumbnail_url);
+		}
 	}
+
+	function init(event) {
+		if (self._isInViewport(loadingPlaceholder)) {
+			event && self._onViewportChange("unsubscribe", init);
+			showVideoPlaceholder(element.children("img"));
+		} else if (typeof(event) !== "string") {
+			self._onViewportChange("subscribe", init);
+		}
+	}
+
+	element.children().hide();
+	element.prepend(loadingPlaceholder);
+	loadingPlaceholder.children().first().children("img").load(init);
 
 	return element.css({
 		"width": oembed.width,
@@ -216,14 +255,15 @@ card.renderers.photoThumbnail = function(element) {
 		: this.get("data.url");
 
 	var imagePlaceholder = $(self.substitute({
-		"template": '<div class="{class:mediaLoading}"><img src="http://cdn.echoenabled.com/sdk/v3.0.16/images/loading.gif"><span>{label:loading}<span></div>'
+		"template": self.templates.mediaPlaceholder
 	}));
+
 	function showImage(element) {
 		element.load(function(e) {
 			element.css("min-height", element.height());
 			imagePlaceholder.hide();
 			element.show(500, function() {
-				element.css("min-height", 0);
+				element.css("min-height", "");
 			});
 		}).error(function(e) {
 			imagePlaceholder.replaceWith(self.substitute({
@@ -243,37 +283,12 @@ card.renderers.photoThumbnail = function(element) {
 	}
 
 	element.parent().prepend(imagePlaceholder);
-	imagePlaceholder.children("img").first().load(init);
-	element.css("max-width", this.config.get("maximumMediaWidth"));
+	imagePlaceholder.children().first().children("img").load(init);
+	element.css({
+		"max-width": this.config.get("maximumMediaWidth"),
+		"width": "100%"
+	});
 	return element;
-};
-
-card.methods._isInViewport = function(canvas) {
-	var viewportHeight = document.documentElement.clientHeight || document.body.clientHeight;
-	var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-	return ((scrollTop + viewportHeight >= canvas.offset().top) && (canvas.offset().top > 0));
-};
-
-card.methods._onViewportChange = function(action, handler) {
-	if (action === "subscribe") {
-		this.events.subscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewScroll",
-			"handler": handler
-		});
-		this.events.subscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewResize",
-			"handler": handler
-		});
-	} else if (action === "unsubscribe") {
-		this.events.unsubscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewScroll",
-			"handler": handler
-		});
-		this.events.unsubscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewResize",
-			"handler": handler
-		});
-	}
 };
 
 card.renderers.photoContainer = function(element) {
@@ -344,6 +359,34 @@ card.renderers.article = function(element) {
 	return element;
 };
 
+card.methods._isInViewport = function(canvas) {
+	var viewportHeight = document.documentElement.clientHeight || document.body.clientHeight;
+	var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+	return ((scrollTop + viewportHeight >= canvas.offset().top) && (canvas.offset().top > 0));
+};
+
+card.methods._onViewportChange = function(action, handler) {
+	if (action === "subscribe") {
+		this.events.subscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewScroll",
+			"handler": handler
+		});
+		this.events.subscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewResize",
+			"handler": handler
+		});
+	} else if (action === "unsubscribe") {
+		this.events.unsubscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewScroll",
+			"handler": handler
+		});
+		this.events.unsubscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewResize",
+			"handler": handler
+		});
+	}
+};
+
 card.methods.displayAuthor = function() {
 	return this.get("data.author_name") && this.config.get("displayAuthor");
 };
@@ -378,8 +421,6 @@ card.css =
 
 	// photo
 	'.{class:photo} .{class:noMediaAvailable} { position: relative; min-height: 120px; padding: 100px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
-	'.{class:photo} .{class:mediaLoading} { position: relative; padding: 125px 0px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
-	'.{class:photo} .{class:mediaLoading}>span { padding: 0 10px; margin: 0 auto; }' +
 	'.{class:photoAvatarWrapper} { position: absolute; width: 100%; }' +
 	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:photoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
@@ -411,10 +452,15 @@ card.css =
 	'.{class:videoDescription} { margin: 5px 0 0 0; }' +
 	'.{class:videoWrapper} { background: #000; }' +
 	'.{class:videoPlaceholder} img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }' +
-	'.{class:videoPlaceholder} { max-width: 100%; position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px auto; background: #000000; overflow: hidden; }' +
+	'.{class:videoPlaceholder} { max-width: 100%; position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px auto; background: #000000; overflow: hidden; text-align:center; }' +
 	'.{class:videoPlaceholder} > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
 	'.{class:videoPlaceholder} > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
 	'.{class:videoPlaceholder} > object { position: absolute; top: 0; left: 0; width: 100%;100 height: 100%; }' +
+
+	// media loading placeholder
+	'.{class:mediaPlaceholder} { position: relative; padding: 110px 0px; background: #000; color: #FFF; text-align: center; }' +
+	'.{class:mediaPlaceholder} span { padding: 0 10px; margin: 0 auto; }' +
+	'.{class:mediaPlaceholder} img { position: relative; }' +
 
 	// article
 	'.{class:article} { padding: 10px; min-width: 200px; }' +
