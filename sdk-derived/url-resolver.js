@@ -40,7 +40,7 @@ Echo.URLResolver.prototype._resolve = function(urls, callback) {
 			return $.extend(true, {}, cache[url]);
 		}));
 	};
-	// normalize urls and colected unresolved ones
+	// normalize urls and collect unresolved ones
 	urls = $.map(urls, function(url) {
 		url = self.normalizeURL(url);
 		if (url && !cache[url]) {
