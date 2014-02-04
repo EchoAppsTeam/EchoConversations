@@ -398,6 +398,42 @@ dashboard.config = {
 		}
 	}, {
 		"component": "Group",
+		"name": "presentation",
+		"type": "object",
+		"config": {
+			"title": "Presentation"
+		},
+		"items": [{
+			"component": "Input",
+			"name": "minimumWidth",
+			"type": "number",
+			"default": 320,
+			"config": {
+				"title": "Minimum width",
+				"desc": "Specify the minimum allowed width (in px) of the App",
+				"options": []
+			}
+		}, {
+			"component": "Input",
+			"name": "maximumHeight",
+			"type": "number",
+			"config": {
+				"title": "Maximum height",
+				"desc": "Specify a height (in px) which the App may not exceed. In the event that there is more content to display, a scrollbar will appear.",
+				"options": []
+			}
+		}, {
+			"component": "Input",
+			"name": "maximumWidth",
+			"type": "number",
+			"config": {
+				"title": "Maximum width",
+				"desc": "Specify a width (in px) which the App may not exceed.",
+				"options": []
+			}
+		}]
+	}, {
+		"component": "Group",
 		"name": "streamingControl",
 		"type": "object",
 		"config": {

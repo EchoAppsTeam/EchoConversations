@@ -189,6 +189,11 @@ conversations.config = {
 	"topMarkers": {
 		"item": "Conversations.TopPost",
 		"user": "Conversations.TopContributor"
+	},
+	"presentation": {
+		"minimumWidth": 320,
+		"maximumHeight": undefined,
+		"maximumWidth": undefined
 	}
 };
 
@@ -398,6 +403,18 @@ conversations.renderers.itemsWaiting = function(element) {
 		element.hide();
 	}
 	return element;
+};
+
+conversations.renderers.container = function(element) {
+	var presentationParams = this.config.get("presentation");
+	element.css({
+		"min-width": presentationParams.minimumWidth + "px",
+		"max-width": presentationParams.maximumWidth + "px",
+		"max-height": presentationParams.maximumHeight + "px",
+		"overflow-y": "auto"
+	});
+	return element;
+
 };
 
 conversations.renderers.content = function(element) {
@@ -1274,7 +1291,7 @@ conversations.css =
 	'.{class:container} .echo-control-message { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{class:container} { position:relative; }' +
 	'.{class:resizeFrame} { position:absolute; z-index:-1; border:0; padding:0; }' +
-	'.{class:container} { min-height: 200px; min-width: 320px; }' +
+	'.{class:container} { min-height: 200px; }' +
 	'.{class:container} li > a, ' +
 	'.{class:container} .echo-primaryFont,' +
 	'.{class:container} .echo-secondaryFont,' +
