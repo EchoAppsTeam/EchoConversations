@@ -858,7 +858,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"displayStyle": config.likesDisplayStyle
 	}, {
 		"intentID": "CommunityFlag",
-		"name": "CommunityFlagCardUI",
+		"name": "CommunityFlag",
 		"showUserList": false
 	}, $.extend(true, replyComposer, {
 		"intentID": "Reply",
@@ -887,7 +887,6 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	}, {
 		"intentID": "Edit",
 		"name": "Edit",
-		"icon": "icon-pencil", // TODO: get rid of it when new buttons protocol will be implemented
 		"requestMethod": "POST",
 		"nestedPlugins": [{
 			"name": "LinkComposer"

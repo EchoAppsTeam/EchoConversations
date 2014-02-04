@@ -69,6 +69,7 @@ plugin.methods._assembleButton = function() {
 		var item = this;
 		return {
 			"name": "Edit",
+			"icon": "icon-pencil",
 			"label": plugin.labels.get("editButton"),
 			"visible": item.user.is("admin") || item.user.has("identity", item.get("data.actor.id")),
 			"callback": function() {
