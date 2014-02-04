@@ -37,10 +37,12 @@ card.templates.video =
 				'<div class="{class:avatar} {class:videoAvatar}" title="{data:author_name}">' +
 					'<div></div>{data:author_name}' +
 				'</div>' +
-				'<div class="{class:videoWrapper}">' +
-					'<div class="{class:videoPlaceholder}">' +
-						'<div class="{class:playButton}"></div>' +
-						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
+				'<div class="{class:videoContainer}">' +
+					'<div class="{class:videoWrapper}">' +
+						'<div class="{class:videoPlaceholder}">' +
+							'<div class="{class:playButton}"></div>' +
+							'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
+						'</div>' +
 					'</div>' +
 				'</div>' +
 				'<div class="{class:title} {class:videoTitle}" title="{data:title}">{data:title}</div>' +
@@ -198,10 +200,11 @@ card.renderers.videoPlaceholder = function(element) {
 		element.empty().append($(oembed.html));
 	}
 
-	return element.css({
-		"width": oembed.width,
-		"padding-bottom": oembed.height / oembed.width * 100 + "%"
-	});
+	return element.css("padding-bottom", oembed.height / oembed.width * 100 + "%");
+};
+
+card.renderers.videoWrapper = function(element) {
+	return element.css("width", this.get("data.width"));
 };
 
 /**
@@ -354,7 +357,8 @@ card.css =
 	'.{class:videoTitle} { margin: 10px 0 0 0; }' +
 	'.{class:videoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
 	'.{class:videoDescription} { margin: 5px 0 0 0; }' +
-	'.{class:videoWrapper} { background: #000; }' +
+	'.{class:videoWrapper} { background: #000; max-width: 100%; margin: 0 auto; }' +
+	'.{class:videoContainer} { background: #000; }' +
 	'.{class:videoPlaceholder} img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }' +
 	'.{class:videoPlaceholder} { max-width: 100%; position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px auto; background: #000000; overflow: hidden; }' +
 	'.{class:videoPlaceholder} > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
