@@ -120,6 +120,7 @@ composer.init = function() {
 composer.destroy = function() {
 	this.auth && this.auth.destroy();
 	this.tabs && this.tabs.destroy();
+	this.mediaContainer && this.mediaContainer.destroy();
 };
 
 composer.config = {
@@ -318,7 +319,6 @@ composer.config = {
 		"apiKey": "5945901611864679a8761b0fcaa56f87",
 		"maxDescriptionCharacters": "200"
 	},
-	"mediaWidth": 230,
 	"displaySharingOnPost": true,
 	"submitPermissions": "forceLogin",
 	"confirmation": {
@@ -439,9 +439,7 @@ composer.templates.main =
 		'</div>' +
 		'<div class="{class:tabs}"></div>' +
 		'<div class="{class:composers}"></div>' +
-		'<div class="{class:mediaWrapper}">' +
-			'<div class="{class:media}"></div>' +
-		'</div>' +
+		'<div class="{class:media}"></div>' +
 		'<div class="{class:metadata}">' +
 			'<div class="echo-primaryFont echo-primaryColor {class:markersContainer} {class:metadataContainer}">' +
 				'<div class="{class:metadataLabel}">{label:markers}</div>' +
@@ -531,21 +529,22 @@ composer.renderers.tabs = function(element) {
 /**
  * @echo_renderer
  */
-composer.renderers.mediaWrapper = function(element) {
-	var action = this.formData.media.length ? "addClass" : "removeClass";
-	element[action](this.cssPrefix + "nonEmpty");
-};
-
-/**
- * @echo_renderer
- */
 composer.renderers.media = function(element) {
 	var self = this;
-	element.empty();
-	$.each(this.formData.media, function(i, media) {
-		media.card = self._renderMedia(media.oembed);
+	this.mediaContainer && this.mediaContainer.destroy();
+	if (!this.formData.media.length) return element;
+
+	this.mediaContainer = new Echo.Conversations.MediaContainer({
+		"target": element.empty(),
+		"data": this.formData.media,
+		"card": {
+			"displaySourceIcon": false,
+			"displayAuthor": false,
+			"onRemove": function(data) {
+				self.removeMedia(self._getDefinedMediaIndex(data));
+			}
+		}
 	});
-	this.view.render({"name": "mediaWrapper"});
 	return element;
 };
 
@@ -784,8 +783,8 @@ composer.methods.post = function() {
 		if (!template) return null;
 		return self.substitute({
 			"template": template,
-			"data": $.extend(true, {}, media.oembed, {
-				"oembed": self._jsonEncode(media.oembed)
+			"data": $.extend(true, {}, media, {
+				"oembed": self._jsonEncode(media)
 			})
 		});
 	});
@@ -887,43 +886,29 @@ composer.methods.attachMedia = function(params) {
 		return $.trim(url);
 	});
 	this.resolver.resolve(urls, function(data) {
-		data = $.grep(data, function(oembed) {
-			return !~self._getDefinedMediaIndex(oembed);
-		});
-		if (!data.length) return;
 		if (params.removeOld) {
 			self.removeMedia();
 		}
-		$.each(data, function(i, oembed) {
-			if (!oembed) return;
-			// TODO get rid of available types list here (move it into NestedCard?)
-			if (!~$.inArray(oembed.type, ["link", "photo", "video"])) return;
-			self.formData.media.push({
-				"oembed": oembed,
-				"card": params.render && self._renderMedia(oembed)
-			});
+		data = $.grep(data, function(oembed) {
+			return !$.isEmptyObject(oembed) && !~self._getDefinedMediaIndex(oembed);
 		});
-		self.view.render({"name": "mediaWrapper"});
+		if (!data.length) return;
+		$.each(data, function(i, oembed) {
+			self.formData.media.push(oembed);
+		});
+		self.view.render({"name": "media"});
 	});
 };
 
 composer.methods.removeMedia = function(index) {
 	if (typeof index === "undefined") {
-		while (this.formData.media.length) {
-			this.removeMedia(0);
-		}
+		this.formData.media = [];
+	} else if (!~index) {
 		return;
+	} else {
+		this.formData.media.splice(index, 1);
 	}
-
-	if (!~index) return;
-	var media = this.formData.media.splice(index, 1);
-	if (media[0].card) {
-		media[0].card.destroy();
-		media[0].card.config.get("target").remove();
-	}
-	if (this.view.get("media").is(":empty")) {
-		this.view.render({"name": "mediaWrapper"});
-	}
+	this.view.render({"name": "media"});
 };
 
 /**
@@ -947,7 +932,7 @@ composer.methods.addPostValidator = function(validator, priority) {
 /**
  * Method implements the refresh logic for the Submit Composer control.
  */
-composer.methods.refresh = function() {
+/*composer.methods.refresh = function() {
 	var self = this;
 	this.config.set("data.object.content", this.view.get("text").val());
 	$.map(["tags", "markers"], function(field) {
@@ -956,7 +941,7 @@ composer.methods.refresh = function() {
 	});
 	var component = Echo.Utils.getComponent("Echo.StreamServer.Controls.SubmitComposer");
 	component.parent.refresh.call(this);
-};
+};*/
 
 composer.methods._extractInfoFromExternalData = function() {
 	var self = this;
@@ -973,9 +958,7 @@ composer.methods._extractInfoFromExternalData = function() {
 		self.formData.text = $(".echo-item-text", content).html();
 		if (/*self.get("content") !== item.get("data.object.content") || */!self.formData.media.length) {
 			self.formData.media = $("div[oembed], div[data-oembed]", content).map(function() {
-				return {
-					"oembed": $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"))
-				};
+				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
 			}).get();
 		}
 		var composer = $(".echo-item-files", content).data("composer");
@@ -1006,11 +989,11 @@ composer.methods._getDefinedMediaIndex = function(oembed) {
 		"video": fields.slice().concat("html")
 	};
 	$.each(this.formData.media, function(i, media) {
-		if (media.oembed.type !== oembed.type) return;
+		if (media.type !== oembed.type) return;
 		$.each(fieldsByType[oembed.type], function(j, field) {
 			found = true;
-			if (typeof media.oembed[field] !== "undefined" &&
-				media.oembed[field] !== oembed[field]
+			if (typeof media[field] !== "undefined" &&
+				media[field] !== oembed[field]
 			) {
 				found = false;
 				return false;
@@ -1265,14 +1248,7 @@ composer.css =
 	'.{class:error} { border: 1px solid red; }' +
 	'.{class:error} input, .{class:error} textarea { background: no-repeat center right url({config:cdnBaseURL.sdk-assets}/images/warning.gif); }' +
 
-	'.{class:mediaWrapper}.{class:nonEmpty} { overflow-y: hidden; overflow-x: auto; border: 1px solid #DEDEDE; border-top-style: dashed; border-bottom: 0px; background-color: #F1F1F1; padding: 10px 5px; }' +
-	'.{class:media} { white-space: nowrap; }' +
-	'.{class:media} > div { display: inline-block; white-space: normal; margin-right: 8px; position: relative; vertical-align: top; }' +
-	'.{class:mediaWrapper}::-webkit-scrollbar { height: 10px; }' +
-	'.{class:mediaWrapper}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); }' +
-	'.{class:mediaWrapper}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5); }' +
-	'.{class:close} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
-	'.{class:close}:hover { opacity: 1; filter: alpha(opacity=100); }' +
+	'.{class:media} .echo-conversations-mediacontainer-multiple { border: 1px solid #DEDEDE; border-top-style: dashed; border-bottom: 0px; background-color: #F1F1F1; }' +
 
 	// tabs
 	'.{class:icon} { vertical-align: middle; margin-right: 2px; }' +

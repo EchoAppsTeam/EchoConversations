@@ -52,6 +52,11 @@ media.renderers.container = function(element) {
 	return element;
 };
 
+media.destroy = function() {
+	$.each(this.cards, function(i, card) {
+		card.destroy();
+	});
+};
 
 media.css =
 	'.{class:container} { line-height: 1px; word-wrap: normal; white-space: nowrap; overflow-x: auto; overflow-y: hidden; padding: 8px 0px 8px 8px; }' +

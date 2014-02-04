@@ -35,8 +35,7 @@ plugin.init = function() {
 		"mediaTemplate": $.proxy(this.mediaTemplate, this),
 		"text": $.proxy(this.getText, this),
 		"fill": $.proxy(this.fill, this),
-		// TODO: select proper type (comment? note?)
-		"postType": "http://activitystrea.ms/schema/1.0/article"
+		"postType": "http://activitystrea.ms/schema/1.0/comment"
 	});
 };
 
@@ -114,7 +113,7 @@ plugin.methods.getText = function() {
 plugin.methods.fill = function(data) {
 	this.composer.find(".echo-link-composer-title").val(data.text);
 	if (data.media.length === 1) {
-		var media = data.media[0].oembed;
+		var media = data.media[0];
 		this.composer.find(".echo-link-composer-link").val(media.original_url || media.url);
 	}
 };

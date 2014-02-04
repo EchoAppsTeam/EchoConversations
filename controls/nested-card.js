@@ -28,6 +28,7 @@ card.templates.photo =
 			'</div>' +
 			'<a class="{class:sourceIcon}" target="_blank"></a>' +
 		'</div>' +
+		'<div class="echo-primaryFont {class:closeButton}">&times;</div>' +
 	'</div>';
 
 card.templates.video =
@@ -50,6 +51,7 @@ card.templates.video =
 				'<a class="{class:sourceIcon}" target="_blank"></a>' +
 			'</div>' +
 		'</div>' +
+		'<div class="echo-primaryFont {class:closeButton}">&times;</div>' +
 	'</div>';
 
 card.templates.link =
@@ -71,6 +73,7 @@ card.templates.link =
 				'<a class="{class:sourceIcon}" target="_blank"></a>' +
 			'</div>' +
 		'</div>' +
+		'<div class="echo-primaryFont {class:closeButton}">&times;</div>' +
 	'</div>';
 
 card.templates.main = function() {
@@ -113,6 +116,16 @@ card.config = {
 	},
 	"displaySourceIcon": true,
 	"displayAuthor": true
+};
+
+card.renderers.closeButton = function(element) {
+	var self = this;
+	if (!$.isFunction(this.config.get("onRemove"))) {
+		return element.hide();
+	}
+	return element.show().one("click", function() {
+		self.config.get("onRemove")(self.get("data"));
+	});
 };
 
 card.renderers.sourceIcon = function(element) {
@@ -320,11 +333,15 @@ var transition = function(value) {
 
 card.css =
 	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:item} { text-align: left; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; }' +
+	'.{class:item} { text-align: left; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; position: relative; }' +
 	'.{class:border} { white-space: normal; word-break: break-word; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; }' +
 	'.{class:item} .{class:sourceIcon} > img { width: 18px; height: 18px; }' +
 	'.echo-sdk-ui .{class:avatar} > div { width: 28px; height: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; margin-right: 6px; }' +
 	'.{class:description} { overflow: hidden; }' +
+
+	// close button
+	'.{class:closeButton} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
+	'.{class:closeButton}:hover { opacity: 1; filter: alpha(opacity=100); }' +
 
 	// photo
 	'.{class:photo} .{class:noMediaAvailable} { position: relative; min-height: 145px; padding: 75px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
