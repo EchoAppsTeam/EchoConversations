@@ -1854,8 +1854,8 @@ card.css =
 	'.{class:photo} .{class:avatar-wrapper} { z-index: 10; position: absolute; top: 15px; }' +
 	'.{class:photo} .{class:header-container} { z-index: 10; position: relative; top: 50px; margin-top: -36px; }' +
 
-	'.{class:link} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
-	'.{class:link} .{plugin.class:mediaContent} .echo-conversations-nestedcard-article { padding: 0px; }' +
+	'.{class:link} .{class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
+	'.{class:link} .{class:mediaContent} .echo-conversations-nestedcard-article { padding: 0px; }' +
 
 	'.{class:mediaContent} { margin-bottom: 8px; }' +
 
