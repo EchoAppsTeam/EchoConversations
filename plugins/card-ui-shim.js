@@ -280,6 +280,9 @@ plugin.renderers.seeMore = function(element) {
 	var self = this;
 	var item = this.component;
 	return element.one("click", function() {
+		self.events.publish({
+			"topic": "onItemExpand"
+		});
 		self.view.remove("seeMore");
 		item.view.get("body").css("max-height", "");
 	});

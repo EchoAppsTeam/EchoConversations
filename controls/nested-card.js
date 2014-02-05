@@ -212,6 +212,9 @@ card.renderers.videoPlaceholder = function(element) {
 			element.show(500, function() {
 				self.view.get("playButton").show();
 				element.css("min-width", "");
+				self.events.publish({
+					"topic":"onMediaLoad"
+				});
 			});
 		}).error(function(e) {
 			loadingPlaceholder.replaceWith(self.substitute({
@@ -227,7 +230,7 @@ card.renderers.videoPlaceholder = function(element) {
 	}
 
 	function init(event) {
-		if (self._isInViewport(loadingPlaceholder)) {
+		if ($.inviewport(loadingPlaceholder, {"threshold": 10})) {
 			event && self._onViewportChange("unsubscribe", init);
 			showVideoPlaceholder(element.children("img"));
 		} else if (typeof(event) !== "string") {
@@ -264,6 +267,9 @@ card.renderers.photoThumbnail = function(element) {
 			imagePlaceholder.hide();
 			element.show(500, function() {
 				element.css("min-height", "");
+				self.events.publish({
+					"topic":"onMediaLoad"
+				});
 			});
 		}).error(function(e) {
 			imagePlaceholder.replaceWith(self.substitute({
@@ -274,7 +280,7 @@ card.renderers.photoThumbnail = function(element) {
 
 	function init(event) {
 		element.hide();
-		if (self._isInViewport(imagePlaceholder)) {
+		if ($.inviewport(imagePlaceholder, {"threshold": 10})) {
 			event && self._onViewportChange("unsubscribe", init);
 			showImage(element);
 		} else if (typeof(event) !== "string") {
@@ -293,7 +299,7 @@ card.renderers.photoThumbnail = function(element) {
 
 card.renderers.photoContainer = function(element) {
 	var expanded = this.cssPrefix + "expanded";
-
+	var self = this;
 	var oembed = this.get("data", {});
 	var thumbnailWidth = this.view.get("photoThumbnail").width();
 	var expandedHeight = oembed.height;
@@ -314,6 +320,9 @@ card.renderers.photoContainer = function(element) {
 			.attr("title", this.labels.get("clickToExpand"))
 			.css("max-height", 250)
 			.one("click", function() {
+				self.events.publish({
+					"topic": "onMediaExpand"
+				});
 				element.css(transitionCss)
 					.css("max-height", expandedHeight)
 					.removeClass("echo-clickable")
@@ -357,12 +366,6 @@ card.renderers.article = function(element) {
 		element.addClass(this.cssPrefix + "withoutPhoto");
 	}
 	return element;
-};
-
-card.methods._isInViewport = function(canvas) {
-	var viewportHeight = document.documentElement.clientHeight || document.body.clientHeight;
-	var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-	return ((scrollTop + viewportHeight >= canvas.offset().top) && (canvas.offset().top > 0));
 };
 
 card.methods._onViewportChange = function(action, handler) {
