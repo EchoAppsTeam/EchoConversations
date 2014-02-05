@@ -850,7 +850,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 
 	var plugins = [{
 		"intentID": "Like",
-		"name": "LikeCardUI",
+		"name": "Like",
 		"item": {
 			"avatar": true,
 			"text": false
