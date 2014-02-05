@@ -53,7 +53,8 @@ plugin.config = {
 	 *			}]
 	 *		});
 	 */
-	"actionString": "Write a reply..."
+	"actionString": "Add a comment...",
+	"displayCompactForm": true
 };
 
 plugin.labels = {
@@ -124,7 +125,6 @@ plugin.component.renderers.children = function(element) {
 	if (item.get("children").length === 1) {
 		var child = item.get("children")[0];
 		if (child.get("added") || child.get("deleted")) {
-			this._itemCSS("remove", item, this.view.get("compactForm"));
 			this.view.render({"name": "compactForm"});
 		}
 	}
@@ -142,14 +142,18 @@ plugin.renderers.submitForm = function(element) {
  * @echo_renderer
  */
 plugin.renderers.compactForm = function(element) {
+	return this._isCompactFormVisible()
+		? element.show()
+		: element.hide();
+};
+
+/**
+ * @echo_renderer
+ */
+plugin.renderers.replyForm = function(element) {
 	var item = this.component;
-	var hasChildren = !!item.children.length;
-	if (!item.get("depth") && hasChildren && !this.get("expanded") && !item.get("children")[0].get("deleted")) {
-		this._itemCSS("add", item, element);
-		return element.show();
-	}
-	this._itemCSS("remove", item, this.view.get("compactForm"));
-	return element.hide();
+	return element
+		.addClass(item.get("cssPrefix") + "depth-" + (item.get("depth") + 1));
 };
 
 /**
@@ -177,6 +181,11 @@ plugin.methods.destroy = function() {
 	$(document).off('click', this.get("documentClickHandler"));
 };
 
+plugin.methods._isCompactFormVisible = function() {
+	var item = this.component;
+	return !item.get("depth") && !this.get("expanded") && this.config.get("displayCompactForm");
+};
+
 plugin.methods._submitConfig = function(target) {
 	var plugin = this, item = this.component;
 	return plugin.config.assemble({
@@ -195,7 +204,6 @@ plugin.methods._submitConfig = function(target) {
 plugin.methods._showSubmit = function() {
 	var item = this.component;
 	var target = this.view.get("submitForm");
-	this._itemCSS("add", item, this.view.get("submitForm"));
 	var submit = this.get("submit");
 	if (submit) {
 		submit.config.set("target", target);
@@ -219,7 +227,6 @@ plugin.methods._hideSubmit = function() {
 		submit.set("data", undefined);
 	}
 	this.set("expanded", false);
-	this._itemCSS("remove", item, this.view.get("submitForm"));
 	this.view.get("submitForm").empty();
 	this.view.render({"name": "compactForm"});
 	item.view.render({"name": "container"});
@@ -271,18 +278,12 @@ plugin.methods._assembleButton = function() {
 		var item = this;
 		return {
 			"name": "Reply",
+			"icon": "icon-comment",
 			"label": plugin.labels.get("replyControl"),
 			"visible": item.get("depth") < item.config.get("parent.children.maxDepth"),
 			"callback": callback
 		};
 	};
-};
-
-plugin.methods._itemCSS = function(action, item, element) {
-	$.each(["container", "container-child", "depth-" + (item.get("depth") + 1)], function(i, css) {
-		element[action + "Class"](item.get("cssPrefix") + css);
-	});
-	element[action + "Class"]('echo-trinaryBackgroundColor');
 };
 
 plugin.methods._getSubmitKey = function() {
@@ -303,13 +304,15 @@ plugin.methods._getSubmitData = function() {
 };
 
 plugin.css =
-	".{plugin.class:compactContent} { padding: 5px 5px 5px 6px; background-color: #fff; }" +
-	".{plugin.class:compactBorder} { border: 1px solid #d2d2d2; }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-secondaryColor { color: #C6C6C6 }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'].echo-primaryFont { font-size: 12px; line-height: 16px; }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text'] { width: 100%; height: 16px; border: none; margin: 0px; padding: 0px; box-shadow: none; vertical-align: middle; }" +
-	".{plugin.class:compactContent} input.{plugin.class:compactField}[type='text']:focus { outline: 0; box-shadow: none; }";// +
-	//'.{plugin.class} .{class:depth-0} .{class:subwrapper} { margin-left: 0px; }';
+	'.{plugin.class:replyForm} { margin-right: 15px; border-left: 4px solid transparent; }' +
+	'.{plugin.class:submitForm} { padding: 8px 0px 15px 0px; }' +
+	'.{plugin.class:compactForm} { padding: 8px 0px 15px 0px; }' +
+	'.{plugin.class:compactContent} { padding: 0px 5px 0px 6px; background-color: #fff; height: 28px; line-height: 28px; }' +
+	'.{plugin.class:compactBorder} { border: 1px solid #d2d2d2; }' +
+	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"].echo-secondaryColor { color: #C6C6C6 }' +
+	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"].echo-primaryFont { font-size: 12px; line-height: 16px; }' +
+	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"] { width: 100%; height: 16px; border: none; margin: 0px; padding: 0px; box-shadow: none; vertical-align: middle; }' +
+	'.{plugin.class:compactContent} input.{plugin.class:compactField}[type="text"]:focus { outline: 0; box-shadow: none; }';
 
 Echo.Plugin.create(plugin);
 
