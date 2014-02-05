@@ -689,7 +689,7 @@ conversations.renderers._streamSorter = function(element, extra) {
 	var config = this.config.get(extra.id);
 
 	var getCurrentTitle = function() {
-		var value = Echo.Cookie.get([extra.id, "sortOrder"].join("."))
+		var value = Echo.Cookie.get([extra.id, self.config.get("targetURL"), "sortOrder"].join("."))
 			|| (function() {
 
 				var stream = self.getComponent(extra.id);
@@ -717,7 +717,7 @@ conversations.renderers._streamSorter = function(element, extra) {
 			return {
 				"title": entry.title,
 				"handler": function() {
-					Echo.Cookie.set([extra.id, "sortOrder"].join("."), entry.value);
+					Echo.Cookie.set([extra.id, self.config.get("targetURL"), "sortOrder"].join("."), entry.value);
 					dropdown.setTitle(entry.title);
 
 					var stream = self.getComponent(extra.id);
@@ -994,7 +994,7 @@ conversations.methods._assembleSearchQuery = function(componentID, overrides) {
 		"data": $.extend({}, config, {
 			"targetURL": this.config.get("targetURL"),
 			"type": config.itemTypes.length ? "type:" + config.itemTypes.join(",") : "",
-			"initialSortOrder": Echo.Cookie.get([componentID, "sortOrder"].join(".")) || config.initialSortOrder
+			"initialSortOrder": Echo.Cookie.get([componentID, this.config.get("targetURL"), "sortOrder"].join(".")) || config.initialSortOrder
 		}, args, overrides)
 	});
 };
