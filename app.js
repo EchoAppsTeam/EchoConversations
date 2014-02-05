@@ -75,6 +75,7 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"displayEditIntent": true,
 		"displayCommunityFlagIntent": false,
+		"displayTweets": true,
 		"likesDisplayStyle": "facepile",
 		"replyNestingLevels": 2,
 		"itemStates": ["Untouched", "ModeratorApproved"],
@@ -118,6 +119,7 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"displayEditIntent": true,
 		"displayCommunityFlagIntent": true,
+		"displayTweets": true,
 		"likesDisplayStyle": "facepile",
 		"replyNestingLevels": 2,
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
@@ -344,7 +346,7 @@ conversations.templates.tabs.contentItem =
 	'<div class="tab-pane {data:class}" id="{data:tabId}"></div>';
 
 conversations.templates.defaultQuery =
-	'{data:filter}:{data:targetURL} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
+	'{data:filter}:{data:targetURL} {data:excludedSources} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
 	'itemsPerPage:{data:initialItemsPerPage} {data:markers} {data:type} ' +
 	'{data:operators} children:{data:replyNestingLevels} {data:childrenOperators}';
 
@@ -993,6 +995,7 @@ conversations.methods._assembleSearchQuery = function(componentID, overrides) {
 		"template": query || conversations.templates.defaultQuery,
 		"data": $.extend({}, config, {
 			"targetURL": this.config.get("targetURL"),
+			"excludedSources": config.displayTweets === false ? "-source:Twitter" : "",
 			"type": config.itemTypes.length ? "type:" + config.itemTypes.join(",") : "",
 			"initialSortOrder": Echo.Cookie.get([componentID, this.config.get("targetURL"), "sortOrder"].join(".")) || config.initialSortOrder
 		}, args, overrides)

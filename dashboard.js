@@ -174,6 +174,15 @@ dashboard.vars = {
 			"desc": "If enabled, users will be able to edit their own posts. Moderators and admins will be able to edit any post."
 		}
 	}, {
+		"component": "Checkbox",
+		"name": "displayTweets",
+		"type": "boolean",
+		"default": true,
+		"config": {
+			"title": "Display Twitter Items",
+			"desc": "Enable twitter items."
+		}
+	}, {
 		"component": "Select",
 		"name": "likesDisplayStyle",
 		"type": "string",
@@ -603,7 +612,7 @@ dashboard.config.normalizer = {
 					var items = assembleBaseECL.call(this);
 
 					items[3]["default"] = 5; // override initialItemsPerPage value
-					items[16]["items"][0]["default"] = true;
+					items[17]["items"][0]["default"] = true;
 					items.pop();
 
 					items.splice(5, 0, {
@@ -622,7 +631,7 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
-					items[16]["items"].push(component.get("premoderationECL"));
+					items[17]["items"].push(component.get("premoderationECL"));
 					items.splice(11, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
