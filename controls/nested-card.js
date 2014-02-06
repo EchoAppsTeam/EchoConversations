@@ -209,7 +209,7 @@ card.renderers.videoPlaceholder = function(element) {
 		element.load(function(e) {
 			element.css("min-width", element.width());
 			loadingPlaceholder.hide();
-			element.show(500, function() {
+			element.show(200, function() {
 				self.view.get("playButton").show();
 				element.css("min-width", "");
 				self.events.publish({
@@ -230,7 +230,7 @@ card.renderers.videoPlaceholder = function(element) {
 	}
 
 	function init(event) {
-		if ($.inviewport(loadingPlaceholder, {"threshold": 10})) {
+		if ($.inviewport(loadingPlaceholder, {"threshold": 0}) || self._belowthefold(loadingPlaceholder, {"threshold": 0, "range": 500})) {
 			event && self._onViewportChange("unsubscribe", init);
 			showVideoPlaceholder(element.children("img"));
 		} else if (typeof(event) !== "string") {
@@ -265,7 +265,7 @@ card.renderers.photoThumbnail = function(element) {
 		element.load(function(e) {
 			element.css("min-height", element.height());
 			imagePlaceholder.hide();
-			element.show(500, function() {
+			element.show(200, function() {
 				element.css("min-height", "");
 				self.events.publish({
 					"topic":"onMediaLoad"
@@ -280,7 +280,7 @@ card.renderers.photoThumbnail = function(element) {
 
 	function init(event) {
 		element.hide();
-		if ($.inviewport(imagePlaceholder, {"threshold": 10})) {
+		if ($.inviewport(imagePlaceholder, {"threshold": 0}) || self._belowthefold(imagePlaceholder, {"threshold": 0, "range": 500 })) {
 			event && self._onViewportChange("unsubscribe", init);
 			showImage(element);
 		} else if (typeof(event) !== "string") {
@@ -366,6 +366,11 @@ card.renderers.article = function(element) {
 		element.addClass(this.cssPrefix + "withoutPhoto");
 	}
 	return element;
+};
+
+card.methods._belowthefold = function(element, settings) {
+	var fold = $(window).height() + $(window).scrollTop();
+	return ((settings.range + fold >= $(element).offset().top - settings.threshold) && (fold <= $(element).offset().top - settings.threshold));
 };
 
 card.methods._onViewportChange = function(action, handler) {
