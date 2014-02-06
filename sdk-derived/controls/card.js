@@ -78,26 +78,27 @@ card.events = {
 	"Echo.Card.onRender": function() {
 		this._pageLayoutChange();
 	},
-	"Echo.CardsCollection.onActivitiesComplete": function() {
+	"Echo.CardCollection.onCardShown": function(topic, args) {
+		if (args.item.data.unique !== this.get("data.unique")) return;
 		this._pageLayoutChange();
 		var self = this;
 		var container = this.view.get("container");
-		if (this.get("isLiveUpdate") && container) {
+
+		if (this.get("isItemNew") && container) {
 			var fade = function() {
 				if ($.inviewport(container, {"threshold": 0})) {
-					self.set("isLiveUpdate", false);
+					self.set("isItemNew", false);
 					if (self._transitionSupported()) {
-						container.removeClass(self.cssPrefix + "liveUpdate");
+						container.removeClass(self.cssPrefix + "new");
 					} else {
 						setTimeout(function() {
 							// IE 8-9 doesn't support transition, so we just remove the highlighting.
 							// Maybe we should use jquery.animate (animating colors requires jQuery UI) ?
-							container.removeClass(self.cssPrefix + "liveUpdate");
+							container.removeClass(self.cssPrefix + "new");
 						}, self.config.get("fadeTimeout"));
 					}
 					$(document).off("scroll", fade).off("resize", fade);
 					return true;
-
 				} else {
 					return false;
 				}
@@ -111,6 +112,7 @@ card.events = {
 
 card.init = function() {
 	this.timestamp = Echo.Utils.timestampFromW3CDTF(this.get("data.object.published"));
+	this.set("isItemNew", this.config.get("live"));
 	this.ready();
 	if (!this.config.get("manualRendering")) {
 		this.render();
@@ -490,7 +492,6 @@ card.renderers.date = function(element) {
 	return element.html(this.age);
 };
 
-
 card.renderers.indicator = function(element) {
 	var transition = "background-color " + this.config.get("fadeTimeout") + "ms linear";
 	element.css({
@@ -508,9 +509,11 @@ card.renderers.indicator = function(element) {
  */
 card.renderers.container = function(element) {
 	var self = this;
-	if (this.get("isLiveUpdate")) {
-		element.addClass(this.cssPrefix + "liveUpdate");
+
+	if (this.get("isItemNew")) {
+		element.addClass(this.cssPrefix + "new");
 	}
+
 	element.removeClass(
 		$.map(["child", "root", "child-thread", "root-thread"],	function(suffix) {
 			return self.cssPrefix + "container-" + suffix;
@@ -1764,9 +1767,8 @@ card.css =
 	'.{class:dropdownButton} > .dropdown { display: inline; }' +
 	'.{class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
 	'.{class:containerWrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
-	'.{class:container} { border-left: 4px solid transparent; background: #ffffff; position: relative; }' +
+	'.{class:container} { background: #ffffff; position: relative; }' +
 	'.{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
-	'.{class:container}.{class:liveUpdate} { border-left: 4px solid #f5ba47; }' +
 
 	'.echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
 	'.{class:date} { float: left; color: #d3d3d3; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; max-width: 100%; }' +
@@ -1833,7 +1835,7 @@ card.css =
 	'.{class:depth-0} .{class:date} { line-height: 18px; }' +
 
 	'.{class:data} { padding: 7px 0px 0px 0px; }' +
-	'.{class:content} .{class:depth-0} { padding: 15px 16px 0px 12px; }' +
+	'.{class:content} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
 	'.{class} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
 	'.{class} { margin: 0px 0px 10px 0px; padding: 0px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; background: #ffffff; }' +
 
@@ -1866,6 +1868,11 @@ card.css =
 
 	// hide switch for now
 	'.{class:modeSwitch} { width: 0px; height: 0px; }' +
+
+	// indicator
+	'.{class:container} { position: relative; }' +
+	'.{class:indicator} { position: absolute; left: 0px; top: 0px; bottom: 0px; width: 4px; background-color: transparent; z-index: 10; }' +
+	'.{class:new} .{class:indicator} { background-color: #f5ba47; }' +
 
 	cardDepthRules.join("\n");
 

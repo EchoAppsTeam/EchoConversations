@@ -374,7 +374,8 @@ stream.config = {
 	 * the first Stream control initialization and when extra items are received after
 	 * the "More" button click.
 	 */
-	"asyncItemsRendering": false
+	"asyncItemsRendering": false,
+	"displayEmptyStream": true
 };
 
 stream.config.normalizer = {
@@ -1243,12 +1244,6 @@ stream.methods._executeNextActivity = function() {
 		acts.state = "paused";
 	}
 
-	if (!acts.queue.length) {
-		this.events.publish({
-			"topic": "onActivitiesComplete"
-		});
-	}
-
 	if (acts.animations > 0 || !this.itemsRenderingComplete ||
 			!acts.queue.length ||
 			this.config.get("liveUpdates.enabled") &&
@@ -1353,7 +1348,18 @@ stream.methods._spotUpdates.remove = function(item, options) {
 };
 
 stream.methods._spotUpdates.animate.add = function(item) {
+	var self = this;
 	this.activities.animations++;
+
+	var next = function() {
+		self.events.publish({
+			"topic": "onCardShown",
+			"data": {"item": {"data": item.data}}
+		});
+		self.activities.animations--;
+		self._executeNextActivity();
+	};
+
 	if (this.timeouts.slide) {
 		// we should specify the element height explicitly
 		// to avoid element jumping during the animation effect
@@ -1369,10 +1375,12 @@ stream.methods._spotUpdates.animate.add = function(item) {
 					// as soon as the animation is complete
 					item.config.get("target").css("overflow", "");
 					item.view.get("content").css("margin-top", "");
+					next();
 				}
 			);
 	} else {
 		item.config.get("target").show();
+		next();
 	}
 };
 
