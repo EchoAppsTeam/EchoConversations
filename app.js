@@ -8,6 +8,7 @@ var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 conversations.config = {
 	"targetURL": "",
 	"bozoFilter": false,
+	"viewportChangeTimeout": 50,
 	"streamingControl": {
 		"pauseOnHover": true,
 		"displayStreamingStateHeader": false,
@@ -52,6 +53,7 @@ conversations.config = {
 	"topPosts": {
 		"visible": true,
 		"label": "Top Posts",
+		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",
 		"initialItemsPerPage": 5,
 		"initialSortOrder": "reverseChronological",
@@ -98,6 +100,7 @@ conversations.config = {
 	"allPosts": {
 		"visible": true,
 		"label": "All Posts",
+		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",
 		"initialItemsPerPage": 15,
 		"initialSortOrder": "reverseChronological",
@@ -292,6 +295,22 @@ conversations.init = function() {
 		app.render();
 		app.ready();
 	});
+
+	this._viewportChangeTimeout = null;
+	// We cannot pass _viewportChange method as an event handler. In this case it will be called with wrong context.
+	this._viewportChangeHandler = function() {
+		app._viewportChange.call(app);
+	};
+	if (
+		this.config.get("allPosts.markItemsAsReadOn") === "viewportenter"
+		|| this.config.get("topPosts.markItemsAsReadOn") === "viewportenter"
+	) {
+		$(window).on("scroll resize", this._viewportChangeHandler);
+	}
+};
+
+conversations.destroy = function() {
+	$(window).off("scroll resize", this._viewportChangeHandler);
 };
 
 conversations.templates.main =
@@ -751,6 +770,20 @@ conversations.methods.setStreamingState = function(state, permanent) {
 	this.view.render({"name": "streamingState"});
 };
 
+conversations.methods._viewportChange = function() {
+	var self = this;
+	if (this._viewportChangeTimeout) {
+		clearTimeout(this._viewportChangeTimeout);
+	}
+	this._viewportChangeTimeout = setTimeout(function() {
+		self.events.publish({
+			"topic": "onViewportChange",
+			"global": false,
+			"bubble": false
+		});
+	}, this.config.get("viewportChangeTimeout"));
+};
+
 conversations.methods._moveStreamingStateCursor = function(event) {
 	var cursor = this.view.get("streamingStateCursor");
 	if (cursor) {
@@ -785,6 +818,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		},
 		"item": {
 			"reTag": false,
+			"markAsRead": config.markItemsAsReadOn,
 			"viaLabel": {
 				"icon": config.displaySourceIcons
 			}
