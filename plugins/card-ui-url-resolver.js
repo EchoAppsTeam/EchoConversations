@@ -207,7 +207,7 @@ submitPlugin.events = {
 };
 
 submitPlugin.dependencies = [{
-	"url": "{%= baseURL %}/third-party/jquery.embedly.js",
+	"url": "{%= baseURLs.prod %}/third-party/jquery.embedly.js",
 	"loaded": function() { return !!$.fn.embedly; }
 }];
 
@@ -252,7 +252,7 @@ submitPlugin.templates.media = {
 
 submitPlugin.templates.attach =
 	'<div class="{plugin.class:attach}">' +
-		'<img class="{plugin.class:attachPic}" src="{%= baseURL %}/images/attach.png" />' +
+		'<img class="{plugin.class:attachPic}" src="{%= baseURLs.prod %}/images/attach.png" />' +
 	'</div>';
 
 

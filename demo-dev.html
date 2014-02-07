@@ -13,7 +13,10 @@
 	<script type="text/javascript">
 
 		Echo.Loader.initApplication({
-			"script": "{%=baseURL%}/app.js",
+			"scripts": {
+				"dev": "{%= baseURLs.dev %}/app.js",
+				"prod": "{%= baseURLs.prod %}/app.js"
+			},
 			"component": "Echo.Apps.Conversations",
 			"backplane": {
 				"serverBaseURL": "https://api.echoenabled.com/v1",
