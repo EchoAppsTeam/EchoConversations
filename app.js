@@ -53,7 +53,7 @@ conversations.config = {
 	"topPosts": {
 		"visible": true,
 		"label": "Top Posts",
-		"markItemsAsRead": "viewport", // 'viewport' or 'mouseenter'
+		"markItemsAsReadOn": "viewport", // "viewport" or "mouseenter"
 		"queryOverride": "",
 		"initialItemsPerPage": 5,
 		"initialSortOrder": "reverseChronological",
@@ -100,7 +100,7 @@ conversations.config = {
 	"allPosts": {
 		"visible": true,
 		"label": "All Posts",
-		"markItemsAsRead": "viewport", // 'viewport' or 'mouseenter'
+		"markItemsAsReadOn": "viewport", // 'viewport' or 'mouseenter'
 		"queryOverride": "",
 		"initialItemsPerPage": 15,
 		"initialSortOrder": "reverseChronological",
@@ -296,26 +296,21 @@ conversations.init = function() {
 		app.ready();
 	});
 
-	// assemble viewport handler
-	this._timeout = null;
+	this._viewportChangeTimeout = null;
+	// We cannot pass _viewportChange method as an event. In this case it will be called with wrong context.
 	this._viewportChangeHandler = function() {
 		app._viewportChange.call(app);
 	};
-
 	if (
-		this.config.get("allPosts.markItemsAsRead") === "viewport"
-		|| this.config.get("topPosts.markItemsAsRead") === "viewport"
+		this.config.get("allPosts.markItemsAsReadOn") === "viewport"
+		|| this.config.get("topPosts.markItemsAsReadOn") === "viewport"
 	) {
-		$(document)
-			.on("scroll", this._viewportChangeHandler)
-			.on("resize", this._viewportChangeHandler);
+		$(document).on("scroll resize", this._viewportChangeHandler);
 	}
 };
 
 conversations.destroy = function() {
-	$(document)
-		.off("scroll", this._viewportChangeHandler)
-		.off("resize", this._viewportChangeHandler);
+	$(document).off("scroll resize", this._viewportChangeHandler);
 };
 
 conversations.templates.main =
@@ -777,14 +772,14 @@ conversations.methods.setStreamingState = function(state, permanent) {
 
 conversations.methods._viewportChange = function() {
 	var self = this;
-	if (this._timeout) {
-		clearTimeout(this._timeout);
+	if (this._viewportChangeTimeout) {
+		clearTimeout(this._viewportChangeTimeout);
 	}
-	this._timeout = setTimeout(function() {
+	this._viewportChangeTimeout = setTimeout(function() {
 		self.events.publish({
 			"topic": "onViewportChange",
 			"global": false,
-			"bubble": "false"
+			"bubble": false
 		});
 	}, this.config.get("viewportChangeTimeout"));
 };
@@ -823,7 +818,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		},
 		"item": {
 			"reTag": false,
-			"markItemAsRead": config.markItemsAsRead,
+			"markAsRead": config.markItemsAsReadOn,
 			"viaLabel": {
 				"icon": config.displaySourceIcons
 			}

@@ -110,28 +110,25 @@ plugin.events = {
 		this._pageLayoutChange();
 	},
 	"Echo.StreamServer.Controls.Stream.onActivitiesComplete": function() {
+		// TODO check if we can get rig of this event handler ?
 		this._pageLayoutChange();
 	},
 	"Echo.Apps.Conversations.onViewportChange": function() {
 		var self = this;
-		var unsubscribe = function() {
-			self.events.unsubscribe({"topic": "Echo.Apps.Conversations.onViewportChange"});
-		};
-		if (!this.get("isLiveUpdate") || this.component.config.get("markItemAsRead") !== "viewport") {
-			unsubscribe();
-
+		if (!this.get("isLiveUpdate") || this.component.config.get("markAsRead") !== "viewport") {
+			this.events.unsubscribe({"topic": "Echo.Apps.Conversations.onViewportChange"});
 		} else {
 			var container = this.component.view.get("container");
+			// Item can be created but not rendered. So we check if container exists here.
 			if (!container || !$.inviewport(container, {"threshold": 0})) {
-			 return;
+				return;
 			}
 			this.set("isLiveUpdate", false);
 			if (this._transitionSupported()) {
 				container.removeClass(this.cssPrefix + "liveUpdate");
-
 			} else {
 				setTimeout(function() {
-				// IE 8-9 doesn't support transition, so we just remove the highlighting.
+					// IE 8-9 doesn't support transition, so we just remove the highlighting.
 					// Maybe we should use jquery.animate (animating colors requires jQuery UI) ?
 					container.removeClass(self.cssPrefix + "liveUpdate");
 				}, this.config.get("fadeTimeout"));
@@ -341,7 +338,7 @@ plugin.component.renderers.container = function(element) {
 	if (this.get("isLiveUpdate")) {
 		var liveUpdate = this.cssPrefix + "liveUpdate";
 		element.addClass(liveUpdate);
-		if (this.component.config.get("markItemAsRead") === "mouseenter") {
+		if (this.component.config.get("markAsRead") === "mouseenter") {
 			element.one("mouseenter", function() {
 				element.removeClass(liveUpdate);
 			});
