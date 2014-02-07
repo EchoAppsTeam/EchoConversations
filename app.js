@@ -81,6 +81,7 @@ conversations.config = {
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
 		"itemTypes": [],
+		"openLinksInNewWindow": true,
 		"sortOrderEntries": [{
 			"title": "Newest First",
 			"value": "reverseChronological"
@@ -126,6 +127,7 @@ conversations.config = {
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
 		"itemTypes": [],
+		"openLinksInNewWindow": true,
 		"sortOrderEntries": [{
 			"title": "Newest First",
 			"value": "reverseChronological"
