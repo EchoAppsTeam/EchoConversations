@@ -53,7 +53,7 @@ conversations.config = {
 	"topPosts": {
 		"visible": true,
 		"label": "Top Posts",
-		"markItemsAsReadOn": "viewport", // "viewport" or "mouseenter"
+		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",
 		"initialItemsPerPage": 5,
 		"initialSortOrder": "reverseChronological",
@@ -100,7 +100,7 @@ conversations.config = {
 	"allPosts": {
 		"visible": true,
 		"label": "All Posts",
-		"markItemsAsReadOn": "viewport", // 'viewport' or 'mouseenter'
+		"markItemsAsReadOn": "viewportenter", // ""viewportenter"" or "mouseenter"
 		"queryOverride": "",
 		"initialItemsPerPage": 15,
 		"initialSortOrder": "reverseChronological",
@@ -297,20 +297,20 @@ conversations.init = function() {
 	});
 
 	this._viewportChangeTimeout = null;
-	// We cannot pass _viewportChange method as an event. In this case it will be called with wrong context.
+	// We cannot pass _viewportChange method as an event handler. In this case it will be called with wrong context.
 	this._viewportChangeHandler = function() {
 		app._viewportChange.call(app);
 	};
 	if (
-		this.config.get("allPosts.markItemsAsReadOn") === "viewport"
-		|| this.config.get("topPosts.markItemsAsReadOn") === "viewport"
+		this.config.get("allPosts.markItemsAsReadOn") === "viewportenter"
+		|| this.config.get("topPosts.markItemsAsReadOn") === "viewportenter"
 	) {
-		$(document).on("scroll resize", this._viewportChangeHandler);
+		$(window).on("scroll resize", this._viewportChangeHandler);
 	}
 };
 
 conversations.destroy = function() {
-	$(document).off("scroll resize", this._viewportChangeHandler);
+	$(window).off("scroll resize", this._viewportChangeHandler);
 };
 
 conversations.templates.main =
