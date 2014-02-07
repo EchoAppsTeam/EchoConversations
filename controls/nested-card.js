@@ -467,7 +467,7 @@ card.css =
 
 	// media loading placeholder
 	'.{class:mediaPlaceholder} { position: relative; padding: 110px 0px; background: #000; color: #FFF; text-align: center; }' +
-	'.{class:mediaPlaceholder} span { padding: 0 10px; margin: 0 auto; }' +
+	'.{class:mediaPlaceholder} span { padding: 0; margin: 0 0 0 10px; }' +
 	'.{class:mediaPlaceholder} img { position: relative; }' +
 
 	// article
