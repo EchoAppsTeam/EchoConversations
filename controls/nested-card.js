@@ -15,7 +15,7 @@ card.templates.photo =
 					'</div>' +
 				'</div>' +
 				'<div class="{class:photoContainer}">' +
-					'<img class="{class:photoThumbnail}" title="{data:title}"/>' +
+					'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
 				'</div>' +
 				'<div class="{class:photoLabel}">' +
 					'<div class="{class:photoLabelContainer}">' +
@@ -40,7 +40,7 @@ card.templates.video =
 				'<div class="{class:videoWrapper}">' +
 					'<div class="{class:videoPlaceholder}">' +
 						'<div class="{class:playButton}"></div>' +
-						'<img title="{data:title}"/>' +
+						'<img src="{data:thumbnail_url}" title="{data:title}"/>' +
 					'</div>' +
 				'</div>' +
 				'<div class="{class:title} {class:videoTitle}" title="{data:title}">{data:title}</div>' +
@@ -75,15 +75,9 @@ card.templates.main = function() {
 	return this.templates[this.getRenderType()];
 };
 
-card.templates.mediaPlaceholder =
-	'<div class="{class:mediaPlaceholder}">' +
-		'<div><img src="http://cdn.echoenabled.com/sdk/v3.0.16/images/loading.gif"><span>{label:loading}<span></div>' +
-	'</div>';
-
 card.labels = {
 	"noMediaAvailable": "No media available",
-	"clickToExpand": "Click to expand",
-	"loading": "Loading media..."
+	"clickToExpand": "Click to expand"
 };
 
 
@@ -200,47 +194,10 @@ card.renderers.playButton = function(element) {
 
 card.renderers.videoPlaceholder = function(element) {
 	var oembed = this.get("data");
-	var self = this;
-	var loadingPlaceholder = $(self.substitute({
-		"template": self.templates.mediaPlaceholder
-	}));
 
-	function showVideoPlaceholder(element) {
-		element.load(function(e) {
-			element.css("min-width", element.width());
-			loadingPlaceholder.hide();
-			element.show(200, function() {
-				self.view.get("playButton").show();
-				element.css("min-width", "");
-				self.events.publish({
-					"topic":"onMediaLoad"
-				});
-			});
-		}).error(function(e) {
-			loadingPlaceholder.replaceWith(self.substitute({
-				"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
-			}));
-		});
-
-		if (!oembed.thumbnail_url) {
-			element.empty().append($(oembed.html));
-		} else {
-			element.attr("src", oembed.thumbnail_url);
-		}
+	if (!oembed.thumbnail_url) {
+		element.empty().append($(oembed.html));
 	}
-
-	function init(event) {
-		if ($.inviewport(loadingPlaceholder, {"threshold": 0}) || self._belowthefold(loadingPlaceholder, {"threshold": 0, "range": 500})) {
-			event && self._onViewportChange("unsubscribe", init);
-			showVideoPlaceholder(element.children("img"));
-		} else if (typeof(event) !== "string") {
-			self._onViewportChange("subscribe", init);
-		}
-	}
-
-	element.children().hide();
-	element.prepend(loadingPlaceholder);
-	loadingPlaceholder.children().first().children("img").load(init);
 
 	return element.css({
 		"width": oembed.width,
@@ -256,45 +213,28 @@ card.renderers.photoThumbnail = function(element) {
 	var thumbnail = this.get("data.type") === "link"
 		? this.get("data.thumbnail_url")
 		: this.get("data.url");
-
-	var imagePlaceholder = $(self.substitute({
-		"template": self.templates.mediaPlaceholder
-	}));
-
-	function showImage(element) {
-		element.load(function(e) {
-			element.css("min-height", element.height());
-			imagePlaceholder.hide();
-			element.show(200, function() {
-				element.css("min-height", "");
-				self.events.publish({
-					"topic":"onMediaLoad"
-				});
-			});
-		}).error(function(e) {
-			imagePlaceholder.replaceWith(self.substitute({
-				"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
-			}));
-		}).attr("src", thumbnail);
+	// we are to create empty img tag because of IE.
+	// If we have an empty src attribute it triggers
+	// error event all the time.
+	var img = $("<img />");
+	img.attr("class", element.attr("class"));
+	if (this.config.get("maxinunMediaWidth")) {
+		img.css("max-width", this.config.get("maximumMediaWidth"));
 	}
-
-	function init(event) {
-		element.hide();
-		if ($.inviewport(imagePlaceholder, {"threshold": 0}) || self._belowthefold(imagePlaceholder, {"threshold": 0, "range": 500 })) {
-			event && self._onViewportChange("unsubscribe", init);
-			showImage(element);
-		} else if (typeof(event) !== "string") {
-			self._onViewportChange("subscribe", init);
-		}
+	if (element.attr("title")) {
+		img.attr("title", element.attr("title"));
 	}
+	img.load(function(e) {
+		self.events.publish({
+			"topic": "onMediaLoad"
+		});
+	}).error(function(e) {
+		img.replaceWith(self.substitute({
+			"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
+		}));
+	}).attr("src", thumbnail);
 
-	element.parent().prepend(imagePlaceholder);
-	imagePlaceholder.children().first().children("img").load(init);
-	element.css({
-		"max-width": this.config.get("maximumMediaWidth"),
-		"width": "100%"
-	});
-	return element;
+	return element.replaceWith(img);
 };
 
 card.renderers.photoContainer = function(element) {
@@ -368,11 +308,6 @@ card.renderers.article = function(element) {
 	return element;
 };
 
-card.methods._belowthefold = function(element, settings) {
-	var fold = $(window).height() + $(window).scrollTop();
-	return ((settings.range + fold >= $(element).offset().top - settings.threshold) && (fold <= $(element).offset().top - settings.threshold));
-};
-
 card.methods._onViewportChange = function(action, handler) {
 	if (action === "subscribe") {
 		this.events.subscribe({
@@ -428,14 +363,14 @@ card.css =
 	'.{class:description} { overflow: hidden; }' +
 
 	// photo
-	'.{class:photo} .{class:noMediaAvailable} { position: relative; min-height: 120px; padding: 100px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
+	'.{class:photo} .{class:noMediaAvailable} { position: relative; min-height: 145px; padding: 75px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
 	'.{class:photoAvatarWrapper} { position: absolute; width: 100%; }' +
 	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:photoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
 	'.{class:photo} { position: relative; left: 0; top: 0; zoom: 1; }' +
 	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
 	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
-	'.{class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; min-height: 60px; }' +
+	'.{class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; }' +
 
 	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
@@ -460,15 +395,10 @@ card.css =
 	'.{class:videoDescription} { margin: 5px 0 0 0; }' +
 	'.{class:videoWrapper} { background: #000; }' +
 	'.{class:videoPlaceholder} img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }' +
-	'.{class:videoPlaceholder} { max-width: 100%; position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px auto; background: #000000; overflow: hidden; text-align:center; }' +
+	'.{class:videoPlaceholder} { max-width: 100%; position: relative; padding-bottom: 75%; height: 0; float: none; margin: 0px auto; background: #000000; overflow: hidden; }' +
 	'.{class:videoPlaceholder} > iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
 	'.{class:videoPlaceholder} > video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
 	'.{class:videoPlaceholder} > object { position: absolute; top: 0; left: 0; width: 100%;100 height: 100%; }' +
-
-	// media loading placeholder
-	'.{class:mediaPlaceholder} { position: relative; padding: 110px 0px; background: #000; color: #FFF; text-align: center; }' +
-	'.{class:mediaPlaceholder} span { padding: 0; margin: 0 0 0 10px; }' +
-	'.{class:mediaPlaceholder} img { position: relative; }' +
 
 	// article
 	'.{class:article} { padding: 10px; min-width: 200px; }' +
