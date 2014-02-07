@@ -111,30 +111,30 @@ plugin.events = {
 	},
 	"Echo.StreamServer.Controls.Stream.onActivitiesComplete": function() {
 		this._pageLayoutChange();
+	},
+	"Echo.Apps.Conversations.onViewportChange": function() {
 		var self = this;
-		var container = this.component.view.get("container");
-		if (this.get("isLiveUpdate") && container) {
-			var fade = function() {
-				if ($.inviewport(container, {"threshold": 0})) {
-					self.set("isLiveUpdate", false);
-					if (self._transitionSupported()) {
-						container.removeClass(self.cssPrefix + "liveUpdate");
-					} else {
-						setTimeout(function() {
-							// IE 8-9 doesn't support transition, so we just remove the highlighting.
-							// Maybe we should use jquery.animate (animating colors requires jQuery UI) ?
-							container.removeClass(self.cssPrefix + "liveUpdate");
-						}, self.config.get("fadeTimeout"));
-					}
-					$(document).off("scroll", fade).off("resize", fade);
-					return true;
+		var unsubscribe = function() {
+			self.events.unsubscribe({"topic": "Echo.Apps.Conversations.onViewportChange"});
+		};
+		if (!this.get("isLiveUpdate") || this.component.config.get("markItemAsRead") !== "viewport") {
+			unsubscribe();
 
-				} else {
-					return false;
-				}
-			};
-			if (!fade()) {
-				$(document).on("scroll", fade).on("resize", fade);
+		} else {
+			var container = this.component.view.get("container");
+			if (!container || !$.inviewport(container, {"threshold": 0})) {
+			 return;
+			}
+			this.set("isLiveUpdate", false);
+			if (this._transitionSupported()) {
+				container.removeClass(this.cssPrefix + "liveUpdate");
+
+			} else {
+				setTimeout(function() {
+				// IE 8-9 doesn't support transition, so we just remove the highlighting.
+					// Maybe we should use jquery.animate (animating colors requires jQuery UI) ?
+					container.removeClass(self.cssPrefix + "liveUpdate");
+				}, this.config.get("fadeTimeout"));
 			}
 		}
 	}
@@ -339,7 +339,13 @@ plugin.component.renderers.markers = function(element) {
 
 plugin.component.renderers.container = function(element) {
 	if (this.get("isLiveUpdate")) {
-		element.addClass(this.cssPrefix + "liveUpdate");
+		var liveUpdate = this.cssPrefix + "liveUpdate";
+		element.addClass(liveUpdate);
+		if (this.component.config.get("markItemAsRead") === "mouseenter") {
+			element.one("mouseenter", function() {
+				element.removeClass(liveUpdate);
+			});
+		}
 	}
 	this.parentRenderer("container", arguments);
 

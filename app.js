@@ -8,6 +8,7 @@ var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 conversations.config = {
 	"targetURL": "",
 	"bozoFilter": false,
+	"viewportChangeTimeout": 50,
 	"streamingControl": {
 		"pauseOnHover": true,
 		"displayStreamingStateHeader": false,
@@ -52,6 +53,7 @@ conversations.config = {
 	"topPosts": {
 		"visible": true,
 		"label": "Top Posts",
+		"markItemsAsRead": "viewport", // 'viewport' or 'mouseenter'
 		"queryOverride": "",
 		"initialItemsPerPage": 5,
 		"initialSortOrder": "reverseChronological",
@@ -98,6 +100,7 @@ conversations.config = {
 	"allPosts": {
 		"visible": true,
 		"label": "All Posts",
+		"markItemsAsRead": "viewport", // 'viewport' or 'mouseenter'
 		"queryOverride": "",
 		"initialItemsPerPage": 15,
 		"initialSortOrder": "reverseChronological",
@@ -292,6 +295,27 @@ conversations.init = function() {
 		app.render();
 		app.ready();
 	});
+
+	// assemble viewport handler
+	this._timeout = null;
+	this._viewportChangeHandler = function() {
+		app._viewportChange.call(app);
+	};
+
+	if (
+		this.config.get("allPosts.markItemsAsRead") === "viewport"
+		|| this.config.get("topPosts.markItemsAsRead") === "viewport"
+	) {
+		$(document)
+			.on("scroll", this._viewportChangeHandler)
+			.on("resize", this._viewportChangeHandler);
+	}
+};
+
+conversations.destroy = function() {
+	$(document)
+		.off("scroll", this._viewportChangeHandler)
+		.off("resize", this._viewportChangeHandler);
 };
 
 conversations.templates.main =
@@ -751,6 +775,20 @@ conversations.methods.setStreamingState = function(state, permanent) {
 	this.view.render({"name": "streamingState"});
 };
 
+conversations.methods._viewportChange = function() {
+	var self = this;
+	if (this._timeout) {
+		clearTimeout(this._timeout);
+	}
+	this._timeout = setTimeout(function() {
+		self.events.publish({
+			"topic": "onViewportChange",
+			"global": false,
+			"bubble": "false"
+		});
+	}, this.config.get("viewportChangeTimeout"));
+};
+
 conversations.methods._moveStreamingStateCursor = function(event) {
 	var cursor = this.view.get("streamingStateCursor");
 	if (cursor) {
@@ -785,6 +823,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		},
 		"item": {
 			"reTag": false,
+			"markItemAsRead": config.markItemsAsRead,
 			"viaLabel": {
 				"icon": config.displaySourceIcons
 			}
