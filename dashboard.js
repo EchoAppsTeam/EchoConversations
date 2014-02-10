@@ -385,6 +385,7 @@ dashboard.vars = {
 };
 
 dashboard.config = {
+	"disableSettings": [],
 	"ecl": [{
 		"component": "Echo.Apps.Conversations.Dashboard.TargetSelector",
 		"name": "targetURL",
@@ -727,6 +728,11 @@ dashboard.methods.initConfigurator = function() {
 			"value": app.name
 		};
 	});
+	// remove items specified in the config.disableSettings
+	var disableSettings = this.config.get("disableSettings");
+	this.config.set("ecl", $.grep(ecl, function(item) {
+		return !~$.inArray(item.name, disableSettings);
+	}));
 	this.parent.apply(this, arguments);
 };
 
