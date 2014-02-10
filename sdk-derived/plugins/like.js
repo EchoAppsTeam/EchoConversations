@@ -41,7 +41,8 @@ plugin.config = {
 	 */
 	"asyncFaceCollectionRendering": false,
 	"likesPerPage": 5,
-	"displayStyle": "facepile"
+	"displayStyle": "facepile",
+	"staticInitialCount": true
 };
 
 plugin.labels = {
@@ -105,13 +106,16 @@ plugin.templates.main =
  * @echo_renderer
  */
 plugin.renderers.likedBy = function(element) {
-	var plugin = this;
 	var item = this.component;
 	if (!item.get("data.object.likes").length) {
 		return element.hide();
 	}
 
 	var youLike = false;
+	var visibleUsersCount = this.get("collection") && !this.config.get("staticInitialCount")
+		? this.get("collection").getVisibleUsersCount()
+		: this.config.get("likesPerPage");
+
 	var userId = item.user.get("identityUrl");
 	var users = item.get("data.object.likes");
 	$.each(users, function(i, like) {
@@ -120,14 +124,13 @@ plugin.renderers.likedBy = function(element) {
 			return false; // break
 		}
 	});
-
-	var config = plugin.config.assemble({
+	var config = this.config.assemble({
 		"target": element.get(0),
 		"data": {
 			"itemsPerPage": this.config.get("likesPerPage"),
 			"entries": users
 		},
-		"initialUsersCount": this.config.get("likesPerPage"),
+		"initialUsersCount": visibleUsersCount,
 		"totalUsersCount": item.get("data.object.accumulators.likesCount"),
 		"item": {
 			"avatar": true,
@@ -140,7 +143,7 @@ plugin.renderers.likedBy = function(element) {
 	});
 
 	if (item.user.is("admin")) {
-		element.addClass(plugin.cssPrefix + "highlight");
+		element.addClass(this.cssPrefix + "highlight");
 	}
 	if (this.config.get("asyncFaceCollectionRendering")) {
 		setTimeout($.proxy(this._initFaceCollection, this, config), 0);
@@ -151,7 +154,7 @@ plugin.renderers.likedBy = function(element) {
 };
 
 plugin.methods._initFaceCollection = function(config) {
-	this.set("facePile", new Echo.StreamServer.Controls.FaceCollection(config));
+	this.set("collection", new Echo.StreamServer.Controls.FaceCollection(config));
 };
 
 plugin.methods._sendRequest = function(data, callback, errorCallback) {
@@ -282,6 +285,7 @@ plugin.methods._assembleButton = function(name) {
 plugin.css =
 	'.{plugin.class:likesArea} { float: right; }' +
 	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 3px; line-height: 10px; }' +
+	// TODO: move these styles to FaceCollection class
 	'.{plugin.class:likedBy} .echo-streamserver-controls-facecollection-container { line-height: 12px; vertical-align: top; }' +
 	'.{plugin.class} .echo-streamserver-controls-facecollection-item-container { position: relative; }' +
 	'.{plugin.class} .echo-streamserver-controls-facecollection-item-avatar { border-radius: 50%; width: 22px; height: 22px; }' +
