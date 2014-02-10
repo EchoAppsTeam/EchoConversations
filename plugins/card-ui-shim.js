@@ -110,32 +110,15 @@ plugin.events = {
 		this._pageLayoutChange();
 	},
 	"Echo.StreamServer.Controls.Stream.onActivitiesComplete": function() {
+		// TODO check if we can get rig of this event handler ?
 		this._pageLayoutChange();
-		var self = this;
-		var container = this.component.view.get("container");
-		if (this.get("isLiveUpdate") && container) {
-			var fade = function() {
-				if ($.inviewport(container, {"threshold": 0})) {
-					self.set("isLiveUpdate", false);
-					if (self._transitionSupported()) {
-						container.removeClass(self.cssPrefix + "liveUpdate");
-					} else {
-						setTimeout(function() {
-							// IE 8-9 doesn't support transition, so we just remove the highlighting.
-							// Maybe we should use jquery.animate (animating colors requires jQuery UI) ?
-							container.removeClass(self.cssPrefix + "liveUpdate");
-						}, self.config.get("fadeTimeout"));
-					}
-					$(document).off("scroll", fade).off("resize", fade);
-					return true;
-
-				} else {
-					return false;
-				}
-			};
-			if (!fade()) {
-				$(document).on("scroll", fade).on("resize", fade);
-			}
+		this._maybeRemoveLiveUpdateIndicator();
+	},
+	"Echo.Apps.Conversations.onViewportChange": function() {
+		if (!this.get("isLiveUpdate") || this.component.config.get("markAsRead") !== "viewportenter") {
+			this.events.unsubscribe({"topic": "Echo.Apps.Conversations.onViewportChange"});
+		} else {
+			this._maybeRemoveLiveUpdateIndicator();
 		}
 	}
 };
@@ -151,7 +134,7 @@ plugin.config = {
 		"visible": true,
 		"marker": "Conversations.TopPost"
 	},
-	"fadeTimeout": 10000, // 10 seconds
+	"fadeTimeout": 5000, // 5 seconds
 	"collapsedContentHeight": 110 //px
 };
 
@@ -328,7 +311,13 @@ plugin.component.renderers.markers = function(element) {
 
 plugin.component.renderers.container = function(element) {
 	if (this.get("isLiveUpdate")) {
-		element.addClass(this.cssPrefix + "liveUpdate");
+		var liveUpdate = this.cssPrefix + "liveUpdate";
+		element.addClass(liveUpdate);
+		if (this.component.config.get("markAsRead") === "mouseenter") {
+			element.one("mouseenter", function() {
+				element.removeClass(liveUpdate);
+			});
+		}
 	}
 	this.parentRenderer("container", arguments);
 
@@ -493,6 +482,29 @@ plugin.component.renderers._button = function(element, extra) {
 plugin.component.renderers.authorName = function(element) {
 	this.parentRenderer("authorName", arguments);
 	return element.wrapInner("<span/>");
+};
+
+plugin.methods._maybeRemoveLiveUpdateIndicator = function() {
+	var self = this;
+	var container = this.component.view.get("container");
+	// Item can be created but not rendered. So we check if container exists here.
+	if (
+		this.component.config.get("markAsRead") !== "viewportenter"
+		|| !container
+		|| !$.inviewport(container, {"threshold": 0})
+	) {
+		return;
+	}
+	this.set("isLiveUpdate", false);
+	if (this._transitionSupported()) {
+		container.removeClass(this.cssPrefix + "liveUpdate");
+	} else {
+		setTimeout(function() {
+			// IE 8-9 doesn't support transition, so we just remove the highlighting.
+			// Maybe we should use jquery.animate (animating colors requires jQuery UI) ?
+			container.removeClass(self.cssPrefix + "liveUpdate");
+		}, this.config.get("fadeTimeout"));
+	}
 };
 
 plugin.methods._checkItemContentHeight = function() {
