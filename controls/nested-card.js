@@ -218,7 +218,7 @@ card.renderers.photoThumbnail = function(element) {
 	// error event all the time.
 	var img = $("<img />");
 	img.attr("class", element.attr("class"));
-	if (this.config.get("maxinunMediaWidth")) {
+	if (this.config.get("maximumMediaWidth")) {
 		img.css("max-width", this.config.get("maximumMediaWidth"));
 	}
 	if (element.attr("title")) {
