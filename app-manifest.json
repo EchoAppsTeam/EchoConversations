@@ -14,7 +14,7 @@
 	"dashboards": [{
 		"id": "instances",
 		"title": "Instances",
-		"script": "{%=baseURL%}/dashboard.js",
+		"script": "{%= baseURLs.prod %}/dashboard.js",
 		"component": "Echo.Apps.Conversations.Dashboard",
 		"type": "instances"
 	}, {
@@ -27,6 +27,9 @@
 	}],
 	"client_widget": {
 		"component": "Echo.Apps.Conversations",
-		"script": "{%=baseURL%}/app.js"
+		"scripts": {
+			"dev": "{%= baseURLs.dev %}/app.js",
+			"prod": "{%= baseURLs.prod %}/app.js"
+		}
 	}
 }

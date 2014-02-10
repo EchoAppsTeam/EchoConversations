@@ -8,6 +8,7 @@ var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 conversations.config = {
 	"targetURL": "",
 	"bozoFilter": false,
+	"viewportChangeTimeout": 50,
 	"streamingControl": {
 		"pauseOnHover": true,
 		"displayStreamingStateHeader": false,
@@ -61,6 +62,7 @@ conversations.config = {
 	"topPosts": {
 		"visible": true,
 		"label": "Top Posts",
+		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",
 		"collapsedContentHeight": 110, // px
 		"initialItemsPerPage": 5,
@@ -107,6 +109,7 @@ conversations.config = {
 	"allPosts": {
 		"visible": true,
 		"label": "All Posts",
+		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",
 		"collapsedContentHeight": 110, // px
 		"initialItemsPerPage": 15,
@@ -263,7 +266,7 @@ conversations.dependencies = [{
 }, {
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.css"
 }, {
-	"url": "{%= baseURL %}/third-party/jquery.embedly.js",
+	"url": "{%= baseURLs.prod %}/third-party/jquery.embedly.js",
 	"loaded": function() { return !!$.fn.embedly; }
 }];
 
@@ -298,6 +301,22 @@ conversations.init = function() {
 		app.render();
 		app.ready();
 	});
+
+	this._viewportChangeTimeout = null;
+	// We cannot pass _viewportChange method as an event handler. In this case it will be called with wrong context.
+	this._viewportChangeHandler = function() {
+		app._viewportChange.call(app);
+	};
+	if (
+		this.config.get("allPosts.markItemsAsReadOn") === "viewportenter"
+		|| this.config.get("topPosts.markItemsAsReadOn") === "viewportenter"
+	) {
+		$(window).on("scroll resize", this._viewportChangeHandler);
+	}
+};
+
+conversations.destroy = function() {
+	$(window).off("scroll resize", this._viewportChangeHandler);
 };
 
 conversations.templates.main =
@@ -362,16 +381,16 @@ conversations.renderers.streamingStateContainer = function(element) {
 conversations.renderers.resizeFrame = function(element) {
 	var self = this;
 	element.on('load', function() {
-		var counter;
+		var timeout;
 		this.contentWindow.onresize = function() {
-			if (counter) {
-				clearTimeout(counter);
+			if (timeout) {
+				clearTimeout(timeout);
 			}
-			counter = setTimeout(function() {
+			timeout = setTimeout(function() {
 				self.events.publish({
 					"topic": "onAppResize"
 				});
-			}, 20);
+			}, 50);
 		};
 	});
 	return element;
@@ -776,6 +795,20 @@ conversations.methods.setStreamingState = function(state, permanent) {
 	this.view.render({"name": "streamingState"});
 };
 
+conversations.methods._viewportChange = function() {
+	var self = this;
+	if (this._viewportChangeTimeout) {
+		clearTimeout(this._viewportChangeTimeout);
+	}
+	this._viewportChangeTimeout = setTimeout(function() {
+		self.events.publish({
+			"topic": "onViewportChange",
+			"global": false,
+			"bubble": false
+		});
+	}, this.config.get("viewportChangeTimeout"));
+};
+
 conversations.methods._moveStreamingStateCursor = function(event) {
 	var cursor = this.view.get("streamingStateCursor");
 	if (cursor) {
@@ -810,6 +843,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		},
 		"item": {
 			"reTag": false,
+			"markAsRead": config.markItemsAsReadOn,
 			"viaLabel": {
 				"icon": config.displaySourceIcons
 			}
@@ -1267,7 +1301,7 @@ conversations.css =
 	// streamSorter dropdown
 	'.{class:streamSorter} { font-size: 13px; }' +
 	'.echo-sdk-ui .{class:streamSorter}:focus { outline: none; }' +
-	'.{class:streamSorter} > ul > li > a { background: url("{%= baseURL %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
+	'.{class:streamSorter} > ul > li > a { background: url("{%= baseURLs.prod %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
 	'.{class:streamSorter} ul.nav { margin-bottom: 0px; font-size: 13px; }' +
 	'.{class:streamSorter} ul.nav > li > a { text-decoration: none; color: #C6C6C6; line-height: 18px; }' +
 	'.{class:streamSorter} .dropdown-menu { float: right; left: auto; right: 0; }' +

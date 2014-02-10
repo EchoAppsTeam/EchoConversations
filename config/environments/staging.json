@@ -4,5 +4,8 @@
 		"id": "echo-conversations-dev",
 		"name": "Conversations (Dev)"
 	},
-	"baseURL": "//echoplatform.com/sandbox/staging/apps/echo/conversations/v{%=packageVersions.stable%}"
+	"baseURLs": {
+		"dev": "//echoplatform.com/sandbox/staging/apps/echo/conversations/v{%=packageVersions.stable%}/dev",
+		"prod": "//echoplatform.com/sandbox/staging/apps/echo/conversations/v{%=packageVersions.stable%}"
+	}
 }

@@ -167,7 +167,7 @@ auth.css =
 	'.{class:container} { float: left; }' +
 	'.{class:or} { font-size: 14px; }' +
 	'.{class:via} { margin-left: 15px; color: #D3D3D3; line-height: 18px; font-size: 14px; }' +
-	'.{class:name} .{class:dropdown} { background: url("{%= baseURL %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
+	'.{class:name} .{class:dropdown} { background: url("{%= baseURLs.prod %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
 	'.{class:name} ul.nav .dropdown .dropdown-toggle { font-size: 20px; }' +
 	'.{class:name} ul.nav { margin-bottom: 3px; }' +
 	'.{class:name} ul.nav .dropdown-menu li > a { font-size: 14px; }' +
