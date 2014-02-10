@@ -133,6 +133,6 @@ var createPlugin = function(component) {
 	Echo.Plugin.create(plugin);
 };
 
-$.map(["Echo.StreamServer.Controls.Stream", "Echo.StreamServer.Controls.Submit"], createPlugin);
+$.map(["Echo.CardCollection", "Echo.StreamServer.Controls.SubmitComposer"], createPlugin);
 
 })(Echo.jQuery);

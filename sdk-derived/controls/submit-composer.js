@@ -605,7 +605,7 @@ composer.renderers.auth = function(element) {
 		"cdnBaseURL": this.config.get("cdnBaseURL")
 	}, this.config.get("auth"));
 	this.auth && this.auth.destroy();
-	this.auth = new Echo.StreamServer.Controls.CardUIAuth(config);
+	this.auth = new Echo.StreamServer.Controls.Auth(config);
 	return element;
 };
 

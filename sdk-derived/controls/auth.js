@@ -2,7 +2,7 @@
 "use strict";
 
 /**
- * @class Echo.IdentityServer.Controls.CardUIAuth
+ * @class Echo.StreamServer.Controls.Auth
  * Echo Auth control displays the user login status and allows them to sign in using different social identities.
  *
  * 	var identityManager = {
@@ -12,7 +12,7 @@
  * 		"url": "http://example.com/auth"
  * 	};
  *
- * 	new Echo.IdentityServer.Controls.CardUIAuth({
+ * 	new Echo.StreamServer.Controls.Auth({
  * 		"target": document.getElementById("echo-auth"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"identityManager": {
@@ -30,12 +30,12 @@
  * @package identityserver.pack.js
  *
  * @constructor
- * Auth constructor initializing Echo.IdentityServer.Controls.CardUIAuth class.
+ * Auth constructor initializing Echo.StreamServer.Controls.Auth class.
  *
  * @param {Object} config
  * Configuration options.
  */
-var auth = Echo.Control.manifest("Echo.StreamServer.Controls.CardUIAuth");
+var auth = Echo.Control.manifest("Echo.StreamServer.Controls.Auth");
 
 if (Echo.Control.isDefined(auth)) return;
 
@@ -75,20 +75,20 @@ if (Echo.Control.isDefined(auth)) return;
 /** @hide @echo_label error_unknown */
 
 /**
- * @echo_event Echo.IdentityServer.Controls.CardUIAuth.onReady
+ * @echo_event Echo.StreamServer.Controls.Auth.onReady
  * Triggered when the app initialization is finished completely.
  */
 /**
- * @echo_event Echo.IdentityServer.Controls.CardUIAuth.onRefresh
+ * @echo_event Echo.StreamServer.Controls.Auth.onRefresh
  * Triggered when the app is refreshed. For example after the user
  * login/logout action or as a result of the "refresh" function call.
  */
 /**
- * @echo_event Echo.IdentityServer.Controls.CardUIAuth.onRender
+ * @echo_event Echo.StreamServer.Controls.Auth.onRender
  * Triggered when the app is rendered.
  */
 /**
- * @echo_event Echo.IdentityServer.Controls.CardUIAuth.onRerender
+ * @echo_event Echo.StreamServer.Controls.Auth.onRerender
  * Triggered when the app is rerendered.
  */
 
