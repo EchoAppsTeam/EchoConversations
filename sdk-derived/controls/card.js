@@ -1763,9 +1763,9 @@ card.css =
 	'.{class:expandChildren} .{class:expandChildrenLabel} { display: inline-block; padding-left: 22px; }' +
 	'.{class:expandChildren} .echo-message-icon { background: url("{config:cdnBaseURL.sdk-assets}/images/whirlpool.png") no-repeat 5px 4px; }' +
 	'.{class:expandChildren} .{class:message-loading} { background: no-repeat left top url("{config:cdnBaseURL.sdk-assets}/images/loading.gif"); }' +
-	'.{class:dropdownButton} { display: inline; margin-left: 0px; }' +
-	'.{class:dropdownButton} > .dropdown { display: inline; }' +
-	'.{class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
+	'.echo-sdk-ui .{class:dropdownButton} { display: inline; margin-left: 0px; }' +
+	'.echo-sdk-ui .{class:dropdownButton} > .dropdown { display: inline; }' +
+	'.echo-sdk-ui .{class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
 	'.{class:containerWrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
 	'.{class:container} { background: #ffffff; position: relative; }' +
 	'.{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
