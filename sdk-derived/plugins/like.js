@@ -286,12 +286,8 @@ plugin.methods._assembleButton = function(name) {
 plugin.css =
 	'.{plugin.class:likesArea} { float: right; }' +
 	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 3px; line-height: 10px; }' +
-	// TODO: move these styles to FaceCollection class
-	'.{plugin.class:likedBy} .echo-streamserver-controls-facecollection-container { line-height: 12px; vertical-align: top; }' +
-	'.{plugin.class} .echo-streamserver-controls-face-container { position: relative; }' +
-	'.{plugin.class} .echo-streamserver-controls-face-avatar { border-radius: 50%; width: 22px; height: 22px; }' +
-	'.{plugin.class} .echo-streamserver-controls-face-avatar img { border-radius: 50%; height: 22px; width: 22px; }' +
-	'.{plugin.class} .echo-streamserver-controls-facecollection-and { display: none; }';
+	// TODO: get rid of this rule
+	'.{plugin.class} .echo-streamserver-controls-face-container { position: relative; }';
 
 Echo.Plugin.create(plugin);
 
@@ -348,6 +344,7 @@ plugin.component.renderers.actors = function() {
 };
 
 plugin.css =
+	'.{plugin.class} .{class:and} { display: none; }' +
 	'.{plugin.class} .{class:more} { float: right; font-size: 12px; margin-top: 5px;  white-space: nowrap; }';
 
 Echo.Plugin.create(plugin);

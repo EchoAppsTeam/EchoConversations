@@ -145,7 +145,8 @@ face.methods.isYou = function() {
 };
 
 face.css =
-	'.{class:avatar} { display: inline-block; width: 16px; height: 16px; margin: 0px 3px 0px 0px; vertical-align: text-top; }' +
+	'.{class:container} .{class:avatar} { display: inline-block; border-radius: 50%; width: 22px; height: 22px; margin: 0px 3px 0px 0px; vertical-align: text-top; }' +
+	'.{class:container} .{class:avatar} img { border-radius: 50%; width: 22px; height: 22px; }' +
 	'.{class:only-avatars} .{class:avatar} { margin: 0px 2px; }' +
 	'.{class:container}, .{class:container} span { white-space: nowrap; display: inline-block; }' +
 	'.{class:only-avatars} .{class:container} { white-space: normal; }';
