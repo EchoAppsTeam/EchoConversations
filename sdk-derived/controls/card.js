@@ -550,7 +550,7 @@ card.renderers.container = function(element) {
 	return this.view.rendered()
 		? element
 		: element.wrap(this.substitute({
-			"template": this._manifest("templates").wrapper
+			"template": card.templates.wrapper
 		}));
 };
 
@@ -987,10 +987,6 @@ card.renderers._extraField = function(element, extra) {
 		) || element).show();
 };
 
-card.renderers._buttonsDelimiter = function(element) {
-	return element.append('<span class="' + this.cssPrefix + 'button-delim"> \u00b7 </span>');
-};
-
 card.renderers._viaText = function(element, extra) {
 	extra = extra || {};
 	var data = this.data[extra.field];
@@ -1028,7 +1024,7 @@ card.renderers._inlineButtons = function(element) {
 card.renderers._dropdownButtons = function(element) {
 	var self = this;
 	var elem = $(this.substitute({
-		"template": this._manifest("templates").dropdownButtons
+		"template": card.templates.dropdownButtons
 	}));
 
 	var buttons = $.map(this.buttonsOrder, function(name) { return self.get("buttons." + name); });
@@ -1065,7 +1061,7 @@ card.renderers._dropdownButtons = function(element) {
 };
 
 card.renderers._button = function(element, extra) {
-	var template = extra.template || this._manifest("templates").button;
+	var template = extra.template || card.templates.button;
 
 	var data = {
 		"label": extra.label || "",
