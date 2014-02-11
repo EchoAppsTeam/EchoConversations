@@ -453,6 +453,7 @@ plugin.component.renderers._button = function(element, extra) {
 			"title": this.get("currentButtonsState") !== "compact" ? extra.label : ""
 		});
 		extra.callback = function(ev) {
+			button.find(".dropdown-menu").addClass("pull-right");
 			button.find(".dropdown-toggle").dropdown("toggle");
 			ev.preventDefault();
 		};
