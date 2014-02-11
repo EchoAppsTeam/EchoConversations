@@ -294,19 +294,19 @@ dashboard.vars = {
 				"component": "Input",
 				"name": "prompt",
 				"type": "string",
-				"default": "What's on your mind?",
 				"config": {
 					"title": "Prompt",
-					"desc": "Specifies the ghost text displayed in the Comment Prompt"
+					"desc": "Specifies the ghost text displayed in the Comment Prompt",
+					"data": {"sample": "What's on your mind?"}
 				}
 			}, {
 				"component": "Input",
 				"name": "confirmationMessage",
 				"type": "string",
-				"default": "Thanks, your post has been submitted for review",
 				"config": {
 					"title": "Confirmation message",
-					"desc": "Specifies the confirmation message text displayed after successful submission if pre-moderation mode is enabled"
+					"desc": "Specifies the confirmation message text displayed after successful submission if pre-moderation mode is enabled",
+					"data": {"sample": "Thanks, your post has been submitted for review"}
 				}
 			}, {
 				"component": "Checkbox",
@@ -417,11 +417,11 @@ dashboard.config = {
 			"component": "Input",
 			"name": "minimumWidth",
 			"type": "number",
-			"default": 320,
 			"config": {
 				"title": "Minimum width",
-				"desc": "Specify the minimum allowed width (in px) of the App",
-				"options": []
+				"desc": "Specify a minimum width (in pixels) of an App container.",
+				"options": [],
+				"data": {"sample": 320}
 			}
 		}, {
 			"component": "Input",
@@ -429,8 +429,9 @@ dashboard.config = {
 			"type": "number",
 			"config": {
 				"title": "Maximum height",
-				"desc": "Specify a height (in px) which the App may not exceed. In the event that there is more content to display, a scrollbar will appear.",
-				"options": []
+				"desc": "Specify a maximum height (in pixels) of an App container. If an App context exceeds the defined max height, a vertical scrollbar appears.",
+				"options": [],
+				"data": {"sample": 700}
 			}
 		}, {
 			"component": "Input",
@@ -438,8 +439,9 @@ dashboard.config = {
 			"type": "number",
 			"config": {
 				"title": "Maximum width",
-				"desc": "Specify a width (in px) which the App may not exceed.",
-				"options": []
+				"desc": "Specify a maximum width (in pixels) of an App container.",
+				"options": [],
+				"data": {"sample": 700}
 			}
 		}, {
 			"component": "Input",
@@ -447,8 +449,9 @@ dashboard.config = {
 			"type": "number",
 			"config": {
 				"title": "Maximum media width",
-				"desc": "Specify a media content width (in px) which the App may not exceed.",
-				"options": []
+				"desc": "Specify a maximum media content width (in pixels) which should be defined when an item is being displayed.",
+				"options": [],
+				"data": {"sample": 500}
 			}
 		}]
 	}, {
