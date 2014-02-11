@@ -258,7 +258,7 @@ conversations.dependencies = [{
 }];
 
 conversations.events = {
-	"Echo.CardCollection.onActivitiesCountChange": function(_, data) {
+	"Echo.StreamServer.Controls.CardCollection.onActivitiesCountChange": function(_, data) {
 		var allPosts = this.getComponent("allPosts");
 		// display activities for 'allPosts' section only.
 		if (allPosts && allPosts.config.get("context") === data.context) {
@@ -439,10 +439,7 @@ conversations.renderers.postComposer = function(element) {
 			},
 			"auth": this.config.get("auth"),
 			"submitPermissions": this._getSubmitPermissions(),
-			"plugins": this._mergeSpecsByName([/*{
-				"name": "URLResolver",
-				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs")
-			},*/ {
+			"plugins": this._mergeSpecsByName([{
 				"name": "LinkComposer"
 			}, {
 				"name": "JanrainBackplaneHandler",
@@ -455,11 +452,6 @@ conversations.renderers.postComposer = function(element) {
 				"object": {
 					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
 				}
-			},
-			"ready": function() {
-				/*this.view.get("text").on("change", function() {
-					Echo.Utils.set(Echo.Variables, targetURL, $(this).val());
-				});*/
 			}
 		})
 	});
@@ -494,7 +486,7 @@ conversations.renderers.topPosts = function(element) {
 	if (this.config.get("topPosts.visible")) {
 		this.initComponent({
 			"id": "topPosts",
-			"component": "Echo.CardCollection",
+			"component": "Echo.StreamServer.Controls.CardCollection",
 			"config": this._assembleStreamConfig("topPosts", {
 				"onItemAdd": function() {
 					self.view.render({"name": "topPostsContainer"});
@@ -555,7 +547,7 @@ conversations.renderers._allPosts = function(element, extra) {
 	});
 	var component = this.initComponent({
 		"id": "allPosts",
-		"component": "Echo.CardCollection",
+		"component": "Echo.StreamServer.Controls.CardCollection",
 		"config": this._assembleStreamConfig("allPosts", {
 			"target": $("<div>")
 		})
@@ -613,7 +605,7 @@ conversations.renderers._tabs = function(element, extra) {
 			}));
 			var component = self.initComponent({
 				"id": tab.name,
-				"component": "Echo.CardCollection",
+				"component": "Echo.StreamServer.Controls.CardCollection",
 				"config": self._assembleStreamConfig(tab.name, {
 					"target": $("<div>")
 				})

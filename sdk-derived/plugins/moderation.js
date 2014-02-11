@@ -4,9 +4,9 @@
 var $ = jQuery;
 
 /**
- * @class Echo.Card.Plugins.Moderation
+ * @class Echo.StreamServer.Controls.Card.Plugins.Moderation
  */
-var plugin = Echo.Plugin.manifest("Moderation", "Echo.Card");
+var plugin = Echo.Plugin.manifest("Moderation", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -73,7 +73,7 @@ plugin.labels = {
 };
 
 plugin.events = {
-	"Echo.Card.onRerender": function() {
+	"Echo.StreamServer.Controls.Card.onRerender": function() {
 		var item = this.component;
 		if (item.user.is("admin")) {
 			var element = item.view.get("container");
@@ -101,7 +101,7 @@ plugin.events = {
 			}
 		}
 	},
-	"Echo.CardCollection.Plugins.Moderation.onUserUpdate": function(topic, args) {
+	"Echo.StreamServer.Controls.CardCollection.Plugins.Moderation.onUserUpdate": function(topic, args) {
 		var target = this.component;
 		var source = args.item;
 		if (target.get("data.actor.id") !== source.data.actor.id) return;
@@ -638,10 +638,10 @@ Echo.Plugin.create(plugin);
 (function() {
 "use strict";
 
-var plugin = Echo.Plugin.manifest("Moderation", "Echo.CardCollection");
+var plugin = Echo.Plugin.manifest("Moderation", "Echo.StreamServer.Controls.CardCollection");
 
 plugin.events = {
-	"Echo.Card.Plugins.Moderation.onUserUpdate": function(topic, args) {
+	"Echo.StreamServer.Controls.Card.Plugins.Moderation.onUserUpdate": function(topic, args) {
 		this.events.publish({
 			"topic": "onUserUpdate",
 			"data": args,

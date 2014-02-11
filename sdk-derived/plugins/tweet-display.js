@@ -4,7 +4,7 @@
 var $ = jQuery;
 
 /**
- * @class Echo.Card.Plugins.TweetDisplay
+ * @class Echo.StreamServer.Controls.Card.Plugins.TweetDisplay
  * Adds the Twitter intents controls into the item UI and updates the
  * item UI to look and behave like a Twitter item. The item UI update includes:
  *
@@ -20,7 +20,7 @@ var $ = jQuery;
  * To enable this plugin should be taken add the corresponding section into the
  * Echo Stream configuration parameter plugins:
  *
- * 	new Echo.CardCollection({
+ * 	new Echo.StreamServer.Controls.CardCollection({
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
@@ -44,7 +44,7 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("TweetDisplay", "Echo.Card");
+var plugin = Echo.Plugin.manifest("TweetDisplay", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -172,7 +172,7 @@ plugin.enabled = function() {
 };
 
 plugin.events = {
-	"Echo.Card.onRender": function(topic, args) {
+	"Echo.StreamServer.Controls.Card.onRender": function(topic, args) {
 		window.twttr && window.twttr.widgets && window.twttr.widgets.load();
 		$.map(this.component.buttons[this.name], function(name) {
 			if (name && name.element) {

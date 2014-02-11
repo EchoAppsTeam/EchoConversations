@@ -2,12 +2,12 @@
 "use strict";
 
 /**
- * @class Echo.CardCollection.Plugins.Reply
+ * @class Echo.StreamServer.Controls.CardCollection.Plugins.Reply
  * Adds extra “Reply” button to each item in the Echo Stream control.
  * Integrates Echo Submit Composer control and provides the ability to submit
  * replies to the posted items.
  *
- *		new Echo.CardCollection({
+ *		new Echo.StreamServer.Controls.CardCollection({
  *			"target": document.getElementById("echo-stream"),
  *			"appkey": "echo.jssdk.demo.aboutecho.com",
  *			"plugins": [{
@@ -23,7 +23,7 @@
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("Reply", "Echo.Card");
+var plugin = Echo.Plugin.manifest("Reply", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -44,7 +44,7 @@ plugin.config = {
 	 * @cfg {String} actionString
 	 * Specifies the hint placed in the empty text area.
 	 *
-	 *		new Echo.CardCollection({
+	 *		new Echo.StreamServer.Controls.CardCollection({
 	 *			"target": document.getElementById("echo-stream"),
 	 *			"appkey": "echo.jssdk.demo.aboutecho.com",
 	 *			"plugins": [{
@@ -71,7 +71,7 @@ plugin.dependencies = [{
 }];
 
 plugin.events = {
-	"Echo.CardCollection.Plugins.Reply.onFormExpand": function(topic, args) {
+	"Echo.StreamServer.Controls.CardCollection.Plugins.Reply.onFormExpand": function(topic, args) {
 		var item = this.component;
 		var context = item.config.get("context");
 		if (this.get("expanded") && context && context !== args.context) {
@@ -81,7 +81,7 @@ plugin.events = {
 	"Echo.StreamServer.Controls.SubmitComposer.onPostComplete": function(topic, args) {
 		this._hideSubmit();
 	},
-	"Echo.Card.onRender": function(topic, args) {
+	"Echo.StreamServer.Controls.Card.onRender": function(topic, args) {
 		if (this.get("expanded")) {
 			this._showSubmit();
 		}
@@ -231,7 +231,7 @@ plugin.methods._hideSubmit = function() {
 	this.view.render({"name": "compactForm"});
 	item.view.render({"name": "container"});
 	/**
-	 * @echo_event Echo.Card.Plugins.Reply.onCollapse
+	 * @echo_event Echo.StreamServer.Controls.Card.Plugins.Reply.onCollapse
 	 * Triggered when the reply form is closed.
 	 */
 	this.events.publish({
@@ -245,7 +245,7 @@ plugin.methods._expand = function() {
 	this.view.render({"name": "submitForm"});
 	this.view.render({"name": "compactForm"});
 	/**
-	 * @echo_event Echo.Card.Plugins.Reply.onExpand
+	 * @echo_event Echo.StreamServer.Controls.Card.Plugins.Reply.onExpand
 	 * Triggered when the reply form is expanded.
 	 */
 	this.events.publish({
@@ -322,11 +322,11 @@ Echo.Plugin.create(plugin);
 "use strict";
 
 /**
- * @class Echo.CardCollection.Plugins.Reply
- * Proxies the "Echo.Card.Plugins.Reply.onExpand"
+ * @class Echo.StreamServer.Controls.CardCollection.Plugins.Reply
+ * Proxies the "Echo.StreamServer.Controls.Card.Plugins.Reply.onExpand"
  * event on the Stream control level.
  *
- * 	new Echo.CardCollection({
+ * 	new Echo.StreamServer.Controls.CardCollection({
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
@@ -343,14 +343,14 @@ Echo.Plugin.create(plugin);
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("Reply", "Echo.CardCollection");
+var plugin = Echo.Plugin.manifest("Reply", "Echo.StreamServer.Controls.CardCollection");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.events = {
-	"Echo.Card.Reply.onExpand": function(topic, args) {
+	"Echo.StreamServer.Controls.Card.Reply.onExpand": function(topic, args) {
 		/**
-		 * @echo_event Echo.CardCollection.Plugins.Reply.onFormExpand
+		 * @echo_event Echo.StreamServer.Controls.CardCollection.Plugins.Reply.onFormExpand
 		 * Triggered if reply form is expanded.
 		 */
 		this.events.publish({

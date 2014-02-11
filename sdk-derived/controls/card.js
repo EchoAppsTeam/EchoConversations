@@ -4,7 +4,7 @@
 var $ = jQuery;
 
 /**
- * @class Echo.Card
+ * @class Echo.StreamServer.Controls.Card
  * Echo Stream.Item control which encapsulates Item mechanics.
  *
  * @extends Echo.Control
@@ -13,12 +13,12 @@ var $ = jQuery;
  * @package streamserver.pack.js
  *
  * @constructor
- * Item constructor initializing Echo.Card class
+ * Item constructor initializing Echo.StreamServer.Controls.Card class
  *
  * @param {Object} config
  * Configuration options
  */
-var card = Echo.Control.manifest("Echo.Card");
+var card = Echo.Control.manifest("Echo.StreamServer.Controls.Card");
 
 if (Echo.Control.isDefined(card)) return;
 
@@ -61,24 +61,24 @@ card.dependencies = [{
 }];
 
 /**
- * @echo_event Echo.Card.onReady
+ * @echo_event Echo.StreamServer.Controls.Card.onReady
  * Triggered when the app initialization is finished completely.
  */
 /**
- * @echo_event Echo.Card.onRefresh
+ * @echo_event Echo.StreamServer.Controls.Card.onRefresh
  * Triggered when the app is refreshed. For example after the user
  * login/logout action or as a result of the "refresh" function call.
  */
 /**
- * @echo_event Echo.Card.onRender
+ * @echo_event Echo.StreamServer.Controls.Card.onRender
  * Triggered when the app is rendered.
  */
 
 card.events = {
-	"Echo.Card.onRender": function() {
+	"Echo.StreamServer.Controls.Card.onRender": function() {
 		this._pageLayoutChange();
 	},
-	"Echo.CardCollection.onCardShown": function(topic, args) {
+	"Echo.StreamServer.Controls.CardCollection.onCardShown": function(topic, args) {
 		if (args.item.data.unique !== this.get("data.unique")) return;
 		this._pageLayoutChange();
 		var self = this;
@@ -896,7 +896,7 @@ card.renderers.expandChildren = function(element, extra) {
 				"extra": {"state": "loading"}
 			});
 			/**
-			 * @echo_event Echo.Card.onChildrenExpand
+			 * @echo_event Echo.StreamServer.Controls.Card.onChildrenExpand
 			 * Triggered when the children block is expanded.
 			 */
 			self.events.publish({
@@ -921,11 +921,11 @@ card.renderers._childrenContainer = function(element, config) {
 		}
 		if (child.deleted || child.added) {
 			/**
-			 * @echo_event Echo.Card.onDelete
+			 * @echo_event Echo.StreamServer.Controls.Card.onDelete
 			 * Triggered when the child item is deleted.
 			 */
 			/**
-			 * @echo_event Echo.Card.onAdd
+			 * @echo_event Echo.StreamServer.Controls.Card.onAdd
 			 * Triggered when the child item is added.
 			 */
 			child.events.publish({
@@ -1464,7 +1464,7 @@ card.methods._assembleButtons = function() {
 			data.callback = function() {
 				callback.call(self);
 				/**
-				 * @echo_event Echo.Card.onButtonClick
+				 * @echo_event Echo.StreamServer.Controls.Card.onButtonClick
 				 * Triggered when the item control button is clicked.
 				 */
 				self.events.publish({

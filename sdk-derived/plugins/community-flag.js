@@ -4,7 +4,7 @@
 var $ = jQuery;
 
 /**
- * @class Echo.Card.Plugins.CommunityFlag
+ * @class Echo.StreamServer.Controls.Card.Plugins.CommunityFlag
  * Adds extra Flag/Unflag buttons to each item in the Echo Stream
  * control for the authenticated users. The item will receive the
  * CommunityFlagged state as soon as it is flagged by a certain number
@@ -13,7 +13,7 @@ var $ = jQuery;
  * also shows the number of flags already set for the item next to the
  * Flag/Unflag control.
  *
- * 	new Echo.CardCollection({
+ * 	new Echo.StreamServer.Controls.CardCollection({
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
@@ -29,7 +29,7 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("CommunityFlag", "Echo.Card");
+var plugin = Echo.Plugin.manifest("CommunityFlag", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -136,11 +136,11 @@ plugin.methods._assembleButton = function(name) {
 			},
 			"onData": function(response) {
 				/**
-				 * @echo_event Echo.Card.Plugins.CommunityFlag.onFlagComplete
+				 * @echo_event Echo.StreamServer.Controls.Card.Plugins.CommunityFlag.onFlagComplete
 				 * Triggered if flag operation was completed.
 				 */
 				/**
-				 * @echo_event Echo.Card.Plugins.CommunityFlag.onUnflagComplete
+				 * @echo_event Echo.StreamServer.Controls.Card.Plugins.CommunityFlag.onUnflagComplete
 				 * Triggered if reverse flag operation was completed.
 				 */
 				plugin._publishEventComplete({
@@ -156,11 +156,11 @@ plugin.methods._assembleButton = function(name) {
 			},
 			"onError": function(response) {
 				/**
-				 * @echo_event Echo.Card.Plugins.CommunityFlag.onFlagError
+				 * @echo_event Echo.StreamServer.Controls.Card.Plugins.CommunityFlag.onFlagError
 				 * Triggered if flag operation failed.
 				 */
 				/**
-				 * @echo_event Echo.Card.Plugins.CommunityFlag.onUnflagError
+				 * @echo_event Echo.StreamServer.Controls.Card.Plugins.CommunityFlag.onUnflagError
 				 * Triggered if reverse flag operation failed.
 				 */
 				plugin._publishEventComplete({

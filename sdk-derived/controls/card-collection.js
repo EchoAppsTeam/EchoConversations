@@ -4,12 +4,12 @@
 var $ = jQuery;
 
 /**
- * @class Echo.CardCollection
+ * @class Echo.StreamServer.Controls.CardCollection
  * Echo Stream control which encapsulates interaction with the
  * <a href="http://echoplatform.com/streamserver/docs/rest-api/items-api/search/" target="_blank">Echo Search API</a>
  * and displays live updating search results in a standard ‘news feed’ style format.
  *
- * 	var stream = new Echo.CardCollection({
+ * 	var collection = new Echo.StreamServer.Controls.CardCollection({
  * 		"target": document.getElementById("stream"),
  * 		"query": "childrenof:http://example.com/js-sdk",
  * 		"appkey": "echo.jssdk.demo.aboutecho.com"
@@ -24,14 +24,14 @@ var $ = jQuery;
  * @package streamserver.pack.js
  *
  * @constructor
- * Stream constructor initializing Echo.CardCollection class
+ * Stream constructor initializing Echo.StreamServer.Controls.CardCollection class
  *
  * @param {Object} config
  * Configuration options
  */
-var stream = Echo.Control.manifest("Echo.CardCollection");
+var collection = Echo.Control.manifest("Echo.StreamServer.Controls.CardCollection");
 
-if (Echo.Control.isDefined(stream)) return;
+if (Echo.Control.isDefined(collection)) return;
 
 /** @hide @method placeImage */
 /** @hide @echo_label justNow */
@@ -53,24 +53,24 @@ if (Echo.Control.isDefined(stream)) return;
 /** @hide @echo_label monthsAgo */
 
 /**
- * @echo_event Echo.CardCollection.onReady
+ * @echo_event Echo.StreamServer.Controls.CardCollection.onReady
  * Triggered when the app initialization is finished completely.
  */
 /**
- * @echo_event Echo.CardCollection.onRefresh
+ * @echo_event Echo.StreamServer.Controls.CardCollection.onRefresh
  * Triggered when the app is refreshed. For example after the user
  * login/logout action or as a result of the "refresh" function call.
  */
 /**
- * @echo_event Echo.CardCollection.onRender
+ * @echo_event Echo.StreamServer.Controls.CardCollection.onRender
  * Triggered when the app is rendered.
  */
 /**
- * @echo_event Echo.CardCollection.onRerender
+ * @echo_event Echo.StreamServer.Controls.CardCollection.onRerender
  * Triggered when the app is rerendered.
  */
 
-stream.init = function() {
+collection.init = function() {
 	var self = this;
 	if (!this.checkAppKey()) return;
 
@@ -129,7 +129,7 @@ stream.init = function() {
 	}
 };
 
-stream.config = {
+collection.config = {
 	/**
 	 * @cfg {String} query
 	 * Specifies the search query to generate the necessary data set.
@@ -137,7 +137,7 @@ stream.config = {
 	 * <a href="http://echoplatform.com/streamserver/docs/rest-api/items-api/search/" target="_blank">"search" API</a>
 	 * method specification.
 	 *
-	 *		new Echo.CardCollection({
+	 *		new Echo.StreamServer.Controls.CardCollection({
 	 *			"target": document.getElementById("echo-stream"),
 	 *			"appkey": "echo.jssdk.demo.aboutecho.com",
 	 *			"query" : "childrenof:http://example.com/test/*"
@@ -182,7 +182,7 @@ stream.config = {
 	/**
 	 * @cfg {Object} item
 	 * Specifies the configuration options to be passed to internal
-	 * Echo.Card component.
+	 * Echo.StreamServer.Controls.Card component.
 	 */
 	"item": {
 		"manualRendering": true
@@ -211,7 +211,7 @@ stream.config = {
 	 * of items.
 	 *
 	 *		// sorting items in the content lexicographical order
-	 *		var stream = new Echo.CardCollection({
+	 *		var collection = new Echo.StreamServer.Controls.CardCollection({
 	 *			...
 	 *			"itemsComparator": function(listedItem, newItem, sort) {
 	 *				return listedItem.get("data.object.content") > newItem.get("data.object.content")
@@ -221,10 +221,10 @@ stream.config = {
 	 *			...
 	 *		});
 	 *
-	 * @cfg {Echo.Card} itemsComparator.listedItem
+	 * @cfg {Echo.StreamServer.Controls.Card} itemsComparator.listedItem
 	 * Item from the list which is compared with new item.
 	 *
-	 * @cfg {Echo.Card} itemsComparator.newItem
+	 * @cfg {Echo.StreamServer.Controls.Card} itemsComparator.newItem
 	 * Item we are trying to find place for.
 	 *
 	 * @cfg {String} itemsComparator.sort
@@ -378,7 +378,7 @@ stream.config = {
 	"displayEmptyStream": true
 };
 
-stream.config.normalizer = {
+collection.config.normalizer = {
 	"showFlags": function(value) {
 		return "off" !== value;
 	},
@@ -389,12 +389,12 @@ stream.config.normalizer = {
 
 		object["layout"] = object["toggleBy"] === "button"
 			? object["layout"]
-			: stream.config.state.layout;
+			: collection.config.state.layout;
 		return object;
 	}
 };
 
-stream.vars = {
+collection.vars = {
 	"activities": {
 		"queue": [],
 		"state": undefined,
@@ -411,7 +411,7 @@ stream.vars = {
 	"itemsRenderingComplete": true
 };
 
-stream.labels = {
+collection.labels = {
 	/**
 	 * @echo_label
 	 */
@@ -446,17 +446,17 @@ stream.labels = {
 	"newItems": "new items"
 };
 
-stream.dependencies = [{
-	"loaded": function() { return !!Echo.Card; },
+collection.dependencies = [{
+	"loaded": function() { return !!Echo.StreamServer.Controls.Card; },
 	"url": "{%=baseURL%}/sdk-derived/controls/card.js"
 }];
 
-stream.events = {
-	"Echo.CardCollection.onItemsRenderingComplete": function() {
+collection.events = {
+	"Echo.StreamServer.Controls.CardCollection.onItemsRenderingComplete": function() {
 		this.view.render({"name": "more"});
 		this._executeNextActivity();
 	},
-	"Echo.Card.onAdd": function(topic, data) {
+	"Echo.StreamServer.Controls.Card.onAdd": function(topic, data) {
 		var self = this;
 		var item = this.items[data.card.data.unique];
 		item.config.get("target").hide();
@@ -472,7 +472,7 @@ stream.events = {
 		});
 		return {"stop": ["bubble"]};
 	},
-	"Echo.Card.onDelete": function(topic, data) {
+	"Echo.StreamServer.Controls.Card.onDelete": function(topic, data) {
 		var self = this;
 		var item = this.items[data.card.data.unique];
 		this.queueActivity({
@@ -486,7 +486,7 @@ stream.events = {
 		});
 		return {"stop": ["bubble"]};
 	},
-	"Echo.Card.onChildrenExpand": function(topic, args) {
+	"Echo.StreamServer.Controls.Card.onChildrenExpand": function(topic, args) {
 		this._requestChildrenItems(args.data.unique);
 		return {"stop": ["bubble"]};
 	}
@@ -495,7 +495,7 @@ stream.events = {
 /**
  * @echo_template
  */
-stream.templates.main =
+collection.templates.main =
 	'<div class="{class:container} echo-primaryFont echo-primaryBackgroundColor">' +
 		'<div class="{class:content}">' +
 			'<div class="{class:body}"></div>' +
@@ -506,7 +506,7 @@ stream.templates.main =
 /**
  * @echo_renderer
  */
-stream.renderers.body = function(element) {
+collection.renderers.body = function(element) {
 	var request = this.lastRequest;
 	if (!request) {
 		return element;
@@ -529,7 +529,7 @@ stream.renderers.body = function(element) {
 /**
  * @echo_renderer
  */
-stream.renderers.content = function(element) {
+collection.renderers.content = function(element) {
 	var self = this, request = this.lastRequest;
 	if (request && request.initial && this.config.get("liveUpdates.enabled") &&
 		this.config.get("state.toggleBy") === "mouseover") {
@@ -544,7 +544,7 @@ stream.renderers.content = function(element) {
 /**
 * @echo_renderer
 */
-stream.renderers.container = function(element) {
+collection.renderers.container = function(element) {
 	var items = $.grep(this.get("threads"), function(item) {
 		return !item.deleted;
 	});
@@ -556,7 +556,7 @@ stream.renderers.container = function(element) {
 /**
  * @echo_renderer
  */
-stream.renderers.state = function(element) {
+collection.renderers.state = function(element) {
 	var self = this;
 	var label = this.config.get("state.label");
 	var layout = this.config.get("state.layout");
@@ -636,7 +636,7 @@ stream.renderers.state = function(element) {
 /**
  * @echo_renderer
  */
-stream.renderers.more = function(element) {
+collection.renderers.more = function(element) {
 	var self = this;
 	if (this.isViewComplete || !this.threads.length) {
 		return element.empty().hide();
@@ -651,7 +651,7 @@ stream.renderers.more = function(element) {
 		.off("click")
 		.one("click", function() {
 			/**
-			 * @echo_event Echo.CardCollection.onMoreButtonPress
+			 * @echo_event Echo.StreamServer.Controls.CardCollection.onMoreButtonPress
 			 * Triggered when the "more" button is pressed.
 			 */
 			self.events.publish({"topic": "onMoreButtonPress"});
@@ -666,7 +666,7 @@ stream.renderers.more = function(element) {
  * @return {String}
  * stream state "live" or "paused".
  */
-stream.methods.getState = function() {
+collection.methods.getState = function() {
 	return this.activities.state;
 };
 
@@ -676,7 +676,7 @@ stream.methods.getState = function() {
  * @param {String} state
  * stream state "live" or "paused".
  */
-stream.methods.setState = function(state) {
+collection.methods.setState = function(state) {
 	this.activities.state = state;
 	if (state === "live") {
 		this._executeNextActivity();
@@ -703,7 +703,7 @@ stream.methods.setState = function(state) {
  * @param {Function} params.handler
  * The handler function of the activity.
  */
-stream.methods.queueActivity = function(params) {
+collection.methods.queueActivity = function(params) {
 	if (!params.item) return;
 	var actorID = params.item.get("data.actor.id");
 	// we consider activity related to the current user if:
@@ -726,7 +726,7 @@ stream.methods.queueActivity = function(params) {
 	}
 };
 
-stream.methods._requestChildrenItems = function(unique) {
+collection.methods._requestChildrenItems = function(unique) {
 	var self = this;
 	var item = this.items[unique];
 	var target = item.view.get("expandChildren");
@@ -767,7 +767,7 @@ stream.methods._requestChildrenItems = function(unique) {
 	request.send();
 };
 
-stream.methods._requestInitialItems = function() {
+collection.methods._requestInitialItems = function() {
 	var self = this;
 	if (!this.request) {
 		this.request = Echo.StreamServer.API.request({
@@ -805,7 +805,7 @@ stream.methods._requestInitialItems = function() {
 	this.request.send();
 };
 
-stream.methods._requestMoreItems = function(element) {
+collection.methods._requestMoreItems = function(element) {
 	var self = this;
 	this.lastRequest = {"initial": false};
 	if (!this.moreRequest) {
@@ -849,11 +849,11 @@ stream.methods._requestMoreItems = function(element) {
 	});
 };
 
-stream.methods._onDataReceive = function(data, type, callback) {
+collection.methods._onDataReceive = function(data, type, callback) {
 	var self = this;
 	var items = {};
 	/**
-	 * @echo_event Echo.CardCollection.onDataReceive
+	 * @echo_event Echo.StreamServer.Controls.CardCollection.onDataReceive
 	 * Triggered when new data is received.
 	 *
 	 * @param {Object} data
@@ -894,14 +894,14 @@ stream.methods._onDataReceive = function(data, type, callback) {
 	});
 };
 
-stream.methods._prepareEventParams = function(params) {
+collection.methods._prepareEventParams = function(params) {
 	return $.extend(params, {
 		"target": this.config.get("target").get(0),
 		"query": this.config.get("query")
 	});
 };
 
-stream.methods._applyLiveUpdates = function(entries, callback) {
+collection.methods._applyLiveUpdates = function(entries, callback) {
 	var self = this, data = {};
 	data.entries = $.map(entries || [], function(entry) {
 		return self._normalizeEntry(entry);
@@ -969,7 +969,7 @@ stream.methods._applyLiveUpdates = function(entries, callback) {
 	});
 };
 
-stream.methods._actualizeChildrenList = function(parent, entries) {
+collection.methods._actualizeChildrenList = function(parent, entries) {
 	var self = this;
 	return $.map(entries, function(entry) {
 
@@ -994,7 +994,7 @@ stream.methods._actualizeChildrenList = function(parent, entries) {
 	});
 };
 
-stream.methods._createChildrenItemsDomWrapper = function(children, parent) {
+collection.methods._createChildrenItemsDomWrapper = function(children, parent) {
 	var self = this;
 	var wrapper = $('<div class="' + this.get("cssPrefix") + 'children-wrapper"></div>');
 	var getIdx = function(item) {
@@ -1010,7 +1010,7 @@ stream.methods._createChildrenItemsDomWrapper = function(children, parent) {
 	return wrapper;
 };
 
-stream.methods._extractPresentationConfig = function(data) {
+collection.methods._extractPresentationConfig = function(data) {
 	var keys = ["sortOrder", "itemsPerPage", "safeHTML", "showFlags"];
 	return Echo.Utils.foldl({}, keys, function(key, acc) {
 		if (typeof data[key] !== "undefined") {
@@ -1019,7 +1019,7 @@ stream.methods._extractPresentationConfig = function(data) {
 	});
 };
 
-stream.methods._extractTimeframeConfig = function(data) {
+collection.methods._extractTimeframeConfig = function(data) {
 	var getComparator = function(value) {
 		var match = value.match(/^(<|>)(.*)$/);
 		var operation = match[1];
@@ -1042,7 +1042,7 @@ stream.methods._extractTimeframeConfig = function(data) {
 	return {"timeframe": timeframe};
 };
 
-stream.methods._getRespectiveAccumulator = function(item, sort) {
+collection.methods._getRespectiveAccumulator = function(item, sort) {
 	var accBySort = {
 		"likesDescending": "likesCount",
 		"flagsDescending": "flagsCount",
@@ -1051,7 +1051,7 @@ stream.methods._getRespectiveAccumulator = function(item, sort) {
 	return item.getAccumulator(accBySort[sort]);
 };
 
-stream.methods._appendRootItems = function(items, container) {
+collection.methods._appendRootItems = function(items, container) {
 	var self = this;
 	if (!items || !items.length) return;
 	this.itemsRenderingComplete = false;
@@ -1076,7 +1076,7 @@ stream.methods._appendRootItems = function(items, container) {
 	})();
 };
 
-stream.methods._constructChildrenSearchQuery = function(item) {
+collection.methods._constructChildrenSearchQuery = function(item) {
 	// depth for item children request
 	var depth = this.config.get("children.maxDepth") - item.get("depth") - 1;
 	var additionalItems = parseInt(this.config.get("children.additionalItemsPerPage"), 10);
@@ -1102,7 +1102,7 @@ stream.methods._constructChildrenSearchQuery = function(item) {
 	}) + filterQuery;
 };
 
-stream.methods._handleInitialResponse = function(data, visualizer) {
+collection.methods._handleInitialResponse = function(data, visualizer) {
 	var self = this, roots = [];
 	this.config.get("target").show();
 	this.nextSince = data.nextSince || 0;
@@ -1158,7 +1158,7 @@ stream.methods._handleInitialResponse = function(data, visualizer) {
 	});
 };
 
-stream.methods._checkTimeframeSatisfy = function() {
+collection.methods._checkTimeframeSatisfy = function() {
 	var self = this;
 	var timeframe = this.config.get("timeframe");
 	if (!timeframe || !timeframe.length) return; // no timeframes defined in the search query
@@ -1173,7 +1173,7 @@ stream.methods._checkTimeframeSatisfy = function() {
 	});
 };
 
-stream.methods._handleLiveUpdatesResponse = function(data) {
+collection.methods._handleLiveUpdatesResponse = function(data) {
 	var self = this;
 	data = data || {};
 	this._applyLiveUpdates(data.entries, function() {
@@ -1182,7 +1182,7 @@ stream.methods._handleLiveUpdatesResponse = function(data) {
 	});
 };
 
-stream.methods._getRequestObject = function(overrides) {
+collection.methods._getRequestObject = function(overrides) {
 	var config = $.extend(true, {
 		"endpoint": "search",
 		"secure": this.config.get("useSecureAPI"),
@@ -1195,7 +1195,7 @@ stream.methods._getRequestObject = function(overrides) {
 	return Echo.StreamServer.API.request(config);
 };
 
-stream.methods._recalcEffectsTimeouts = function() {
+collection.methods._recalcEffectsTimeouts = function() {
 	// recalculating timeouts based on amount of items in activities queue
 	var s = this;
 	var maxTimeouts = {
@@ -1226,7 +1226,7 @@ stream.methods._recalcEffectsTimeouts = function() {
 	s.timeouts.slide = calc("slide", msPerItem);
 };
 
-stream.methods._refreshItemsDate = function() {
+collection.methods._refreshItemsDate = function() {
 	$.map(this.threads, function(item) {
 		item.view.render({"name": "date"});
 		item.traverse(item.get("children"), function(child) {
@@ -1235,7 +1235,7 @@ stream.methods._refreshItemsDate = function() {
 	});
 };
 
-stream.methods._executeNextActivity = function() {
+collection.methods._executeNextActivity = function() {
 	var acts = this.activities;
 
 	// return stream state to "paused" when no more items
@@ -1257,9 +1257,9 @@ stream.methods._executeNextActivity = function() {
 
 // the list of spot update helpers, executed by the
 // "_applySpotUpdates" and "_animateSpotUpdates" top level functions
-stream.methods._spotUpdates = {"animate": {}};
+collection.methods._spotUpdates = {"animate": {}};
 
-stream.methods._spotUpdates.add = function(item, options) {
+collection.methods._spotUpdates.add = function(item, options) {
 	// if we are trying to add an item which already exists,
 	// we should change the operation to "replace"
 	var _item = this.items[item.get("data.unique")];
@@ -1282,7 +1282,7 @@ stream.methods._spotUpdates.add = function(item, options) {
 	}
 };
 
-stream.methods._spotUpdates.replace = function(item, options) {
+collection.methods._spotUpdates.replace = function(item, options) {
 	item.unblock();
 	if (this._maybeMoveItem(item)) {
 		var parent = this._getParentItem(item);
@@ -1310,15 +1310,15 @@ stream.methods._spotUpdates.replace = function(item, options) {
 	if (item && item.view.rendered()) {
 		item.view.render({"name": "container", "recursive": true});
 		/**
-		 * @member Echo.Card
-		 * @echo_event Echo.Card.onRerender
+		 * @member Echo.StreamServer.Controls.Card
+		 * @echo_event Echo.StreamServer.Controls.Card.onRerender
 		 * Triggered when the item is rerendered.
 		 */
 		item.events.publish({"topic": "onRerender"});
 	}
 };
 
-stream.methods._spotUpdates.remove = function(item, options) {
+collection.methods._spotUpdates.remove = function(item, options) {
 	item.set("deleted", true);
 	if (item.isRoot()) {
 		item.events.publish({
@@ -1347,7 +1347,7 @@ stream.methods._spotUpdates.remove = function(item, options) {
 	}
 };
 
-stream.methods._spotUpdates.animate.add = function(item) {
+collection.methods._spotUpdates.animate.add = function(item) {
 	var self = this;
 	this.activities.animations++;
 
@@ -1384,7 +1384,7 @@ stream.methods._spotUpdates.animate.add = function(item) {
 	}
 };
 
-stream.methods._spotUpdates.animate.remove = function(item, config) {
+collection.methods._spotUpdates.animate.remove = function(item, config) {
 	var self = this;
 	this.activities.animations++;
 	config = config || {};
@@ -1414,7 +1414,7 @@ stream.methods._spotUpdates.animate.remove = function(item, config) {
 	}
 };
 
-stream.methods._applySpotUpdates = function(action, item, options) {
+collection.methods._applySpotUpdates = function(action, item, options) {
 	var self = this;
 	options = options || {};
 	this.queueActivity({
@@ -1428,11 +1428,11 @@ stream.methods._applySpotUpdates = function(action, item, options) {
 	});
 };
 
-stream.methods._animateSpotUpdate = function(action, item, options) {
+collection.methods._animateSpotUpdate = function(action, item, options) {
 	this._spotUpdates.animate[action].call(this, item, options);
 };
 
-stream.methods._getActivityProjectedIndex = function(byCurrentUser, params) {
+collection.methods._getActivityProjectedIndex = function(byCurrentUser, params) {
 	var priorityWeights = {
 		"highest": 0,
 		"high": 10,
@@ -1466,17 +1466,17 @@ stream.methods._getActivityProjectedIndex = function(byCurrentUser, params) {
 	return index;
 };
 
-stream.methods._classifyAction = function(entry) {
+collection.methods._classifyAction = function(entry) {
 	return entry.verbs[0] === "http://activitystrea.ms/schema/1.0/delete"
 		? "delete"
 		: "post";
 };
 
-stream.methods._maybeMoveItem = function(item) {
+collection.methods._maybeMoveItem = function(item) {
 	return item.get("forceInject");
 };
 
-stream.methods._withinVisibleFrame = function(item, items, isViewComplete, sortOrder) {
+collection.methods._withinVisibleFrame = function(item, items, isViewComplete, sortOrder) {
 	items = items || this.threads;
 	isViewComplete = typeof isViewComplete === "undefined"
 		? this.isViewComplete
@@ -1488,7 +1488,7 @@ stream.methods._withinVisibleFrame = function(item, items, isViewComplete, sortO
 	return this._itemsComparator(items[items.length - 1], item, sortOrder) === 1;
 };
 
-stream.methods._withinVisibleChildrenFrame = function(item) {
+collection.methods._withinVisibleChildrenFrame = function(item) {
 	// Before checking if a child item satisfies visibility conditions,
 	// we need to find its parent first. The parent might be already there
 	// in the data structure or it might be in the activity queue at this moment,
@@ -1506,7 +1506,7 @@ stream.methods._withinVisibleChildrenFrame = function(item) {
 	);
 };
 
-stream.methods._getParentItemFromActivityQueue = function(item) {
+collection.methods._getParentItemFromActivityQueue = function(item) {
 	if (item.isRoot()) return;
 	// let's handle exceptions just in case something goes wrong (though it shouldn't)
 	return Echo.Utils.safelyExecute(function(queue) {
@@ -1521,11 +1521,11 @@ stream.methods._getParentItemFromActivityQueue = function(item) {
 	}, [this.activities.queue]);
 };
 
-stream.methods._getParentItem = function(item) {
+collection.methods._getParentItem = function(item) {
 	return item.isRoot() ? undefined : this.items[item.get("data.parentUnique")];
 };
 
-stream.methods._itemsComparator = function(listedItem, newItem, sort) {
+collection.methods._itemsComparator = function(listedItem, newItem, sort) {
 	var self = this, result;
 	var customComparator = this.config.get("itemsComparator");
 	if (customComparator && $.isFunction(customComparator)) {
@@ -1552,7 +1552,7 @@ stream.methods._itemsComparator = function(listedItem, newItem, sort) {
 	return result ? 1 : (typeof result === "undefined" ? 0 : -1);
 };
 
-stream.methods._placeRootItem = function(item) {
+collection.methods._placeRootItem = function(item) {
 	var content = item.config.get("target");
 	if (this.threads.length > 1) {
 		var id = this._getItemListIndex(item, this.threads);
@@ -1572,7 +1572,7 @@ stream.methods._placeRootItem = function(item) {
 	});
 };
 
-stream.methods._placeChildItems = function(parent, children) {
+collection.methods._placeChildItems = function(parent, children) {
 	var self = this;
 	var itemsWrapper = this._createChildrenItemsDomWrapper(children, parent);
 
@@ -1617,7 +1617,7 @@ stream.methods._placeChildItems = function(parent, children) {
 		});
 };
 
-stream.methods._getItemListIndex = function(item, items) {
+collection.methods._getItemListIndex = function(item, items) {
 	var idx = -1;
 	$.each(items || [], function(i, entry) {
 		if (entry.get("data.unique") === item.get("data.unique")) {
@@ -1628,11 +1628,11 @@ stream.methods._getItemListIndex = function(item, items) {
 	return idx;
 };
 
-stream.methods._isItemInList = function(item, items) {
+collection.methods._isItemInList = function(item, items) {
 	return this._getItemListIndex(item, items) >= 0;
 };
 
-stream.methods._initItem = function(entry, isLive, callback) {
+collection.methods._initItem = function(entry, isLive, callback) {
 	// there is no need to create a clone of the parent config every time,
 	// we can do it only once and pass it into all Item constructor calls
 	if (!this.itemParentConfig) {
@@ -1656,11 +1656,11 @@ stream.methods._initItem = function(entry, isLive, callback) {
 	// of the $.extend call for performance reasons
 	config.parent = this.itemParentConfig;
 
-	var init = function() { new Echo.Card(config); };
+	var init = function() { new Echo.StreamServer.Controls.Card(config); };
 	this.config.get("asyncItemsRendering") ? setTimeout(init, 0) : init();
 };
 
-stream.methods._updateItem = function(entry) {
+collection.methods._updateItem = function(entry) {
 	var item = this.items[entry.unique];
 	// forcing item re-injection if the published date or the respective accumulator was changed
 	var sortOrder = this.config.get(item.isRoot() ? "sortOrder" : "children.sortOrder");
@@ -1679,7 +1679,7 @@ stream.methods._updateItem = function(entry) {
 	return item;
 };
 
-stream.methods._getItemProjectedIndex = function(item, items, sort) {
+collection.methods._getItemProjectedIndex = function(item, items, sort) {
 	var self = this;
 	var index;
 	if (item.config.get("live") || item.get("forceInject")) {
@@ -1693,7 +1693,7 @@ stream.methods._getItemProjectedIndex = function(item, items, sort) {
 	return typeof index !== "undefined" ? index : items.length;
 };
 
-stream.methods._addItemToList = function(items, item, sort) {
+collection.methods._addItemToList = function(items, item, sort) {
 	if (this.config.get("itemsComparator")) {
 		item.set("forceInject", true);
 	}
@@ -1702,7 +1702,7 @@ stream.methods._addItemToList = function(items, item, sort) {
 	this.items[item.get("data.unique")] = item;
 };
 
-stream.methods._applyStructureUpdates = function(action, item, options) {
+collection.methods._applyStructureUpdates = function(action, item, options) {
 	var parent, self = this;
 	options = options || {};
 	switch (action) {
@@ -1750,7 +1750,7 @@ stream.methods._applyStructureUpdates = function(action, item, options) {
 	}
 };
 
-stream.methods._normalizeEntry = function(entry) {
+collection.methods._normalizeEntry = function(entry) {
 	if (entry.normalized) return entry;
 	var self = this;
 	entry.normalized = true;
@@ -1781,7 +1781,7 @@ stream.methods._normalizeEntry = function(entry) {
 	return entry;
 };
 
-stream.css =
+collection.css =
 	'.{class:message-wrapper} { padding: 15px 0px; text-align: center; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; border: 1px solid #E4E4E4; }' +
 	'.{class:message-empty}, .{class:message-loading}, .{class:message-error} { display: inline-block; height: 16px; padding-left: 21px; background: no-repeat left center; }' +
 	'.{class:message-empty} { background-image: url({config:cdnBaseURL.sdk-assets}/images/information.png); }' +
@@ -1804,6 +1804,6 @@ stream.css =
 	'.{class:body} .echo-control-message .echo-control-message-info { height: 35px; display: block; font-size: 14px; line-height: 16px; font-weight: normal; font-style: normal; background-image: url({%= baseURL %}/images/info.png); padding-left: 40px; width: 180px; margin: 0px auto; }' +
 	'.echo-control-message-info { background: url({%= baseURL %}/images/info.png) no-repeat; }' ;
 
-Echo.Control.create(stream);
+Echo.Control.create(collection);
 
 })(Echo.jQuery);

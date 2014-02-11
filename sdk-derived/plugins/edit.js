@@ -4,13 +4,13 @@
 var $ = jQuery;
 
 /**
- * @class Echo.Card.Plugins.Edit
+ * @class Echo.StreamServer.Controls.Card.Plugins.Edit
  * Adds extra “Edit” button to each item in the Echo Stream control
  * which allows to edit the content and some metadata of the item.
  * This button will appear either for the users with
  * administrative privileges or for editing of personal comments.
  *
- * 	new Echo.CardCollection({
+ * 	new Echo.StreamServer.Controls.CardCollection({
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
@@ -26,7 +26,7 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("Edit", "Echo.Card");
+var plugin = Echo.Plugin.manifest("Edit", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 

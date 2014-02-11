@@ -4,11 +4,11 @@
 var $ = jQuery;
 
 /**
- * @class Echo.Card.Plugins.Like
+ * @class Echo.StreamServer.Controls.Card.Plugins.Like
  * Adds extra Like/Unlike buttons to each item in the Echo Stream
  * control for authenticated users.
  *
- * 	new Echo.CardCollection({
+ * 	new Echo.StreamServer.Controls.CardCollection({
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
@@ -24,7 +24,7 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("Like", "Echo.Card");
+var plugin = Echo.Plugin.manifest("Like", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -185,11 +185,11 @@ plugin.methods._sendActivity = function(name, item, actor) {
 		"target-query": item.config.get("parent.query")
 	}, function(response) {
 		/**
-		 * @echo_event Echo.Card.Plugins.Like.onLikeComplete
+		 * @echo_event Echo.StreamServer.Controls.Card.Plugins.Like.onLikeComplete
 		 * Triggered when the Like operation is finished.
 		 */
 		/**
-		 * @echo_event Echo.Card.Plugins.Like.onUnlikeComplete
+		 * @echo_event Echo.StreamServer.Controls.Card.Plugins.Like.onUnlikeComplete
 		 * Triggered when the reverse Like operation is finished.
 		 */
 		plugin._publishEventComplete({
@@ -200,11 +200,11 @@ plugin.methods._sendActivity = function(name, item, actor) {
 		plugin.requestDataRefresh();
 	}, function(response) {
 		/**
-		 * @echo_event Echo.Card.Plugins.Like.onLikeError
+		 * @echo_event Echo.StreamServer.Controls.Card.Plugins.Like.onLikeError
 		 * Triggered when the Like operation failed.
 		 */
 		/**
-		 * @echo_event Echo.Card.Plugins.Like.onUnlikeError
+		 * @echo_event Echo.StreamServer.Controls.Card.Plugins.Like.onUnlikeError
 		 * Triggered when the reverse Like operation failed.
 		 */
 		plugin._publishEventComplete({

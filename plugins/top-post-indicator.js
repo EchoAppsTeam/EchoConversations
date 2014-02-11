@@ -1,7 +1,7 @@
 (function($) {
 "use strict";
 
-var plugin = Echo.Plugin.manifest("TopPostIndicator", "Echo.Card");
+var plugin = Echo.Plugin.manifest("TopPostIndicator", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
