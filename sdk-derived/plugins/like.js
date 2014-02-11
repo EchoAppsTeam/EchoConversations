@@ -249,11 +249,12 @@ plugin.methods._assembleButton = function(name) {
 		var item = this;
 
 		var buttonHandler = function() {
-			var buttonNode = item.get("buttons." + self.name + "." + name + ".element");
-			buttonNode.off("click");
-			$("." + item.cssPrefix + "buttonCaption", buttonNode)
+			var view = item.get("buttons." + self.name + "." + name + ".view");
+			view.get("buttonLabel")
+				.off("click")
 				.empty()
 				.append(self.labels.get(name.toLowerCase() + "Processing"));
+
 			self._sendActivity(name, item);
 		};
 

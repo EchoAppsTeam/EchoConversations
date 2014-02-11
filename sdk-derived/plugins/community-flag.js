@@ -116,10 +116,12 @@ plugin.methods._assembleButton = function(name) {
 	var plugin = this;
 	var callback = function() {
 		var item = this;
-		item.get("buttons." + plugin.name + "." + name + ".element")
-			.find("." + item.cssPrefix + "buttonCaption")
+
+		var view = item.get("buttons." + plugin.name + "." + name + ".view");
+		view.get("buttonLabel")
 			.empty()
 			.append(plugin.labels.get(name.toLowerCase() + "Processing"));
+
 		var activity = {
 			"verbs": ["http://activitystrea.ms/schema/1.0/" + name.toLowerCase()],
 			"targets": [{"id": item.get("data.object.id")}]

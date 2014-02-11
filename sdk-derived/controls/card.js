@@ -455,14 +455,14 @@ card.templates.childrenBottom =
 card.templates.button =
 	'<a class="{class:button} {class:button}-{data:name}">' +
 		'<i class="{class:buttonIcon} {data:icon}"></i>' +
-		'<span class="echo-primaryFont {class:buttonCaption}">{data:label}</span>' +
+		'<span class="echo-primaryFont {class:buttonLabel}">{data:label}</span>' +
 	'</a>';
 
 card.templates.dropdownButtons =
 	'<div class="dropdown">' +
 		'<a class="dropdown-toggle {class:button}" data-toggle="dropdown" href="#">' +
 			'<i class="{class:buttonIcon} icon-list"></i>' +
-			'<span class="echo-primaryFont {class:buttonCaption}">{label:actions}</span>' +
+			'<span class="echo-primaryFont {class:buttonLabel}">{label:actions}</span>' +
 		'</a>' +
 	'</div>';
 
@@ -530,7 +530,7 @@ card.renderers.container = function(element) {
 	var switchClasses = function(action) {
 		$.map(self.buttonsOrder, function(name) {
 			var clickables = self.get("buttons." + name + ".clickableElements");
-			if (!self.get("buttons." + name + ".element") || !clickables) return;
+			if (!self.get("buttons." + name + ".view") || !clickables) return;
 			clickables[action + "Class"]("echo-linkColor");
 		});
 	};
@@ -1046,7 +1046,11 @@ card.renderers._dropdownButtons = function(element) {
 			self.view.render({
 				"name": "_button",
 				"target": menuItem,
-				"extra": $.extend({}, button, {"inner": inner, "clickable": true, "callback": closeDropdown(button.callback)})
+				"extra": $.extend({}, button, {
+					"inner": inner,
+					"clickable": true,
+					"callback": closeDropdown(button.callback)
+				})
 			});
 			if (button.entries) {
 				menuItem.addClass("dropdown-submenu");
@@ -1061,6 +1065,7 @@ card.renderers._dropdownButtons = function(element) {
 };
 
 card.renderers._button = function(element, extra) {
+	var view = this.view.fork();
 	var template = extra.template || card.templates.button;
 
 	var data = {
@@ -1068,7 +1073,12 @@ card.renderers._button = function(element, extra) {
 		"name": extra.name,
 		"icon": extra.icon || (!extra.inner && "icon-comment")
 	};
-	var button = $(this.substitute({"template": template, "data": data}));
+
+	var button = view.render({
+		"template": template,
+		"data": data
+	});
+
 	if (extra.inner) {
 		button.addClass("echo-clickable");
 	}
@@ -1082,7 +1092,7 @@ card.renderers._button = function(element, extra) {
 				: null;
 		});
 		new Echo.GUI.Dropdown({
-			"target": button.find("span"),
+			"target": view.get("buttonLabel"),
 			"extraClass": this.cssPrefix + "dropdownButton",
 			"entries": $.map(entries, function(entry) { return $.extend({"handler": entry.callback}, entry); }),
 			"title": extra.label || ""
@@ -1106,7 +1116,7 @@ card.renderers._button = function(element, extra) {
 
 	if (!extra.inner) {
 		var _data = this.get("buttons." + extra.plugin + "." + extra.name);
-		_data.element = button;
+		_data.view = view;
 		_data.clickableElements = clickables;
 		if (Echo.Utils.isMobileDevice()) {
 			clickables.addClass("echo-linkColor");
@@ -1802,7 +1812,7 @@ card.css =
 		'.echo-sdk-ui .{class:button}:active,' +
 		'.echo-sdk-ui .{class:button}:focus { text-decoration: none; color: #c6c6c6; }' +
 	'.{class:container}:hover a.{class:button} { color: #262626; text-decoration: none; }' +
-	'.{class:buttonCaption} { vertical-align: middle; font-size: 12px; }' +
+	'.{class:buttonLabel} { vertical-align: middle; font-size: 12px; }' +
 	'.{class:buttons} a.{class:button}.echo-linkColor .{class:buttonIcon},' +
 		'.{class:container}:hover .{class:buttonIcon},' +
 		'.{class:buttons} a.{class:button}:hover .{class:buttonIcon} { opacity: 0.8; }' +
