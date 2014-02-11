@@ -30,9 +30,9 @@ var $ = jQuery;
  * @param {Object} config
  * Configuration options
 /*/
-var pile = Echo.Control.manifest("Echo.StreamServer.Controls.FaceCollection");
+var collection = Echo.Control.manifest("Echo.StreamServer.Controls.FaceCollection");
 
-if (Echo.Control.isDefined(pile)) return;
+if (Echo.Control.isDefined(collection)) return;
 
 /** @hide @cfg defaultAvatar */
 /** @hide @cfg submissionProxyURL */
@@ -75,7 +75,7 @@ if (Echo.Control.isDefined(pile)) return;
  */
 
 
-pile.init = function() {
+collection.init = function() {
 	if (!this.checkAppKey()) return;
 
 	// picking up timeout value for backwards compatibility
@@ -95,7 +95,7 @@ pile.init = function() {
 	}
 };
 
-pile.config = {
+collection.config = {
 	/**
 	 * @cfg {Object} data
 	 * Specifies static data for the face pile. It has the same format as returned
@@ -219,7 +219,7 @@ pile.config = {
 	}
 };
 
-pile.vars = {
+collection.vars = {
 	"users": [],
 	"uniqueUsers": {},
 	"isViewComplete": false,
@@ -230,7 +230,7 @@ pile.vars = {
 	}
 };
 
-pile.labels = {
+collection.labels = {
 	/**
 	 * @echo_label
 	 */
@@ -244,7 +244,7 @@ pile.labels = {
 /**
  * @echo_template
  */
-pile.templates.main =
+collection.templates.main =
 	'<span class="{class:container}">' +
 		'<span class="{class:actors}"></span>' +
 		'<span class="{class:more}"></span>' +
@@ -254,7 +254,7 @@ pile.templates.main =
 /**
  * @echo_renderer
  */
-pile.renderers.more = function(element) {
+collection.renderers.more = function(element) {
 	var self = this;
 	if (!this._isMoreButtonVisible()) {
 		return element.hide();
@@ -281,7 +281,7 @@ pile.renderers.more = function(element) {
 /**
  * @echo_renderer
  */
-pile.renderers.actors = function(element) {
+collection.renderers.actors = function(element) {
 	var self = this, usersDOM = [];
 	var cssPrefix = this.get("cssPrefix");
 	var item = this.config.get("item");
@@ -329,7 +329,7 @@ pile.renderers.actors = function(element) {
 /**
  * @echo_renderer
  */
-pile.renderers.suffixText = function(element) {
+collection.renderers.suffixText = function(element) {
 	return element.empty().append(this.config.get("suffixText", ""));
 };
 
@@ -339,19 +339,19 @@ pile.renderers.suffixText = function(element) {
  * @return {Number}
  * visible users count
  */
-pile.methods.getVisibleUsersCount = function() {
+collection.methods.getVisibleUsersCount = function() {
 	return this.count.visible;
 };
 
-pile.methods._isMoreButtonVisible = function() {
+collection.methods._isMoreButtonVisible = function() {
 	return !this._fromExternalData() && !this.isViewComplete || this.count.visible < this.count.total;
 };
 
-pile.methods._fromExternalData = function() {
+collection.methods._fromExternalData = function() {
 	return !this.config.get("query") && !!this.data;
 };
 
-pile.methods._request = function() {
+collection.methods._request = function() {
 	var self = this;
 	var request = this.get("request");
 	if (!request) {
@@ -383,7 +383,7 @@ pile.methods._request = function() {
 	request.send();
 };
 
-pile.methods._requestMoreItems = function() {
+collection.methods._requestMoreItems = function() {
 	var self = this, query = this.config.get("query");
 	var nextPageAfter = this.get("nextPageAfter");
 	if (typeof nextPageAfter !== "undefined") {
@@ -407,7 +407,7 @@ pile.methods._requestMoreItems = function() {
 	request.send();
 };
 
-pile.methods._initialResponseHandler = function(data) {
+collection.methods._initialResponseHandler = function(data) {
 	if (data.itemsPerPage && data.itemsPerPage !== this.config.get("itemsPerPage")) {
 		this.config.set("itemsPerPage", +data.itemsPerPage);
 	}
@@ -432,11 +432,11 @@ pile.methods._initialResponseHandler = function(data) {
 	this._processResponse(data);
 };
 
-pile.methods._secondaryResponseHandler = function(data) {
+collection.methods._secondaryResponseHandler = function(data) {
 	this._processResponse(data, true);
 };
 
-pile.methods._processResponse = function(data, isLive) {
+collection.methods._processResponse = function(data, isLive) {
 	var self = this, fetchMoreUsers = true;
 	var actions = $.map(data.entries, function(entry) {
 		return function(callback) {
@@ -466,11 +466,11 @@ pile.methods._processResponse = function(data, isLive) {
 	});
 };
 
-pile.methods._isRemoveAction = function(entry) {
+collection.methods._isRemoveAction = function(entry) {
 	return entry.verbs && entry.verbs[0] === "http://activitystrea.ms/schema/1.0/delete";
 };
 
-pile.methods._output = function(isLive, fetchMoreUsers) {
+collection.methods._output = function(isLive, fetchMoreUsers) {
 	if (this._fromExternalData()) {
 		this.set("count.total", Math.max(this.get("users").length, this.get("count.total")));
 	} else {
@@ -489,11 +489,11 @@ pile.methods._output = function(isLive, fetchMoreUsers) {
 	}
 };
 
-pile.methods._isUniqueUser = function(entry) {
+collection.methods._isUniqueUser = function(entry) {
 	return !this.get("uniqueUsers." + entry.actor.id);
 };
 
-pile.methods._initItem = function(entry, callback) {
+collection.methods._initItem = function(entry, callback) {
 	var config = $.extend({
 		"apiBaseURL": this.config.get("apiBaseURL"),
 		"submissionProxyURL": this.config.get("submissionProxyURL"),
@@ -507,10 +507,10 @@ pile.methods._initItem = function(entry, callback) {
 		"user": this.user,
 		"ready": callback
 	}, this.config.get("item"));
-	return new Echo.StreamServer.Controls.FaceCollection.Item(config);
+	return new Echo.StreamServer.Controls.Face(config);
 };
 
-pile.methods._updateStructure = function(item) {
+collection.methods._updateStructure = function(item) {
 	this.set("uniqueUsers." + item.get("data.id"), {
 		"itemsCount": 1,
 		"instance": item
@@ -519,7 +519,7 @@ pile.methods._updateStructure = function(item) {
 	this.get("users")[user.instance.isYou() ? "unshift" : "push"](user);
 };
 
-pile.methods._maybeRemoveItem = function(entry) {
+collection.methods._maybeRemoveItem = function(entry) {
 	var user = this.get("uniqueUsers." + entry.actor.id);
 	// if we have move than one item posted by the same user,
 	// we decrement the counter, but leave the user in the list
@@ -535,7 +535,7 @@ pile.methods._maybeRemoveItem = function(entry) {
 	this.remove("uniqueUsers." + entry.actor.id);
 };
 
-pile.methods._getMoreUsers = function() {
+collection.methods._getMoreUsers = function() {
 	if (this._fromExternalData()) {
 		var usersLength = this.get("users").length;
 		var currentVisible = this.get("count.visible");
@@ -556,175 +556,19 @@ pile.methods._getMoreUsers = function() {
 	}
 };
 
-pile.methods._intersperse = function(object, separator) {
+collection.methods._intersperse = function(object, separator) {
 	return Echo.Utils.foldl([], object, function(item, acc, key) {
 		if (acc.length) acc.push(separator);
 		acc.push(item);
 	});
 };
 
-pile.css =
+collection.css =
 	'.{class:container} { line-height: 20px; vertical-align: middle; }' +
 	'.{class:more} { white-space: nowrap; }' +
 	'.{class:more}.echo-linkColor a, .{class:more}.echo-linkColor a:hover { color: #476CB8; text-decoration: underline; }' +
 	'.{class:more} .echo-control-message-icon { display: inline; margin: 0px 5px; }';
 
-Echo.Control.create(pile);
-
-})(Echo.jQuery);
-
-(function(jQuery) {
-"use strict";
-
-/**
- * @class Echo.StreamServer.Controls.FaceCollection.Item
- * Echo FaceCollection.Item control displays single user (actor). 
- *
- * @extends Echo.Control
- *
- * @package streamserver/controls.pack.js
- * @package streamserver.pack.js
- *
- * @constructor
- * FaceCollection.Item constructor initializing Echo.StreamServer.Controls.FaceCollection.Item class
- *
- * @param {Object} config
- * Configuration options
- */
-var item = Echo.Control.manifest("Echo.StreamServer.Controls.FaceCollection.Item");
-
-if (Echo.Control.isDefined(item)) return;
-
-/** @hide @cfg appkey */
-/** @hide @cfg plugins */
-/** @hide @cfg submissionProxyURL */
-/** @hide @method checkAppKey */
-/** @hide @method placeImage */
-/** @hide @method dependent */
-/** @hide @method getRelativeTime */
-/** @hide @echo_label justNow */
-/** @hide @echo_label today */
-/** @hide @echo_label yesterday */
-/** @hide @echo_label lastWeek */
-/** @hide @echo_label lastMonth */
-/** @hide @echo_label secondAgo */
-/** @hide @echo_label secondsAgo */
-/** @hide @echo_label minuteAgo */
-/** @hide @echo_label minutesAgo */
-/** @hide @echo_label hourAgo */
-/** @hide @echo_label hoursAgo */
-/** @hide @echo_label dayAgo */
-/** @hide @echo_label daysAgo */
-/** @hide @echo_label weekAgo */
-/** @hide @echo_label weeksAgo */
-/** @hide @echo_label monthAgo */
-/** @hide @echo_label monthsAgo */
-/** @hide @echo_label loading */
-/** @hide @echo_label retrying */
-/** @hide @echo_label error_busy */
-/** @hide @echo_label error_timeout */
-/** @hide @echo_label error_waiting */
-/** @hide @echo_label error_view_limit */
-/** @hide @echo_label error_view_update_capacity_exceeded */
-/** @hide @echo_label error_result_too_large */
-/** @hide @echo_label error_wrong_query */
-/** @hide @echo_label error_incorrect_appkey */
-/** @hide @echo_label error_internal_error */
-/** @hide @echo_label error_quota_exceeded */
-/** @hide @echo_label error_incorrect_user_id */
-/** @hide @echo_label error_unknown */
-
-/**
- * @echo_event Echo.StreamServer.Controls.FaceCollection.Item.onReady
- * Triggered when the app initialization is finished completely.
- */
-/**
- * @echo_event Echo.StreamServer.Controls.FaceCollection.Item.onRefresh
- * Triggered when the app is refreshed. For example after the user
- * login/logout action or as a result of the "refresh" function call.
- */
-/**
- * @echo_event Echo.StreamServer.Controls.FaceCollection.Item.onRender
- * Triggered when the app is rendered.
- */
-/**
- * @echo_event Echo.StreamServer.Controls.FaceCollection.Item.onRerender
- * Triggered when the app is rerendered.
- */
-
-item.config = {
-	/**
-	 * @cfg {String} infoMessages
-	 * Customizes the look and feel of info messages, for example "loading" and "error".
-	 */
-	"infoMessages": {
-		"enabled": false
-	}
-};
-
-item.labels = {
-	/**
-	 * @echo_label
-	 */
-	"you": "You"
-};
-
-/**
- * @echo_template
- */
-item.templates.main =
-	'<span class="{class:container}">' +
-		'<span class="{class:avatar}"></span>' +
-		'<span class="{class:title}">{data:title}</span>' +
-	'</span>';
-
-/**
- * @echo_renderer
- */
-item.renderers.avatar = function(element) {
-	if (this.config.get("avatar")) {
-		this.placeImage({
-			"container": element,
-			"image": this.get("data.avatar"),
-			"defaultImage": this.config.get("defaultAvatar")
-		});
-		if (!this.config.get("text")) {
-			element.attr("title", this.get("data.title"));
-		}
-	} else {
-		element.hide();
-	}
-	return element;
-};
-
-/**
- * @echo_renderer
- */
-item.renderers.title = function(element) {
-	if (this.config.get("text")) {
-		element.empty().append(this.isYou() ? this.labels.get("you") : this.get("data.title"));
-	} else {
-		element.hide();
-	}
-	return element;
-};
-
-/**
- * Function to check if the item was posted by the current user.
- *
- * @return {Boolean}
- */
-item.methods.isYou = function() {
-	var id = this.get("data.id");
-	return id && id === this.user.get("identityUrl");
-};
-
-item.css =
-	".{class:avatar} { display: inline-block; width: 16px; height: 16px; margin: 0px 3px 0px 0px; vertical-align: text-top; }" +
-	'.{class:only-avatars} .{class:avatar} { margin: 0px 2px; }' +
-	'.{class:container}, .{class:container} span { white-space: nowrap; display: inline-block; }' +
-	'.{class:only-avatars} .{class:container} { white-space: normal; }';
-
-Echo.Control.create(item);
+Echo.Control.create(collection);
 
 })(Echo.jQuery);

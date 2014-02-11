@@ -78,7 +78,7 @@ plugin.dependencies = [{
 }];
 
 plugin.events = {
-	"Echo.StreamServer.Controls.FaceCollection.Item.Plugins.Like.onUnlike": function(topic, args) {
+	"Echo.StreamServer.Controls.Face.Plugins.Like.onUnlike": function(topic, args) {
 		this._sendActivity("Unlike", this.component, args.actor);
 		return {"stop": ["bubble"]};
 	},
@@ -288,9 +288,9 @@ plugin.css =
 	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 3px; line-height: 10px; }' +
 	// TODO: move these styles to FaceCollection class
 	'.{plugin.class:likedBy} .echo-streamserver-controls-facecollection-container { line-height: 12px; vertical-align: top; }' +
-	'.{plugin.class} .echo-streamserver-controls-facecollection-item-container { position: relative; }' +
-	'.{plugin.class} .echo-streamserver-controls-facecollection-item-avatar { border-radius: 50%; width: 22px; height: 22px; }' +
-	'.{plugin.class} .echo-streamserver-controls-facecollection-item-avatar img { border-radius: 50%; height: 22px; width: 22px; }' +
+	'.{plugin.class} .echo-streamserver-controls-face-container { position: relative; }' +
+	'.{plugin.class} .echo-streamserver-controls-face-avatar { border-radius: 50%; width: 22px; height: 22px; }' +
+	'.{plugin.class} .echo-streamserver-controls-face-avatar img { border-radius: 50%; height: 22px; width: 22px; }' +
 	'.{plugin.class} .echo-streamserver-controls-facecollection-and { display: none; }';
 
 Echo.Plugin.create(plugin);
@@ -358,13 +358,13 @@ Echo.Plugin.create(plugin);
 "use strict";
 
 /**
- * @class Echo.StreamServer.Controls.FaceCollection.Item.Plugins.Like
+ * @class Echo.StreamServer.Controls.Face.Plugins.Like
  * Adds extra controls to items in the Echo FaceCollection control.
  *
  * @extends Echo.Plugin
  * @private
  */
-var plugin = Echo.Plugin.manifest("Like", "Echo.StreamServer.Controls.FaceCollection.Item");
+var plugin = Echo.Plugin.manifest("Like", "Echo.StreamServer.Controls.Face");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -413,7 +413,7 @@ plugin.renderers.adminUnlike = function(element) {
 	}
 	return element.one("click", function() {
 		/**
-		 * @echo_event Echo.StreamServer.Controls.FaceCollection.Item.Plugins.Like.onUnlike
+		 * @echo_event Echo.StreamServer.Controls.Face.Plugins.Like.onUnlike
 		 * Triggered when the item is "unliked" by admin on behalf of a user.
 		 */
 		plugin.events.publish({
