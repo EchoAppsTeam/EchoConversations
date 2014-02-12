@@ -78,6 +78,9 @@ card.events = {
 	"Echo.StreamServer.Controls.Card.onRender": function() {
 		this._pageLayoutChange();
 	},
+	"Echo.Apps.Conversations.onAppResize": function() {
+		this._pageLayoutChange();
+	},
 	"Echo.StreamServer.Controls.CardCollection.onCardShown": function(topic, args) {
 		// TODO check if we can get rig of this event handler ?
 		if (args.item.data.unique !== this.get("data.unique")) return;
@@ -449,6 +452,12 @@ card.templates.dropdownButtons =
 		'</a>' +
 	'</div>';
 
+card.templates.compactButtons =
+	'<a title="{data:label}" class="class{class:button} {class:compactButton} {class:button}-{data:name}">' +
+		'<i class="{plugin.class:buttonIcon} {data:icon}"></i>' +
+		'<span Classs="echo-primaryFont {class:buttonCaption}"></span>' +
+	'</a>';
+
 card.methods.template = function() {
 	return this.templates.mainHeader +
 	(this.config.get("parent.children.sortOrder") === "chronological"
@@ -642,7 +651,6 @@ card.renderers.buttons = function(element) {
 	this._assembleButtons();
 	this._sortButtons();
 	element.empty();
-
 	this.view.render({
 		"name": "_" + this.get("buttonsLayout") + "Buttons",
 		"target": element
@@ -1019,11 +1027,31 @@ card.renderers._viaText = function(element, extra) {
 
 card.renderers._inlineButtons = function(element) {
 	var self = this;
-	var buttons = $.map(this.buttonsOrder, function(name) { return self.get("buttons." + name); });
+	var buttons = $.map(this.buttonsOrder, function(name) {
+		return self.get("buttons." + name);
+	});
 	$.map(buttons, function(button) {
 		if (!button || !Echo.Utils.invoke(button.visible)) {
 			return;
 		}
+		self.view.render({
+			"name": "_button",
+			"target": element,
+			"extra": button
+		});
+	});
+};
+
+card.renderers._compactButtons = function(element) {
+	var self = this;
+	var buttons = $.map(this.buttonsOrder, function(name) {
+		return self.get("buttons." + name);
+	});
+	$.map(buttons, function(button) {
+		if (!button || !Echo.Utils.invoke(button.visible)) {
+			return;
+		}
+		button.template = card.templates.compactButtons;
 		self.view.render({
 			"name": "_button",
 			"target": element,
@@ -1136,48 +1164,55 @@ card.renderers._button = function(element, extra) {
 	return element.append(button);
 };
 
-card.methods._initPageObserver = function() {
-	// TODO need to unsubscribe when card destroyed
-	var self = this;
-
-	// observe DOM tree and call _pageLayoutChange if something was changed
-	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-	if (MutationObserver) {
-		var observer = new MutationObserver(function(mutations) {
-			self._pageLayoutChange();
-		});
-		var config = {"childList": true, "subtree": true, "attributes": true};
-		observer.observe(document, config);
-	}
-
-	$(window).on("resize", function() {
-		self._pageLayoutChange();
-	});
-};
-
 card.methods._pageLayoutChange = function() {
 	var footer = this.view.get("footer");
 	var buttons = this.view.get("buttons");
+	var buttonsStates = [
+		"inline",
+		"compact",
+		"dropdown"
+	];
 
-	if (footer && buttons && footer.is(":visible")) {
-		var likes = footer.children("div").first();
-		var layout = this.get("buttonsLayout");
+	if (!this.get("buttonsStates")) {
+		this.set("buttonsStates", buttonsStates);
+	}
+	var configuredButtonsState = this.config.get("initialIntentsDisplayMode") ||  buttonsStates[0];
 
-		var likesWidth = likes.width();
-		var buttonsWidth = layout === "inline"
-			? buttons.width() + likesWidth + 5
-			: this.get("buttonsWidth") || (buttons.width() + likesWidth + 5);
+	var currentState = this.get("buttonsLayout");
+	if (!currentState) {
+		currentState = configuredButtonsState;
+		this.set("buttonsLayout", currentState);
+	}
+	if (!footer || !buttons || !footer.is(":visible")) {
+		this._checkItemContentHeight();
+		return;
+	}
+	var footerWidth = footer.width();
+	var buttonsWidth = buttons.width();
 
-		if (layout === "inline" && footer.width() < buttonsWidth) {
-			this.set("buttonsLayout", "dropdown");
-			this.set("buttonsWidth", buttonsWidth);
+	var prevFreeSpace = this.get("prevFreeSpace") || 0;
+	var freeSpace = footerWidth - footer.children().eq(0).width() - footer.children().eq(1).width();
+	if (prevFreeSpace !== freeSpace || footerWidth < buttonsWidth) {
+		this.set("prevFreeSpace", freeSpace);
+		var index = $.inArray(currentState, buttonsStates);
+		if (freeSpace < buttonsWidth) {
+			if (buttonsStates[index + 1]) {
+				currentState = buttonsStates[index + 1];
+			}
+			this.set("buttonsLayout", currentState);
 			this.view.render({"name": "buttons"});
-		} else if (layout === "dropdown" && footer.width() > buttonsWidth) {
-			this.set("buttonsWidth", 0);
-			this.set("buttonsLayout", "inline");
+		} else if (freeSpace > (2 * buttonsWidth)) {
+			var indexOfConfiguredState = $.inArray(configuredButtonsState, buttonsStates);
+			if (indexOfConfiguredState < index && buttonsStates[index - 1]) {
+				currentState = buttonsStates[index - 1];
+			} else {
+				currentState = configuredButtonsState;
+			}
+			this.set("buttonsLayout", currentState);
 			this.view.render({"name": "buttons"});
 		}
 	}
+
 	this._checkItemContentHeight();
 };
 
@@ -1802,6 +1837,7 @@ card.css =
 	'.{class:buttons} .dropdown .{class:button} { margin-right: 0px; }' +
 	'.{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
+	'.{class:compactButton} ul.dropdown-menu { left: -20px; }' +
 	'.{class:buttonIcon} { opacity: 0.3; }' +
 		'.{class:buttons} a.{class:button}.echo-linkColor,' +
 		'.echo-sdk-ui .{class:button}:active,' +
