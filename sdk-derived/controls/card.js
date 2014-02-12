@@ -80,32 +80,13 @@ card.events = {
 	},
 	"Echo.StreamServer.Controls.CardCollection.onCardShown": function(topic, args) {
 		if (args.item.data.unique !== this.get("data.unique")) return;
-		this._pageLayoutChange();
-		var self = this;
-		var container = this.view.get("container");
-
-		if (this.get("isItemNew") && container) {
-			var fade = function() {
-				if ($.inviewport(container, {"threshold": 0})) {
-					self.set("isItemNew", false);
-					if (self._transitionSupported()) {
-						container.removeClass(self.cssPrefix + "new");
-					} else {
-						setTimeout(function() {
-							// IE 8-9 doesn't support transition, so we just remove the highlighting.
-							// Maybe we should use jquery.animate (animating colors requires jQuery UI) ?
-							container.removeClass(self.cssPrefix + "new");
-						}, self.config.get("fadeTimeout"));
-					}
-					$(document).off("scroll", fade).off("resize", fade);
-					return true;
-				} else {
-					return false;
-				}
-			};
-			if (!fade()) {
-				$(document).on("scroll", fade).on("resize", fade);
-			}
+		this._maybeRemoveLiveUpdateIndicator();
+	},
+	"Echo.Apps.Conversations.onViewportChange": function() {
+		if (!this.get("isItemNew") || this.config.get("markAsRead") !== "viewportenter") {
+			this.events.unsubscribe({"topic": "Echo.Apps.Conversations.onViewportChange"});
+		} else {
+			this._maybeRemoveLiveUpdateIndicator();
 		}
 	}
 };
@@ -241,7 +222,7 @@ card.config = {
 		"icon": false,
 		"text": false
 	},
-	"fadeTimeout": 10000, // 10 seconds
+	"fadeTimeout": 5000, // 50 seconds
 	"mediaWidth": 340,
 	"manualRendering": false
 };
@@ -509,9 +490,14 @@ card.renderers.indicator = function(element) {
  */
 card.renderers.container = function(element) {
 	var self = this;
-
 	if (this.get("isItemNew")) {
-		element.addClass(this.cssPrefix + "new");
+		var liveUpdate = this.cssPrefix + "new";
+		element.addClass(liveUpdate);
+		if (this.config.get("markAsRead") === "mouseenter") {
+			element.one("mouseenter", function() {
+				element.removeClass(liveUpdate);
+			});
+		}
 	}
 
 	element.removeClass(
@@ -908,6 +894,29 @@ card.renderers.expandChildren = function(element, extra) {
 		});
 };
 
+card.methods._maybeRemoveLiveUpdateIndicator = function() {
+	var self = this;
+	var container = this.view.get("container");
+	// Item can be created but not rendered. So we check if container exists here.
+	if (
+		this.config.get("markAsRead") !== "viewportenter"
+	|| !container
+		|| !$.inviewport(container, {"threshold": 0})
+	) {
+		return;
+}
+	this.set("isItemNew", false);
+	if (this._transitionSupported()) {
+		container.removeClass(this.cssPrefix + "new");
+	} else {
+		setTimeout(function() {
+			// IE 8-9 doesn't support transition, so we just remove the highlighting.
+			// Maybe we should use jquery.animate (animating colors requires jQuery UI) ?
+			container.removeClass(self.cssPrefix + "new");
+		}, this.config.get("fadeTimeout"));
+	}
+};
+
 card.renderers._childrenContainer = function(element, config) {
 	// we cannot use element.empty() because it will remove children's event handlers
 	$.each(element.children(), function(i, child) {
@@ -1235,22 +1244,6 @@ card.methods._getItemRenderType = function() {
 	});
 
 	return result;
-};
-
-card.methods._getMediaAttachments = function() {
-	var self = this;
-	if (this.get("content") !== this.get("data.object.content") || typeof this.get("media") === "undefined") {
-		var result = [];
-		Echo.Utils.safelyExecute(function() {
-			var content = $("<div/>").append(self.get("data.object.content"));
-			result = $("div[oembed], div[data-oembed]", content).map(function() {
-				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
-			}).get();
-		});
-		this.set("content", this.get("data.object.content"));
-		this.set("media", result);
-	}
-	return this.get("media", []);
 };
 
 /**

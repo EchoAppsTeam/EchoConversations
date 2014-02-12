@@ -8,6 +8,7 @@ var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 conversations.config = {
 	"targetURL": "",
 	"bozoFilter": false,
+	"viewportChangeTimeout": 50,
 	"streamingControl": {
 		"pauseOnHover": true,
 		"displayStreamingStateHeader": false,
@@ -65,6 +66,7 @@ conversations.config = {
 	"topPosts": {
 		"visible": true,
 		"label": "Top Posts",
+		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",
 		"maxItemBodyHeight": 110, // px
 		"initialItemsPerPage": 5,
@@ -79,11 +81,13 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"displayEditIntent": true,
 		"displayCommunityFlagIntent": false,
+		"displayTweets": true,
 		"likesDisplayStyle": "facepile",
 		"replyNestingLevels": 2,
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
 		"itemTypes": [],
+		"openLinksInNewWindow": true,
 		"sortOrderEntries": [{
 			"title": "Newest First",
 			"value": "reverseChronological"
@@ -109,6 +113,7 @@ conversations.config = {
 	"allPosts": {
 		"visible": true,
 		"label": "All Posts",
+		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",
 		"maxItemBodyHeight": 110, // px
 		"initialItemsPerPage": 15,
@@ -122,12 +127,14 @@ conversations.config = {
 		"displayReplyIntent": true,
 		"displayEditIntent": true,
 		"displayCommunityFlagIntent": true,
+		"displayTweets": true,
 		"likesDisplayStyle": "facepile",
 		"replyNestingLevels": 2,
 		"noPostsMessage": "There are no posts yet.<br>Be the first to chime in!",
 		"itemStates": ["Untouched", "ModeratorApproved"],
 		"itemMarkers": [],
 		"itemTypes": [],
+		"openLinksInNewWindow": true,
 		"sortOrderEntries": [{
 			"title": "Newest First",
 			"value": "reverseChronological"
@@ -193,6 +200,12 @@ conversations.config = {
 	"topMarkers": {
 		"item": "Conversations.TopPost",
 		"user": "Conversations.TopContributor"
+	},
+	"presentation": {
+		"minimumWidth": 320,
+		"maximumHeight": undefined,
+		"maximumWidth": undefined,
+		"maximumMediaWidth": undefined
 	}
 };
 
@@ -292,6 +305,22 @@ conversations.init = function() {
 		app.render();
 		app.ready();
 	});
+
+	this._viewportChangeTimeout = null;
+	// We cannot pass _viewportChange method as an event handler. In this case it will be called with wrong context.
+	this._viewportChangeHandler = function() {
+		app._viewportChange.call(app);
+	};
+	if (
+		this.config.get("allPosts.markItemsAsReadOn") === "viewportenter"
+		|| this.config.get("topPosts.markItemsAsReadOn") === "viewportenter"
+	) {
+		$(window).on("scroll resize", this._viewportChangeHandler);
+	}
+};
+
+conversations.destroy = function() {
+	$(window).off("scroll resize", this._viewportChangeHandler);
 };
 
 conversations.templates.main =
@@ -342,7 +371,7 @@ conversations.templates.tabs.contentItem =
 	'<div class="tab-pane {data:class}" id="{data:tabId}"></div>';
 
 conversations.templates.defaultQuery =
-	'{data:filter}:{data:targetURL} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
+	'{data:filter}:{data:targetURL} {data:excludedSources} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
 	'itemsPerPage:{data:initialItemsPerPage} {data:markers} {data:type} ' +
 	'{data:operators} children:{data:replyNestingLevels} {data:childrenOperators}';
 
@@ -356,16 +385,16 @@ conversations.renderers.streamingStateContainer = function(element) {
 conversations.renderers.resizeFrame = function(element) {
 	var self = this;
 	element.on('load', function() {
-		var counter;
+		var timeout;
 		this.contentWindow.onresize = function() {
-			if (counter) {
-				clearTimeout(counter);
+			if (timeout) {
+				clearTimeout(timeout);
 			}
-			counter = setTimeout(function() {
+			timeout = setTimeout(function() {
 				self.events.publish({
 					"topic": "onAppResize"
 				});
-			}, 20);
+			}, 50);
 		};
 	});
 	return element;
@@ -401,6 +430,17 @@ conversations.renderers.itemsWaiting = function(element) {
 	} else {
 		element.hide();
 	}
+	return element;
+};
+
+conversations.renderers.container = function(element) {
+	var presentationParams = this.config.get("presentation");
+	element.css({
+		"min-width": presentationParams.minimumWidth + "px",
+		"max-width": presentationParams.maximumWidth + "px",
+		"max-height": presentationParams.maximumHeight + "px",
+		"overflow-y": "auto"
+	});
 	return element;
 };
 
@@ -649,7 +689,7 @@ conversations.renderers._streamSorter = function(element, extra) {
 	var config = this.config.get(extra.id);
 
 	var getCurrentTitle = function() {
-		var value = Echo.Cookie.get([extra.id, "sortOrder"].join("."))
+		var value = Echo.Cookie.get([extra.id, self.config.get("targetURL"), "sortOrder"].join("."))
 			|| (function() {
 
 				var stream = self.getComponent(extra.id);
@@ -677,7 +717,7 @@ conversations.renderers._streamSorter = function(element, extra) {
 			return {
 				"title": entry.title,
 				"handler": function() {
-					Echo.Cookie.set([extra.id, "sortOrder"].join("."), entry.value);
+					Echo.Cookie.set([extra.id, self.config.get("targetURL"), "sortOrder"].join("."), entry.value);
 					dropdown.setTitle(entry.title);
 
 					var stream = self.getComponent(extra.id);
@@ -745,6 +785,20 @@ conversations.methods.setStreamingState = function(state, permanent) {
 	this.view.render({"name": "streamingState"});
 };
 
+conversations.methods._viewportChange = function() {
+	var self = this;
+	if (this._viewportChangeTimeout) {
+		clearTimeout(this._viewportChangeTimeout);
+	}
+	this._viewportChangeTimeout = setTimeout(function() {
+		self.events.publish({
+			"topic": "onViewportChange",
+			"global": false,
+			"bubble": false
+		});
+	}, this.config.get("viewportChangeTimeout"));
+};
+
 conversations.methods._moveStreamingStateCursor = function(event) {
 	var cursor = this.view.get("streamingStateCursor");
 	if (cursor) {
@@ -782,6 +836,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 				"maxBodyHeight": config.maxItemBodyHeight
 			},
 			"reTag": false,
+			"markAsRead": config.markItemsAsReadOn,
 			"viaLabel": {
 				"icon": config.displaySourceIcons
 			}
@@ -935,8 +990,9 @@ conversations.methods._assembleSearchQuery = function(componentID, overrides) {
 		"template": query || conversations.templates.defaultQuery,
 		"data": $.extend({}, config, {
 			"targetURL": this.config.get("targetURL"),
+			"excludedSources": config.displayTweets === false ? "-source:Twitter" : "",
 			"type": config.itemTypes.length ? "type:" + config.itemTypes.join(",") : "",
-			"initialSortOrder": Echo.Cookie.get([componentID, "sortOrder"].join(".")) || config.initialSortOrder
+			"initialSortOrder": Echo.Cookie.get([componentID, this.config.get("targetURL"), "sortOrder"].join(".")) || config.initialSortOrder
 		}, args, overrides)
 	});
 };
@@ -1248,7 +1304,7 @@ conversations.css =
 	'.{class:container} .echo-control-message { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{class:container} { position:relative; }' +
 	'.{class:resizeFrame} { position:absolute; z-index:-1; border:0; padding:0; }' +
-	'.{class:container} { min-height: 200px; min-width: 320px; }' +
+	'.{class:container} { min-height: 200px; }' +
 	'.{class:container} li > a, ' +
 	'.{class:container} .echo-primaryFont,' +
 	'.{class:container} .echo-secondaryFont,' +

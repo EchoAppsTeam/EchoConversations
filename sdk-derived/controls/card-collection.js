@@ -1199,19 +1199,16 @@ collection.methods._recalcEffectsTimeouts = function() {
 	// recalculating timeouts based on amount of items in activities queue
 	var s = this;
 	var maxTimeouts = {
-		"fade": s.config.get("fadeTimeout"),
 		"slide": s.config.get("slideTimeout")
 	};
 	s.timeouts = s.timeouts || {
-		"fade": maxTimeouts.fade,
 		"slide": maxTimeouts.slide
 	};
-	if (!maxTimeouts.fade && !maxTimeouts.slide) {
+	if (!maxTimeouts.slide) {
 		return;
 	}
 	s.timeouts.coeff = s.timeouts.coeff || {
-		"fade": s.timeouts.fade / (maxTimeouts.fade + maxTimeouts.slide),
-		"slide": s.timeouts.slide / (maxTimeouts.fade + maxTimeouts.slide)
+		"slide": s.timeouts.slide / maxTimeouts.slide
 	};
 	var calc = function(timeout, value) {
 		value = Math.round(value * s.timeouts.coeff[timeout]);
@@ -1222,7 +1219,6 @@ collection.methods._recalcEffectsTimeouts = function() {
 	// reserving 80% of time between live updates for activities
 	var frame = s.config.get("liveUpdates.polling.timeout") * 1000 * 0.8;
 	var msPerItem = s.activities.queue.length ? frame / s.activities.queue.length : frame;
-	s.timeouts.fade = calc("fade", msPerItem);
 	s.timeouts.slide = calc("slide", msPerItem);
 };
 
