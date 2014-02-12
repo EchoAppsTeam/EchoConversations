@@ -97,7 +97,7 @@ composer.init = function() {
 			self._requestLoginPrompt();
 			return false;
 		}
-		return true;//!self.highlightMandatory(self.view.get("name"));
+		return true;
 	}, "low");
 	var tabsUniqueId = Echo.Utils.getUniqueString();
 	$.each(this.composers, function(i, tab) {
@@ -112,7 +112,8 @@ composer.init = function() {
 	this.resolver = new Echo.URLResolver({
 		"embedly": this.config.get("embedly")
 	});
-	self._extractInfoFromExternalData();
+	this.collapsed = this.config.get("compact.mode") !== "none";
+	this._extractInfoFromExternalData();
 	this.render();
 	this.ready();
 };
@@ -121,6 +122,7 @@ composer.destroy = function() {
 	this.auth && this.auth.destroy();
 	this.tabs && this.tabs.destroy();
 	this.mediaContainer && this.mediaContainer.destroy();
+	this.toggleModeHandler && $(document).off("click", this.toggleModeHandler);
 };
 
 composer.config = {
@@ -319,6 +321,10 @@ composer.config = {
 		"apiKey": "5945901611864679a8761b0fcaa56f87",
 		"maxDescriptionCharacters": "200"
 	},
+	"compact": {
+		"mode": "none", // none || small || smallest || inline
+		"prompt": "Contribute here"
+	},
 	"displaySharingOnPost": true,
 	"submitPermissions": "forceLogin",
 	"confirmation": {
@@ -341,9 +347,11 @@ composer.vars = {
 };
 
 composer.dependencies = [{
-	// because of NestedCard
-	"url": "{%=baseURL%}/app.js",
-	"loaded": function() { return !!Echo.Conversations; }
+	"url": "{%=baseURL%}/controls/nested-card.js",
+	"loaded": function() { return !!Echo.Conversations.NestedCard; }
+}, {
+	"url": "{%=baseURL%}/controls/media-container.js",
+	"loaded": function() { return !!Echo.Conversations.MediaContainer; }
 }, {
 	"url": "{%=baseURL%}/third-party/jquery.placeholder.js",
 	"loaded": function() { return !!$.placeholder; }
@@ -438,44 +446,50 @@ composer.templates.main =
 			'</div>' +
 		'</div>' +
 		'<div class="{class:tabs}"></div>' +
-		'<div class="{class:composers}"></div>' +
-		'<div class="{class:media}"></div>' +
-		'<div class="{class:metadata}">' +
-			'<div class="echo-primaryFont echo-primaryColor {class:markersContainer} {class:metadataContainer}">' +
-				'<div class="{class:metadataLabel}">{label:markers}</div>' +
-				'<div class="{class:metadataWrapper}">' +
-					'<div class="{class:metadataSubwrapper} {class:border}">' +
-						'<input type="text" class="echo-primaryFont {class:markers}">' +
+		'<div class="{class:compactFieldWrapper} {class:border}">' +
+			'<input type="text" class="echo-primaryFont {class:compactField}" placeholder="{config:compact.prompt}">' +
+		'</div>' +
+		'<div class="{class:formWrapper}">' +
+			'<div class="{class:composers}"></div>' +
+			'<div class="{class:media}"></div>' +
+			'<div class="{class:metadata}">' +
+				'<div class="echo-primaryFont echo-primaryColor {class:markersContainer} {class:metadataContainer}">' +
+					'<div class="{class:metadataLabel}">{label:markers}</div>' +
+					'<div class="{class:metadataWrapper}">' +
+						'<div class="{class:metadataSubwrapper} {class:border}">' +
+							'<input type="text" class="echo-primaryFont {class:markers}">' +
+						'</div>' +
 					'</div>' +
+					'<div class="echo-clear"></div>' +
 				'</div>' +
-				'<div class="echo-clear"></div>' +
-			'</div>' +
-			'<div class="echo-primaryFont echo-primaryColor {class:tagsContainer} {class:metadataContainer}">' +
-				'<div class="{class:metadataLabel}">{label:tags}</div>' +
-				'<div class="{class:metadataWrapper}">' +
-					'<div class="{class:metadataSubwrapper} {class:border}">' +
-						'<input type="text" class="echo-primaryFont {class:tags} {class:border}">' +
+				'<div class="echo-primaryFont echo-primaryColor {class:tagsContainer} {class:metadataContainer}">' +
+					'<div class="{class:metadataLabel}">{label:tags}</div>' +
+					'<div class="{class:metadataWrapper}">' +
+						'<div class="{class:metadataSubwrapper} {class:border}">' +
+							'<input type="text" class="echo-primaryFont {class:tags} {class:border}">' +
+						'</div>' +
 					'</div>' +
+					'<div class="echo-clear"></div>' +
+				'</div>' +
+			'</div>' +
+			'<div class="{class:controls}">' +
+				'<div class="{class:postButtonWrapper}">' +
+					'<div class="btn btn-primary {class:postButton}"></div>' +
+					'<div class="btn btn-primary dropdown-toggle {class:postButtonSwitcher}" data-toggle="dropdown">' +
+						'<span class="caret"></span>' +
+					'</div>' +
+					'<ul class="dropdown-menu pull-right">' +
+						'<li><a href="#" class="{class:switchToPost}">{label:post}</a></li>' +
+						'<li><a href="#" class="{class:switchToPostAndShare}">{label:postAndShare}</a></li>' +
+					'</ul>' +
+				'</div>' +
+				'<div class="{class:attachers}">' +
+					'<img class="{class:attachPic}" src="{%= baseURL %}/images/attach.png">' +
 				'</div>' +
 				'<div class="echo-clear"></div>' +
 			'</div>' +
 		'</div>' +
-		'<div class="{class:controls}">' +
-			'<div class="{class:postButtonWrapper}">' +
-				'<div class="btn btn-primary {class:postButton}"></div>' +
-				'<div class="btn btn-primary dropdown-toggle {class:postButtonSwitcher}" data-toggle="dropdown">' +
-					'<span class="caret"></span>' +
-				'</div>' +
-				'<ul class="dropdown-menu pull-right">' +
-					'<li><a href="#" class="{class:switchToPost}">{label:post}</a></li>' +
-					'<li><a href="#" class="{class:switchToPostAndShare}">{label:postAndShare}</a></li>' +
-				'</ul>' +
-			'</div>' +
-			'<div class="{class:attachers}">' +
-				'<img class="{class:attachPic}" src="{%= baseURL %}/images/attach.png">' +
-			'</div>' +
-			'<div class="echo-clear"></div>' +
-		'</div>' +
+		'<div class="echo-clear"></div>' +
 	'</div>';
 
 /**
@@ -484,6 +498,34 @@ composer.templates.main =
 composer.templates.post =
 	'<div class="echo-item-text">{data:text}</div>' +
 	'<div class="echo-item-files" data-composer="{data:composer}">{data:media}</div>';
+
+/**
+ * @echo_renderer
+ */
+composer.renderers.container = function(element) {
+	var self = this;
+	var classes = $.map(["normal", "small", "smallest", "inline"], function(_class) {
+		return self.cssPrefix + _class;
+	});
+	element.removeClass(classes.join(" "));
+	var _class = !this.collapsed || this.config.get("compact.mode") === "none"
+		? "normal"
+		: this.config.get("compact.mode");
+	element.addClass(this.cssPrefix + _class);
+	if (this.collapsed) {
+		if (!this.toggleModeHandler) {
+			this.toggleModeHandler = function(event) {
+				if (self.collapsed) return;
+				var target = self.config.get("target");
+				var isInTarget = target && target.find(event.target).length;
+				if (isInTarget) return;
+				self._collapse();
+			};
+			$(document).on("click", this.toggleModeHandler);
+		}
+	}
+	return element;
+};
 
 /**
  * @echo_renderer
@@ -498,7 +540,7 @@ composer.renderers.tabs = function(element) {
 	}
 	this.tabs = new Echo.GUI.Tabs({
 		"target": element,
-		"classPrefix": this.cssPrefix,
+		"classPrefix": this.cssPrefix + "tabs-",
 		"selected": this.currentComposer && this.currentComposer.index,
 		"entries": $.map(this.composers, function(tab) {
 			return {
@@ -506,22 +548,21 @@ composer.renderers.tabs = function(element) {
 				"extraClass": "echo-primaryFont",
 				"panel": tab.composer(),
 				"label": self.substitute({
-					"template": '<span class="{class:icon} {data:tab.icon}"></span>' +
-						'<span class="{class:label}">{data:tab.label}</span>',
-					"data": {
-						"tab": tab
-					}
+					"template": '<span class="{class:icon} {data:icon}"></span>' +
+						'<span class="{class:label}">{data:label}</span>',
+					"data": tab
 				})
 			};
 		}),
 		"panels": this.view.get("composers").empty(),
 		"shown": function(tab, panel, id, index) {
 			self.currentComposer = self.composers[index];
-			self.currentComposer.fill($.extend(true, {}, self.formData));
 			// timeout allows form fields to be added to target element DOM
 			setTimeout(function() {
 				self._initFormFields();
 			}, 0);
+			if (self.collapsed) return;
+			self.currentComposer.fill($.extend(true, {}, self.formData));
 		}
 	});
 };
@@ -592,6 +633,17 @@ composer.renderers.header = function(element) {
 	return element
 		.removeClass(_class)
 		.addClass(this.cssPrefix + this._userStatus());
+};
+
+/**
+ * @echo_renderer
+ */
+composer.renderers.compactField = function(element) {
+	var self = this;
+	if (this.config.get("compact.mode") === "none") return element;
+	return element.on("focus", function() {
+		self._expand();
+	});
 };
 
 /**
@@ -943,6 +995,16 @@ composer.methods.addPostValidator = function(validator, priority) {
 	component.parent.refresh.call(this);
 };*/
 
+composer.methods._expand = function() {
+	this.collapsed = false;
+	this.view.render({"name": "container"});
+};
+
+composer.methods._collapse = function() {
+	this.collapsed = true;
+	this.view.render({"name": "container"});
+};
+
 composer.methods._extractInfoFromExternalData = function() {
 	var self = this;
 	this.formData = {
@@ -1214,6 +1276,8 @@ composer.css =
 	'.{class:nameContainer} input.{class:name}[type="text"].echo-secondaryColor,' +
 		'.{class:container} .{class:metadataSubwrapper} input.echo-secondaryColor[type="text"]' +
 		' { color: #C6C6C6; }' +
+	'.{class:compactFieldWrapper} { padding: 7px 11px; }' +
+	'.{class:compactFieldWrapper} input.{class:compactField}[type="text"] { border: none; width: 100%; margin-bottom: 0px; padding: 0px; outline: 0; box-shadow: none; background-color: transparent; }' +
 	'.{class:metadataContainer} { margin-top: 6px; }' +
 	'.{class:metadataLabel} { float: left; width: 50px; margin-right: -50px; text-align: right; line-height: 22px; }' +
 	'.{class:metadataWrapper} { float: left; width: 100%; }' +
@@ -1230,7 +1294,7 @@ composer.css =
 	'.{class:postButtonWrapper} .{class:postButton}.btn { padding: 3px 12px 5px 12px; }' +
 	'.{class:tagsContainer} { display: none !important; }' +
 	'.{class:markersContainer} { display: none !important; }' +
-	'.{class:border} { border: 1px solid #d2d2d2; }' +
+	'.{class:border} { border: 1px solid #d8d8d8; }' +
 	'.{class:mandatory} { border: 1px solid red; }' +
 	'.{class:queriesViewOption} { padding-right: 5px; }' +
 
@@ -1249,6 +1313,21 @@ composer.css =
 	'.{class:error} input, .{class:error} textarea { background: no-repeat center right url({config:cdnBaseURL.sdk-assets}/images/warning.gif); }' +
 
 	'.{class:media} .echo-conversations-mediacontainer-multiple { border: 1px solid #DEDEDE; border-top-style: dashed; border-bottom: 0px; background-color: #F1F1F1; }' +
+
+	// display modes
+	'.{class:normal} .{class:compactFieldWrapper},' +
+		'.{class:small} .{class:formWrapper},' +
+		'.{class:smallest} .{class:formWrapper},' +
+		'.{class:smallest} .{class:header} { display: none; }' +
+	'.echo-sdk-ui .{class:inline} .nav-tabs,' +
+		'.{class:inline} .{class:formWrapper},' +
+		'.{class:inline} .echo-streamserver-controls-auth-container { display: none; }' +
+	'.{class:inline} .{class:compactFieldWrapper} { margin-left: 24px; }' +
+	'.{class:inline} .{class:header} { float: left; margin: 7px 0px 0px -14px; }' +
+	'.{class:inline} .echo-streamserver-controls-auth-avatar,' +
+		'.{class:inline} .echo-streamserver-controls-auth-avatar > div { width: 24px; height: 24px; }' +
+	'.echo-sdk-ui .{class:small} .nav-tabs,' +
+		'.echo-sdk-ui .{class:smallest} .nav-tabs { border-bottom-width: 0px; }' +
 
 	// tabs
 	'.{class:icon} { vertical-align: middle; margin-right: 2px; }' +

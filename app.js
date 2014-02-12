@@ -39,6 +39,10 @@ conversations.config = {
 		"visible": true,
 		"displaySharingOnPost": true,
 		"displayCompactForm": true,
+		"compact": {
+			"mode": "inline",
+			"prompt": "Add a comment..."
+		},
 		"contentTypes": {
 			"comments": {
 				"visible": true,
@@ -52,7 +56,7 @@ conversations.config = {
 			}
 		},
 		"confirmation": {
-			"enable": true,
+			"enabled": true,
 			"message": "Thanks, your post has been submitted for review",
 			"timeout": 5000
 		},
