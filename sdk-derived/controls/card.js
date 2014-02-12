@@ -79,7 +79,9 @@ card.events = {
 		this._pageLayoutChange();
 	},
 	"Echo.StreamServer.Controls.CardCollection.onCardShown": function(topic, args) {
+		// TODO check if we can get rig of this event handler ?
 		if (args.item.data.unique !== this.get("data.unique")) return;
+		this._pageLayoutChange();
 		this._maybeRemoveLiveUpdateIndicator();
 	},
 	"Echo.Apps.Conversations.onViewportChange": function() {
