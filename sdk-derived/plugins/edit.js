@@ -120,6 +120,7 @@ if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
 	this.extendTemplate("insertAfter", "postButtonWrapper", plugin.templates.cancel);
+	this.extendTemplate("insertBefore", "formWrapper", plugin.templates.noneditable);
 	this.extendTemplate("replace", "header", plugin.templates.header);
 	this.component.labels.set({
 		"post": this.labels.get("post"),
@@ -151,7 +152,11 @@ plugin.labels = {
 	/**
 	 * @echo_label
 	 */
-	"cancel": "cancel"
+	"cancel": "cancel",
+	/**
+	 * @echo_label
+	 */
+	"cantEditUnknownType": "Unfortunately this item cannot be edited due to its unknown type"
 };
 
 /**
@@ -203,10 +208,30 @@ plugin.templates.header =
  */
 plugin.templates.cancel =
 	'<div class="{plugin.class:cancelButtonContainer}">' +
-		'<a href="javascript:void(0);" class="{plugin.class:cancelButton} echo-primaryFont echo-clickable echo-linkColor">' +
+		'<a href="javascript:void(0);" class="echo-primaryFont echo-clickable echo-linkColor {plugin.class:cancelButton}">' +
 			'{plugin.label:cancel}' +
 		'</a>' +
 	'</div>';
+
+/**
+ * @echo_template
+ */
+plugin.templates.noneditable = '<div class="{class:border} {plugin.class:warning}">{plugin.label:cantEditUnknownType}</div>';
+
+
+/**
+ * @echo_renderer
+ */
+plugin.component.renderers.container = function(element) {
+	this.parentRenderer("container", arguments);
+	var _class = this.cssPrefix + "noneditable";
+	if (this.component.currentComposer) {
+		element.removeClass(_class);
+	} else {
+		element.addClass(_class);
+	}
+	return element;
+};
 
 /**
  * @echo_renderer
@@ -245,6 +270,11 @@ plugin.renderers.editedDate = function(element) {
  */
 plugin.renderers.cancelButton = function(element) {
 	var plugin = this;
+	if (plugin.component.view.get("container").hasClass(this.cssPrefix + "noneditable")) {
+		element.addClass("btn");
+	} else {
+		element.removeClass("btn");
+	}
 	return element.click(function() {
 		plugin.events.publish({"topic": "onEditError"});
 	});
@@ -298,6 +328,15 @@ plugin.methods._getMetaDataUpdates = function(verb, type, data) {
 
 plugin.css =
 	'.{plugin.class:cancelButtonContainer} { float: right; margin: 6px 15px 0px 0px; }' +
+	'.{plugin.class:warning} { display: none; padding: 7px 11px; border-bottom-width: 0px; }' +
+	'.{plugin.class:noneditable} .{class:tabs},' +
+		'.{plugin.class:noneditable} .{class:formWrapper} > *,' +
+		'.{plugin.class:noneditable} .{class:controls} > * { display: none; }' +
+	'.{plugin.class:noneditable} .{plugin.class:warning},' +
+		'.{plugin.class:noneditable} .{class:controls},' +
+		'.{plugin.class:noneditable} .{plugin.class:cancelButtonContainer} { display: block; }' +
+	'.{plugin.class:noneditable} .{plugin.class:cancelButtonContainer} { margin: 0px; }' +
+	'.{plugin.class:noneditable} .echo-clear { display: inherit; }' +
 	'.{plugin.class} .{class:container} { border: none; padding: 0px; }' +
 	'.{plugin.class} .{class:nameContainer}, .{plugin.class} .{class:controls}, .{plugin.class} .{class:composers} { background-color: #fff; }' +
 	'.{plugin.class:avatar-wrapper} { margin-right: 5px; float: left; position: relative; }' +
