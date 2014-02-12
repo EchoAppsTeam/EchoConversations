@@ -1282,7 +1282,7 @@ composer.css =
 	'.{class:metadataLabel} { float: left; width: 50px; margin-right: -50px; text-align: right; line-height: 22px; }' +
 	'.{class:metadataWrapper} { float: left; width: 100%; }' +
 	'.{class:metadataSubwrapper} { margin-left: 55px; padding: 2px 2px 2px 3px; background-color: #fff; }' +
-	'.{class:container} { padding: 20px 20px 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
+	'.{class:container} { padding: 20px 20px 20px 12px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"] { width: 100%; border: 0; padding: 0px; outline: 0; box-shadow: none; margin-bottom: 0px; }' +
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"]:focus { outline: 0; box-shadow: none; }' +
 	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 0px 1px; }' +
@@ -1307,7 +1307,7 @@ composer.css =
 		'{ color: #3c3c3c; border-color: transparent; box-shadow: none; }' +
 
 	'.echo-submitcomposer-delimiter { height: 0px; border-top: 1px dashed #d8d8d8; }' +
-	'.echo-submitcomposer-field-wrapper { padding: 7px 11px; border: 1px solid transparent; display: inline-block; width: 100%; box-sizing: border-box !important/* because of conversations*/; }' +
+	'.echo-submitcomposer-field-wrapper { padding: 7px 11px; border: 1px solid transparent; display: inline-block; width: 100%; box-sizing: border-box !important/* XXX: because of conversations*/; }' +
 
 	'.{class:error} { border: 1px solid red; }' +
 	'.{class:error} input, .{class:error} textarea { background: no-repeat center right url({config:cdnBaseURL.sdk-assets}/images/warning.gif); }' +
@@ -1322,8 +1322,8 @@ composer.css =
 	'.echo-sdk-ui .{class:inline} .nav-tabs,' +
 		'.{class:inline} .{class:formWrapper},' +
 		'.{class:inline} .echo-streamserver-controls-auth-container { display: none; }' +
-	'.{class:inline} .{class:compactFieldWrapper} { margin-left: 24px; }' +
-	'.{class:inline} .{class:header} { float: left; margin: 7px 0px 0px -14px; }' +
+	'.{class:inline} .{class:compactFieldWrapper} { margin-left: 38px; }' +
+	'.{class:inline} .{class:header} { float: left; margin: 7px 0px 0px 0px; }' +
 	'.{class:inline} .echo-streamserver-controls-auth-avatar,' +
 		'.{class:inline} .echo-streamserver-controls-auth-avatar > div { width: 24px; height: 24px; }' +
 	'.echo-sdk-ui .{class:small} .nav-tabs,' +
