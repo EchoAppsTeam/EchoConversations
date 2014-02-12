@@ -270,18 +270,6 @@ composer.config = {
 	"postingTimeout": 30,
 
 	/**
-	 * @cfg {String} type
-	 * Allows to define item type. The value of this parameter should be a valid URI.
-	 *
-	 *		new Echo.StreamServer.Controls.SubmitComposer({
-	 *			...
-	 *			"type": "http://echoenabled.com/activitystreams/schema/1.0/category",
-	 *			...
-	 *		});
-	 */
-	"type": undefined,
-
-	/**
 	 * @cfg {Object} errorPopup
 	 * Is used to define dimensions of error message popup. The value of this parameter
 	 * is an object with the following fields:
@@ -817,7 +805,7 @@ composer.renderers._metaFields = function(element, extra) {
  * endpoint through <a href="http://echoplatform.com/streamserver/docs/features/submission-proxy/" target="_blank">Echo Submission Proxy</a>.
  */
 composer.methods.post = function() {
-	var self = this;
+	var self = this, mediaContent = [];
 	var publish = function(phase, data, responseBody, requestState) {
 		var args = {
 			"topic": "onPost" + phase,
@@ -831,16 +819,17 @@ composer.methods.post = function() {
 		}
 		self.events.publish(args);
 	};
-	var mediaContent = $.map(this.formData.media, function(media) {
-		var template = self.currentComposer.mediaTemplate();
-		if (!template) return null;
-		return self.substitute({
-			"template": template,
-			"data": $.extend(true, {}, media, {
-				"oembed": self._jsonEncode(media)
-			})
+	var template = this.currentComposer.mediaTemplate && this.currentComposer.mediaTemplate();
+	if (template) {
+		mediaContent = $.map(this.formData.media, function(media) {
+			return self.substitute({
+				"template": template,
+				"data": $.extend(true, {}, media, {
+					"oembed": self._htmlEncode(media)
+				})
+			});
 		});
-	});
+	}
 	var text = self.substitute({
 		"template": composer.templates.post,
 		"data": {
@@ -849,9 +838,9 @@ composer.methods.post = function() {
 			"composer": self.currentComposer.id
 		}
 	});
-	var postType = this.config.get("type", this.currentComposer.postType || this._getASURL("comment"));
+	var objectType = this.currentComposer.objectType || this._getASURL("comment");
 	var content = [].concat(
-		self._getActivity("post", postType, text),
+		self._getActivity("post", objectType, text),
 		self._getActivity("tag", this._getASURL("marker"), self.view.get("markers").val()),
 		self._getActivity("tag", this._getASURL("tag"), self.view.get("tags").val())
 	);
@@ -1025,8 +1014,16 @@ composer.methods._extractInfoFromExternalData = function() {
 			}).get();
 		}
 		var composer = $(".echo-item-files", content).data("composer");
+		var types = self.config.get("data.object.objectTypes");
 		$.each(self.composers, function(i, data) {
 			if (data.id === composer) {
+				self.currentComposer = data;
+				return false;
+			}
+			var matches = $.grep(types, function(type) {
+				return data.objectType === type;
+			});
+			if (matches.length) {
 				self.currentComposer = data;
 				return false;
 			}
@@ -1034,7 +1031,7 @@ composer.methods._extractInfoFromExternalData = function() {
 	});
 };
 
-composer.methods._jsonEncode = function(json) {
+composer.methods._htmlEncode = function(json) {
 	return JSON.stringify(json)
 		.replace(/&/g, '&amp;')
 		.replace(/"/g, '&quot;')

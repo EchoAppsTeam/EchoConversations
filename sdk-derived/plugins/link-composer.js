@@ -35,7 +35,7 @@ plugin.init = function() {
 		"mediaTemplate": $.proxy(this.mediaTemplate, this),
 		"text": $.proxy(this.getText, this),
 		"fill": $.proxy(this.fill, this),
-		"postType": "http://activitystrea.ms/schema/1.0/comment"
+		"objectType": "http://echoenabled.com/schema/1.0/link"
 	});
 };
 
@@ -88,8 +88,7 @@ plugin.methods.buildComposer = function() {
 
 plugin.methods.mediaTemplate = function() {
 	return '<div class="echo-media-item" data-oembed="{data:oembed}">' +
-		// XXX: replace {plugin.config}
-		'<div class="echo-item-article" style="width: {plugin.config:linkWidth}">' +
+		'<div class="echo-item-article">' +
 			'<div class="echo-item-template-article-thumbnail" style="width: 30%; float: left; max-width: 120px; max-height: 120px; text-align: center; overflow: hidden;">' +
 				'<img src="{data:thumbnail_url}" style="width: auto; height: auto; max-height: 120px; max-width: 120px;">' +
 			'</div>' +
@@ -112,7 +111,7 @@ plugin.methods.getText = function() {
 
 plugin.methods.fill = function(data) {
 	this.composer.find(".echo-link-composer-title").val(data.text);
-	if (data.media.length === 1) {
+	if (data.media.length) {
 		var media = data.media[0];
 		this.composer.find(".echo-link-composer-link").val(media.original_url || media.url);
 	}
@@ -128,9 +127,6 @@ plugin.methods.isValid = function() {
 	}
 	return true;
 };
-
-plugin.css =
-	'';
 
 Echo.Plugin.create(plugin);
 
