@@ -173,13 +173,6 @@ collection.config = {
 	},
 
 	/**
-	 * @cfg {String} flashColor
-	 * Specifies the necessary flash color of the events coming to your
-	 * stream as live updates. This parameter must have a hex color value.
-	 */
-	"flashColor": "#ffff99",
-
-	/**
 	 * @cfg {Object} item
 	 * Specifies the configuration options to be passed to internal
 	 * Echo.StreamServer.Controls.Card component.
