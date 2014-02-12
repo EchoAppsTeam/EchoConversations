@@ -746,6 +746,7 @@ composer.renderers.postButton = function(element) {
 		}
 	});
 	this.posting.action = this.posting.action || function() {
+		if (self.postButtonState === "disabled") return;
 		if (self._isPostValid()) {
 			self.post();
 		}
