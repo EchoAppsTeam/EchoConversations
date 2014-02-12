@@ -122,7 +122,7 @@ composer.destroy = function() {
 	this.auth && this.auth.destroy();
 	this.tabs && this.tabs.destroy();
 	this.mediaContainer && this.mediaContainer.destroy();
-	this.toggleModeHandler && $(document).off("click", this.toggleModeHandler);
+	this.toggleModeHandler && $(document).off("mousedown", this.toggleModeHandler);
 };
 
 composer.config = {
@@ -325,6 +325,8 @@ composer.config = {
 };
 
 composer.vars = {
+	"collapsed": false,
+	"toggleModeHandler": undefined,
 	"postButtonState": "disabled",
 	"formData": {
 		"text": "",
@@ -509,7 +511,7 @@ composer.renderers.container = function(element) {
 				if (isInTarget) return;
 				self._collapse();
 			};
-			$(document).on("click", this.toggleModeHandler);
+			$(document).on("mousedown", this.toggleModeHandler);
 		}
 	}
 	return element;
