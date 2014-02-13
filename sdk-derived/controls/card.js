@@ -227,7 +227,7 @@ card.config = {
 		"icon": false,
 		"text": false
 	},
-	"fadeTimeout": 5000, // 50 seconds
+	"fadeTimeout": 5000, // 5 seconds
 	"mediaWidth": 340,
 	"manualRendering": false
 };
@@ -910,11 +910,11 @@ card.methods._maybeRemoveLiveUpdateIndicator = function() {
 	// Item can be created but not rendered. So we check if container exists here.
 	if (
 		this.config.get("markAsRead") !== "viewportenter"
-	|| !container
+		|| !container
 		|| !$.inviewport(container, {"threshold": 0})
 	) {
 		return;
-}
+	}
 	this.set("isItemNew", false);
 	if (this._transitionSupported()) {
 		container.removeClass(this.cssPrefix + "new");
