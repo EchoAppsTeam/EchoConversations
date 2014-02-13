@@ -453,9 +453,9 @@ card.templates.dropdownButtons =
 	'</div>';
 
 card.templates.compactButtons =
-	'<a title="{data:label}" class="class{class:button} {class:compactButton} {class:button}-{data:name}">' +
-		'<i class="{plugin.class:buttonIcon} {data:icon}"></i>' +
-		'<span Classs="echo-primaryFont {class:buttonCaption}"></span>' +
+	'<a title="{data:label}" class="{class:button} {class:compactButton} {class:button}-{data:name}">' +
+		'<i class="{class:buttonIcon} {data:icon}"></i>' +
+		'<span class="echo-primaryFont {class:buttonLabel}"></span>' +
 	'</a>';
 
 card.methods.template = function() {
@@ -719,7 +719,10 @@ card.renderers.sourceIcon = function(element) {
 		return element.hide();
 	}
 	var url = this.get("data.source.icon", this.config.get("providerIcon"));
-	var data = {"href": this.get("data.source.uri", this.get("data.object.permalink"))};
+	var data = {
+		"class": this.cssPrefix + "sourceIconLink",
+		"href": this.get("data.source.uri", this.get("data.object.permalink"))
+	};
 	var config = {"openInNewWindow": this.config.get("parent.openLinksInNewWindow")};
 	element.hide()
 		.attr("src", Echo.Utils.htmlize(url))
@@ -1123,7 +1126,6 @@ card.renderers._button = function(element, extra) {
 	}
 	var clickables = $(".echo-clickable", button);
 	if (!extra.clickable) return element.append(button);
-
 	if (extra.entries) {
 		var entries = $.map(extra.entries, function(entry) {
 			return Echo.Utils.invoke(entry.visible)
@@ -1131,15 +1133,18 @@ card.renderers._button = function(element, extra) {
 				: null;
 		});
 		new Echo.GUI.Dropdown({
-			"target": view.get("buttonLabel"),
+			"target": button.find("span"),
 			"extraClass": this.cssPrefix + "dropdownButton",
 			"entries": $.map(entries, function(entry) { return $.extend({"handler": entry.callback}, entry); }),
-			"title": extra.label || ""
+			"title": this.get("buttonsLayout") !== "compact" ? extra.label : ""
 		});
 		extra.callback = function(ev) {
+			button.find(".dropdown-menu").addClass("pull-right");
 			button.find(".dropdown-toggle").dropdown("toggle");
 			ev.preventDefault();
 		};
+	} else if (this.get("buttonsLayout") === "compact") {
+		button.children("span").first().css("display", "none");
 	}
 
 	if (!clickables.length) {
@@ -1172,7 +1177,6 @@ card.methods._pageLayoutChange = function() {
 		"compact",
 		"dropdown"
 	];
-
 	if (!this.get("buttonsStates")) {
 		this.set("buttonsStates", buttonsStates);
 	}
@@ -1783,10 +1787,10 @@ card.css =
 	'.{class:re} a:link, .{class:re} a:visited, .{class:re} a:active { text-decoration: none; }' +
 	'.{class:re} a:hover { text-decoration: underline; }' +
 	'.{class:body} { padding-top: 4px; }' +
-	'.{class:buttons} { float: left; margin-left: 3px; }' +
 	'.{class:buttons} a.{class:button} { color: #C6C6C6; }' +
 	'.{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #476CB8; text-decoration: none; }' +
-	'.{class:sourceIcon} { float: left; height: 16px; width: 16px; margin-right: 5px; border: 0px; }' +
+	'.{class:sourceIcon} { height: 16px; width: 16px; }' +
+	'.{class:sourceIconLink} { float: left; display: block; line-height: 20px; margin-right: 10px; }' +
 	'.{class:date}, .{class:from}, .{class:via} { float: left; }' +
 	'.{class:from} a, .{class:via} a { text-decoration: none; color: #C6C6C6; }' +
 	'.{class:from} a:hover, .{class:via} a:hover { color: #476CB8; }' +
@@ -1812,7 +1816,7 @@ card.css =
 	'.{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
 
 	'.{class:content} { background: #f8f8f8; border-radius: 3px; }' +
-	'.{class:buttons} { margin-left: 0px; white-space: nowrap; }' +
+	'.{class:buttons} { white-space: nowrap; float: left; }' +
 	'.{class:metadata} { margin-bottom: 8px; }' +
 	'.{class:body} { padding-top: 0px; margin-bottom: 8px; overflow: hidden; }' +
 	'.{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
@@ -1833,7 +1837,7 @@ card.css =
 	'.{class:children} .{class:expandChildren} { padding-bottom: 10px; padding-top: 12px; }' +
 
 	'.echo-sdk-ui .{class:buttons} a:focus { outline: none; }' +
-	'.{class:button} { margin-right: 10px; }' +
+	'.{class:button} { margin-right: 10px; line-height: 20px; }' +
 	'.{class:buttons} .dropdown .{class:button} { margin-right: 0px; }' +
 	'.{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
