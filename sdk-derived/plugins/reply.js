@@ -420,7 +420,7 @@ $.map(["onRender", "onRerender"], function(topic) {
 });
 
 plugin.css =
-	'.{plugin.class} .{class:container} { border: none; padding: 0px; }' +
+	'.{class}.{plugin.class} .{class:container} { border: none; padding: 0px; }' +
 	'.{plugin.class} .{class:nameContainer}, .{plugin.class} .{class:controls}, .{plugin.class} .{class:composers} { background-color: #fff; }';
 
 Echo.Plugin.create(plugin);

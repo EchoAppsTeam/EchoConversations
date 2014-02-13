@@ -502,6 +502,10 @@ composer.renderers.container = function(element) {
 		? "normal"
 		: this.config.get("compact.mode");
 	element.addClass(this.cssPrefix + _class);
+	_class = this.substitute({"template": "{class:logged} {class:anonymous} {class:forcedLogin}"});
+	element
+		.removeClass(_class)
+		.addClass(this.cssPrefix + this._userStatus());
 	if (this.collapsed) {
 		if (!this.toggleModeHandler) {
 			this.toggleModeHandler = function(event) {
@@ -613,16 +617,6 @@ composer.renderers.tags = function(element) {
 		"target": element,
 		"extra": {"type": "tags"}
 	});
-};
-
-/**
- * @echo_renderer
- */
-composer.renderers.header = function(element) {
-	var _class = this.substitute({"template": "{class:logged} {class:anonymous} {class:forcedLogin}"});
-	return element
-		.removeClass(_class)
-		.addClass(this.cssPrefix + this._userStatus());
 };
 
 /**
@@ -1268,7 +1262,7 @@ composer.methods._prepareEventParams = function(params) {
 
 composer.css =
 	'.{class:header} { margin-bottom: 10px; }' +
-	'.{class:header}.{class:anonymous} { margin-bottom: 7px; }' +
+	'.{class:anonymous} .{class:header} { margin-bottom: 7px; }' +
 	'.{class:auth} { display: none; }' +
 	'.{class:nameContainer} { margin: 11px 0px 0px 0px; padding: 3px 2px 3px 5px; }' +
 	'.{class:nameContainer} input.{class:name}[type="text"] { font-size: 14px; border: none; width: 100%; margin-bottom: 0px; padding: 0px; outline: 0; box-shadow: none; background-color: transparent; }' +
@@ -1282,7 +1276,7 @@ composer.css =
 	'.{class:metadataLabel} { float: left; width: 50px; margin-right: -50px; text-align: right; line-height: 22px; }' +
 	'.{class:metadataWrapper} { float: left; width: 100%; }' +
 	'.{class:metadataSubwrapper} { margin-left: 55px; padding: 2px 2px 2px 3px; background-color: #fff; }' +
-	'.{class:container} { padding: 20px 20px 20px 12px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
+	'.{class:container} { padding: 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"] { width: 100%; border: 0; padding: 0px; outline: 0; box-shadow: none; margin-bottom: 0px; }' +
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"]:focus { outline: 0; box-shadow: none; }' +
 	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 0px 1px; }' +
@@ -1321,8 +1315,11 @@ composer.css =
 		'.{class:smallest} .{class:header} { display: none; }' +
 	'.echo-sdk-ui .{class:inline} .nav-tabs,' +
 		'.{class:inline} .{class:formWrapper},' +
+		'.{class:inline}.{class:anonymous} .{class:header},' +
 		'.{class:inline} .echo-streamserver-controls-auth-container { display: none; }' +
 	'.{class:inline} .{class:compactFieldWrapper} { margin-left: 38px; }' +
+	'.{class:inline}.{class:anonymous} .{class:compactFieldWrapper} { margin-left: 0px; }' +
+	'.{class:inline}.{class:container}:not(.{class:anonymous}) { padding-left: 12px; }' +
 	'.{class:inline} .{class:header} { float: left; margin: 7px 0px 0px 0px; }' +
 	'.{class:inline} .echo-streamserver-controls-auth-avatar,' +
 		'.{class:inline} .echo-streamserver-controls-auth-avatar > div { width: 24px; height: 24px; }' +
