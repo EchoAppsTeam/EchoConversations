@@ -120,7 +120,8 @@ itemPlugin.css =
 	'.{plugin.class:photo} .{class:authorName} { color: #FFFFFF; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); }' +
 	'.{plugin.class:photo} .{class:date} { text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); padding-right: 1px; }' +
 	'.{plugin.class:photo} .{class:avatar-wrapper} { z-index: 10; position: absolute; top: 15px; }' +
-	'.{plugin.class:photo} .echo-streamserver-controls-stream-item-plugin-CardUIShim-header-box { z-index: 10; position: relative; top: 50px; margin-top: -36px; }' +
+	'.{plugin.class:photo} .echo-streamserver-controls-stream-item-plugin-CardUIShim-header-box { z-index: 10; position: relative; top: 15px; margin-top: 0px; }' +
+	'.{plugin.class:photo} .{plugin.class:mediaContent}>div { margin-top: -36px }' +
 
 	'.{plugin.class:link} .{plugin.class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
 	'.{plugin.class:link} .{plugin.class:mediaContent} .echo-conversations-nestedcard-article { padding: 0px; }' +
@@ -557,7 +558,6 @@ submitPlugin.css =
 	'.{plugin.class:mediaContent} .echo-conversations-nestedcard-videoAvatar { margin-right: 20px; }' +
 	'.{plugin.class:mediaContent} .echo-conversations-nestedcard-articleTitle { margin-right: 15px; }' +
 	'.{plugin.class:mediaContent} .echo-conversations-nestedcard-photoAvatar { margin-right: 15px; }' +
-
 	'.{plugin.class:mediaContent} { white-space: nowrap; word-wrap: normal; }' +
 	'.{plugin.class:mediaContent} > div { display: inline-block; white-space: normal; margin-right: 8px; position: relative; vertical-align: top; max-width: 90%; }' +
 
