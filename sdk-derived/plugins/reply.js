@@ -31,8 +31,6 @@ plugin.init = function() {
 	var item = this.component;
 	item.addButtonSpec("Reply", this._assembleButton());
 	this.extendTemplate("insertAsLastChild", "content", plugin.templates.form);
-	this.set("documentClickHandler", this._getClickHandler());
-	$(document).on("click", this.get("documentClickHandler"));
 };
 
 plugin.config = {
@@ -76,33 +74,36 @@ plugin.renderers.composer = function(element, extra) {
 	var item = this.component;
 	element.empty();
 	if (!item.get("depth") && this.config.get("displayCompactForm")) {
-		this._showComposer("inline", element);
+		this._showComposer("compact", element);
+		return element.show();
 	}
-	return element;
+	return element.hide();
 };
 
 
 plugin.methods._showComposer = function(mode, target) {
-	var item = this;
 	var composer = this.get("composer");
 	target = target || this.view.get("composer");
 
-	if (composer) {
-		composer.config.set("target", target);
-		composer.config.set("compact.mode", mode);
-		composer.refresh();
+	var collapsed = composer && composer.get("collapsed") && mode === "normal";
+	if (collapsed) {
+		composer.expand();
 		return;
 	}
 
 	var config = this._assembleComposerConfig({
 		"target": target,
-		"compact": {
-			"mode": mode
-		}
+		"initialMode": mode,
+		"expand": mode === "normal"
+			? function() { this.config.get("target").show(); }
+			: $.noop,
+		"collapse": mode === "normal"
+			? function() { this.config.get("target").hide(); }
+			: $.noop
 	});
 	config.plugins.push({
 		"name": "Reply",
-		"inReplyTo": item.get("data")
+		"inReplyTo": this.component.get("data")
 	});
 	new Echo.StreamServer.Controls.SubmitComposer(config);
 };
@@ -112,6 +113,7 @@ plugin.methods._assembleComposerConfig = function(config) {
 	return this.config.assemble($.extend(true, {
 		"targetURL": item.get("data.object.id"),
 		"targetQuery": item.config.get("query", ""),
+		"collapsible": true,
 		"parent": item.config.getAsHash(),
 		"data": this.get("data") || {},
 		"ready": function() {
@@ -123,7 +125,7 @@ plugin.methods._assembleComposerConfig = function(config) {
 plugin.methods._assembleButton = function() {
 	var plugin = this;
 	var callback = function() {
-		plugin._showComposer("none");
+		plugin._showComposer("normal");
 	};
 	return function() {
 		var item = this;
@@ -135,26 +137,6 @@ plugin.methods._assembleButton = function() {
 			"callback": callback
 		};
 	};
-};
-
-plugin.methods._getClickHandler = function() {
-	var plugin = this;
-	return function(event) {
-		var composer = plugin.get("composer");
-		if (!composer) return;
-
-		var target = composer.config.get("target");
-		var isClickedInComposer = target && target.find(event.target).length;
-		if (!isClickedInComposer && !composer.get("collapsed")) {
-			plugin.view.render({
-				"name": "composer"
-			});
-		}
-	};
-};
-
-plugin.methods.destroy = function() {
-	$(document).off("click", this.get("documentClickHandler"));
 };
 
 plugin.css =

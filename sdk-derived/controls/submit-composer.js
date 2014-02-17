@@ -112,7 +112,8 @@ composer.init = function() {
 	this.resolver = new Echo.URLResolver({
 		"embedly": this.config.get("embedly")
 	});
-	this.collapsed = this.config.get("compact.mode") !== "none";
+
+	this.collapsed = this.config.get("initialMode") !== "normal";
 	this._extractInfoFromExternalData();
 	this.render();
 	this.ready();
@@ -309,10 +310,14 @@ composer.config = {
 		"apiKey": "5945901611864679a8761b0fcaa56f87",
 		"maxDescriptionCharacters": "200"
 	},
+	"initialMode": "normal", // normal || compact
+	"collapsible": false,
 	"compact": {
-		"mode": "none", // none || small || smallest || inline
+		"layout": "inline", // small || smallest || inline
 		"prompt": "Contribute here"
 	},
+	"collapse": $.noop,
+	"expand": $.noop,
 	"displaySharingOnPost": true,
 	"submitPermissions": "forceLogin",
 	"confirmation": {
@@ -498,26 +503,28 @@ composer.renderers.container = function(element) {
 		return self.cssPrefix + _class;
 	});
 	element.removeClass(classes.join(" "));
-	var _class = !this.collapsed || this.config.get("compact.mode") === "none"
-		? "normal"
-		: this.config.get("compact.mode");
+
+	var _class = this.collapsed ? this.config.get("compact.layout") : "normal";
 	element.addClass(this.cssPrefix + _class);
+
 	_class = this.substitute({"template": "{class:logged} {class:anonymous} {class:forcedLogin}"});
 	element
 		.removeClass(_class)
 		.addClass(this.cssPrefix + this._userStatus());
-	if (this.collapsed) {
+
+	if (this.config.get("collapsible")) {
 		if (!this.toggleModeHandler) {
 			this.toggleModeHandler = function(event) {
 				if (self.collapsed) return;
 				var target = self.config.get("target");
 				var isInTarget = target && target.find(event.target).length;
 				if (isInTarget) return;
-				self._collapse();
+				self.collapse();
 			};
 			$(document).on("mousedown", this.toggleModeHandler);
 		}
 	}
+
 	return element;
 };
 
@@ -624,9 +631,8 @@ composer.renderers.tags = function(element) {
  */
 composer.renderers.compactField = function(element) {
 	var self = this;
-	if (this.config.get("compact.mode") === "none") return element;
 	return element.on("focus", function() {
-		self._expand();
+		self.expand();
 	});
 };
 
@@ -981,14 +987,16 @@ composer.methods.addPostValidator = function(validator, priority) {
 	component.parent.refresh.call(this);
 };*/
 
-composer.methods._expand = function() {
+composer.methods.expand = function() {
 	this.collapsed = false;
 	this.view.render({"name": "container"});
+	this.config.get("expand").apply(this, arguments);
 };
 
-composer.methods._collapse = function() {
+composer.methods.collapse = function() {
 	this.collapsed = true;
 	this.view.render({"name": "container"});
+	this.config.get("collapse").apply(this, arguments);
 };
 
 composer.methods._extractInfoFromExternalData = function() {
