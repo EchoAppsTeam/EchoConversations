@@ -544,10 +544,11 @@ composer.renderers.tabs = function(element) {
 		"classPrefix": this.cssPrefix + "tabs-",
 		"selected": this.currentComposer && this.currentComposer.index,
 		"entries": $.map(this.composers, function(tab) {
+			tab.panel = $("<div>");
 			return {
 				"id": tab.id,
 				"extraClass": "echo-primaryFont",
-				"panel": tab.composer(),
+				"panel": tab.panel,
 				"label": self.substitute({
 					"template": '<span class="{class:icon} {data:icon}"></span>' +
 						'<span class="{class:label}">{data:label}</span>',
@@ -558,12 +559,7 @@ composer.renderers.tabs = function(element) {
 		"panels": this.view.get("composers").empty(),
 		"shown": function(tab, panel, id, index) {
 			self.currentComposer = self.composers[index];
-			// timeout allows form fields to be added to target element DOM
-			setTimeout(function() {
-				self._initFormFields();
-			}, 0);
-			if (self.collapsed) return;
-			self.currentComposer.fill($.extend(true, {}, self.formData));
+			self._initCurrentComposer();
 		}
 	});
 };
@@ -989,6 +985,7 @@ composer.methods.addPostValidator = function(validator, priority) {
 
 composer.methods.expand = function() {
 	this.collapsed = false;
+	this._initCurrentComposer();
 	this.view.render({"name": "container"});
 	this.config.get("expand").apply(this, arguments);
 };
@@ -997,6 +994,20 @@ composer.methods.collapse = function() {
 	this.collapsed = true;
 	this.view.render({"name": "container"});
 	this.config.get("collapse").apply(this, arguments);
+};
+
+composer.methods._initCurrentComposer = function() {
+	if (this.collapsed) return;
+	var self = this;
+	var composer = this.currentComposer;
+	if (!composer.panel.children().length) {
+		composer.panel.append(composer.composer());
+		composer.setData($.extend(true, {}, this.formData));
+	}
+	// timeout allows form fields to be added to target element DOM
+	setTimeout(function() {
+		self._initFormFields();
+	}, 0);
 };
 
 composer.methods._extractInfoFromExternalData = function() {
