@@ -1284,8 +1284,8 @@ composer.css =
 	'.{class:nameContainer} input.{class:name}[type="text"].echo-secondaryColor,' +
 		'.{class:container} .{class:metadataSubwrapper} input.echo-secondaryColor[type="text"]' +
 		' { color: #C6C6C6; }' +
-	'.{class:compactFieldWrapper} { padding: 7px 11px; }' +
-	'.{class:compactFieldWrapper} input.{class:compactField}[type="text"] { border: none; width: 100%; margin-bottom: 0px; padding: 0px; outline: 0; box-shadow: none; background-color: transparent; }' +
+	'.{class:compactFieldWrapper} { padding: 4px 8px; }' +
+	'.{class:compactFieldWrapper} input.{class:compactField}[type="text"] { border: none; width: 100%; margin-bottom: 0px; padding: 0px; outline: 0; box-shadow: none; background-color: transparent; font-size: 12px; }' +
 	'.{class:metadataContainer} { margin-top: 6px; }' +
 	'.{class:metadataLabel} { float: left; width: 50px; margin-right: -50px; text-align: right; line-height: 22px; }' +
 	'.{class:metadataWrapper} { float: left; width: 100%; }' +
@@ -1334,9 +1334,9 @@ composer.css =
 	'.{class:inline} .{class:compactFieldWrapper} { margin-left: 38px; }' +
 	'.{class:inline}.{class:anonymous} .{class:compactFieldWrapper} { margin-left: 0px; }' +
 	'.{class:inline}.{class:container}:not(.{class:anonymous}) { padding-left: 12px; }' +
-	'.{class:inline} .{class:header} { float: left; margin: 7px 0px 0px 0px; }' +
+	'.{class:inline} .{class:header} { float: left; margin: 0px; }' +
 	'.{class:inline} .echo-streamserver-controls-auth-avatar,' +
-		'.{class:inline} .echo-streamserver-controls-auth-avatar > div { width: 24px; height: 24px; }' +
+		'.{class:inline} .echo-streamserver-controls-auth-avatar > div { width: 28px; height: 28px; }' +
 	'.echo-sdk-ui .{class:small} .nav-tabs,' +
 		'.echo-sdk-ui .{class:smallest} .nav-tabs { border-bottom-width: 0px; }' +
 

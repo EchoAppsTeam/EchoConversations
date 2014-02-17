@@ -1754,7 +1754,7 @@ card.methods._sortButtons = function() {
 var cardDepthRules = [];
 // 100 is a maximum level of children in query, but we can apply styles for ~20
 for (var i = 0; i <= 20; i++) {
-	cardDepthRules.push('.{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 8 + (i - 1) * 39 : 16) + 'px; }');
+	cardDepthRules.push('.{class:content} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 12 + (i - 1) * 39 : 16) + 'px; }');
 }
 
 card.css =
@@ -1781,7 +1781,7 @@ card.css =
 	'.{class:childrenMarker} { border-color: transparent transparent #ECEFF5; border-width: 0px 11px 11px; border-style: solid; margin: 3px 0px 0px 77px; height: 1px; width: 0px; display: none; }' + // This is magic "arrow up". Only color and margins could be changed
 	'.{class:container-root-thread} .{class:childrenMarker} { display: block; }' +
 	'.{class:avatar} { width: 48px; height: 48px; }' +
-	'.{class:children} .{class:avatar}, .{class:childrenByCurrentActorLive} .{class:avatar} { width: 24px; height: 24px; }' +
+	'.{class:children} .{class:avatar}, .{class:childrenByCurrentActorLive} .{class:avatar} { width: 28px; height: 28px; }' +
 	'.{class:authorName} { float: left; font-size: 15px; font-family: Arial, sans-serif; font-weight: bold; }' +
 	'.{class:re} { font-weight: bold; }' +
 	'.{class:re} a:link, .{class:re} a:visited, .{class:re} a:active { text-decoration: none; }' +
@@ -1827,14 +1827,14 @@ card.css =
 	'.{class:children} .{class} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; background: #F8F8F8; }' +
 	'.{class:children} .{class} { padding-top: 0px; background: none; border: none; }' +
 
-	'.{class:content} .{class:container-child-thread} { padding: 12px 0px 10px 8px; margin: 0px 15px 2px 0px; }' +
+	'.{class:content} .{class:container-child-thread} { padding: 8px 0px 10px 8px; margin: 0px 15px 2px 0px; }' +
 
 	'.{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{class:children} .{class:frame} { margin-left: 5px; }' +
 	'.{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
 	'.{class:children} .{class:containerWrapper} { padding-top: 0px; background: none; border: none; }' +
-	'.{class:expandChildren} { padding-bottom: 0px; padding-top: 5px; }' +
-	'.{class:children} .{class:expandChildren} { padding-bottom: 10px; padding-top: 12px; }' +
+	'.{class:expandChildren} { padding: 15px 0px 8px 16px; margin-bottom: 0px; }' +
+	'.{class:children} .{class:expandChildren} { padding: 8px 0px; margin-bottom: 0px; }' +
 
 	'.echo-sdk-ui .{class:buttons} a:focus { outline: none; }' +
 	'.{class:button} { margin-right: 10px; line-height: 20px; }' +
