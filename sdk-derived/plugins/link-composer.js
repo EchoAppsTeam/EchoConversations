@@ -112,16 +112,14 @@ plugin.methods.isValid = function() {
 };
 
 plugin.methods._getMediaContent = function() {
-	var component = this.component;
-	var template = this._mediaTemplate();
-	return $.map(this.component.formData.media, function(media) {
-		return component.substitute({
-			"template": template,
-			"data": $.extend(true, {}, media, {
-				"oembed": component._htmlEncode(media)
-			})
-		});
-	}).join("");
+	var media = this.component.formData.media[0];
+	if (!media) return "";
+	return this.component.substitute({
+		"template": this._mediaTemplate(),
+		"data": $.extend(true, {}, media, {
+			"oembed": this.component._htmlEncode(media)
+		})
+	});
 };
 
 plugin.methods._mediaTemplate = function() {

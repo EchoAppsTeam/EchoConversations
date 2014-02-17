@@ -110,7 +110,7 @@ composer.init = function() {
 		}, "low");
 	});
 	this.resolver = new Echo.URLResolver({
-		"embedly": this.config.get("embedly")
+		"embedly": this.config.get("dependencies.embedly")
 	});
 
 	this.collapsed = this.config.get("initialMode") !== "normal";
@@ -306,9 +306,14 @@ composer.config = {
 	 */
 	"auth": {},
 
-	"embedly": {
-		"apiKey": "5945901611864679a8761b0fcaa56f87",
-		"maxDescriptionCharacters": "200"
+	"dependencies": {
+		"FilePicker": {
+			"apiKey": undefined
+		},
+		"embedly": {
+			"apiKey": undefined,
+			"maxDescriptionCharacters": "200"
+		}
 	},
 	"initialMode": "normal", // normal || compact
 	"collapsible": false,

@@ -194,7 +194,7 @@ conversations.config = {
 			}
 		},
 		"FilePicker": {
-			"apiKey": "AFLWUBllDRwWZl7sQO1V1z"
+			"apiKey": undefined
 		}
 	},
 	"topMarkers": {
@@ -482,7 +482,13 @@ conversations.renderers.postComposer = function(element) {
 			},
 			"auth": this.config.get("auth"),
 			"submitPermissions": this._getSubmitPermissions(),
+			"dependencies": {
+				"FilePicker": this.config.get("dependencies.FilePicker"),
+				"embedly": this.config.get("dependencies.embedly")
+			},
 			"plugins": this._mergeSpecsByName([{
+				"name": "PhotoComposer"
+			}, {
 				"name": "LinkComposer"
 			}, {
 				"name": "JanrainBackplaneHandler",
@@ -922,7 +928,13 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"enabled": this._isModerationRequired() && replyComposer.confirmation.enabled
 		},
 		"submitPermissions": this._getSubmitPermissions(),
+		"dependencies": {
+			"FilePicker": this.config.get("dependencies.FilePicker"),
+			"embedly": this.config.get("dependencies.embedly")
+		},
 		"nestedPlugins": this._mergeSpecsByName([{
+			"name": "PhotoComposer"
+		}, {
 			"name": "LinkComposer"
 		}, {
 			"name": "JanrainBackplaneHandler",
@@ -938,7 +950,13 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"intentID": "Edit",
 		"name": "Edit",
 		"requestMethod": "POST",
+		"dependencies": {
+			"FilePicker": this.config.get("dependencies.FilePicker"),
+			"embedly": this.config.get("dependencies.embedly")
+		},
 		"nestedPlugins": [{
+			"name": "PhotoComposer"
+		}, {
 			"name": "LinkComposer"
 		}]
 	}];
