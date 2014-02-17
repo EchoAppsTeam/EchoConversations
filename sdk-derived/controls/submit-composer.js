@@ -803,7 +803,7 @@ composer.renderers._metaFields = function(element, extra) {
  * endpoint through <a href="http://echoplatform.com/streamserver/docs/features/submission-proxy/" target="_blank">Echo Submission Proxy</a>.
  */
 composer.methods.post = function() {
-	var self = this, mediaContent = [];
+	var self = this;
 	var publish = function(phase, data, responseBody, requestState) {
 		var args = {
 			"topic": "onPost" + phase,
@@ -817,22 +817,12 @@ composer.methods.post = function() {
 		}
 		self.events.publish(args);
 	};
-	var template = this.currentComposer.mediaTemplate && this.currentComposer.mediaTemplate();
-	if (template) {
-		mediaContent = $.map(this.formData.media, function(media) {
-			return self.substitute({
-				"template": template,
-				"data": $.extend(true, {}, media, {
-					"oembed": self._htmlEncode(media)
-				})
-			});
-		});
-	}
+	var data = this.currentComposer.getData();
 	var text = self.substitute({
 		"template": composer.templates.post,
 		"data": {
-			"text": self.currentComposer.text(),
-			"media": mediaContent.join(""),
+			"text": data.text,
+			"media": data.media,
 			"composer": self.currentComposer.id
 		}
 	});

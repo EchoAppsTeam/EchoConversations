@@ -32,9 +32,8 @@ plugin.init = function() {
 		"icon": "icon-globe",
 		"isValid": $.proxy(this.isValid, this),
 		"composer": $.proxy(this.buildComposer, this),
-		"mediaTemplate": $.proxy(this.mediaTemplate, this),
-		"text": $.proxy(this.getText, this),
-		"fill": $.proxy(this.fill, this),
+		"getData": $.proxy(this.getData, this),
+		"setData": $.proxy(this.setData, this),
 		"objectType": "http://echoenabled.com/schema/1.0/link"
 	});
 };
@@ -86,30 +85,14 @@ plugin.methods.buildComposer = function() {
 	return this.composer;
 };
 
-plugin.methods.mediaTemplate = function() {
-	return '<div class="echo-media-item" data-oembed="{data:oembed}">' +
-		'<div class="echo-item-article">' +
-			'<div class="echo-item-template-article-thumbnail" style="width: 30%; float: left; max-width: 120px; max-height: 120px; text-align: center; overflow: hidden;">' +
-				'<img src="{data:thumbnail_url}" style="width: auto; height: auto; max-height: 120px; max-width: 120px;">' +
-			'</div>' +
-			'<div class="echo-item-template-article" style="width: 70%; float: left;">' +
-				'<div class="echo-item-template-article-title" style="margin-left: 10px;">' +
-					'<a href="{data:url}" target="_blank">{data:title}</a>' +
-				'</div>' +
-				'<div class="echo-item-template-article-descriptionContainer">' +
-					'<div class="echo-item-template-article-description" style="margin-left: 10px;">{data:description}</div>' +
-				'</div>' +
-			'</div>' +
-			'<div class="echo-clear"></div>' +
-		'</div>' +
-	'</div>';
+plugin.methods.getData = function() {
+	return {
+		"text": this.composer.find(".echo-link-composer-title").val(),
+		"media": this._getMediaContent()
+	};
 };
 
-plugin.methods.getText = function() {
-	return this.composer.find(".echo-link-composer-title").val();
-};
-
-plugin.methods.fill = function(data) {
+plugin.methods.setData = function(data) {
 	this.composer.find(".echo-link-composer-title").val(data.text);
 	if (data.media.length) {
 		var media = data.media[0];
@@ -126,6 +109,38 @@ plugin.methods.isValid = function() {
 		return false;
 	}
 	return true;
+};
+
+plugin.methods._getMediaContent = function() {
+	var component = this.component;
+	var template = this._mediaTemplate();
+	return $.map(this.component.formData.media, function(media) {
+		return component.substitute({
+			"template": template,
+			"data": $.extend(true, {}, media, {
+				"oembed": component._htmlEncode(media)
+			})
+		});
+	}).join("");
+};
+
+plugin.methods._mediaTemplate = function() {
+	return '<div class="echo-media-item" data-oembed="{data:oembed}">' +
+		'<div class="echo-item-article">' +
+			'<div class="echo-item-template-article-thumbnail" style="width: 30%; float: left; max-width: 120px; max-height: 120px; text-align: center; overflow: hidden;">' +
+				'<img src="{data:thumbnail_url}" style="width: auto; height: auto; max-height: 120px; max-width: 120px;">' +
+			'</div>' +
+			'<div class="echo-item-template-article" style="width: 70%; float: left;">' +
+				'<div class="echo-item-template-article-title" style="margin-left: 10px;">' +
+					'<a href="{data:url}" target="_blank">{data:title}</a>' +
+				'</div>' +
+				'<div class="echo-item-template-article-descriptionContainer">' +
+					'<div class="echo-item-template-article-description" style="margin-left: 10px;">{data:description}</div>' +
+				'</div>' +
+			'</div>' +
+			'<div class="echo-clear"></div>' +
+		'</div>' +
+	'</div>';
 };
 
 Echo.Plugin.create(plugin);
