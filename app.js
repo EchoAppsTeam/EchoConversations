@@ -892,6 +892,14 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"name": "Moderation",
 		"extraActions": moderationExtraActions,
 		"topMarkers": this.config.get("topMarkers")
+	}, {
+		"name": "Photo"
+	}, {
+		"name": "Video"
+	}, {
+		"name": "Article"
+	}, {
+		"name": "Note"
 	}]);
 
 	return this._mergeSpecsByName(plugins, config.plugins);

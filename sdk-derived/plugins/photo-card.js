@@ -1,0 +1,188 @@
+(function($) {
+"use strict";
+
+var plugin = Echo.Plugin.manifest("Photo", "Echo.StreamServer.Controls.Card");
+
+if (Echo.Plugin.isDefined(plugin)) return;
+
+plugin.init = function() {
+	var self = this;
+	this.media = [];
+	Echo.Utils.safelyExecute(function() {
+		var content = $("<div/>").append(self.component.get("data.object.content"));
+		self.media = $("div[data-oembed]", content).map(function() {
+			//TODO: validate parsed data, ex.: type, url, etc.
+			return $.parseJSON($(this).attr("data-oembed"));
+		}).get();
+	});
+	// now, we can handle only one photo per streamserver item
+	this.set("data", this.media[0]);
+	this.extendTemplate("remove", "seeMore");
+	this.extendTemplate("insertAsFirstChild", "body", plugin.templates.main);
+};
+
+plugin.labels = {
+	"noMediaAvailable": "No media available",
+	"clickToExpand": "Click to expand"
+};
+
+plugin.templates.main =
+	'<div class="{plugin.class:item}">' +
+		'<div class="{plugin.class:photo}">' +
+			'<div class="{plugin.class:photoContainer}">' +
+				'<img class="{plugin.class:photoThumbnail}" src="{plugin.data:thumbnail_url}" title="{plugin.data:title}"/>' +
+			'</div>' +
+			'<div class="{plugin.class:photoLabel}">' +
+				'<div class="{plugin.class:photoLabelContainer}">' +
+					'<div class="{plugin.class:title} {plugin.class:photoTitle}" title="{plugin.data:title}">' +
+						'<a class="echo-clickable" href="{plugin.data:url}" target="_blank">{plugin.data:title}</a>' +
+					'</div>' +
+					'<div class="{plugin.class:description} {plugin.class:photoDescription}">{plugin.data:description}</div>' +
+				'</div>' +
+			'</div>' +
+		'</div>' +
+	'</div>';
+
+plugin.events = {
+	"Echo.Apps.Conversations.onAppResize": function() {
+		this.view.render({"name": "photoContainer"});
+	}
+};
+
+plugin.component.renderers.container = function(element) {
+	return this.parentRenderer("container", arguments)
+		.addClass(this.cssPrefix + "enabled");
+};
+
+plugin.renderers.title = function(element) {
+	return this.get("data.title") ? element : element.hide();
+};
+
+plugin.renderers.description = function(element) {
+	return this.get("data.description") ? element : element.hide();
+};
+
+plugin.renderers.photoThumbnail = function(element) {
+	var self = this;
+	var thumbnail = this.get("data.type") === "link"
+		? this.get("data.thumbnail_url")
+		: this.get("data.url");
+	// we are to create empty img tag because of IE.
+	// If we have an empty src attribute it triggers
+	// error event all the time.
+	var img = $("<img />");
+	img.attr("class", element.attr("class"));
+	if (element.attr("title")) {
+		img.attr("title", element.attr("title"));
+	}
+	img.error(function(e) {
+		img.replaceWith(self.substitute({
+			"template": '<div class="{plugin.class:noMediaAvailable}"><span>{plugin.label:noMediaAvailable}</span></div>'
+		}));
+	}).attr("src", thumbnail);
+	return element.replaceWith(img);
+};
+
+plugin.renderers.photoContainer = function(element) {
+	var expanded = this.cssPrefix + "expanded";
+	var self = this;
+	var oembed = this.get("data", {});
+	var thumbnailWidth = this.view.get("photoThumbnail").width();
+	var expandedHeight = oembed.height;
+	var collapsedHeight = (thumbnailWidth || oembed.width) * 9 / 16;
+	var imageWidth = oembed.width;
+	var imageHeight = oembed.height;
+	if (!imageWidth || !imageHeight) {
+		imageWidth = oembed.thumbnail_width;
+		imageHeight = oembed.thumbnail_height;
+	}
+	// calc height using aspect ratio 16:9 if image has ratio 1:2
+	if (!element.hasClass(expanded) && oembed.height > collapsedHeight && imageHeight >= 2 * imageWidth) {
+		var transitionCss = Echo.Utils.foldl({}, ["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(key, acc) {
+			acc[key] = 'max-height ease 500ms';
+		});
+
+		element.addClass("echo-clickable")
+			.attr("title", this.labels.get("clickToExpand"))
+			.css("max-height", 250)
+			.one("click", function() {
+				self.events.publish({
+					"topic": "onMediaExpand"
+				});
+				element.css(transitionCss)
+					.css("max-height", expandedHeight)
+					.removeClass("echo-clickable")
+					.addClass(expanded)
+					.attr("title", "");
+			});
+	} else {
+		element.css("max-height", expandedHeight);
+	}
+
+	return element;
+};
+
+plugin.renderers.photoLabelContainer = function(element) {
+	// calculate photoLabel max-height
+	var photoLabelHeight = 20 // photoLabelContainer padding
+		+ 2*16; // photoDescription line-height * lines count
+
+	if (this.get("data.title")) {
+		photoLabelHeight += 16 // photoTitle width
+			+ 5; // photoTitle margin
+	}
+	this.view.get("photoLabel").css("max-height", photoLabelHeight);
+
+	if (!this.get("data.description") && !this.get("data.title")) {
+		element.hide();
+	} else {
+		this.view.get("photoContainer").css({
+			"min-height": 55 + photoLabelHeight, // first number is added for default item avatar
+			"min-width": 200
+		});
+	}
+	return element;
+};
+
+plugin.enabled = function() {
+	var result = false;
+	$.each(this.component.get("data.object.objectTypes", []), function(i, objectType) {
+		if (objectType === "http://activitystrea.ms/schema/1.0/image") {
+			result = true;
+			return false;
+		}
+	});
+	return result;
+};
+
+var transition = function(value) {
+	return $.map(["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(propertyName) {
+		return propertyName +': ' + value;
+	}).join(";");
+};
+
+plugin.css =
+	'.{class:depth-0} .{plugin.class:item} { margin: -51px -16px 0 -16px; }' +
+	'.{plugin.class:photo} .{plugin.class:noMediaAvailable} { position: relative; min-height: 145px; padding: 75px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
+	'.{plugin.class:photo} { position: relative; left: 0; top: 0; zoom: 1; }' +
+	'.{plugin.class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
+	'.{plugin.class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; }' +
+
+	'.echo-sdk-ui .{plugin.class:photoLabel} a:link, .echo-sdk-ui .{plugin.class:photoLabel} a:visited, .echo-sdk-ui .{plugin.class:photoLabel} a:hover, .echo-sdk-ui .{plugin.class:photoLabel} a:active { color: #fff; }' +
+	'.{plugin.class:photoLabelContainer} { padding: 10px; }' +
+	'.{plugin.class:photoTitle} { margin: 0 0 5px 0; }' +
+
+	'.{plugin.class:photoLabel} { overflow: hidden; }' +
+	'.{plugin.class:photo}:hover .{plugin.class:photoLabel} { max-height: 100% !important; }' +
+
+	'.{plugin.class:enabled} .{class:avatar-wrapper} { z-index: 10; }' +
+	'.{class:depth-0}.{plugin.class:enabled} .{class:header-container} { position: relative; z-index: 10; }' +
+	'.{plugin.class:enabled} .{class:text} { display: none; }' +
+	'.{class:depth-0}.{plugin.class:enabled} .{class:body} { margin-bottom: 0px; overflow: visible; }' +
+	'.{class:depth-0}.{plugin.class:enabled} .{class:data} { padding-top: 0px; }' +
+	'.{class:depth-0}.{plugin.class:enabled} .{class:authorName} { color: #FFFFFF; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); }' +
+	'.{plugin.class:photoLabel} { ' + transition('max-height ease 300ms') + '; }';
+
+Echo.Plugin.create(plugin);
+
+})(Echo.jQuery);

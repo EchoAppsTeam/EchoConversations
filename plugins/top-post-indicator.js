@@ -31,7 +31,7 @@ plugin.renderers.indicator = function(element) {
 };
 
 plugin.css =
-	'.{plugin.class:indicator} { float: right; position: relative; top: -19px; right: 0px; }';
+	'.{plugin.class:indicator} { float: right; position: absolute; top: -19px; right: 0px; z-index: 10;}';
 
 Echo.Plugin.create(plugin);
 

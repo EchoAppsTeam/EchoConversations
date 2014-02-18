@@ -52,12 +52,6 @@ card.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.js"
 }, {
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.css"
-}, {
-	"loaded": function() { return !!Echo.Conversations.NestedCard; },
-	"url": "{%= baseURL %}/controls/nested-card.js"
-}, {
-	"loaded": function() { return !!Echo.Conversations.MediaContainer; },
-	"url": "{%= baseURL %}/controls/media-container.js"
 }];
 
 /**
@@ -280,7 +274,6 @@ card.vars = {
 	"buttonSpecs": {},
 	"buttons": {},
 	"buttonsLayout": "inline",
-	"media": [],
 	"content": undefined
 };
 
@@ -390,7 +383,6 @@ card.templates.mainHeader =
 									'<span class="{class:textToggleTruncated} echo-linkColor echo-clickable"></span>' +
 								'</div>' +
 								'<div class="{class:seeMore}">{label:seeMore}</div>' +
-								'<div class="{class:mediaContent}"></div>' +
 							'</div>' +
 							'<div class="{class:metadata}"></div>' +
 							'<div class="{class:footer} echo-secondaryColor echo-secondaryFont">' +
@@ -792,23 +784,6 @@ card.renderers.textToggleTruncated = function(element) {
 card.renderers.body = function(element) {
 	var self = this;
 	var itemContent = this.get("data.object.content");
-	var media = self._getMediaAttachments();
-
-	Echo.Utils.safelyExecute(function() {
-		var content = $("<div/>").append(itemContent);
-		var text = $(".echo-item-text", content);
-		if (media.length && text.length) {
-			itemContent = text.html();
-		} else if (media.length) {
-			itemContent = content.html();
-		}
-	});
-
-	// hide all item content if item type is article, photo or video
-	// and item has media attachments
-	if (media.length && this._getItemRenderType()) {
-		return element.hide();
-	}
 
 	var data = [itemContent, {
 		"source": this.get("data.source.name"),
@@ -959,28 +934,6 @@ card.renderers._childrenContainer = function(element, config) {
 				"global": false,
 				"propagation": false
 			});
-		}
-	});
-	return element;
-};
-
-card.renderers.mediaContent = function(element) {
-	var self = this;
-	var media = this._getMediaAttachments();
-	var type = this._getItemRenderType();
-	var cardConfig = media.length && type
-		? { "displaySourceIcon": false, "displayAuthor": false }
-		: {};
-
-	new Echo.Conversations.MediaContainer({
-		"target": element.empty(),
-		"data": media,
-		"card": cardConfig,
-		"ready": function() {
-			if (media.length && self.isRoot() && type) {
-				var cardType = this.cards[0].getRenderType();
-				self.view.get("container").addClass(self.cssPrefix + cardType);
-			}
 		}
 	});
 	return element;
@@ -1258,22 +1211,6 @@ card.methods._transitionSupported = function() {
 			'OTransition' in s;
 	}
 	return cache.transitionSupported;
-};
-
-card.methods._getMediaAttachments = function() {
-	var self = this;
-	//TODO: get rid of "content" and clean "media" if item content was updated
-	if (this.get("content") !== this.get("data.object.content") || typeof this.get("media") === "undefined") {
-		var result = [];
-		Echo.Utils.safelyExecute(function() {
-			var content = $("<div/>").append(self.get("data.object.content"));
-			result = $("div[oembed], div[data-oembed]", content).map(function() {
-				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
-			}).get();
-		});
-		this.set("media", result);
-	}
-	return this.get("media", []);
 };
 
 card.methods._getItemRenderType = function() {
@@ -1771,7 +1708,7 @@ card.css =
 	'.{class:children} .{class:subwrapper}, .{class:childrenByCurrentActorLive} .{class:subwrapper} { margin-left: 34px; }' +
 	'.{class:wrapper} { float: left; width: 100%; }' +
 	'.{class:subwrapper} { margin-left: 58px; }' +
-	'.{class:subcontainer} { float: left; width: 100%; }' +
+	'.{class:subcontainer} { float: left; width: 100%; position: relative; }' +
 	'.{class:markers} { line-height: 16px; background: url("{config:cdnBaseURL.sdk-assets}/images/curation/metadata/marker.png") no-repeat; padding: 0px 0px 4px 21px; margin-top: 7px; }' +
 	'.{class:tags} { line-height: 16px; background: url("{config:cdnBaseURL.sdk-assets}/images/tag_blue.png") no-repeat; padding: 0px 0px 4px 21px; }' +
 	'.{class:metadata-title} { font-weight: bold; line-height: 25px; height: 25px; margin-right: 5px; }' +
@@ -1880,35 +1817,13 @@ card.css =
 	'.{class} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
 	'.{class} { margin: 0px 0px 10px 0px; padding: 0px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; background: #ffffff; }' +
 
-	// Nested card css
-	'.{class:depth-0} .{class:mediaContent} .echo-conversations-mediacontainer-multiple { margin-left: -16px; margin-right: -16px; }' +
-	'.{class:mediaContent} .echo-conversations-mediacontainer-multiple { border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
-	'.{class:depth-0} .{class:mediaContent} { margin-bottom: 0px; }' +
-	'.{class:video} .{class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
-	'.{class:video} .{class:mediaContent} .echo-conversations-nestedcard-video { padding: 0px; }' +
-
-	'.{class:photo}.{class:container}.{class:depth-0} { padding-top: 0; }' +
-	'.{class:photo} .{class:mediaContent} { margin: 0 -16px; }' +
-	'.{class:photo} .{class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
-	'.{class:photo} .echo-conversations-nestedcard-photoContainer { border-top-left-radius: 3px; border-top-right-radius: 3px; }' +
-	'.{class:photo} .{class:data} { padding-top: 0; }' +
-	'.{class:photo} .{class:authorName} { color: #FFFFFF; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); }' +
-	'.{class:photo} .{class:date} { text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); padding-right: 1px; }' +
-	'.{class:photo} .{class:avatar-wrapper} { z-index: 10; position: absolute; top: 15px; }' +
-	'.{class:photo} .{class:header-container} { z-index: 10; position: relative; top: 50px; margin-top: -36px; }' +
-
-	'.{class:link} .{class:mediaContent} .echo-conversations-nestedcard-border { border: 0px; }' +
-	'.{class:link} .{class:mediaContent} .echo-conversations-nestedcard-article { padding: 0px; }' +
-
-	'.{class:mediaContent} { margin-bottom: 8px; }' +
-
 	// see more
 	'.{class:seeMore}:before { content: ""; display: block; height: 3px; box-shadow: 0 -3px 3px rgba(0, 0, 0, 0.08); position: relative; top: 0px; }' +
 	'.{class:seeMore} { margin-top: -8px; display: none; padding: 0 0 15px 0; border-top: 1px solid #D8D8D8; text-align: center; font-size: 12px; cursor: pointer; color: #C6C6C6; }' +
 	'.{class:seeMore}:hover { color: #262626; }' +
 
 	// hide switch for now
-	'.{class:modeSwitch} { width: 0px; height: 0px; }' +
+	'.{class:modeSwitch} { width: 0px; height: 0px; display: none !important; }' +
 
 	// indicator
 	'.{class:container} { position: relative; }' +
