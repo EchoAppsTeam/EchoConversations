@@ -608,12 +608,15 @@ card.renderers.wrapper = function(element) {
  * @echo_renderer
  */
 card.renderers.avatar = function(element) {
-	this.placeImage({
-		"container": element,
-		"image": this.get("data.actor.avatar"),
-		"defaultImage": this.config.get("defaultAvatar")
-	});
-	return element;
+	var avatarURL = this.get("data.actor.avatar", this.config.get("defaultAvatar"));
+	element.css("background-image", "url('" + avatarURL + "')");
+
+	// we have to do it because filter must work in IE8 only
+	// in other cases we will have square avatar in IE 9
+	var isIE8 = document.all && document.querySelector && !document.addEventListener;
+	return isIE8
+		? element.css({ "filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + avatarURL + "', sizingMethod='scale')" })
+		: element;
 };
 
 /**
@@ -1780,8 +1783,6 @@ card.css =
 	'.{class:modeSwitch} { float: right; width: 16px; height: 16px; background:url("{config:cdnBaseURL.sdk-assets}/images/curation/metadata/flip.png") no-repeat 0px 3px; }' +
 	'.{class:childrenMarker} { border-color: transparent transparent #ECEFF5; border-width: 0px 11px 11px; border-style: solid; margin: 3px 0px 0px 77px; height: 1px; width: 0px; display: none; }' + // This is magic "arrow up". Only color and margins could be changed
 	'.{class:container-root-thread} .{class:childrenMarker} { display: block; }' +
-	'.{class:avatar} { width: 48px; height: 48px; }' +
-	'.{class:children} .{class:avatar}, .{class:childrenByCurrentActorLive} .{class:avatar} { width: 28px; height: 28px; }' +
 	'.{class:authorName} { float: left; font-size: 15px; font-family: Arial, sans-serif; font-weight: bold; }' +
 	'.{class:re} { font-weight: bold; }' +
 	'.{class:re} a:link, .{class:re} a:visited, .{class:re} a:active { text-decoration: none; }' +
@@ -1813,7 +1814,8 @@ card.css =
 	'.echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
 	'.{class:date} { float: left; color: #d3d3d3; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; max-width: 100%; }' +
 
-	'.{class:avatar} img { height: 28px; width: 28px; border-radius: 50%;}' +
+	'.{class:avatar} { width: 36px; height: 36px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; }' +
+	'.{class:children} .{class:avatar}, .{class:childrenByCurrentActorLive} .{class:avatar} { width: 28px; height: 28px; }' +
 
 	'.{class:content} { background: #f8f8f8; border-radius: 3px; }' +
 	'.{class:buttons} { white-space: nowrap; float: left; }' +
@@ -1864,8 +1866,6 @@ card.css =
 	'.echo-sdk-ui .{class:mediaAvatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
 	'.{class:depth-0} .{class:footer} { padding: 8px 0px 10px; }' +
 	'.{class:depth-0} .{class:body} { padding-top: 0px; }' +
-	'.{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
-	'.{class:depth-0} .{class:avatar} img { height: 36px; width: 36px; border-radius: 50%;}' +
 	'.{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 18px; }' +
 	'.{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
 	'.{class:depth-0} .{class:childrenMarker} { display: none; }' +

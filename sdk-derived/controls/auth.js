@@ -98,7 +98,13 @@ auth.config = {
 	 * @cfg {String} infoMessages
 	 * Customizes the look and feel of info messages, for example "loading" and "error".
 	 */
-	"infoMessages": {"enabled": false}
+	"infoMessages": {"enabled": false},
+	"providers": {
+		"twitter.com": "Twitter",
+		"facebook.com": "Facebook",
+		"google.com": "Google",
+		"me.yahoo.com": "Yahoo"
+	}
 };
 
 auth.dependencies = [{
@@ -162,7 +168,9 @@ auth.templates.anonymous =
  */
 auth.templates.logged =
 	'<div class="{class:userLogged}">' +
-		'<div class="{class:avatar}"><div class="{class:avatarElem}"></div></div>' +
+		'<div class="{class:avatarContainer}">' +
+			'<div class="{class:avatar}"></div>' +
+		'</div>' +
 		'<div class="{class:container}">' +
 			'<div class="{class:name}"></div>' +
 			'<div class="echo-primaryFont {class:via}"></div>' +
@@ -207,19 +215,16 @@ auth.renderers.or = function(element) {
 /**
  * @echo_renderer
  */
-auth.renderers.avatarElem = function(element) {
-	var avatarURL = this.user.get("avatar");
-	if (!avatarURL) {
-		avatarURL = this.config.get("defaultAvatar");
-	}
-	element.css("background-image", 'url("' + avatarURL + '")');
+auth.renderers.avatar = function(element) {
+	var avatarURL = this.user.get("avatar") || this.config.get("defaultAvatar");
+	element.css("background-image", "url('" + avatarURL + "')");
+
 	// we have to do it because filter must work in IE8 only
 	// in other cases we will have square avatar in IE 9
 	var isIE8 = document.all && document.querySelector && !document.addEventListener;
-	if (isIE8) {
-		element.css({ "filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + avatarURL + "', sizingMethod='scale')" });
-	}
-	return element;
+	return isIE8
+		? element.css({ "filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + avatarURL + "', sizingMethod='scale')" })
+		: element;
 };
 
 /**
@@ -271,16 +276,9 @@ auth.methods.template = function() {
 };
 
 auth.methods._detectAuthProvider = function() {
-	// TODO: provide an ability to update this list via plugin config
-	var providers = {
-		"twitter.com": "Twitter",
-		"facebook.com": "Facebook",
-		"google.com": "Google",
-		"me.yahoo.com": "Yahoo"
-	};
 	var id = this.user.get("identityUrl", "");
 	var domain = Echo.Utils.parseURL(id).domain;
-	return providers[domain] || domain || id;
+	return this.config.get("providers")[domain] || domain || id;
 };
 
 auth.methods._assembleIdentityControl = function(type, element) {
@@ -316,14 +314,12 @@ auth.css =
 	'.{class:name} ul.nav .dropdown .dropdown-toggle { font-size: 20px; }' +
 	'.{class:name} ul.nav { margin-bottom: 3px; }' +
 	'.{class:name} ul.nav .dropdown-menu li > a { font-size: 14px; }' +
-	'.{class:avatar} div { border-radius: 50%; background-size:cover; display:inline-block; background-position:center; }' +
 	'.{class:login}, .{plugin.class} .{class:signup} { color: #006DCC; }' +
 	'.{class:userAnonymous} { margin: 0px 0px 7px 2px; text-align: left; }' +
 	'.{class:userLogged} { margin: 0px 0px 5px 3px; }' +
 	'.{class:name} { float: none; margin: 3px 0px 0px 15px; font-weight: normal; }' +
-	'.class:container} { float: left; }' +
-	'.{class:avatar} { float: left; width: 48px; height: 48px; border-radius: 50%; }' +
-	'.{class:avatar} > div { width: 48px; height: 48px; background-size:cover; display:inline-block; background-position:center; }';
+	'.{class:avatarContainer} { float: left; width: 48px; height: 48px; border-radius: 50%; }' +
+	'.{class:avatar} { border-radius: 50%; width: 48px; height: 48px; background-size: cover; display: inline-block; background-position: center; }';
 
 Echo.Control.create(auth);
 

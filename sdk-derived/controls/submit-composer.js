@@ -1335,8 +1335,8 @@ composer.css =
 	'.{class:inline}.{class:anonymous} .{class:compactFieldWrapper} { margin-left: 0px; }' +
 	'.{class:inline}.{class:container}:not(.{class:anonymous}) { padding-left: 12px; }' +
 	'.{class:inline} .{class:header} { float: left; margin: 0px; }' +
-	'.{class:inline} .echo-streamserver-controls-auth-avatar,' +
-		'.{class:inline} .echo-streamserver-controls-auth-avatar > div { width: 28px; height: 28px; }' +
+	'.{class:inline} .echo-streamserver-controls-auth-avatarContainer,' +
+		'.{class:inline} .echo-streamserver-controls-auth-avatar { width: 28px; height: 28px; }' +
 	'.echo-sdk-ui .{class:small} .nav-tabs,' +
 		'.echo-sdk-ui .{class:smallest} .nav-tabs { border-bottom-width: 0px; }' +
 
