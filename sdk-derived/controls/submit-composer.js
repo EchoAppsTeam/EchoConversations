@@ -337,7 +337,7 @@ composer.config = {
 composer.vars = {
 	"collapsed": false,
 	"toggleModeHandler": undefined,
-	"postButtonState": "disabled",
+	"postButtonState": "normal",
 	"formData": {
 		"text": "",
 		"media": []
@@ -1080,7 +1080,7 @@ composer.methods._getDefinedMediaIndex = function(oembed) {
 composer.methods._initFormFields = function() {
 	var self = this, nonEmpty = [];
 	var timer;
-	this.postButtonState = "disabled";
+	//this.postButtonState = "disabled";
 	var fields = this.config.get("target")
 		.find("input[type=text][required], textarea[required]")
 		.on("keyup paste", function() {
@@ -1098,7 +1098,7 @@ composer.methods._initFormFields = function() {
 			if (idx !== -1) nonEmpty.splice(idx, 1);
 		}
 		// TODO: only fields from the current composer plugin must be counted here
-		self._setPostButtonState(nonEmpty.length === fields.length ? "normal" : "disabled");
+		self._setPostButtonState("normal");//nonEmpty.length === fields.length ? "normal" : "disabled");
 	};
 	this.config.get("target")
 		.find("input[type=text], textarea")
