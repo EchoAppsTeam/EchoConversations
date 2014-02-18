@@ -452,8 +452,25 @@ plugin.component.renderers._button = function(element, extra) {
 			"entries": $.map(entries, function(entry) { return $.extend({"handler": entry.callback}, entry); }),
 			"title": this.get("currentButtonsState") !== "compact" ? extra.label : ""
 		});
+		var footerWidth = item.view.get("footer").width();
+		var maxHeight = item.config.get("parent.presentation.maximumHeight");
+		var container = $(".echo-apps-conversations-container");
 		extra.callback = function(ev) {
-			button.find(".dropdown-menu").addClass("pull-right");
+			if (maxHeight && maxHeight > 0) {
+				var dropdownMenu = button.find(".dropdown-menu");
+				if (dropdownMenu.outerWidth() > footerWidth - button.position().left) {
+					dropdownMenu.addClass("pull-right");
+					dropdownMenu.css({"left": "auto"});
+				} else if (dropdownMenu.hasClass("pull-right")) {
+					dropdownMenu.removeClass("pull-right");
+				}
+				if ((container[0].scrollHeight - container.scrollTop() <= container.height())
+					&& (maxHeight - (button.offset().top - container.offset().top) < dropdownMenu.outerHeight())) {
+					dropdownMenu.css({"bottom": "100%", "top": "auto"});
+				} else {
+					dropdownMenu.css({"top": "100%", "bottom": "auto"});
+				}
+			}
 			button.find(".dropdown-toggle").dropdown("toggle");
 			ev.preventDefault();
 		};
