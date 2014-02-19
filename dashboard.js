@@ -683,6 +683,7 @@ dashboard.init = function() {
 };
 
 dashboard.methods.declareInitialConfig = function() {
+	if (~$.inArray("dependencies", this.config.get("disableSettings"))) return {};
 	var keys = this.get("appkeys", []);
 	var apps = this.get("janrainapps", []);
 	return {
@@ -733,9 +734,15 @@ dashboard.methods.initConfigurator = function() {
 	});
 	// remove items specified in the config.disableSettings
 	var disableSettings = this.config.get("disableSettings");
-	this.config.set("ecl", $.grep(ecl, function(item) {
-		return !~$.inArray(item.name, disableSettings);
-	}));
+	(function traverse(items, path) {
+		return $.map(items, function(item, key) {
+			var itemPath = path ? path + "." + item.name : item.name;
+			if (~$.inArray(itemPath, disableSettings)) {
+				delete items[key];
+			}
+			if (item.items) traverse(item.items, itemPath);
+		});
+	})(ecl);
 	this.parent.apply(this, arguments);
 };
 
