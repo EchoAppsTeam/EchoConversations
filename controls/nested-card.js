@@ -206,7 +206,7 @@ card.renderers.videoPlaceholder = function(element) {
 card.renderers.videoWrapper = function(element) {
 	var width = this.get("data.width");
 	if (typeof this.config.get("maximumMediaWidth") === "number" && this.config.get("maximumMediaWidth") < width) {
-		width =  this.config.get("maximumMediaWidth"));
+		width =  this.config.get("maximumMediaWidth");
 	}
 	return element.css("width", width);
 };

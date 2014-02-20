@@ -430,13 +430,19 @@ conversations.renderers.itemsWaiting = function(element) {
 };
 
 conversations.renderers.container = function(element) {
-	var presentationParams = this.config.get("presentation");
-	element.css({
-		"min-width": presentationParams.minimumWidth + "px",
-		"max-width": presentationParams.maximumWidth + "px",
-		"max-height": presentationParams.maximumHeight + "px",
-		"overflow-y": "auto"
-	});
+	var presentation = this.config.get("presentation");
+	var styles = {};
+	if (presentation.minimumWidth) {
+		styles["min-width"] = presentation.minimumWidth + "px";
+	}
+	if (presentation.maximumWidth) {
+		styles["max-width"] = presentation.maximumWidth + "px";
+	}
+	if (presentation.maximumHeight) {
+		styles["max-height"] = presentation.maximumHeight + "px";
+		styles["overflow-y"] = "auto";
+	}
+	element.css(styles);
 	return element;
 
 };
