@@ -464,8 +464,9 @@ plugin.component.renderers._button = function(element, extra) {
 				} else if (dropdownMenu.hasClass("pull-right")) {
 					dropdownMenu.removeClass("pull-right");
 				}
-				if ((container[0].scrollHeight - container.scrollTop() <= container.height())
-					&& (maxHeight - (button.offset().top - container.offset().top) < dropdownMenu.outerHeight())) {
+				var isScrollAtTheBottom = container[0].scrollHeight - container.scrollTop() <= maxHeight + dropdownMenu.outerHeight();
+				var isEnoughFreeSpace = maxHeight - (button.offset().top - container.offset().top) < dropdownMenu.outerHeight();
+				if (isScrollAtTheBottom && isEnoughFreeSpace) {
 					dropdownMenu.css({"bottom": "100%", "top": "auto"});
 				} else {
 					dropdownMenu.css({"top": "100%", "bottom": "auto"});
