@@ -1,7 +1,7 @@
 (function($) {
 "use strict";
 
-var plugin = Echo.Plugin.manifest("Note", "Echo.StreamServer.Controls.Card");
+var plugin = Echo.Plugin.manifest("CommentCard", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 

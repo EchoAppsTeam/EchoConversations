@@ -6,17 +6,6 @@ var plugin = Echo.Plugin.manifest("PhotoCard", "Echo.StreamServer.Controls.Card"
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	var self = this;
-	this.media = [];
-	Echo.Utils.safelyExecute(function() {
-		var content = $("<div/>").append(self.component.get("data.object.content"));
-		self.media = $("div[data-oembed]", content).map(function() {
-			//TODO: validate parsed data, ex.: type, url, etc.
-			return $.parseJSON($(this).attr("data-oembed"));
-		}).get();
-	});
-	// now, we can handle only one photo per streamserver item
-	this.set("data", this.media[0]);
 	this.extendTemplate("remove", "seeMore");
 	this.extendTemplate("insertAsFirstChild", "body", plugin.templates.main);
 };
@@ -30,14 +19,14 @@ plugin.templates.main =
 	'<div class="{plugin.class:item}">' +
 		'<div class="{plugin.class:photo}">' +
 			'<div class="{plugin.class:photoContainer}">' +
-				'<img class="{plugin.class:photoThumbnail}" src="{plugin.data:thumbnail_url}" title="{plugin.data:title}"/>' +
+				'<img class="{plugin.class:photoThumbnail}" src="{data:oembed.thumbnail_url}" title="{data:oembed.title}"/>' +
 			'</div>' +
 			'<div class="{plugin.class:photoLabel}">' +
 				'<div class="{plugin.class:photoLabelContainer}">' +
-					'<div class="{plugin.class:title} {plugin.class:photoTitle}" title="{plugin.data:title}">' +
-						'<a class="echo-clickable" href="{plugin.data:url}" target="_blank">{plugin.data:title}</a>' +
+					'<div class="{plugin.class:title} {plugin.class:photoTitle}" title="{data:oembed.title}">' +
+						'<a class="echo-clickable" href="{data:oembed.url}" target="_blank">{data:oembed.title}</a>' +
 					'</div>' +
-					'<div class="{plugin.class:description} {plugin.class:photoDescription}">{plugin.data:description}</div>' +
+					'<div class="{plugin.class:description} {plugin.class:photoDescription}">{data:oembed.description}</div>' +
 				'</div>' +
 			'</div>' +
 		'</div>' +
@@ -55,18 +44,18 @@ plugin.component.renderers.container = function(element) {
 };
 
 plugin.renderers.title = function(element) {
-	return this.get("data.title") ? element : element.hide();
+	return this.component.get("data.oembed.title") ? element : element.hide();
 };
 
 plugin.renderers.description = function(element) {
-	return this.get("data.description") ? element : element.hide();
+	return this.component.get("data.oembed.description") ? element : element.hide();
 };
 
 plugin.renderers.photoThumbnail = function(element) {
 	var self = this;
-	var thumbnail = this.get("data.type") === "link"
-		? this.get("data.thumbnail_url")
-		: this.get("data.url");
+	var thumbnail = this.component.get("data.oembed.type") === "link"
+		? this.component.get("data.oembed.thumbnail_url")
+		: this.component.get("data.oembed.url");
 	// we are to create empty img tag because of IE.
 	// If we have an empty src attribute it triggers
 	// error event all the time.
@@ -86,7 +75,7 @@ plugin.renderers.photoThumbnail = function(element) {
 plugin.renderers.photoContainer = function(element) {
 	var expanded = this.cssPrefix + "expanded";
 	var self = this;
-	var oembed = this.get("data", {});
+	var oembed = this.component.get("data.oembed", {});
 	var thumbnailWidth = this.view.get("photoThumbnail").width();
 	var expandedHeight = oembed.height;
 	var collapsedHeight = (thumbnailWidth || oembed.width) * 9 / 16;
@@ -127,13 +116,13 @@ plugin.renderers.photoLabelContainer = function(element) {
 	var photoLabelHeight = 20 // photoLabelContainer padding
 		+ 2*16; // photoDescription line-height * lines count
 
-	if (this.get("data.title")) {
+	if (this.component.get("data.oembed.title")) {
 		photoLabelHeight += 16 // photoTitle width
 			+ 5; // photoTitle margin
 	}
 	this.view.get("photoLabel").css("max-height", photoLabelHeight);
 
-	if (!this.get("data.description") && !this.get("data.title")) {
+	if (!this.component.get("data.oembed.description") && !this.component.get("data.oembed.title")) {
 		element.hide();
 	} else {
 		this.view.get("photoContainer").css({
@@ -145,14 +134,7 @@ plugin.renderers.photoLabelContainer = function(element) {
 };
 
 plugin.enabled = function() {
-	var result = false;
-	$.each(this.component.get("data.object.objectTypes", []), function(i, objectType) {
-		if (objectType === "http://activitystrea.ms/schema/1.0/image") {
-			result = true;
-			return false;
-		}
-	});
-	return result;
+	return ~$.inArray("http://activitystrea.ms/schema/1.0/image", this.component.get("data.object.objectTypes"));
 };
 
 var transition = function(value) {

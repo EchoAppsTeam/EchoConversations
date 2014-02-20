@@ -899,7 +899,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 	}, {
 		"name": "ArticleCard"
 	}, {
-		"name": "NoteCard"
+		"name": "CommentCard"
 	}, {
 		"name": "LinkCard"
 	}]);

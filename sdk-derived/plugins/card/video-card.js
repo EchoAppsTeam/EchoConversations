@@ -1,22 +1,11 @@
 (function($) {
 "use strict";
 
-var plugin = Echo.Plugin.manifest("Video", "Echo.StreamServer.Controls.Card");
+var plugin = Echo.Plugin.manifest("VideoCard", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	var self = this;
-	this.media = [];
-	Echo.Utils.safelyExecute(function() {
-		var content = $("<div/>").append(self.component.get("data.object.content"));
-		self.media = $("div[data-oembed]", content).map(function() {
-			//TODO: validate parsed data, ex.: type, url, etc.
-			return $.parseJSON($(this).attr("data-oembed"));
-		}).get();
-	});
-	// now, we can handle only one photo per streamserver item
-	this.set("data", this.media[0]);
 	this.extendTemplate("replace", "data", plugin.templates.main);
 };
 
@@ -27,26 +16,26 @@ plugin.templates.main =
 				'<div class="{plugin.class:videoWrapper}">' +
 					'<div class="{plugin.class:videoPlaceholder}">' +
 						'<div class="{plugin.class:playButton}"></div>' +
-						'<img src="{plugin.data:thumbnail_url}" title="{plugin.data:title}"/>' +
+						'<img src="{data:oembed.thumbnail_url}" title="{data:oembed.title}"/>' +
 					'</div>' +
 				'</div>' +
 			'</div>' +
-			'<div class="{plugin.class:title} {plugin.class:videoTitle}" title="{plugin.data:title}">{plugin.data:title}</div>' +
-			'<div class="{plugin.class:description} {plugin.class:videoDescription}">{plugin.data:description}</div>' +
+			'<div class="{plugin.class:title} {plugin.class:videoTitle}" title="{data:oembed.title}">{data:oembed.title}</div>' +
+			'<div class="{plugin.class:description} {plugin.class:videoDescription}">{data:oembed.description}</div>' +
 		'</div>' +
 	'</div>';
 
 plugin.renderers.title = function(element) {
-	return this.get("data.title") ? element : element.hide();
+	return this.component.get("data.oembed.title") ? element : element.hide();
 };
 
 plugin.renderers.description = function(element) {
-	return this.get("data.description") ? element : element.hide();
+	return this.component.get("data.oembed.description") ? element : element.hide();
 };
 
 plugin.renderers.playButton = function(element) {
 	var self = this;
-	var oembed = this.get("data");
+	var oembed = this.component.get("data.oembed");
 	element.on("click", function() {
 		self.view.get("videoPlaceholder").empty().append($(oembed.html));
 	});
@@ -54,7 +43,7 @@ plugin.renderers.playButton = function(element) {
 };
 
 plugin.renderers.videoPlaceholder = function(element) {
-	var oembed = this.get("data");
+	var oembed = this.component.get("data.oembed");
 
 	if (!oembed.thumbnail_url) {
 		element.empty().append($(oembed.html));
@@ -64,18 +53,11 @@ plugin.renderers.videoPlaceholder = function(element) {
 };
 
 plugin.renderers.videoWrapper = function(element) {
-	return element.css("width", this.get("data.width"));
+	return element.css("width", this.component.get("data.oembed.width"));
 };
 
 plugin.enabled = function() {
-	var result = false;
-	$.each(this.component.get("data.object.objectTypes", []), function(i, objectType) {
-		if (objectType === "http://activitystrea.ms/schema/1.0/video") {
-			result = true;
-			return false;
-		}
-	});
-	return result;
+	return ~$.inArray("http://activitystrea.ms/schema/1.0/video", this.component.get("data.object.objectTypes"));
 };
 
 plugin.css =

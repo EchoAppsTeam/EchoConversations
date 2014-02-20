@@ -897,7 +897,7 @@ collection.methods._prepareEventParams = function(params) {
 collection.methods._applyLiveUpdates = function(entries, callback) {
 	var self = this, data = {};
 	data.entries = $.map(entries || [], function(entry) {
-		return self._normalizeEntry(entry);
+		return self.normalizeEntry(entry);
 	});
 	this.events.publish({
 		"topic": "onDataReceive",
@@ -973,7 +973,7 @@ collection.methods._actualizeChildrenList = function(parent, entries) {
 			return target;
 		});
 
-		entry = self._normalizeEntry(entry);
+		entry = self.normalizeEntry(entry);
 		var item = self.items[entry.unique];
 
 		// drop item from items list if the item already exists
@@ -1114,7 +1114,7 @@ collection.methods._handleInitialResponse = function(data, visualizer) {
 	this.config.extend(this._extractTimeframeConfig(data));
 	var sortOrder = this.config.get("sortOrder");
 	data.entries = $.map(data.entries, function(entry) {
-		return self._normalizeEntry(entry);
+		return self.normalizeEntry(entry);
 	});
 	var receivedDataType = this.hasInitialData ? "more" : "initial";
 	this._onDataReceive(data, receivedDataType, function(items) {
@@ -1739,7 +1739,14 @@ collection.methods._applyStructureUpdates = function(action, item, options) {
 	}
 };
 
-collection.methods._normalizeEntry = function(entry) {
+collection.methods.normalizeEntryContent = function(content) {
+	return Echo.Utils.safelyExecute(function() {
+		var $content = $("<div/>").append(content);
+		return $("div[data-oembed]", $content).data("oembed");
+	});
+};
+
+collection.methods.normalizeEntry = function(entry) {
 	if (entry.normalized) return entry;
 	var self = this;
 	entry.normalized = true;
@@ -1752,6 +1759,8 @@ collection.methods._normalizeEntry = function(entry) {
 				entry.target = target;
 		}
 	});
+
+	entry.oembed = this.normalizeEntryContent(entry.object.content);
 
 	entry.object.content_type = entry.object.content_type || "text";
 	entry.object.accumulators = entry.object.accumulators || {};

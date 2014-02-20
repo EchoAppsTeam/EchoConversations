@@ -1,22 +1,11 @@
 (function($) {
 "use strict";
 
-var plugin = Echo.Plugin.manifest("Article", "Echo.StreamServer.Controls.Card");
+var plugin = Echo.Plugin.manifest("ArticleCard", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	var self = this;
-	this.media = [];
-	Echo.Utils.safelyExecute(function() {
-		var content = $("<div/>").append(self.component.get("data.object.content"));
-		self.media = $("div[data-oembed]", content).map(function() {
-			//TODO: validate parsed data, ex.: type, url, etc.
-			return $.parseJSON($(this).attr("data-oembed"));
-		}).get();
-	});
-	// now, we can handle only one photo per streamserver item
-	this.set("data", this.media[0]);
 	this.extendTemplate("replace", "data", plugin.templates.main);
 };
 
@@ -25,14 +14,15 @@ plugin.templates.main =
 		'<div class="{plugin.class:border}">' +
 			'<div class="{plugin.class:article}">' +
 				'<div class="{plugin.class:articleThumbnail}">' +
-					'<img src="{plugin.data:thumbnail_url}"/>' +
+					'<img src="{data:oembed.thumbnail_url}"/>' +
+					'<img src="{data:oembed.url}"/>' +
 				'</div>' +
 				'<div class="{plugin.class:articleTemplate}">' +
-					'<div class="{plugin.class:title} {plugin.class:articleTitle}" title="{plugin.data:title}">' +
-						'<a href="{plugin.data:url}" target="_blank">{plugin.data:title}</a>' +
+					'<div class="{plugin.class:title} {plugin.class:articleTitle}" title="{data:oembed.title}">' +
+						'<a href="{data:oembed.url}" target="_blank">{data:oembed.title}</a>' +
 					'</div>' +
 					'<div class="{plugin.class:articleDescriptionContainer}">' +
-						'<div class="{plugin.class:articleDescription}">{plugin.data:description}</div>' +
+						'<div class="{plugin.class:articleDescription}">{data:oembed.description}</div>' +
 					'</div>' +
 				'</div>' +
 				'<div class="echo-clear"></div>' +
@@ -42,23 +32,14 @@ plugin.templates.main =
 	'</div>';
 
 plugin.renderers.article = function(element) {
-	if (!this.get("data.thumbnail_url")) {
+	if (!this.component.get("data.oembed.thumbnail_url")) {
 		element.addClass(this.cssPrefix + "withoutPhoto");
 	}
 	return element;
 };
 
 plugin.enabled = function() {
-	var result = false;
-	$.each(this.component.get("data.object.objectTypes", []), function(i, objectType) {
-		if (objectType === "http://activitystrea.ms/schema/1.0/article" ||
-			objectType === "http://echoenabled.com/schema/1.0/link"
-		) {
-			result = true;
-			return false;
-		}
-	});
-	return result;
+	return ~$.inArray("http://activitystrea.ms/schema/1.0/article", this.component.get("data.object.objectTypes"));
 };
 
 plugin.css =
