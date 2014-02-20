@@ -377,7 +377,7 @@ card.css =
 	'.{class:photoTitle} { margin: 0 0 5px 0; }' +
 
 	'.{class:photoLabel} { overflow: hidden; }' +
-	'.{class:photo}:hover .{class:photoLabel} { max-height: 100% !important; }' +
+	'.{class:photo}:hover .{class:photoLabel} { max-height: 60% !important; }' +
 	'.{class:photoLabel} { ' + transition('max-height ease 300ms') + '; }' +
 
 	// play button
