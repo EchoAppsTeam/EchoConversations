@@ -2,14 +2,14 @@
 "use strict";
 
 /**
- * @class Echo.StreamServer.Controls.SubmitComposer.Plugins.LinkComposer
- * Adds custom composer to SubmitComposer control allowing to post links.
+ * @class Echo.StreamServer.Controls.CardComposer.Plugins.LinkCard
+ * Adds custom composer to CardComposer control allowing to post links.
  *
- *		new Echo.StreamServer.Controls.SubmitComposer({
+ *		new Echo.StreamServer.Controls.CardComposer({
  *			"target": document.getElementById("composer"),
  *			"appkey": "echo.jssdk.demo.aboutecho.com",
  *			"plugins": [{
- *				"name": "LinkComposer"
+ *				"name": "LinkCard"
  *			}]
  *		});
  *
@@ -21,7 +21,7 @@
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("LinkComposer", "Echo.StreamServer.Controls.SubmitComposer");
+var plugin = Echo.Plugin.manifest("LinkCard", "Echo.StreamServer.Controls.CardComposer");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -64,11 +64,11 @@ plugin.labels = {
 plugin.methods.buildComposer = function() {
 	var self = this, timer;
 	this.composer = $("<div>").append(
-		'<div class="echo-submitcomposer-field-wrapper">' +
+		'<div class="echo-cardcomposer-field-wrapper">' +
 			'<input type="text" class="echo-link-composer-title" placeholder="' + this.labels.get("title") + '">' +
 		'</div>' +
-		'<div class="echo-submitcomposer-delimiter"></div>' +
-		'<div class="echo-submitcomposer-field-wrapper">' +
+		'<div class="echo-cardcomposer-delimiter"></div>' +
+		'<div class="echo-cardcomposer-field-wrapper">' +
 			'<input type="text" class="echo-link-composer-link" placeholder="' + this.labels.get("URL") + '" required>' +
 		'</div>'
 	);

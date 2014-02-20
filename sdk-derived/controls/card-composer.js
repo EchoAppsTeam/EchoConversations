@@ -4,11 +4,11 @@
 var $ = jQuery;
 
 /**
- * @class Echo.StreamServer.Controls.SubmitComposer
+ * @class Echo.StreamServer.Controls.CardComposer
  * Echo Submit control which encapsulates interaction with the
  * <a href="http://echoplatform.com/streamserver/docs/rest-api/items-api/submit/" target="_blank">Echo Submit API</a>.
  *
- *		new Echo.StreamServer.Controls.SubmitComposer({
+ *		new Echo.StreamServer.Controls.CardComposer({
  *			"target": document.getElementById("composer"),
  *			"targetURL": "http://example.com/composer",
  *			"appkey": "echo.jssdk.demo.aboutecho.com",
@@ -23,12 +23,12 @@ var $ = jQuery;
  * @package streamserver.pack.js
  *
  * @constructor
- * Submit constructor initializing Echo.StreamServer.Controls.SubmitComposer class
+ * Submit constructor initializing Echo.StreamServer.Controls.CardComposer class
  *
  * @param {Object} config
  * Configuration options
  */
-var composer = Echo.Control.manifest("Echo.StreamServer.Controls.SubmitComposer");
+var composer = Echo.Control.manifest("Echo.StreamServer.Controls.CardComposer");
 
 if (Echo.Control.isDefined(composer)) return;
 
@@ -68,20 +68,20 @@ if (Echo.Control.isDefined(composer)) return;
 /** @hide @echo_label error_unknown */
 
 /**
- * @echo_event Echo.StreamServer.Controls.SubmitComposer.onReady
+ * @echo_event Echo.StreamServer.Controls.CardComposer.onReady
  * Triggered when the app initialization is finished completely.
  */
 /**
- * @echo_event Echo.StreamServer.Controls.SubmitComposer.onRefresh
+ * @echo_event Echo.StreamServer.Controls.CardComposer.onRefresh
  * Triggered when the app is refreshed. For example after the user
  * login/logout action or as a result of the "refresh" function call.
  */
 /**
- * @echo_event Echo.StreamServer.Controls.SubmitComposer.onRender
+ * @echo_event Echo.StreamServer.Controls.CardComposer.onRender
  * Triggered when the app is rendered.
  */
 /**
- * @echo_event Echo.StreamServer.Controls.SubmitComposer.onRerender
+ * @echo_event Echo.StreamServer.Controls.CardComposer.onRerender
  * Triggered when the app is rerendered.
  */
 
@@ -132,7 +132,7 @@ composer.config = {
 	 * Specifies the URI to which the submitted Echo item is related. 
 	 * This parameter will be used as a activity target value for the item.
 	 *
-	 *		new Echo.StreamServer.Controls.SubmitComposer({
+	 *		new Echo.StreamServer.Controls.CardComposer({
 	 *			...
 	 *			"targetURL": "http://somedomain.com/some_article.html",
 	 *			...
@@ -148,7 +148,7 @@ composer.config = {
 	 * @cfg {String} contentTypes.comments.prompt
 	 * Is used to define the default call to action phrase.
 	 *
-	 *		new Echo.StreamServer.Controls.SubmitComposer({
+	 *		new Echo.StreamServer.Controls.CardComposer({
 	 *			...
 	 *			"contentTypes": {
 	 *				"comments": {
@@ -175,7 +175,7 @@ composer.config = {
 	 * For non-admin users the markers value will be submitted along with
 	 * other item content when the "Post" button is pressed.
 	 *
-	 *		new Echo.StreamServer.Controls.SubmitComposer({
+	 *		new Echo.StreamServer.Controls.CardComposer({
 	 *			...
 	 *			"markers": ["marker1", "marker2", "marker3"],
 	 *			...
@@ -197,7 +197,7 @@ composer.config = {
 	 * @cfg {String} source.icon
 	 * Source icon.
 	 *
-	 *		new Echo.StreamServer.Controls.SubmitComposer({
+	 *		new Echo.StreamServer.Controls.CardComposer({
 	 *			...
 	 *			"source": {
 	 *				"name": "ExampleSource",
@@ -218,7 +218,7 @@ composer.config = {
 	 * users the tags value will be submitted along with the other item
 	 * content when the "Post" button is pressed.
 	 *
-	 *		new Echo.StreamServer.Controls.SubmitComposer({
+	 *		new Echo.StreamServer.Controls.CardComposer({
 	 *			...
 	 *			"tags": ["tag1", "tag2", "tag3"],
 	 *			...
@@ -233,7 +233,7 @@ composer.config = {
 	 * We can't handle server response, UI won't show any waiting for the
 	 * server responses actions.
 	 *
-	 *		new Echo.StreamServer.Controls.SubmitComposer({
+	 *		new Echo.StreamServer.Controls.CardComposer({
 	 *			...
 	 *			"requestMethod": "POST",
 	 *			...
@@ -248,7 +248,7 @@ composer.config = {
 	 * unique id should be inserted. If this parameter is ommited in
 	 * configuration or the URI is invalid it'll be ignored.
 	 *
-	 *		new Echo.StreamServer.Controls.SubmitComposer({
+	 *		new Echo.StreamServer.Controls.CardComposer({
 	 *			...
 	 *			"itemURIPattern": "http://your-domain.com/path/{id}",
 	 *			...
@@ -262,7 +262,7 @@ composer.config = {
 	 * the timeout error dialog if the server does not return anything. If the parameter
 	 * value is 0 then the mentioned dialog will never be shown.
 	 *
-	 *		new Echo.StreamServer.Controls.SubmitComposer({
+	 *		new Echo.StreamServer.Controls.CardComposer({
 	 *			...
 	 *			"postingTimeout": 15,
 	 *			...
@@ -284,7 +284,7 @@ composer.config = {
 	 * @cfg {Number} errorPopup.width
 	 * The width of error message popup.
 	 *
-	 *		new Echo.StreamServer.Controls.SubmitComposer({
+	 *		new Echo.StreamServer.Controls.CardComposer({
 	 *			...
 	 *			"errorPopup": {
 	 *				"minHeight": 70,
@@ -423,7 +423,7 @@ composer.events = {
 			}
 		}
 	},
-	"Echo.StreamServer.Controls.SubmitComposer.onAutoSharingToggle": {
+	"Echo.StreamServer.Controls.CardComposer.onAutoSharingToggle": {
 		"context": "global",
 		"handler": function() {
 			this.view.render({"name": "postButton"});
@@ -848,7 +848,7 @@ composer.methods.post = function() {
 	var callbacks = {
 		"onData": function(response, state) {
 			/**
-			 * @echo_event Echo.StreamServer.Controls.SubmitComposer.onPostComplete
+			 * @echo_event Echo.StreamServer.Controls.CardComposer.onPostComplete
 			 * Triggered when the submit operation is finished.
 			 */
 			publish("Complete", entry, response, state);
@@ -866,14 +866,14 @@ composer.methods.post = function() {
 		},
 		"onError": function(response, state) {
 			/**
-			 * @echo_event Echo.StreamServer.Controls.SubmitComposer.onPostError
+			 * @echo_event Echo.StreamServer.Controls.CardComposer.onPostError
 			 * Triggered if submit operation failed.
 			 */
 			publish("Error", entry, response, state);
 		}
 	};
 	/**
-	 * @echo_event Echo.StreamServer.Controls.SubmitComposer.onPostInit
+	 * @echo_event Echo.StreamServer.Controls.CardComposer.onPostInit
 	 * Triggered if submit operation was started.
 	 */
 	publish("Init", entry);
@@ -974,7 +974,7 @@ composer.methods.addPostValidator = function(validator, priority) {
 		var elements = self.view.get(field).val().split(", ");
 		self.config.set("data.object." + field, elements || []);
 	});
-	var component = Echo.Utils.getComponent("Echo.StreamServer.Controls.SubmitComposer");
+	var component = Echo.Utils.getComponent("Echo.StreamServer.Controls.CardComposer");
 	component.parent.refresh.call(this);
 };*/
 
@@ -1314,8 +1314,8 @@ composer.css =
 		'.echo-sdk-ui .{class:container} textarea:focus:invalid:focus' +
 		'{ color: #3c3c3c; border-color: transparent; box-shadow: none; }' +
 
-	'.echo-submitcomposer-delimiter { height: 0px; border-top: 1px dashed #d8d8d8; }' +
-	'.echo-submitcomposer-field-wrapper { padding: 7px 11px; border: 1px solid transparent; display: inline-block; width: 100%; box-sizing: border-box !important/* XXX: because of conversations*/; }' +
+	'.echo-cardcomposer-delimiter { height: 0px; border-top: 1px dashed #d8d8d8; }' +
+	'.echo-cardcomposer-field-wrapper { padding: 7px 11px; border: 1px solid transparent; display: inline-block; width: 100%; box-sizing: border-box !important/* XXX: because of conversations*/; }' +
 
 	'.{class:error} { border: 1px solid red; }' +
 	'.{class:error} input, .{class:error} textarea { background: no-repeat center right url({config:cdnBaseURL.sdk-assets}/images/warning.gif); }' +

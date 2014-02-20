@@ -266,7 +266,7 @@ conversations.dependencies = [{
 	"control": "Echo.StreamServer.API"
 }, {
 	"url": "{%= baseURL %}/streamserver.pack.js",
-	"control": "Echo.StreamServer.Controls.SubmitComposer"
+	"control": "Echo.StreamServer.Controls.CardComposer"
 }, {
 	"loaded": function() { return !!Echo.GUI; },
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.js"
@@ -467,7 +467,7 @@ conversations.renderers.postComposer = function(element) {
 
 	this.initComponent({
 		"id": "postComposer",
-		"component": "Echo.StreamServer.Controls.SubmitComposer",
+		"component": "Echo.StreamServer.Controls.CardComposer",
 		"config": $.extend(true, postComposer, {
 			"appkey": ssConfig.appkey,
 			"apiBaseURL": ssConfig.apiBaseURL,
@@ -487,9 +487,9 @@ conversations.renderers.postComposer = function(element) {
 				"embedly": this.config.get("dependencies.embedly")
 			},
 			"plugins": this._mergeSpecsByName([{
-				"name": "PhotoComposer"
+				"name": "PhotoCard"
 			}, {
-				"name": "LinkComposer"
+				"name": "LinkCard"
 			}, {
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
@@ -893,13 +893,15 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"extraActions": moderationExtraActions,
 		"topMarkers": this.config.get("topMarkers")
 	}, {
-		"name": "Photo"
+		"name": "PhotoCard"
 	}, {
-		"name": "Video"
+		"name": "VideoCard"
 	}, {
-		"name": "Article"
+		"name": "ArticleCard"
 	}, {
-		"name": "Note"
+		"name": "NoteCard"
+	}, {
+		"name": "LinkCard"
 	}]);
 
 	return this._mergeSpecsByName(plugins, config.plugins);
@@ -941,9 +943,9 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"embedly": this.config.get("dependencies.embedly")
 		},
 		"nestedPlugins": this._mergeSpecsByName([{
-			"name": "PhotoComposer"
+			"name": "PhotoCard"
 		}, {
-			"name": "LinkComposer"
+			"name": "LinkCard"
 		}, {
 			"name": "JanrainBackplaneHandler",
 			"appId": this.config.get("dependencies.Janrain.appId"),
@@ -963,9 +965,9 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"embedly": this.config.get("dependencies.embedly")
 		},
 		"nestedPlugins": [{
-			"name": "PhotoComposer"
+			"name": "PhotoCard"
 		}, {
-			"name": "LinkComposer"
+			"name": "LinkCard"
 		}]
 	}];
 

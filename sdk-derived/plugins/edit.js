@@ -35,7 +35,7 @@ plugin.init = function() {
 };
 
 $.map(["Complete", "Error"], function(action) {
-	plugin.events["Echo.StreamServer.Controls.SubmitComposer.Plugins.Edit.onEdit" + action] =
+	plugin.events["Echo.StreamServer.Controls.CardComposer.Plugins.Edit.onEdit" + action] =
 		function(topic, args) {
 			this.component.render();
 		};
@@ -54,7 +54,7 @@ plugin.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js"
 }];
 
-plugin.methods._submitConfig = function(item, target) {
+plugin.methods._composerConfig = function(item, target) {
 	return this.config.assemble({
 		"target": target,
 		"data": item.get("data"),
@@ -73,13 +73,13 @@ plugin.methods._assembleButton = function() {
 			"label": plugin.labels.get("editButton"),
 			"visible": item.user.is("admin") || item.user.has("identity", item.get("data.actor.id")),
 			"callback": function() {
-				var config = plugin._submitConfig(item, item.view.get("container"));
+				var config = plugin._composerConfig(item, item.view.get("container"));
 				config["parent"] = plugin.component.config.getAsHash();
 				config["targetQuery"] = plugin.config.get("query", "");
 				config.plugins.push({
 					"name": "Edit"
 				});
-				new Echo.StreamServer.Controls.SubmitComposer(config);
+				new Echo.StreamServer.Controls.CardComposer(config);
 				item.config.get("target").get(0).scrollIntoView(true);
 			}
 		};
@@ -96,12 +96,12 @@ Echo.Plugin.create(plugin);
 var $ = jQuery;
 
 /**
- * @class Echo.StreamServer.Controls.SubmitComposer.Plugins.Edit
+ * @class Echo.StreamServer.Controls.CardComposer.Plugins.Edit
  * Adds new mode to the Echo Submit control which allows
  * to edit the content and some metadata of the item.
  *
- * 	new Echo.StreamServer.Controls.SubmitComposer({
- * 		"target": document.getElementById("echo-submit"),
+ * 	new Echo.StreamServer.Controls.CardComposer({
+ * 		"target": document.getElementById("echo-composer"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
  * 			"name": "Edit"
@@ -114,7 +114,7 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("Edit", "Echo.StreamServer.Controls.SubmitComposer");
+var plugin = Echo.Plugin.manifest("Edit", "Echo.StreamServer.Controls.CardComposer");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -160,19 +160,19 @@ plugin.labels = {
 };
 
 /**
- * @echo_event Echo.StreamServer.Controls.SubmitComposer.Plugins.Edit.onEditInit
+ * @echo_event Echo.StreamServer.Controls.CardComposer.Plugins.Edit.onEditInit
  * Triggered when edit operation was started
  */
 /**
- * @echo_event Echo.StreamServer.Controls.SubmitComposer.Plugins.Edit.onEditComplete
+ * @echo_event Echo.StreamServer.Controls.CardComposer.Plugins.Edit.onEditComplete
  * Triggered when edit operation is finished
  */
 /**
- * @echo_event Echo.StreamServer.Controls.SubmitComposer.Plugins.Edit.onEditError
+ * @echo_event Echo.StreamServer.Controls.CardComposer.Plugins.Edit.onEditError
  * Triggered if edit operation failed
  */
 $.map(["Init", "Complete", "Error"], function(action) {
-	plugin.events["Echo.StreamServer.Controls.SubmitComposer.onPost" + action] = function(topic, args) {
+	plugin.events["Echo.StreamServer.Controls.CardComposer.onPost" + action] = function(topic, args) {
 		if (action === "Init") {
 			$.each(args.postData.content, function(i, data) {
 				data.verbs = $.map(data.verbs, function(verb) {
@@ -281,9 +281,9 @@ plugin.renderers.cancelButton = function(element) {
 };
 
 plugin.methods._prepareContent = function() {
-	var submit = this.component;
+	var composer = this.component;
 	var get = function(name){
-		return submit.view.get(name).val();
+		return composer.view.get(name).val();
 	};
 	return [].concat(this._getMetaDataUpdates("tag", "tag", get("tags")),
 			 this._getMetaDataUpdates("mark", "marker", get("markers")),

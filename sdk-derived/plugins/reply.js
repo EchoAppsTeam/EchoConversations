@@ -46,7 +46,7 @@ plugin.labels = {
 };
 
 plugin.dependencies = [{
-	"control": "Echo.StreamServer.Controls.SubmitComposer",
+	"control": "Echo.StreamServer.Controls.CardComposer",
 	"url": "{%=baseURL%}/streamserver.pack.js"
 }];
 
@@ -105,7 +105,7 @@ plugin.methods._showComposer = function(mode, target) {
 		"name": "Reply",
 		"inReplyTo": this.component.get("data")
 	});
-	new Echo.StreamServer.Controls.SubmitComposer(config);
+	new Echo.StreamServer.Controls.CardComposer(config);
 };
 
 plugin.methods._assembleComposerConfig = function(config) {
@@ -199,11 +199,11 @@ Echo.Plugin.create(plugin);
 "use strict";
 
 /**
- * @class Echo.StreamServer.Controls.SubmitComposer.Plugins.Reply
+ * @class Echo.StreamServer.Controls.CardComposer.Plugins.Reply
  * Adds internal data field "inReplyTo" for correct reply workflow.
  *
- * 	new Echo.StreamServer.Controls.SubmitComposer({
- * 		"target": document.getElementById("echo-submit"),
+ * 	new Echo.StreamServer.Controls.CardComposer({
+ * 		"target": document.getElementById("echo-composer"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
  * 			"name": "Reply",
@@ -220,15 +220,15 @@ Echo.Plugin.create(plugin);
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("Reply", "Echo.StreamServer.Controls.SubmitComposer");
+var plugin = Echo.Plugin.manifest("Reply", "Echo.StreamServer.Controls.CardComposer");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	var plugin = this, submit = plugin.component;
-	var _prepareEventParams = submit._prepareEventParams;
-	submit._prepareEventParams = function(params) {
-		var _params = _prepareEventParams.call(submit, params);
+	var plugin = this, composer = plugin.component;
+	var _prepareEventParams = composer._prepareEventParams;
+	composer._prepareEventParams = function(params) {
+		var _params = _prepareEventParams.call(composer, params);
 		_params.inReplyTo = plugin.config.get("inReplyTo");
 		return _params;
 	};
@@ -240,11 +240,11 @@ plugin.init = function() {
  */
 
 $.map(["onRender", "onRerender"], function(topic) {
-	plugin.events["Echo.StreamServer.Controls.SubmitComposer." + topic] = function() {
-		var submit = this.component;
-		submit.config.get("target").show();
+	plugin.events["Echo.StreamServer.Controls.CardComposer." + topic] = function() {
+		var composer = this.component;
+		composer.config.get("target").show();
 		// TODO: set focus/scroll to proper element
-		submit.view.get("container").get(0).scrollIntoView();
+		composer.view.get("container").get(0).scrollIntoView();
 	};
 });
 
