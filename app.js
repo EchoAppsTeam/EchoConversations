@@ -433,13 +433,13 @@ conversations.renderers.container = function(element) {
 	var presentation = this.config.get("presentation");
 	var styles = {};
 	if (presentation.minimumWidth) {
-		styles["min-width"] = presentation.minimumWidth + "px";
+		styles["min-width"] = presentation.minimumWidth;
 	}
 	if (presentation.maximumWidth) {
-		styles["max-width"] = presentation.maximumWidth + "px";
+		styles["max-width"] = presentation.maximumWidth;
 	}
 	if (presentation.maximumHeight) {
-		styles["max-height"] = presentation.maximumHeight + "px";
+		styles["max-height"] = presentation.maximumHeight;
 		styles["overflow-y"] = "auto";
 	}
 	element.css(styles);
