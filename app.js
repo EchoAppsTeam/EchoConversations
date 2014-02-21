@@ -902,6 +902,8 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"name": "ItemsRollingWindow",
 		"moreButton": true
 	}, {
+		"name": "MediaCard"
+	}, {
 		"name": "URLResolver",
 		"presentation": this.config.get("presentation")
 	}], this._getConditionalStreamPluginList(componentID), [{

@@ -1,16 +1,40 @@
 (function($) {
 "use strict";
 
+var plugin = Echo.Plugin.manifest("MediaCard", "Echo.StreamServer.Controls.Stream");
+
+plugin.events = {
+	"Echo.StreamServer.Controls.Stream.onDataReceive": function(topic, args) {
+		$.map(args.entries, $.proxy(this.normalizeEntry, this));
+	}
+};
+
+plugin.methods.normalizeEntry = function(entry) {
+	Echo.Utils.safelyExecute(function() {
+		var content = $("<div/>").append(entry.object.content);
+		var cards = $("div[data-oembed]", content).map(function() {
+			return $(this).data("oembed");
+		}).get();
+		$("div[data-oembed]", content).remove();
+
+		entry.card = {
+			"attachments": cards,
+			"content": content.html()
+		};
+	});
+};
+
+Echo.Plugin.create(plugin);
+})(Echo.jQuery);
+
+(function($) {
+"use strict";
+
 /**
  * @class Echo.StreamServer.Controls.Submit.Plugins.URLResolver
  * Extends Stream Item control to enable url media resoving.
  */
 var itemPlugin = Echo.Plugin.manifest("URLResolver", "Echo.StreamServer.Controls.Stream.Item");
-
-itemPlugin.vars = {
-	"media": [],
-	"content": undefined
-};
 
 itemPlugin.templates.media = '<div class="{plugin.class:mediaContent}"></div>';
 
@@ -19,40 +43,43 @@ itemPlugin.init = function() {
 };
 
 itemPlugin.component.renderers.body = function(element) {
-	var self = this;
 	var item = this.component;
+	var media = item.get("data.card.attachments");
 
-	var original = item.get("data.object.content");
-	var content = $("<div/>").append(original);
-	var media = self._getMediaAttachments();
-	$("div[oembed], div[data-oembed]", content).remove();
+	this.parentRenderer("body", arguments);
+	item.view.get("textEllipses").hide();
+	item.view.get("textToggleTruncated").hide();
 
 	// hide all item content if item type is article, photo or video
 	// and item has media attachments
 	if (media.length && this._getItemRenderType()) {
 		element.hide();
 	}
-
-	Echo.Utils.safelyExecute(function() {
-		var text = $(".echo-item-text", content);
-		if (media.length && text.length) {
-			item.set("data.object.content", text.html());
-		} else if (media.length) {
-			item.set("data.object.content", content.html());
-		}
-	});
-
-	this.parentRenderer("body", arguments);
-
-	item.set("data.object.content", original);
+	var text = this.prepareContent(item.get("data.card.content"));
+	var textElement = item.view.get("text").empty();
+	Echo.Utils.safelyExecute(textElement.append, text, textElement);
 
 	return element;
+};
+
+itemPlugin.methods.prepareContent = function(content) {
+	var item = this.component;
+	var data = [content, {
+		"source": item.get("data.source.name"),
+		"limits": item.config.get("limits"),
+		"contentTransformations": item.config.get("contentTransformations." + item.get("data.object.content_type"), {}),
+		"openLinksInNewWindow": item.config.get("parent.openLinksInNewWindow")
+	}];
+	$.each(item._getBodyTransformations(), function(i, trasformation) {
+		data = trasformation.apply(item, data);
+	});
+	return data[0];
 };
 
 itemPlugin.renderers.mediaContent = function(element) {
 	var self = this;
 	var item = this.component;
-	var media = this._getMediaAttachments();
+	var media = item.get("data.card.attachments");
 	var type = this._getItemRenderType();
 	var cardConfig = media.length && type
 		? { "displaySourceIcon": false, "displayAuthor": false }
@@ -87,22 +114,6 @@ itemPlugin.methods._getItemRenderType = function() {
 	});
 
 	return result;
-};
-
-itemPlugin.methods._getMediaAttachments = function() {
-	var item = this.component;
-	if (this.get("content") !== item.get("data.object.content") || typeof this.get("media") === "undefined") {
-		var result = [];
-		Echo.Utils.safelyExecute(function() {
-			var content = $("<div/>").append(item.get("data.object.content"));
-			result = $("div[oembed], div[data-oembed]", content).map(function() {
-				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
-			}).get();
-		});
-		this.set("content", item.get("data.object.content"));
-		this.set("media", result);
-	}
-	return this.get("media", []);
 };
 
 itemPlugin.css =
