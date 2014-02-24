@@ -28,4 +28,4 @@ You can see the demo page of Echo Conversations app [here](http://echoappsteam.g
 
 And here is the screenshot:
 
-![Echo Conversations](http://echoappsteam.github.io/EchoConversations/images/news-feed-screenshot.png "Echo Conversations Screenshot")
+![Echo Conversations](http://echoappsteam.github.io/EchoConversations/images/conversations-screenshot.png "Echo Conversations Screenshot")
