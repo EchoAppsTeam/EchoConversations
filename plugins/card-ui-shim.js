@@ -144,6 +144,7 @@ plugin.init = function() {
 
 	this.set("isLiveUpdate", this.component.config.get("live"));
 	this.extendTemplate("replace", "sourceIcon", plugin.templates.sourceIcon);
+	this.extendTemplate("insertAsLastChild", "buttons", plugin.templates.buttons);
 	this.extendTemplate("insertBefore", "frame", plugin.templates.topPostMarker);
 	this.extendTemplate("remove", "date");
 	this.extendTemplate("remove", "authorName");
@@ -193,11 +194,22 @@ plugin.templates.wrapper =
 plugin.templates.chevron =
 	'<span class="{plugin.class:chevron} icon-chevron-down"></span>';
 
+plugin.templates.buttons =
+	'<div class="dropdown">' +
+		'<a class="dropdown-toggle {class:button}" href="#">' +
+			'<i class="{plugin.class:buttonIcon} icon-list"></i>' +
+			'<span class="echo-primaryFont {class:buttonCaption}">{plugin.label:actions}</span>' +
+		'</a>' +
+		'<ul class="{plugin.class:inline}"></ul>';
+	'</div>';
+
 plugin.templates.button =
-	'<a class="{class:button} {class:button}-{data:name}">' +
-		'<i class="{plugin.class:buttonIcon} {data:icon}"></i>' +
-		'<span class="echo-primaryFont {class:buttonCaption}">{data:label}</span>' +
-	'</a>';
+	'<li>' +
+		'<a class="{class:button} {class:button}-{data:name}">' +
+			'<i class="{plugin.class:buttonIcon} {data:icon}"></i>' +
+			'<span class="echo-primaryFont {class:buttonCaption}">{data:label}</span>' +
+		'</a>' +
+	'</li>';
 
 plugin.templates.topPostMarker =
 	'<i class="icon-bookmark {plugin.class:topPostMarker}" title="{plugin.label:topPostIndicatorTitle}"></i>';
@@ -210,7 +222,7 @@ plugin.templates.compactButtons =
 
 plugin.templates.dropdownButtons =
 	'<div class="dropdown">' +
-		'<a class="dropdown-toggle {class:button}" data-toggle="dropdown" href="#">' +
+		'<a class="dropdown-toggle {class:button}" data-toggle="dropdown">' +
 			'<i class="{plugin.class:buttonIcon} icon-list"></i>' +
 			'<span class="echo-primaryFont {class:buttonCaption}">{plugin.label:actions}</span>' +
 		'</a>' +
@@ -416,10 +428,26 @@ plugin.component.renderers.buttons = function(element) {
 	item._sortButtons();
 	element.empty();
 
-	item.view.render({
-		"name": "_" + this.get("currentButtonsState") + "Buttons",
-		"target": element
+	//item.view.render({
+		//"name": "_" + this.get("currentButtonsState") + "Buttons",
+		//"target": element
+	//});
+	
+	var buttons = $.map(item.buttonsOrder, function(name) {
+		return item.get("buttons." + name);
 	});
+
+	$.map(buttons, function(button) {
+		if (!button || !Echo.Utils.invoke(button.visible)) {
+			return;
+		}
+		item.view.render({
+			"name": "_button",
+			"target": element,
+			"extra": button
+		});
+	});
+
 	return element;
 };
 
@@ -442,16 +470,23 @@ plugin.component.renderers._button = function(element, extra) {
 
 	if (extra.entries) {
 		var entries = $.map(extra.entries, function(entry) {
-			return Echo.Utils.invoke(entry.visible)
-				? {"title": entry.label, "handler": entry.callback}
-				: null;
+			if (Echo.Utils.invoke(entry.visible)) {
+				var item = $('<li><a>' + entry.label + '</a></li>');
+				item.children("a").on("click", entry.callback);
+				return item;
+			} else {
+				return null;
+			}
 		});
-		new Echo.GUI.Dropdown({
+		var dropdown = $('<ul class="dropdown-menu"></ul>').append(entries);
+		button.children("a").addClass("dropdown-toggle");
+		button.append(dropdown).addClass("dropdown").dropdown();
+		/*new Echo.GUI.Dropdown({
 			"target": button.find("span"),
 			"extraClass": this.cssPrefix + "dropdownButton",
 			"entries": $.map(entries, function(entry) { return $.extend({"handler": entry.callback}, entry); }),
 			"title": this.get("currentButtonsState") !== "compact" ? extra.label : ""
-		});
+		});*/
 		var footerWidth = item.view.get("footer").width();
 		var maxHeight = item.config.get("parent.presentation.maximumHeight");
 		var container = $(".echo-apps-conversations-container");
@@ -547,7 +582,7 @@ plugin.methods._checkItemContentHeight = function() {
 };
 
 plugin.methods._pageLayoutChange = function() {
-	var item = this.component;
+/*	var item = this.component;
 	var footer = item.view.get("footer");
 	var buttons = item.view.get("buttons");
 	var buttonsStates = [
@@ -555,6 +590,33 @@ plugin.methods._pageLayoutChange = function() {
 		"compact",
 		"dropdown"
 	];
+	
+	var checkButtons = function() {
+		var result = true;
+		buttons.children("li").each(function() {
+			if (this.offsetTop > 0) {
+				result = false;
+				return false;
+			}
+		});
+		return result;
+	};
+*/
+	// set default state
+/*	item.view.get("buttonCaption").show();
+	$(".intents .compact").removeClass("dropdown");
+	$(".intents").append($(".intents .list-item"));
+	$(".intents .list-item.dropdown-submenu").removeClass("dropdown-submenu").addClass("dropdown");
+
+	if (!checkButtons()) {
+		$(".intents .list-item .item-label").hide();
+		if (!checkButtons()) {
+			$(".intents .list-item.dropdown").addClass("dropdown-submenu");
+			$(".intents .compact").addClass("dropdown").find("ul").append($(".intents .list-item"));
+			$(".intents .compact > a").dropdown();
+		}
+	}*/
+	/*
 	if (!this.get("buttonsStates")) {
 		this.set("buttonsStates", buttonsStates);
 	}
@@ -592,7 +654,7 @@ plugin.methods._pageLayoutChange = function() {
 			this.set("currentButtonsState", currentState);
 			item.view.render({"name": "buttons"});
 		}
-	}
+	}*/
 	this._checkItemContentHeight();
 };
 
@@ -684,6 +746,8 @@ plugin.css =
 	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{plugin.class:buttonIcon},' +
 	'.{plugin.class} .{class:container}:hover .{plugin.class:buttonIcon},' +
 	'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
+	'.echo-sdk-ui .{class:buttons} > ul { margin: 0; padding: 0; list-style: none; position: relative; }'+
+	'.{class:buttons} > ul > li { float: left; }'+
 	'.{plugin.class} .{class:compactButton} ul.dropdown-menu { left: -20px; }' +
 
 	'.{plugin.class} .{class:depth-0} .{class:date} { line-height: 20px; }' +
