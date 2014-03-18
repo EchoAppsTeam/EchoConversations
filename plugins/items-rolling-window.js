@@ -17,9 +17,11 @@ plugin.events = {
 		var maxCount = this.get("maxCount");
 		$.map(this.component.get("threads").slice(maxCount), function(item) {
 			self.component._spotUpdates.remove.call(self.component, item);
+			self.component.isViewComplete = false;
 		});
 		if (this.config.get("moreButton")) {
 			this._updateNextPageAfter();
+			self.component.view.render({"name": "more"});
 		}
 	},
 	"Echo.StreamServer.Controls.Stream.onRerender": function() {
