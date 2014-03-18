@@ -16,15 +16,14 @@ plugin.events = {
 		var self = this;
 		var maxCount = this.get("maxCount");
 		var itemsToRemove = this.component.get("threads").slice(maxCount);
-		var moreButton = self.component.view.get("more");
 		$.map(itemsToRemove, function(item) {
 			self.component._spotUpdates.remove.call(self.component, item);
 		});
-		if (this.config.get("moreButton")) {
+		if (this.config.get("moreButton") && itemsToRemove.length) {
 			this._updateNextPageAfter();
-			if (itemsToRemove.length && !moreButton.is(":visible")) {
-				self.component.isViewComplete = false;
-				self.component.view.render({"name": "more"});
+			if (!this.component.view.get("more").is(":visible")) {
+				this.component.isViewComplete = false;
+				this.component.view.render({"name": "more"});
 			}
 		}
 	},
