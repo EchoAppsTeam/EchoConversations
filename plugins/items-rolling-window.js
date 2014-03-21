@@ -15,11 +15,16 @@ plugin.events = {
 	"Echo.StreamServer.Controls.Stream.Item.onRender": function() {
 		var self = this;
 		var maxCount = this.get("maxCount");
-		$.map(this.component.get("threads").slice(maxCount), function(item) {
+		var itemsToRemove = this.component.get("threads").slice(maxCount);
+		$.map(itemsToRemove, function(item) {
 			self.component._spotUpdates.remove.call(self.component, item);
 		});
-		if (this.config.get("moreButton")) {
+		if (this.config.get("moreButton") && itemsToRemove.length) {
 			this._updateNextPageAfter();
+			if (!this.component.view.get("more").is(":visible")) {
+				this.component.isViewComplete = false;
+				this.component.view.render({"name": "more"});
+			}
 		}
 	},
 	"Echo.StreamServer.Controls.Stream.onRerender": function() {
