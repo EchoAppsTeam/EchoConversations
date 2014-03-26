@@ -195,13 +195,11 @@ plugin.templates.chevron =
 	'<span class="{plugin.class:chevron} icon-chevron-down"></span>';
 
 plugin.templates.buttons =
-	'<div class="dropdown">' +
-		'<a class="dropdown-toggle {class:button}" href="#">' +
-			'<i class="{plugin.class:buttonIcon} icon-list"></i>' +
-			'<span class="echo-primaryFont {class:buttonCaption}">{plugin.label:actions}</span>' +
-		'</a>' +
-		'<ul class="{plugin.class:inline}"></ul>';
-	'</div>';
+	'<a class="dropdown-toggle" data-toggle="dropdown" href="#">' +
+		'<i class="{plugin.class:buttonIcon} icon-list"></i>' +
+		'<span class="echo-primaryFont {class:buttonCaption}">{plugin.label:actions}</span>' +
+	'</a>' +
+	'<ul class=""></ul>';
 
 plugin.templates.button =
 	'<li>' +
@@ -426,7 +424,7 @@ plugin.component.renderers.buttons = function(element) {
 	var item = this.component;
 	item._assembleButtons();
 	item._sortButtons();
-	element.empty();
+	//element.empty();
 
 	//item.view.render({
 		//"name": "_" + this.get("currentButtonsState") + "Buttons",
@@ -436,14 +434,14 @@ plugin.component.renderers.buttons = function(element) {
 	var buttons = $.map(item.buttonsOrder, function(name) {
 		return item.get("buttons." + name);
 	});
-
+	var btnContainer = element.find("ul");
 	$.map(buttons, function(button) {
 		if (!button || !Echo.Utils.invoke(button.visible)) {
 			return;
 		}
 		item.view.render({
 			"name": "_button",
-			"target": element,
+			"target": btnContainer,
 			"extra": button
 		});
 	});
@@ -656,6 +654,42 @@ plugin.methods._pageLayoutChange = function() {
 		}
 	}*/
 	this._checkItemContentHeight();
+
+	var item = this.component;
+	var buttons = item.view.get("buttons");
+
+	// function checks if buttons are displayed as a line
+	var checkButtonsLayout = function() {
+		var result = true;
+		buttons.find("> ul > li").each(function() {
+			if (this.offsetTop > 0) {
+				result = false;
+				return false;
+			}
+		});
+		return result;
+	};
+
+	if (buttons) {
+		// reset to default state
+		buttons.removeClass(this.cssPrefix + "compactLayout")
+			.removeClass(this.cssPrefix + "dropdownLayout")
+			.removeClass("dropdown")
+			.children("ul").removeClass("dropdown-menu")
+			.children("li.dropdown-submenu").addClass("dropdown").removeClass("dropdown-submenu");
+
+		if (!checkButtonsLayout()) {
+			// switch to compact layout (icons only)
+			buttons.addClass(this.cssPrefix + "compactLayout");
+			if (!checkButtonsLayout()) {
+				// switch to dropdown
+				buttons.addClass(this.cssPrefix + "dropdownLayout")
+					.addClass("dropdown").children("ul").addClass("dropdown-menu")
+					.children("li.dropdown").addClass("dropdown-submenu").removeClass("dropdown");
+			}
+		}
+	}
+
 };
 
 var cache = {};
@@ -732,7 +766,8 @@ plugin.css =
 	'.{plugin.class} .{class:expandChildren} { padding: 15px 0px 8px 16px; margin-bottom: 0px; }' +
 	'.{plugin.class} .{class:children} .{class:expandChildren} { padding: 8px 0px; margin-bottom: 0px; }' +
 
-	'.echo-sdk-ui .{plugin.class} .{class:buttons} a:focus { outline: none; }' +
+	'.echo-sdk-ui .{plugin.class} .{class:buttons} a:focus { outline: none; text-decoration: none; }' +
+	//'.echo-sdk-ui .{plugin.class} .{class:buttons} .dropdownmenu a { font-size: 12px; }' +
 	'.{plugin.class} .{class:button} { margin-right: 10px; }' +
 	'.{plugin.class} .{class:buttons} .dropdown .{class:button} { margin-right: 0px; }' +
 	'.{plugin.class} .{class:button-delim} { display: none; }' +
@@ -746,8 +781,17 @@ plugin.css =
 	'.{plugin.class} .{class:buttons} a.{class:button}.echo-linkColor .{plugin.class:buttonIcon},' +
 	'.{plugin.class} .{class:container}:hover .{plugin.class:buttonIcon},' +
 	'.{class:buttons} a.{class:button}:hover .{plugin.class:buttonIcon} { opacity: 0.8; }' +
-	'.echo-sdk-ui .{class:buttons} > ul { margin: 0; padding: 0; list-style: none; position: relative; }'+
-	'.{class:buttons} > ul > li { float: left; }'+
+	'.echo-sdk-ui .{class:buttons} > ul { margin: 0; padding: 0; list-style: none; position: relative; }' +
+	'.echo-sdk-ui .{class:buttons}.{plugin.class:dropdownLayout} > ul { position: absolute; padding: 5px 0; margin: 2px 0 0; }' +
+	'.{plugin.class} .{class:buttons} > ul > li { float: left; }' +
+	'.{plugin.class} .{class:buttons} > ul > li { float: left; }' +
+	'.{plugin.class} .{class:buttons}.{plugin.class:dropdownLayout} > ul > li { float: none; }' +
+	'.{plugin.class} .{class:buttons}.{plugin.class:dropdownLayout} > a { display: block; color: #C6C6C6; }' +
+	'.{plugin.class} .{class:container}:hover .{class:buttons}.{plugin.class:dropdownLayout} > a { color: #262626; text-decoration: none; }' +
+	'.{plugin.class} .{class:buttons}.{plugin.class:dropdownLayout} .{class:button} { margin-right: 0px; }' +
+	'.{plugin.class} .{class:buttons} > a { display: none; }' +
+	'.{plugin.class} .{class:buttons}.{plugin.class:compactLayout} > ul span { display: none; }'+
+	'.{plugin.class} .{class:buttons}.{plugin.class:dropdownLayout} > ul span { display: inline; }'+
 	'.{plugin.class} .{class:compactButton} ul.dropdown-menu { left: -20px; }' +
 
 	'.{plugin.class} .{class:depth-0} .{class:date} { line-height: 20px; }' +
@@ -760,6 +804,7 @@ plugin.css =
 	'.{plugin.class} .{class:expandChildren} .echo-message-icon { padding-left: 0px; background: none; }' +
 	'.{plugin.class} .{class:expandChildren} .{class:message-loading} { background: none; }' +
 	'.{plugin.class} .{class:depth-0} .{class:footer} { padding: 8px 0px 10px; }' +
+	'.{plugin.class} .{class:footer} { height: 20px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:body} { padding-top: 0px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} { height: 36px; width: 36px; }' +
 	'.{plugin.class} .{class:depth-0} .{class:avatar} div { height: 36px; width: 36px; }' +
