@@ -174,6 +174,15 @@ dashboard.vars = {
 			"desc": "If enabled, users will be able to edit their own posts. Moderators and admins will be able to edit any post."
 		}
 	}, {
+		"component": "Checkbox",
+		"name": "displayTweets",
+		"type": "boolean",
+		"default": true,
+		"config": {
+			"title": "Display Twitter Items",
+			"desc": "Enable twitter items."
+		}
+	}, {
 		"component": "Select",
 		"name": "likesDisplayStyle",
 		"type": "string",
@@ -285,19 +294,19 @@ dashboard.vars = {
 				"component": "Input",
 				"name": "prompt",
 				"type": "string",
-				"default": "What's on your mind?",
 				"config": {
 					"title": "Prompt",
-					"desc": "Specifies the ghost text displayed in the Comment Prompt"
+					"desc": "Specifies the ghost text displayed in the Comment Prompt",
+					"data": {"sample": "What's on your mind?"}
 				}
 			}, {
 				"component": "Input",
 				"name": "confirmationMessage",
 				"type": "string",
-				"default": "Thanks, your post has been submitted for review",
 				"config": {
 					"title": "Confirmation message",
-					"desc": "Specifies the confirmation message text displayed after successful submission if pre-moderation mode is enabled"
+					"desc": "Specifies the confirmation message text displayed after successful submission if pre-moderation mode is enabled",
+					"data": {"sample": "Thanks, your post has been submitted for review"}
 				}
 			}, {
 				"component": "Checkbox",
@@ -376,6 +385,7 @@ dashboard.vars = {
 };
 
 dashboard.config = {
+	"disableSettings": [],
 	"ecl": [{
 		"component": "Echo.Apps.Conversations.Dashboard.TargetSelector",
 		"name": "targetURL",
@@ -396,6 +406,54 @@ dashboard.config = {
 			"title": "Enable Bozo Filter",
 			"desc": "If enabled, ensures that users see their own post irrespective of the moderation state of that post"
 		}
+	}, {
+		"component": "Group",
+		"name": "presentation",
+		"type": "object",
+		"config": {
+			"title": "Presentation"
+		},
+		"items": [{
+			"component": "Input",
+			"name": "minimumWidth",
+			"type": "number",
+			"config": {
+				"title": "Minimum width",
+				"desc": "Specify a minimum width (in pixels) of an App container.",
+				"options": [],
+				"data": {"sample": 320}
+			}
+		}, {
+			"component": "Input",
+			"name": "maximumHeight",
+			"type": "number",
+			"config": {
+				"title": "Maximum height",
+				"desc": "Specify a maximum height (in pixels) of an App container. If an App context exceeds the defined max height, a vertical scrollbar appears.",
+				"options": [],
+				"data": {"sample": 700}
+			}
+		}, {
+			"component": "Input",
+			"name": "maximumWidth",
+			"type": "number",
+			"config": {
+				"title": "Maximum width",
+				"desc": "Specify a maximum width (in pixels) of an App container.",
+				"options": [],
+				"data": {"sample": 700}
+			}
+		}, {
+			"component": "Input",
+			"name": "maximumMediaWidth",
+			"type": "number",
+			"config": {
+				"title": "Maximum media width",
+				"desc": "Specify a maximum media content width (in pixels) which should be defined when an item is being displayed.",
+				"options": [],
+				"data": {"sample": 500}
+			}
+		}]
 	}, {
 		"component": "Group",
 		"name": "streamingControl",
@@ -558,7 +616,7 @@ dashboard.config.normalizer = {
 					var items = assembleBaseECL.call(this);
 
 					items[3]["default"] = 5; // override initialItemsPerPage value
-					items[16]["items"][0]["default"] = true;
+					items[17]["items"][0]["default"] = true;
 					items.pop();
 
 					items.splice(5, 0, {
@@ -577,7 +635,7 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
-					items[16]["items"].push(component.get("premoderationECL"));
+					items[17]["items"].push(component.get("premoderationECL"));
 					items.splice(11, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
@@ -625,6 +683,7 @@ dashboard.init = function() {
 };
 
 dashboard.methods.declareInitialConfig = function() {
+	if (~$.inArray("dependencies", this.config.get("disableSettings"))) return {};
 	var keys = this.get("appkeys", []);
 	var apps = this.get("janrainapps", []);
 	return {
@@ -673,6 +732,17 @@ dashboard.methods.initConfigurator = function() {
 			"value": app.name
 		};
 	});
+	// remove items specified in the config.disableSettings
+	var disableSettings = this.config.get("disableSettings");
+	(function traverse(items, path) {
+		return $.map(items, function(item, key) {
+			var itemPath = path ? path + "." + item.name : item.name;
+			if (~$.inArray(itemPath, disableSettings)) {
+				delete items[key];
+			}
+			if (item.items) traverse(item.items, itemPath);
+		});
+	})(ecl);
 	this.parent.apply(this, arguments);
 };
 

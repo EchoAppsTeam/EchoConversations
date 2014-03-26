@@ -14,7 +14,7 @@ Echo.URLResolver.prototype.resolve = function(urls, callback) {
 		return;
 	}
 	Echo.Loader.download([{
-		"url": "{%= baseURL %}/third-party/jquery.embedly.js"
+		"url": "{%= baseURLs.prod %}/third-party/jquery.embedly.js"
 	}], function() {
 		self._resolve(urls, callback);
 	});

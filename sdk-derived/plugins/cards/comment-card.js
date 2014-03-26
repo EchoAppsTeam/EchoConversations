@@ -7,10 +7,10 @@ if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.dependencies = [{
 	"loaded": function() { return !!Echo.Conversations.NestedCard; },
-	"url": "{%= baseURL %}/controls/nested-card.js"
+	"url": "{%= baseURLs.prod %}/controls/nested-card.js"
 }, {
 	"loaded": function() { return !!Echo.Conversations.MediaContainer; },
-	"url": "{%= baseURL %}/controls/media-container.js"
+	"url": "{%= baseURLs.prod %}/controls/media-container.js"
 }];
 
 plugin.init = function() {

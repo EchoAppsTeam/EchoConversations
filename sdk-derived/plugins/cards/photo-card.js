@@ -257,9 +257,9 @@ plugin.methods.buildComposer = function() {
 				"url": InkBlob.url,
 				"removeOld": true
 			});
-			this.log(JSON.stringify(InkBlob));
+			self.log(JSON.stringify(InkBlob));
 		}, function(FPError) {
-			this.log(FPError);
+			self.log(FPError);
 			window.filepicker.setKey(filepickerKey);
 		});
 	}, 0);

@@ -347,13 +347,13 @@ composer.vars = {
 };
 
 composer.dependencies = [{
-	"url": "{%=baseURL%}/controls/nested-card.js",
+	"url": "{%= baseURLs.prod %}/controls/nested-card.js",
 	"loaded": function() { return !!Echo.Conversations.NestedCard; }
 }, {
-	"url": "{%=baseURL%}/controls/media-container.js",
+	"url": "{%= baseURLs.prod %}/controls/media-container.js",
 	"loaded": function() { return !!Echo.Conversations.MediaContainer; }
 }, {
-	"url": "{%=baseURL%}/third-party/jquery.placeholder.js",
+	"url": "{%= baseURLs.prod %}/third-party/jquery.placeholder.js",
 	"loaded": function() { return !!$.placeholder; }
 }, {
 	"loaded": function() { return !!Echo.GUI; },
@@ -484,7 +484,7 @@ composer.templates.main =
 					'</ul>' +
 				'</div>' +
 				'<div class="{class:attachers}">' +
-					'<img class="{class:attachPic}" src="{%= baseURL %}/images/attach.png">' +
+					'<img class="{class:attachPic}" src="{%= baseURLs.prod %}/images/attach.png">' +
 				'</div>' +
 				'<div class="echo-clear"></div>' +
 			'</div>' +

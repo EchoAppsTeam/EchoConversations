@@ -115,7 +115,8 @@ card.config = {
 		}]
 	},
 	"displaySourceIcon": true,
-	"displayAuthor": true
+	"displayAuthor": true,
+	"maximumMediaWidth": undefined
 };
 
 card.renderers.closeButton = function(element) {
@@ -212,12 +213,15 @@ card.renderers.videoPlaceholder = function(element) {
 	if (!oembed.thumbnail_url) {
 		element.empty().append($(oembed.html));
 	}
-
 	return element.css("padding-bottom", oembed.height / oembed.width * 100 + "%");
 };
 
 card.renderers.videoWrapper = function(element) {
-	return element.css("width", this.get("data.width"));
+	var width = this.get("data.width");
+	if (typeof this.config.get("maximumMediaWidth") === "number" && this.config.get("maximumMediaWidth") < width) {
+		width =  this.config.get("maximumMediaWidth");
+	}
+	return element.css("width", width);
 };
 
 /**
@@ -233,27 +237,40 @@ card.renderers.photoThumbnail = function(element) {
 	// error event all the time.
 	var img = $("<img />");
 	img.attr("class", element.attr("class"));
+	if (this.config.get("maximumMediaWidth")) {
+		img.css("max-width", this.config.get("maximumMediaWidth"));
+	}
 	if (element.attr("title")) {
 		img.attr("title", element.attr("title"));
 	}
-	img.error(function(e) {
+	img.load(function(e) {
+		self.events.publish({
+			"topic": "onMediaLoad"
+		});
+	}).error(function(e) {
 		img.replaceWith(self.substitute({
 			"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
 		}));
 	}).attr("src", thumbnail);
+
 	return element.replaceWith(img);
 };
 
 card.renderers.photoContainer = function(element) {
 	var expanded = this.cssPrefix + "expanded";
-
+	var self = this;
 	var oembed = this.get("data", {});
 	var thumbnailWidth = this.view.get("photoThumbnail").width();
 	var expandedHeight = oembed.height;
 	var collapsedHeight = (thumbnailWidth || oembed.width) * 9 / 16;
-
-	//calc height using aspect ratio 16:9
-	if (!element.hasClass(expanded) && oembed.height > collapsedHeight) {
+	var imageWidth = oembed.width;
+	var imageHeight = oembed.height;
+	if (!imageWidth || !imageHeight) {
+		imageWidth = oembed.thumbnail_width;
+		imageHeight = oembed.thumbnail_height;
+	}
+	// calc height using aspect ratio 16:9 if image has ratio 1:2
+	if (!element.hasClass(expanded) && oembed.height > collapsedHeight && imageHeight >= 2 * imageWidth) {
 		var transitionCss = Echo.Utils.foldl({}, ["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(key, acc) {
 			acc[key] = 'max-height ease 500ms';
 		});
@@ -262,6 +279,9 @@ card.renderers.photoContainer = function(element) {
 			.attr("title", this.labels.get("clickToExpand"))
 			.css("max-height", 250)
 			.one("click", function() {
+				self.events.publish({
+					"topic": "onMediaExpand"
+				});
 				element.css(transitionCss)
 					.css("max-height", expandedHeight)
 					.removeClass("echo-clickable")
@@ -290,7 +310,7 @@ card.renderers.photoLabelContainer = function(element) {
 		element.hide();
 	} else {
 		this.view.get("photoContainer").css({
-			"min-height": (this.displayAuthor() ? 55 : 0) + photoLabelHeight,
+			"min-height": 55 + (this.displayAuthor() ? 55 : 0) + photoLabelHeight, // first number is added for default item avatar
 			"min-width": 200
 		});
 	}
@@ -305,6 +325,28 @@ card.renderers.article = function(element) {
 		element.addClass(this.cssPrefix + "withoutPhoto");
 	}
 	return element;
+};
+
+card.methods._onViewportChange = function(action, handler) {
+	if (action === "subscribe") {
+		this.events.subscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewScroll",
+			"handler": handler
+		});
+		this.events.subscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewResize",
+			"handler": handler
+		});
+	} else if (action === "unsubscribe") {
+		this.events.unsubscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewScroll",
+			"handler": handler
+		});
+		this.events.unsubscribe({
+			"topic": "Echo.Apps.Conversations.onAppViewResize",
+			"handler": handler
+		});
+	}
 };
 
 card.methods.displayAuthor = function() {
@@ -358,7 +400,7 @@ card.css =
 	'.{class:photoTitle} { margin: 0 0 5px 0; }' +
 
 	'.{class:photoLabel} { overflow: hidden; }' +
-	'.{class:photo}:hover .{class:photoLabel} { max-height: 100% !important; }' +
+	'.{class:photo}:hover .{class:photoLabel} { max-height: 60% !important; }' +
 	'.{class:photoLabel} { ' + transition('max-height ease 300ms') + '; }' +
 
 	// play button
