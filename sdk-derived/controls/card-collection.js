@@ -1393,6 +1393,9 @@ collection.methods._spotUpdates.animate.remove = function(item, config) {
 				"target": self.view.get("body")
 			});
 		}
+		// if keepChildren is not set, we suppose it is 'remove' action (not 'replace')
+		// and we can completely destroy this item.
+		if (!config.keepChildren) item.destroy();
 		self.activities.animations--;
 		self._executeNextActivity();
 	};
