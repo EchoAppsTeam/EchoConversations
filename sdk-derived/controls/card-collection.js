@@ -1742,7 +1742,7 @@ collection.methods._applyStructureUpdates = function(action, item, options) {
 collection.methods.normalizeEntryContent = function(content) {
 	return Echo.Utils.safelyExecute(function() {
 		var $content = $("<div/>").append(content);
-		return $("div[data-oembed]", $content).data("oembed");
+		return $("div[data-oembed]", $content).data("oembed") || {};
 	});
 };
 
