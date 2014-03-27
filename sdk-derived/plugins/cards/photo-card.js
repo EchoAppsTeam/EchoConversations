@@ -246,6 +246,9 @@ plugin.methods.buildComposer = function() {
 		'<iframe class="echo-photo-composer-iframe" id="' + unique + '"></iframe>'
 	);
 	setTimeout(function() {
+		// iframe for filepicker is dead, nothing to do
+		if (!$("#" + unique).length) return;
+
 		var filepickerKey = window.filepicker.apikey;
 		window.filepicker.setKey(self.component.config.get("dependencies.FilePicker.apiKey"));
 		window.filepicker.pick({
