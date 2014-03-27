@@ -337,7 +337,7 @@ composer.config = {
 composer.vars = {
 	"collapsed": false,
 	"toggleModeHandler": undefined,
-	"postButtonState": "normal",
+	"postButtonState": "disabled",
 	"formData": {
 		"text": "",
 		"media": []
@@ -1078,28 +1078,42 @@ composer.methods._getDefinedMediaIndex = function(oembed) {
 };
 
 composer.methods._initFormFields = function() {
-	var self = this, nonEmpty = [];
-	var timer;
-	//this.postButtonState = "disabled";
-	var fields = this.config.get("target")
-		.find("input[type=text][required], textarea[required]")
-		.on("keyup paste", function() {
-			clearTimeout(timer);
-			var el = this;
-			timer = setTimeout(function() {
-				init(el);
-			}, 100);
-		});
-	var init = function(el) {
-		var idx = nonEmpty.indexOf(el);
-		if ($.trim($(el).val())) {
-			if (idx === -1) nonEmpty.push(el);
-		} else {
-			if (idx !== -1) nonEmpty.splice(idx, 1);
+	var self = this, nonEmpty = {};
+	var init = function(container, id) {
+		var timer;
+		nonEmpty[id] = [];
+		var fields = container.find("input[type=text][required], textarea[required]");
+		if (id === "_global") {
+			// filter out composer fields while searching for global fields
+			fields = fields.map(function(i, el) {
+				if ($(el).closest("." + self.cssPrefix + "formWrapper", container).length) {
+					return null;
+				}
+				return el;
+			});
 		}
-		// TODO: only fields from the current composer plugin must be counted here
-		self._setPostButtonState("normal");//nonEmpty.length === fields.length ? "normal" : "disabled");
+		return fields
+			.off("keyup.cardComposer paste.cardComposer")
+			.on("keyup.cardComposer paste.cardComposer", function() {
+				clearTimeout(timer);
+				var el = this;
+				timer = setTimeout(function() {
+					process(el, id);
+				}, 100);
+			});
 	};
+	var process = function(el, id) {
+		var idx = nonEmpty[id].indexOf(el);
+		if ($.trim($(el).val())) {
+			if (idx === -1) nonEmpty[id].push(el);
+		} else {
+			if (idx !== -1) nonEmpty[id].splice(idx, 1);
+		}
+		var actual = nonEmpty["_global"].length + nonEmpty[self.currentComposer.id].length;
+		var expected = globalFields.length + composerFields.length;
+		self._setPostButtonState(actual === expected ? "normal" : "disabled");
+	};
+
 	this.config.get("target")
 		.find("input[type=text], textarea")
 		.each(function() {
@@ -1114,8 +1128,19 @@ composer.methods._initFormFields = function() {
 				}
 			}
 		});
-	fields.each(function(i, el) {
-		init(el);
+
+	var globalFields = init(this.config.get("target"), "_global");
+	var composerFields = init(this.currentComposer.panel, this.currentComposer.id);
+	if (!globalFields.length && !composerFields.length) {
+		this._setPostButtonState("normal");
+		return;
+	}
+
+	globalFields.each(function(i, el) {
+		process(el, "_global");
+	});
+	composerFields.each(function(i, el) {
+		process(el, self.currentComposer.id);
 	});
 };
 
