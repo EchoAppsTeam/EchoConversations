@@ -489,10 +489,7 @@ conversations.renderers.postComposer = function(element) {
 			},
 			"auth": this.config.get("auth"),
 			"submitPermissions": this._getSubmitPermissions(),
-			"dependencies": {
-				"FilePicker": this.config.get("dependencies.FilePicker"),
-				"embedly": this.config.get("dependencies.embedly")
-			},
+			"dependencies": this.config.get("dependencies"),
 			"plugins": this._mergeSpecsByName([{
 				"name": "PhotoCard"
 			}, {
@@ -948,10 +945,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"enabled": this._isModerationRequired() && replyComposer.confirmation.enabled
 		},
 		"submitPermissions": this._getSubmitPermissions(),
-		"dependencies": {
-			"FilePicker": this.config.get("dependencies.FilePicker"),
-			"embedly": this.config.get("dependencies.embedly")
-		},
+		"dependencies": this.config.get("dependencies"),
 		"nestedPlugins": this._mergeSpecsByName([{
 			"name": "PhotoCard"
 		}, {
@@ -970,10 +964,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"intentID": "Edit",
 		"name": "Edit",
 		"requestMethod": "POST",
-		"dependencies": {
-			"FilePicker": this.config.get("dependencies.FilePicker"),
-			"embedly": this.config.get("dependencies.embedly")
-		},
+		"dependencies": this.config.get("dependencies"),
 		"nestedPlugins": [{
 			"name": "PhotoCard"
 		}, {
