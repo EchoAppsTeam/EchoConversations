@@ -689,7 +689,7 @@ composer.renderers.postButton = function(element) {
 			"label": this.labels.get("posting")
 		}
 	};
-	var postButton = new Echo.GUI.Button(states[this.postButtonState]);
+	new Echo.GUI.Button(states[this.postButtonState]);
 	this.posting = this.posting || {};
 	this.posting.subscriptions = this.posting.subscriptions || [];
 	var subscribe = function(phase, state, callback) {
@@ -704,18 +704,18 @@ composer.renderers.postButton = function(element) {
 		subscriptions[topic] = self.events.subscribe({
 			"topic": topic,
 			"handler": function(topic, params) {
-				postButton.setState(state);
+				self._setPostButtonState(state);
 				if (callback) callback(params);
 			}
 		});
 	};
 
-	subscribe("Init", states.posting, function() {
+	subscribe("Init", "posting", function() {
 		if (self.config.get("confirmation.enabled")) {
 			self.view.get("confirmation").hide();
 		}
 	});
-	subscribe("Complete", states.disabled, function(data) {
+	subscribe("Complete", "disabled", function(data) {
 		if (self.config.get("confirmation.enabled")) {
 			var confirmation = self.view.get("confirmation").show();
 			setTimeout(function() {
@@ -730,7 +730,7 @@ composer.renderers.postButton = function(element) {
 		self.view.render({"name": "tags"});
 		self.view.render({"name": "markers"});
 	});
-	subscribe("Error", states.normal, function(params) {
+	subscribe("Error", "normal", function(params) {
 		var request = params.request || {};
 		if (request.state && request.state.critical) {
 			self._showError(params);
@@ -763,9 +763,9 @@ composer.renderers.postButtonSwitcher = function(element) {
 	if (!this.config.get("displaySharingOnPost")) {
 		element.hide();
 	}
-	var action = this.postButtonState === "disabled"
-		? "addClass"
-		: "removeClass";
+	var action = this.postButtonState === "normal"
+		? "removeClass"
+		: "addClass";
 	return element[action]("disabled");
 };
 
