@@ -268,6 +268,9 @@ conversations.dependencies = [{
 	"url": "{%= baseURLs.dev %}/streamserver.pack.js",
 	"control": "Echo.StreamServer.Controls.CardComposer"
 }, {
+	"url": "{%= baseURLs.prod %}/third-party/jquery.placeholder.js",
+	"loaded": function() { return !!$.placeholder; }
+}, {
 	"loaded": function() { return !!Echo.GUI; },
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.js"
 }, {
