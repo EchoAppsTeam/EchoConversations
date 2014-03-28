@@ -6,7 +6,7 @@ var plugin = Echo.Plugin.manifest("TopPostIndicator", "Echo.StreamServer.Control
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	this.extendTemplate("insertAsFirstChild", "subcontainer", plugin.templates.main);
+	this.extendTemplate("insertAsFirstChild", "subwrapper", plugin.templates.main);
 };
 
 plugin.labels = {

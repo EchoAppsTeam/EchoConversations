@@ -365,36 +365,31 @@ card.templates.mainHeader =
 			'</div>' +
 			'<div class="{class:wrapper}">' +
 				'<div class="{class:subwrapper}">' +
-					'<div class="{class:subcontainer}">' +
-						'<div class="{class:frame}">' +
-							'<div class="{class:header-container}">' +
-								'<div class="{class:header-centered}">' +
-									'<div class="{class:authorName}"></div>' +
-									'<div class="{class:date}"></div>' +
-									'<div class="echo-clear"></div>' +
-								'</div>' +
-							'</div>' +
-							'<div class="{class:modeSwitch} echo-clickable"></div>' +
-							'<div class="{class:data}">' +
-								'<div class="{class:re}"></div>' +
-								'<div class="{class:body} echo-primaryColor"> ' +
-									'<span class="{class:text}"></span>' +
-									'<span class="{class:textEllipses}">...</span>' +
-									'<span class="{class:textToggleTruncated} echo-linkColor echo-clickable"></span>' +
-								'</div>' +
-								'<div class="{class:seeMore}">{label:seeMore}</div>' +
-							'</div>' +
-							'<div class="{class:metadata}"></div>' +
-							'<div class="{class:footer} echo-secondaryColor echo-secondaryFont">' +
-								'<img class="{class:sourceIcon} echo-clickable">' +
-								'<div class="{class:from}"></div>' +
-								'<div class="{class:via}"></div>' +
-								'<div class="{class:buttons}"></div>' +
-								'<div class="echo-clear"></div>' +
-							'</div>' +
+					'<div class="{class:header-container}">' +
+						'<div class="{class:header-centered}">' +
+							'<div class="{class:authorName}"></div>' +
+							'<div class="{class:date}"></div>' +
+							'<div class="echo-clear"></div>' +
 						'</div>' +
 					'</div>' +
-					'<div class="echo-clear"></div>' +
+					'<div class="{class:modeSwitch} echo-clickable"></div>' +
+					'<div class="{class:data}">' +
+						'<div class="{class:re}"></div>' +
+						'<div class="{class:body} echo-primaryColor"> ' +
+							'<span class="{class:text}"></span>' +
+							'<span class="{class:textEllipses}">...</span>' +
+							'<span class="{class:textToggleTruncated} echo-linkColor echo-clickable"></span>' +
+						'</div>' +
+						'<div class="{class:seeMore}">{label:seeMore}</div>' +
+					'</div>' +
+					'<div class="{class:metadata}"></div>' +
+					'<div class="{class:footer} echo-secondaryColor echo-secondaryFont">' +
+						'<img class="{class:sourceIcon} echo-clickable">' +
+						'<div class="{class:from}"></div>' +
+						'<div class="{class:via}"></div>' +
+						'<div class="{class:buttons}"></div>' +
+						'<div class="echo-clear"></div>' +
+					'</div>' +
 				'</div>' +
 			'</div>' +
 			'<div class="echo-clear"></div>' +
@@ -1705,10 +1700,9 @@ card.css =
 	'.{class:container-child-thread} { padding: 10px; margin: 0px 20px 2px 0px; }' +
 	'.{class:avatar-wrapper} { margin-right: -58px; float: left; position: relative; }' +
 	'.{class:children} .{class:avatar-wrapper}, .{class:childrenByCurrentActorLive} .{class:avatar-wrapper} { margin-right: -34px; }' +
-	'.{class:children} .{class:subwrapper}, .{class:childrenByCurrentActorLive} .{class:subwrapper} { margin-left: 34px; }' +
 	'.{class:wrapper} { float: left; width: 100%; }' +
-	'.{class:subwrapper} { margin-left: 58px; }' +
-	'.{class:subcontainer} { float: left; width: 100%; position: relative; }' +
+	'.{class:subwrapper} { position: relative; }' +
+	'.{class:children} .{class:subwrapper}, .{class:childrenByCurrentActorLive} .{class:subwrapper} { margin-left: 34px; }' +
 	'.{class:markers} { line-height: 16px; background: url("{config:cdnBaseURL.sdk-assets}/images/curation/metadata/marker.png") no-repeat; padding: 0px 0px 4px 21px; margin-top: 7px; }' +
 	'.{class:tags} { line-height: 16px; background: url("{config:cdnBaseURL.sdk-assets}/images/tag_blue.png") no-repeat; padding: 0px 0px 4px 21px; }' +
 	'.{class:metadata-title} { font-weight: bold; line-height: 25px; height: 25px; margin-right: 5px; }' +
@@ -1769,7 +1763,6 @@ card.css =
 	'.{class:content} .{class:container-child-thread} { padding: 8px 0px 10px 8px; margin: 0px 15px 2px 0px; }' +
 
 	'.{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
-	'.{class:children} .{class:frame} { margin-left: 5px; }' +
 	'.{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
 	'.{class:children} .{class:containerWrapper} { padding-top: 0px; background: none; border: none; }' +
 	'.{class:expandChildren} { padding: 15px 0px 8px 16px; margin-bottom: 0px; }' +
