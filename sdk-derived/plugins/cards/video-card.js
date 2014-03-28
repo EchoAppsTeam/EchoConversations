@@ -53,7 +53,11 @@ plugin.renderers.videoPlaceholder = function(element) {
 };
 
 plugin.renderers.videoWrapper = function(element) {
-	return element.css("width", this.component.get("data.oembed.width"));
+	var item = this.component;
+	var width = item.get("data.oembed.width");
+	var maxWidth = item.config.get("limits.maxMediaWidth");
+
+	return element.css("width", maxWidth < width ? maxWidth : width);
 };
 
 plugin.enabled = function() {

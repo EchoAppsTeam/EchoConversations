@@ -61,6 +61,9 @@ plugin.renderers.photoThumbnail = function(element) {
 	// error event all the time.
 	var img = $("<img />");
 	img.attr("class", element.attr("class"));
+	if (this.component.config.get("limits.maxMediaWidth")) {
+		img.css("max-width", this.component.config.get("limits.maxMediaWidth"));
+	}
 	if (element.attr("title")) {
 		img.attr("title", element.attr("title"));
 	}
@@ -129,8 +132,8 @@ plugin.renderers.photoLabelContainer = function(element) {
 			"min-height": 55 + photoLabelHeight, // first number is added for default item avatar
 			"min-width": 200
 		});
-	}
 	return element;
+	}
 };
 
 plugin.enabled = function() {
@@ -155,7 +158,7 @@ plugin.css =
 	'.{plugin.class:photoTitle} { margin: 0 0 5px 0; }' +
 
 	'.{plugin.class:photoLabel} { overflow: hidden; }' +
-	'.{plugin.class:photo}:hover .{plugin.class:photoLabel} { max-height: 100% !important; }' +
+	'.{plugin.class:photo}:hover .{plugin.class:photoLabel} { max-height: 60% !important; }' +
 
 	'.{plugin.class:enabled} .{class:avatar-wrapper} { z-index: 10; }' +
 	'.{class:depth-0}.{plugin.class:enabled} .{class:header-container} { position: relative; z-index: 10; }' +

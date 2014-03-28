@@ -845,7 +845,8 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		},
 		"item": {
 			"limits": {
-				"maxBodyHeight": config.maxItemBodyHeight
+				"maxBodyHeight": config.maxItemBodyHeight,
+				"maxMediaWidth": this.config.get("presentation.maximumMediaWidth")
 			},
 			"reTag": false,
 			"markAsRead": config.markItemsAsReadOn,
@@ -895,9 +896,6 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 	}, {
 		"name": "CardsRollingWindow",
 		"moreButton": true
-/*	}, {
-		"name": "URLResolver",
-		"presentation": this.config.get("presentation")*/
 	}], this._getConditionalStreamPluginList(componentID), [{
 		"name": "Moderation",
 		"extraActions": moderationExtraActions,
