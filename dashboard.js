@@ -587,6 +587,18 @@ dashboard.config = {
 					"options": []
 				}
 			}]
+		}, {
+			"component": "Fieldset",
+			"name": "embedly",
+			"type": "object",
+			"items": [{
+				"component": "Input",
+				"name": "apiKey",
+				"type": "string",
+				"config": {
+					"title": "Embed.ly API Key"
+				}
+			}]
 		}]
 	}]
 };
@@ -695,6 +707,9 @@ dashboard.methods.declareInitialConfig = function() {
 			},
 			"FilePicker": {
 				"apiKey": "AFLWUBllDRwWZl7sQO1V1z"
+			},
+			"embedly": {
+				"apiKey": "5945901611864679a8761b0fcaa56f87"
 			}
 		}
 	};
