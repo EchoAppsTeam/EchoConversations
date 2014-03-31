@@ -10,6 +10,12 @@ plugin.init = function() {
 	this.extendTemplate("insertAsFirstChild", "body", plugin.templates.main);
 };
 
+plugin.config = {
+	// we display aricle via different layouts
+	// according to thumbnail image width
+	"minArticleImageWidth": 320
+};
+
 plugin.labels = {
 	"noMediaAvailable": "No media available",
 	"clickToExpand": "Click to expand"
@@ -137,7 +143,10 @@ plugin.renderers.photoLabelContainer = function(element) {
 };
 
 plugin.enabled = function() {
-	return ~$.inArray("http://activitystrea.ms/schema/1.0/image", this.component.get("data.object.objectTypes"));
+	var item = this.component;
+	var isArticle = ~$.inArray("http://activitystrea.ms/schema/1.0/article", item.get("data.object.objectTypes"));
+	var isPhoto = ~$.inArray("http://activitystrea.ms/schema/1.0/image", item.get("data.object.objectTypes"));
+	return isPhoto || isArticle && item.get("data.oembed.thumbnail_width") >= this.config.get("minArticleImageWidth");
 };
 
 var transition = function(value) {

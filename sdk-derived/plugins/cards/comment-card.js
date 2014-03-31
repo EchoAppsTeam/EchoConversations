@@ -62,7 +62,8 @@ plugin.enabled = function() {
 	var result = false;
 	$.each(this.component.get("data.object.objectTypes", []), function(i, objectType) {
 		if (objectType === "http://activitystrea.ms/schema/1.0/note" ||
-				objectType === "http://activitystrea.ms/schema/1.0/comment"
+				objectType === "http://activitystrea.ms/schema/1.0/comment" ||
+				objectType === "http://echoenabled.com/schema/1.0/link"
 		) {
 			result = true;
 			return false;
