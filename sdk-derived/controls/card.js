@@ -1034,6 +1034,20 @@ card.renderers._dropdownButtons = function(element) {
 			callback && callback();
 		};
 	};
+	var footer = this.view.get("footer");
+	var dropdownCallback = function(ev) {
+		var buttonOffset = footer.width() - $(this).position().left;
+		var minOffset = 10; // this is minimum offset for dropdown
+		var dropdownMenu = $(this).find(".dropdown-menu");
+		var dropdownWidth = dropdownMenu.outerWidth();
+		if (dropdownWidth > buttonOffset) {
+			var shifting = Math.min(buttonOffset - dropdownWidth - minOffset, 0);
+			dropdownMenu.css({"left": shifting + "px"});
+		}
+		elem.find(".dropdown-toggle").dropdown("toggle");
+		ev.preventDefault();
+	};
+	elem.click(dropdownCallback);
 
 	(function assembleCards(container, buttons, inner) {
 		var menu = $('<ul class="dropdown-menu" role="menu">');
@@ -1042,20 +1056,38 @@ card.renderers._dropdownButtons = function(element) {
 				return;
 			}
 			var menuItem = $("<li>");
+			if (button.entries && button.entries.length) {
+				button.icon = "none";
+			}
 			self.view.render({
 				"name": "_button",
 				"target": menuItem,
 				"extra": $.extend({}, button, {
 					"inner": inner,
-					"clickable": true,
+					"clickable": !(button.entries && button.entries.length),
 					"callback": closeDropdown(button.callback)
 				})
 			});
-			if (button.entries) {
-				menuItem.addClass("dropdown-submenu");
-				assembleCards(menuItem, button.entries, true);
-			}
 			menu.append(menuItem);
+			if (button.entries && button.entries.length) {
+				menuItem.addClass("dropdown-header");
+				$.map(button.entries, function(nestedButton) {
+					nestedButton.plugin = button.plugin;
+					nestedButton.name = button.name;
+					nestedButton.icon = "none";
+					var subItem = $("<li>");
+					self.view.render({
+						"name": "_button",
+						"target": subItem,
+						"extra": $.extend({}, nestedButton, {
+							"inner": inner,
+							"clickable": true,
+							"callback": closeDropdown(nestedButton.callback)
+						})
+					});
+					menu.append(subItem);
+				});
+			}
 		});
 		container.append(menu);
 	})(elem, buttons);
@@ -1096,22 +1128,14 @@ card.renderers._button = function(element, extra) {
 			"title": this.get("buttonsLayout") !== "compact" ? extra.label : ""
 		});
 		var footer = this.view.get("footer");
-		var maxHeight = this.config.get("parent.presentation.maximumHeight");
-		var container = $(".echo-apps-conversations-container");
 		extra.callback = function(ev) {
-			if (maxHeight && maxHeight > 0) {
-				var dropdownMenu = button.find(".dropdown-menu");
-				if (dropdownMenu.outerWidth() > footer.width() - button.position().left) {
-					var shifting = Math.min((footer.width() - button.position().left) - dropdownMenu.outerWidth() - 10, 0);
-					dropdownMenu.css({"left": shifting + "px"});
-				}
-				var isScrollAtTheBottom = container[0].scrollHeight - container.scrollTop() <= maxHeight + dropdownMenu.outerHeight();
-				var isEnoughFreeSpace = maxHeight - (button.offset().top - container.offset().top) < dropdownMenu.outerHeight();
-				if (isScrollAtTheBottom && isEnoughFreeSpace) {
-					dropdownMenu.css({"bottom": "100%", "top": "auto"});
-				} else {
-					dropdownMenu.css({"top": "100%", "bottom": "auto"});
-				}
+			var buttonOffset = footer.width() - button.position().left;
+			var minOffset = 10; // this is minimum offset for dropdown
+			var dropdownMenu = button.find(".dropdown-menu");
+			var dropdownWidth = dropdownMenu.outerWidth();
+			if (dropdownWidth > buttonOffset) {
+				var shifting = Math.min(buttonOffset - dropdownWidth - minOffset, 0);
+				dropdownMenu.css({"left": shifting + "px"});
 			}
 			button.find(".dropdown-toggle").dropdown("toggle");
 			ev.preventDefault();
@@ -1796,6 +1820,11 @@ card.css =
 	'.{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
 	'.{class:dropdownButton} ul.dropdown-menu { left: -20px; }' +
+	'.{class:buttons} ul.dropdown-menu li.dropdown-header { padding: 3px 0px; border-top: 1px solid #E5E5E5; margin-top: 10px; }' +
+	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a:hover { background:none; background-image:none; color: #999; }' +
+	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a > i { background:none; background-image:none; }' +
+	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a > span { color: #999; }' +
+	'div.echo-streamserver-controls-cardcollection-body > div.{class}:last-child ul.dropdown-menu { top: auto; bottom: 100%; }' +
 	'.{class:buttonIcon} { opacity: 0.3; }' +
 		'.{class:buttons} a.{class:button}.echo-linkColor,' +
 		'.echo-sdk-ui .{class:button}:active,' +
