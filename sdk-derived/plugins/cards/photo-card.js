@@ -132,8 +132,8 @@ plugin.renderers.photoLabelContainer = function(element) {
 			"min-height": 55 + photoLabelHeight, // first number is added for default item avatar
 			"min-width": 200
 		});
-	return element;
 	}
+	return element;
 };
 
 plugin.enabled = function() {
