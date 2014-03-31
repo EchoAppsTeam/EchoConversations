@@ -385,6 +385,7 @@ dashboard.vars = {
 };
 
 dashboard.config = {
+	"filePickerDefaultApikey": "AFLWUBllDRwWZl7sQO1V1z",
 	"disableSettings": [],
 	"ecl": [{
 		"component": "Echo.Apps.Conversations.Dashboard.TargetSelector",
@@ -581,7 +582,6 @@ dashboard.config = {
 				"component": "Input",
 				"name": "apiKey",
 				"type": "string",
-				"default": "AFLWUBllDRwWZl7sQO1V1z",
 				"config": {
 					"title": "FilePicker API key",
 					"desc": "Specifies the Filepicker api key for this instance",
@@ -693,6 +693,9 @@ dashboard.methods.declareInitialConfig = function() {
 			},
 			"StreamServer": {
 				"appkey": keys.length ? keys[0].key : undefined
+			},
+			"FilePicker": {
+				"apiKey": this.config.get("filePickerDefaultApikey")
 			}
 		}
 	};
