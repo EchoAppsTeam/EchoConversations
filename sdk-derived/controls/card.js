@@ -595,15 +595,21 @@ card.renderers.wrapper = function(element) {
  * @echo_renderer
  */
 card.renderers.avatar = function(element) {
-	var avatarURL = this.get("data.actor.avatar", this.config.get("defaultAvatar"));
-	element.css("background-image", "url('" + avatarURL + "')");
+	var defaultAvatar = this.config.get("defaultAvatar");
+	var avatarURL = this.get("data.actor.avatar", "");
+
+	element.css("background-image", "url('" + avatarURL + "'), url('" + defaultAvatar + "')");
 
 	// we have to do it because filter must work in IE8 only
 	// in other cases we will have square avatar in IE 9
 	var isIE8 = document.all && document.querySelector && !document.addEventListener;
-	return isIE8
-		? element.css({ "filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + avatarURL + "', sizingMethod='scale')" })
-		: element;
+	if (isIE8) {
+		element.css({
+			"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + defaultAvatar + "', sizingMethod='scale'), progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + avatarURL + "', sizingMethod='scale')"
+		});
+	}
+
+	return element;
 };
 
 /**
