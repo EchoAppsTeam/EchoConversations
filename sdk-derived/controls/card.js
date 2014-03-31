@@ -1089,8 +1089,24 @@ card.renderers._button = function(element, extra) {
 			"entries": $.map(entries, function(entry) { return $.extend({"handler": entry.callback}, entry); }),
 			"title": this.get("buttonsLayout") !== "compact" ? extra.label : ""
 		});
+		var footer = this.view.get("footer");
+		var maxHeight = this.config.get("parent.presentation.maximumHeight");
+		var container = $(".echo-apps-conversations-container");
 		extra.callback = function(ev) {
-			button.find(".dropdown-menu").addClass("pull-right");
+			if (maxHeight && maxHeight > 0) {
+				var dropdownMenu = button.find(".dropdown-menu");
+				if (dropdownMenu.outerWidth() > footer.width() - button.position().left) {
+					var shifting = Math.min((footer.width() - button.position().left) - dropdownMenu.outerWidth() - 10, 0);
+					dropdownMenu.css({"left": shifting + "px"});
+				}
+				var isScrollAtTheBottom = container[0].scrollHeight - container.scrollTop() <= maxHeight + dropdownMenu.outerHeight();
+				var isEnoughFreeSpace = maxHeight - (button.offset().top - container.offset().top) < dropdownMenu.outerHeight();
+				if (isScrollAtTheBottom && isEnoughFreeSpace) {
+					dropdownMenu.css({"bottom": "100%", "top": "auto"});
+				} else {
+					dropdownMenu.css({"top": "100%", "bottom": "auto"});
+				}
+			}
 			button.find(".dropdown-toggle").dropdown("toggle");
 			ev.preventDefault();
 		};
@@ -1773,7 +1789,7 @@ card.css =
 	'.{class:buttons} .dropdown .{class:button} { margin-right: 0px; }' +
 	'.{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
-	'.{class:compactButton} ul.dropdown-menu { left: -20px; }' +
+	'.{class:dropdownButton} ul.dropdown-menu { left: -20px; }' +
 	'.{class:buttonIcon} { opacity: 0.3; }' +
 		'.{class:buttons} a.{class:button}.echo-linkColor,' +
 		'.echo-sdk-ui .{class:button}:active,' +

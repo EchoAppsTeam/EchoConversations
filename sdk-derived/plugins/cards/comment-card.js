@@ -47,7 +47,7 @@ plugin.component.renderers.body = function(element) {
 plugin.renderers.mediaContent = function(element) {
 	var media = this._getMediaAttachments();
 	var cardConfig = {
-		"maximumMediaWidth": this.config.get("presentation.maximumMediaWidth")
+		"maximumMediaWidth": this.component.config.get("limits.maxMediaWidth")
 	};
 	new Echo.Conversations.MediaContainer(this.config.assemble({
 		"target": element.empty(),
