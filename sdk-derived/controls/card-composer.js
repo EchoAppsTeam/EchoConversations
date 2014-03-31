@@ -1309,8 +1309,8 @@ composer.css =
 	'.{class:nameContainer} input.{class:name}[type="text"].echo-secondaryColor,' +
 		'.{class:container} .{class:metadataSubwrapper} input.echo-secondaryColor[type="text"]' +
 		' { color: #C6C6C6; }' +
-	'.{class:compactFieldWrapper} { padding: 4px 8px; }' +
-	'.{class:compactFieldWrapper} input.{class:compactField}[type="text"] { border: none; width: 100%; margin-bottom: 0px; padding: 0px; outline: 0; box-shadow: none; background-color: transparent; font-size: 12px; }' +
+	'.{class:compactFieldWrapper} { padding: 4px 8px; background-color: #fff; }' +
+	'.{class:compactFieldWrapper} input.{class:compactField}[type="text"] { border: none; width: 100%; margin-bottom: 0px; padding: 0px; outline: 0; box-shadow: none; font-size: 12px; }' +
 	'.{class:metadataContainer} { margin-top: 6px; }' +
 	'.{class:metadataLabel} { float: left; width: 50px; margin-right: -50px; text-align: right; line-height: 22px; }' +
 	'.{class:metadataWrapper} { float: left; width: 100%; }' +
