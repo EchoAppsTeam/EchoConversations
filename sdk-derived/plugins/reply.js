@@ -54,52 +54,48 @@ plugin.dependencies = [{
  * @echo_template
  */
 plugin.templates.form =
-	'<div class="{plugin.class:container}">' +
-		'<div class="{plugin.class:composer}"></div>' +
-	'</div>';
-
-/**
- * @echo_renderer
- */
-plugin.renderers.container = function(element) {
-	var item = this.component;
-	return element
-		.addClass(item.get("cssPrefix") + "depth-" + (item.get("depth") + 1));
-};
+	'<div class="{plugin.class:composer}"></div>';
 
 /**
  * @echo_renderer
  */
 plugin.renderers.composer = function(element, extra) {
 	var item = this.component;
-	element.empty();
+	element.empty()
+		.addClass(item.get("cssPrefix") + "depth-" + (item.get("depth") + 1));
 	if (!item.get("depth") && this.config.get("displayCompactForm")) {
-		this._showComposer("compact", element);
-		return element.show();
+		element.show();
+		this._showComposer("collapsed", element);
+	} else {
+		element.hide();
 	}
-	return element.hide();
+	return element;
 };
 
 
 plugin.methods._showComposer = function(mode, target) {
+	var plugin = this, item = this.component;
 	var composer = this.get("composer");
 	target = target || this.view.get("composer");
 
-	var collapsed = composer && composer.get("collapsed") && mode === "normal";
-	if (collapsed) {
+	var collapsed = composer && composer.get("collapsed");
+	if (collapsed && mode !== "collapsed") {
 		composer.expand();
 		return;
 	}
 
-	var config = this._assembleComposerConfig({
+	var config = this.config.assemble({
 		"target": target,
+		"targetURL": item.get("data.object.id"),
+		"targetQuery": item.config.get("query", ""),
+		"collapsible": true,
 		"initialMode": mode,
-		"expand": mode === "normal"
-			? function() { this.config.get("target").show(); }
-			: $.noop,
-		"collapse": mode === "normal"
-			? function() { this.config.get("target").hide(); }
-			: $.noop
+		"parent": item.config.getAsHash(),
+		"data": this.get("data") || {},
+		"ready": function() {
+			plugin.set("composer", this);
+			this.config.get("target").show();
+		}
 	});
 	config.plugins.push({
 		"name": "Reply",
@@ -108,24 +104,10 @@ plugin.methods._showComposer = function(mode, target) {
 	new Echo.StreamServer.Controls.CardComposer(config);
 };
 
-plugin.methods._assembleComposerConfig = function(config) {
-	var plugin = this, item = this.component;
-	return this.config.assemble($.extend(true, {
-		"targetURL": item.get("data.object.id"),
-		"targetQuery": item.config.get("query", ""),
-		"collapsible": true,
-		"parent": item.config.getAsHash(),
-		"data": this.get("data") || {},
-		"ready": function() {
-			plugin.set("composer", this);
-		}
-	}, config));
-};
-
 plugin.methods._assembleButton = function() {
 	var plugin = this;
 	var callback = function() {
-		plugin._showComposer("normal");
+		plugin._showComposer("expanded");
 	};
 	return function() {
 		var item = this;
@@ -140,8 +122,7 @@ plugin.methods._assembleButton = function() {
 };
 
 plugin.css =
-	'.{plugin.class:container} { margin-right: 15px; border-left: 4px solid transparent; }' +
-	'.{plugin.class:composer} { padding: 8px 0px 15px 0px; }';
+	'.{plugin.class:composer} { margin-right: 15px; border-left: 4px solid transparent; padding: 8px 0px 15px 0px; }';
 
 Echo.Plugin.create(plugin);
 
@@ -176,20 +157,7 @@ var plugin = Echo.Plugin.manifest("Reply", "Echo.StreamServer.Controls.CardColle
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
-plugin.events = {
-	"Echo.StreamServer.Controls.Card.Reply.onExpand": function(topic, args) {
-		/**
-		 * @echo_event Echo.StreamServer.Controls.CardCollection.Plugins.Reply.onFormExpand
-		 * Triggered if reply form is expanded.
-		 */
-		this.events.publish({
-			"topic": "onFormExpand",
-			"data": {
-			    "context": args.context
-			}
-		});
-	}
-};
+// lizard: please don't remove this plugin
 
 Echo.Plugin.create(plugin);
 
@@ -239,14 +207,24 @@ plugin.init = function() {
  * Entry which is the parent for the current reply.
  */
 
-$.map(["onRender", "onRerender"], function(topic) {
-	plugin.events["Echo.StreamServer.Controls.CardComposer." + topic] = function() {
+plugin.events = {
+	"Echo.StreamServer.Controls.CardComposer.onExpand": function() {
+		var target = this.component.config.get("target");
+		target.show();
+		var element = target.find("input[type=text]:first-of-type, textarea:first-of-type");
+		if (element.length) {
+			element.focus();
+		} else {
+			target.get(0).scrollIntoView(true);
+		}
+	},
+	"Echo.StreamServer.Controls.CardComposer.onCollapse": function() {
 		var composer = this.component;
-		composer.config.get("target").show();
-		// TODO: set focus/scroll to proper element
-		composer.view.get("container").get(0).scrollIntoView();
-	};
-});
+		if (composer.config.get("initialMode") !== "collapsed") {
+			composer.config.get("target").hide();
+		}
+	}
+};
 
 plugin.css =
 	'.{class}.{plugin.class} .{class:container} { border: none; padding: 0px; }' +

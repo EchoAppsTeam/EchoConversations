@@ -113,7 +113,7 @@ composer.init = function() {
 		"embedly": this.config.get("dependencies.embedly")
 	});
 
-	this.collapsed = this.config.get("initialMode") !== "normal";
+	this.collapsed = this.config.get("initialMode") === "collapsed";
 	this._extractInfoFromExternalData();
 	this.render();
 	this.ready();
@@ -315,14 +315,12 @@ composer.config = {
 			"maxDescriptionCharacters": "200"
 		}
 	},
-	"initialMode": "normal", // normal || compact
+	"initialMode": "expanded", // expanded || collapsed
 	"collapsible": false,
 	"compact": {
 		"layout": "inline", // small || smallest || inline
 		"prompt": "Contribute here"
 	},
-	"collapse": $.noop,
-	"expand": $.noop,
 	"displaySharingOnPost": true,
 	"submitPermissions": "forceLogin",
 	"confirmation": {
@@ -979,16 +977,18 @@ composer.methods.addPostValidator = function(validator, priority) {
 };*/
 
 composer.methods.expand = function() {
+	if (!this.collapsed) return;
 	this.collapsed = false;
 	this._initCurrentComposer();
 	this.view.render({"name": "container"});
-	this.config.get("expand").apply(this, arguments);
+	this.events.publish({"topic": "onExpand"});
 };
 
 composer.methods.collapse = function() {
+	if (this.collapsed) return;
 	this.collapsed = true;
 	this.view.render({"name": "container"});
-	this.config.get("collapse").apply(this, arguments);
+	this.events.publish({"topic": "onCollapse"});
 };
 
 composer.methods._initCurrentComposer = function() {
