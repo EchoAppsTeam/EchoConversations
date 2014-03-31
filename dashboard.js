@@ -385,7 +385,6 @@ dashboard.vars = {
 };
 
 dashboard.config = {
-	"filePickerDefaultApikey": "AFLWUBllDRwWZl7sQO1V1z",
 	"disableSettings": [],
 	"ecl": [{
 		"component": "Echo.Apps.Conversations.Dashboard.TargetSelector",
@@ -695,7 +694,7 @@ dashboard.methods.declareInitialConfig = function() {
 				"appkey": keys.length ? keys[0].key : undefined
 			},
 			"FilePicker": {
-				"apiKey": this.config.get("filePickerDefaultApikey")
+				"apiKey": "AFLWUBllDRwWZl7sQO1V1z"
 			}
 		}
 	};
