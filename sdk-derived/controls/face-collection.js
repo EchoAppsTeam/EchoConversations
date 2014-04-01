@@ -564,7 +564,7 @@ collection.methods._intersperse = function(object, separator) {
 };
 
 collection.css =
-	'.{class:container} { line-height: 20px; vertical-align: middle; }' +
+	'.{class:container} { vertical-align: top; }' +
 	'.{class:more} { white-space: nowrap; }' +
 	'.{class:more}.echo-linkColor a, .{class:more}.echo-linkColor a:hover { color: #476CB8; text-decoration: underline; }' +
 	'.{class:more} .echo-control-message-icon { display: inline; margin: 0px 5px; }';

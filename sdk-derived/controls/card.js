@@ -1812,7 +1812,7 @@ card.css =
 	'.{class:children} .{class:containerWrapper} { padding-top: 0px; background: none; border: none; }' +
 
 	'.echo-sdk-ui .{class:buttons} a:focus { outline: none; }' +
-	'.{class:button} { margin-right: 10px; line-height: 20px; }' +
+	'.{class:button} { margin-right: 10px; line-height: 21px; }' +
 	'.{class:buttons} .dropdown .{class:button} { margin-right: 0px; }' +
 	'.{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +

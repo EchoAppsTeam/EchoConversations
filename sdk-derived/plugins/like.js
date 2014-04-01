@@ -285,7 +285,7 @@ plugin.methods._assembleButton = function(name) {
 
 plugin.css =
 	'.{plugin.class:likesArea} { float: right; }' +
-	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 3px; line-height: 10px; }' +
+	'.{plugin.class:likedBy} { float: left; margin-right: 3px; }' +
 	// TODO: get rid of this rule
 	'.{plugin.class} .echo-streamserver-controls-face-container { position: relative; }';
 
