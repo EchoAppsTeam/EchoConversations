@@ -415,7 +415,7 @@ dashboard.config = {
 		},
 		"items": [{
 			"component": "Input",
-			"name": "minimumWidth",
+			"name": "minWidth",
 			"type": "number",
 			"config": {
 				"title": "Minimum width",
@@ -425,7 +425,7 @@ dashboard.config = {
 			}
 		}, {
 			"component": "Input",
-			"name": "maximumHeight",
+			"name": "maxHeight",
 			"type": "number",
 			"config": {
 				"title": "Maximum height",
@@ -435,7 +435,7 @@ dashboard.config = {
 			}
 		}, {
 			"component": "Input",
-			"name": "maximumWidth",
+			"name": "maxWidth",
 			"type": "number",
 			"config": {
 				"title": "Maximum width",
@@ -445,7 +445,7 @@ dashboard.config = {
 			}
 		}, {
 			"component": "Input",
-			"name": "maximumMediaWidth",
+			"name": "maxMediaWidth",
 			"type": "number",
 			"config": {
 				"title": "Maximum media width",

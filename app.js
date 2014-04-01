@@ -202,10 +202,10 @@ conversations.config = {
 		"user": "Conversations.TopContributor"
 	},
 	"presentation": {
-		"minimumWidth": 320,
-		"maximumHeight": undefined,
-		"maximumWidth": undefined,
-		"maximumMediaWidth": undefined
+		"minWidth": 320,
+		"maxHeight": undefined,
+		"maxWidth": undefined,
+		"maxMediaWidth": undefined
 	}
 };
 
@@ -438,18 +438,12 @@ conversations.renderers.itemsWaiting = function(element) {
 
 conversations.renderers.container = function(element) {
 	var presentation = this.config.get("presentation");
-	var styles = {};
-	if (presentation.minimumWidth) {
-		styles["min-width"] = presentation.minimumWidth;
-	}
-	if (presentation.maximumWidth) {
-		styles["max-width"] = presentation.maximumWidth;
-	}
-	if (presentation.maximumHeight) {
-		styles["max-height"] = presentation.maximumHeight;
-		styles["overflow-y"] = "auto";
-	}
-	element.css(styles);
+	element.css({
+		"max-width": presentation.maxWidth,
+		"min-width": presentation.minWidth,
+		"max-height": presentation.maxHeight,
+		"overflow-y": presentation.maxHeight ? "auto" : "none"
+	});
 	return element;
 };
 
@@ -846,7 +840,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		"item": {
 			"limits": {
 				"maxBodyHeight": config.maxItemBodyHeight,
-				"maxMediaWidth": this.config.get("presentation.maximumMediaWidth")
+				"maxMediaWidth": this.config.get("presentation.maxMediaWidth")
 			},
 			"reTag": false,
 			"markAsRead": config.markItemsAsReadOn,
@@ -1333,7 +1327,6 @@ conversations.css =
 	'.{class:container} .echo-control-message { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{class:container} { position:relative; }' +
 	'.{class:resizeFrame} { position:absolute; z-index:-1; border:0; padding:0; }' +
-	'.{class:container} { min-height: 200px; overflow-y: auto; }' +
 	'.{class:container} li > a, ' +
 	'.{class:container} .echo-primaryFont,' +
 	'.{class:container} .echo-secondaryFont,' +

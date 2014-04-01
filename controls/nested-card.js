@@ -116,7 +116,7 @@ card.config = {
 	},
 	"displaySourceIcon": true,
 	"displayAuthor": true,
-	"maximumMediaWidth": undefined
+	"maxMediaWidth": undefined
 };
 
 card.renderers.closeButton = function(element) {
@@ -218,8 +218,8 @@ card.renderers.videoPlaceholder = function(element) {
 
 card.renderers.videoWrapper = function(element) {
 	var width = this.get("data.width");
-	if (typeof this.config.get("maximumMediaWidth") === "number" && this.config.get("maximumMediaWidth") < width) {
-		width =  this.config.get("maximumMediaWidth");
+	if (typeof this.config.get("maxMediaWidth") === "number" && this.config.get("maxMediaWidth") < width) {
+		width = this.config.get("maxMediaWidth");
 	}
 	return element.css("width", width);
 };
@@ -237,8 +237,8 @@ card.renderers.photoThumbnail = function(element) {
 	// error event all the time.
 	var img = $("<img />");
 	img.attr("class", element.attr("class"));
-	if (this.config.get("maximumMediaWidth")) {
-		img.css("max-width", this.config.get("maximumMediaWidth"));
+	if (this.config.get("maxMediaWidth")) {
+		img.css("max-width", this.config.get("maxMediaWidth"));
 	}
 	if (element.attr("title")) {
 		img.attr("title", element.attr("title"));
