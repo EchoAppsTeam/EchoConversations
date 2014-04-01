@@ -345,13 +345,14 @@ dashboard.vars = {
 							"sample": "COMPUTER, INSTAGRAM, FACEBOOK, FLICKR, DROPBOX, PICASA, EVERNOTE, FTP, GITHUB, BOX, GOOGLE_DRIVE, SKYDRIVE, WEBDAV, GMAIL, IMAGE_SEARCH, URL, VIDEO, WEBCAM"
 						}
 					}
-				}, {//TODO: make it using templates and renderer
+				}, {
+					//TODO: make it using templates and renderer
 					"component": "TextField",
 					"name": "sourcesHelp",
-						"config": {
-							"data": { "value": "<a href=\"//developers.inkfilepicker.com/docs/web/#pick\" target=\"_blank\">Documentation</a>"}
-						}
-                }]
+					"config": {
+						"data": {"value": "<a href=\"//developers.inkfilepicker.com/docs/web/#pick\" target=\"_blank\">Documentation</a>"}
+					}
+		                }]
 			}]
 		}]
 	}],

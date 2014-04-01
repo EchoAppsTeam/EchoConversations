@@ -28,9 +28,6 @@ module.exports = function(grunt) {
 		],
 		"demo": [
 			"demo.html",
-			"demo-card.html",
-			"demo-card-collection.html",
-			"demo-submit-composer.html",
 			"premoderation.html",
 			"demo-dev.html"
 		]
