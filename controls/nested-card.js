@@ -327,28 +327,6 @@ card.renderers.article = function(element) {
 	return element;
 };
 
-card.methods._onViewportChange = function(action, handler) {
-	if (action === "subscribe") {
-		this.events.subscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewScroll",
-			"handler": handler
-		});
-		this.events.subscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewResize",
-			"handler": handler
-		});
-	} else if (action === "unsubscribe") {
-		this.events.unsubscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewScroll",
-			"handler": handler
-		});
-		this.events.unsubscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewResize",
-			"handler": handler
-		});
-	}
-};
-
 card.methods.displayAuthor = function() {
 	return this.get("data.author_name") && this.config.get("displayAuthor");
 };
