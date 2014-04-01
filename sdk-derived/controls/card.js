@@ -1230,11 +1230,10 @@ card.methods._checkItemContentHeight = function() {
 		var lineCount = Math.round(maxBodyHeight / lineHeight);
 		var realMaxHeight = lineCount * lineHeight - fontSize / 2;
 		var coeffToShow = 1.2; // we don't need to hide text if it's height <= 120% of maxBodyHeight
-
-		if (body.height() > realMaxHeight * coeffToShow && !button.is(":visible")) {
+		if (text.height() > realMaxHeight * coeffToShow && !button.is(":visible")) {
 			body.css("max-height", realMaxHeight);
 			button.show();
-		} else if (body.height() < realMaxHeight && button.is(":visible")) {
+		} else if (text.height() < realMaxHeight && button.is(":visible")) {
 			body.css("max-height", "");
 			button.hide();
 		}
