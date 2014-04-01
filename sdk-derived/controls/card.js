@@ -1820,8 +1820,8 @@ card.css =
 	'.echo-sdk-ui .{class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
 	'.{class:dropdownButton} ul.dropdown-menu { left: -20px; }' +
 	'.{class:buttons} ul.dropdown-menu li.dropdown-header { padding: 3px 0px; border-top: 1px solid #E5E5E5; margin-top: 10px; }' +
-	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a:hover { background:none; background-image:none; color: #999; }' +
-	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a > i { background:none; background-image:none; }' +
+	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a:hover { background: none; color: #999; }' +
+	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a > i { background: none; }' +
 	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a > span { color: #999; }' +
 	'.{class:buttonIcon} { opacity: 0.3; }' +
 		'.{class:buttons} a.{class:button}.echo-linkColor,' +
