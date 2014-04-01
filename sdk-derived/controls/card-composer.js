@@ -1024,7 +1024,7 @@ composer.methods._extractInfoFromExternalData = function() {
 			}).get();
 		}
 		var composer = $(".echo-item-files", content).data("composer");
-		var types = self.config.get("data.object.objectTypes");
+		var types = self.config.get("data.object.objectTypes", []);
 		$.each(self.composers, function(i, data) {
 			if (data.id === composer) {
 				self.currentComposer = data;
