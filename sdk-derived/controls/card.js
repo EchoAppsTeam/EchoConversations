@@ -1776,7 +1776,7 @@ card.css =
 	'.{class:textToggleTruncated} { margin-left: 5px; }' +
 	'.{class:blocker-backdrop} { position: absolute; left: 0px; top: 0px; background: #FFFFFF; opacity: 0.7; z-index: 100; }' +
 	'.{class:blocker-message} { position: absolute; z-index: 200; width: 200px; height: 20px; line-height: 20px; text-align: center; background-color: #FFFF99; border: 1px solid #C6C677; opacity: 0.7; -moz-border-radius: 0.5em 0.5em 0.5em 0.5em; }' +
-	'.{class:expandChildren} { display:none; text-align: center; padding:4px; }' +
+	'.{class:expandChildren} { display: none; text-align: center; padding: 8px 0px; margin-bottom: 0px; }' +
 	'.{class:expandChildren} .{class:expandChildrenLabel} { display: inline-block; padding-left: 22px; }' +
 	'.{class:expandChildren} .echo-message-icon { background: url("{config:cdnBaseURL.sdk-assets}/images/whirlpool.png") no-repeat 5px 4px; }' +
 	'.{class:expandChildren} .{class:message-loading} { background: no-repeat left top url("{config:cdnBaseURL.sdk-assets}/images/loading.gif"); }' +
@@ -1801,17 +1801,15 @@ card.css =
 	'.{class:authorName} { float: left; color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; max-width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; }' +
 	'.{class:authorName}:after { content: ""; display: inline; padding-right: 5px; }' +
 
-	'.{class:container-child} { padding-bottom: 8px; padding-right: 0px; margin: 0px 15px 2px 0px; }' +
+	'.{class:container-child} { padding-bottom: 8px; padding-right: 0px; margin: 0px 16px 2px 0px; }' +
 	'.{class:children} .{class} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; background: #F8F8F8; }' +
 	'.{class:children} .{class} { padding-top: 0px; background: none; border: none; }' +
 
-	'.{class:content} .{class:container-child-thread} { padding: 8px 0px 10px 8px; margin: 0px 15px 2px 0px; }' +
+	'.{class:content} .{class:container-child-thread} { padding: 8px 0px 10px 8px; margin: 0px 16px 2px 0px; }' +
 
 	'.{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
 	'.{class:children} .{class:containerWrapper} { padding-top: 0px; background: none; border: none; }' +
-	'.{class:expandChildren} { padding: 15px 0px 8px 16px; margin-bottom: 0px; }' +
-	'.{class:children} .{class:expandChildren} { padding: 8px 0px; margin-bottom: 0px; }' +
 
 	'.echo-sdk-ui .{class:buttons} a:focus { outline: none; }' +
 	'.{class:button} { margin-right: 10px; line-height: 20px; }' +

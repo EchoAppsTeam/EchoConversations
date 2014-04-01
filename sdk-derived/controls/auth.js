@@ -315,8 +315,7 @@ auth.css =
 	'.{class:name} ul.nav { margin-bottom: 3px; }' +
 	'.{class:name} ul.nav .dropdown-menu li > a { font-size: 14px; }' +
 	'.{class:login}, .{plugin.class} .{class:signup} { color: #006DCC; }' +
-	'.{class:userAnonymous} { margin: 0px 0px 7px 2px; text-align: left; }' +
-	'.{class:userLogged} { margin: 0px 0px 5px 3px; }' +
+	'.{class:userAnonymous} { text-align: left; }' +
 	'.{class:name} { float: none; margin: 3px 0px 0px 15px; font-weight: normal; }' +
 	'.{class:avatarContainer} { float: left; width: 48px; height: 48px; border-radius: 50%; }' +
 	'.{class:avatar} { border-radius: 50%; width: 48px; height: 48px; background-size: cover; display: inline-block; background-position: center; }';

@@ -31,6 +31,7 @@ plugin.init = function() {
 	var item = this.component;
 	item.addButtonSpec("Reply", this._assembleButton());
 	this.extendTemplate("insertAsLastChild", "content", plugin.templates.form);
+	this.extendTemplate("insertBefore", "expandChildren", plugin.templates.topSpacing);
 };
 
 plugin.config = {
@@ -57,13 +58,20 @@ plugin.templates.form =
 	'<div class="{plugin.class:composer}"></div>';
 
 /**
+ * @echo_template
+ */
+
+plugin.templates.topSpacing =
+	'<div class="{plugin.class:topSpacing}"></div>';
+
+/**
  * @echo_renderer
  */
-plugin.renderers.composer = function(element, extra) {
+plugin.renderers.composer = function(element) {
 	var item = this.component;
 	element.empty()
 		.addClass(item.get("cssPrefix") + "depth-" + (item.get("depth") + 1));
-	if (!item.get("depth") && this.config.get("displayCompactForm")) {
+	if (this._isCompactFormVisible()) {
 		element.show();
 		this._showComposer("collapsed", element);
 	} else {
@@ -72,6 +80,14 @@ plugin.renderers.composer = function(element, extra) {
 	return element;
 };
 
+/**
+ * @echo_renderer
+ */
+plugin.renderers.topSpacing = function(element) {
+	return this._isCompactFormVisible()
+		? element.show()
+		: element.hide();
+};
 
 plugin.methods._showComposer = function(mode, target) {
 	var plugin = this, item = this.component;
@@ -121,8 +137,14 @@ plugin.methods._assembleButton = function() {
 	};
 };
 
+plugin.methods._isCompactFormVisible = function() {
+	return !this.component.get("depth") && this.config.get("displayCompactForm");
+};
+
 plugin.css =
-	'.{plugin.class:composer} { margin-right: 15px; border-left: 4px solid transparent; padding: 8px 0px 15px 0px; }';
+	'.{plugin.class:topSpacing} { padding-top: 8px; }' +
+	'.{plugin.class:composer} { margin-right: 16px; border-left: 4px solid transparent; padding: 8px 0px 16px 0px; }' +
+	'.{class:children} .{plugin.class:composer} { padding-bottom: 0px; }';
 
 Echo.Plugin.create(plugin);
 
