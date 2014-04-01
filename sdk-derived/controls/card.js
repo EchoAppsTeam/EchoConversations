@@ -1823,7 +1823,6 @@ card.css =
 	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a:hover { background:none; background-image:none; color: #999; }' +
 	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a > i { background:none; background-image:none; }' +
 	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a > span { color: #999; }' +
-	'div.echo-streamserver-controls-cardcollection-body > div.{class}:last-child ul.dropdown-menu { top: auto; bottom: 100%; }' +
 	'.{class:buttonIcon} { opacity: 0.3; }' +
 		'.{class:buttons} a.{class:button}.echo-linkColor,' +
 		'.echo-sdk-ui .{class:button}:active,' +

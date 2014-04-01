@@ -1797,6 +1797,7 @@ collection.css =
 	'.echo-clickable a.{class:state-message}:hover { text-decoration: underline; }' +
 	'.{class:more}:hover, .{class:fullStateLayout}:hover { background-color: #E4E4E4; }' +
 	'.{class:more}, .{class:fullStateLayout} { text-align: center; border: solid 1px #E4E4E4; margin-top: 10px; padding: 10px; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; cursor: pointer; font-weight: bold; }' +
+	'div.{class:body} > div.echo-streamserver-controls-card:last-child ul.dropdown-menu { top: auto; bottom: 100%; }' +
 	'.{class:more} .echo-app-message { padding: 0; border: none; border-radius: 0; }' +
 	'.{class:more} { border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{class:messageText} { border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
