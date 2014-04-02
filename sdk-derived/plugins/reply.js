@@ -27,13 +27,6 @@ var plugin = Echo.Plugin.manifest("Reply", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
-plugin.init = function() {
-	var item = this.component;
-	item.addButtonSpec("Reply", this._assembleButton());
-	this.extendTemplate("insertAsLastChild", "content", plugin.templates.form);
-	this.extendTemplate("insertBefore", "expandChildren", plugin.templates.topSpacing);
-};
-
 plugin.config = {
 	"displayCompactForm": true
 };
@@ -44,6 +37,13 @@ plugin.labels = {
 	 * Label for the button in the item
 	 */
 	"replyControl": "Reply"
+};
+
+plugin.init = function() {
+	var item = this.component;
+	item.addButtonSpec("Reply", this._assembleButton());
+	this.extendTemplate("insertAsLastChild", "content", plugin.templates.form);
+	this.extendTemplate("insertBefore", "expandChildren", plugin.templates.topSpacing);
 };
 
 plugin.dependencies = [{
@@ -104,8 +104,11 @@ plugin.methods._showComposer = function(mode, target) {
 		"target": target,
 		"targetURL": item.get("data.object.id"),
 		"targetQuery": item.config.get("query", ""),
-		"collapsible": true,
 		"initialMode": mode,
+		"collapseOn": {
+			"documentClick": true,
+			"postComplete": true
+		},
 		"parent": item.config.getAsHash(),
 		"data": this.get("data") || {},
 		"ready": function() {

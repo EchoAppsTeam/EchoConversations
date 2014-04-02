@@ -316,10 +316,13 @@ composer.config = {
 		}
 	},
 	"initialMode": "expanded", // expanded || collapsed
-	"collapsible": false,
 	"compact": {
 		"layout": "inline", // small || smallest || inline
 		"prompt": "Contribute here"
+	},
+	"collapseOn": {
+		"documentClick": false,
+		"postComplete": false
 	},
 	"displaySharingOnPost": true,
 	"submitPermissions": "forceLogin",
@@ -515,17 +518,15 @@ composer.renderers.container = function(element) {
 		.removeClass(_class)
 		.addClass(this.cssPrefix + this._userStatus());
 
-	if (this.config.get("collapsible")) {
-		if (!this.toggleModeHandler) {
-			this.toggleModeHandler = function(event) {
-				if (self.collapsed) return;
-				var target = self.config.get("target");
-				var isInTarget = target && target.find(event.target).length;
-				if (isInTarget) return;
-				self.collapse();
-			};
-			$(document).on("mousedown", this.toggleModeHandler);
-		}
+	if (this.config.get("collapseOn.documentClick") && !this.toggleModeHandler) {
+		this.toggleModeHandler = function(event) {
+			if (self.collapsed || self.cardProcessing) return;
+			var target = self.config.get("target");
+			var isInTarget = target && target.find(event.target).length;
+			if (isInTarget) return;
+			self.collapse();
+		};
+		$(document).on("mousedown", this.toggleModeHandler);
 	}
 
 	return element;
@@ -712,14 +713,9 @@ composer.renderers.postButton = function(element) {
 		if (self.config.get("confirmation.enabled")) {
 			self.view.get("confirmation").hide();
 		}
+		self.cardProcessing = true;
 	});
 	subscribe("Complete", "disabled", function(data) {
-		if (self.config.get("confirmation.enabled")) {
-			var confirmation = self.view.get("confirmation").show();
-			setTimeout(function() {
-				confirmation.slideUp(self.config.get("confirmation.hidingTimeout"));
-			}, self.config.get("confirmation.timeout"));
-		}
 		if (self._isAutoSharingEnabled()) {
 			self._share(data);
 		}
@@ -727,9 +723,25 @@ composer.renderers.postButton = function(element) {
 		self.view.render({"name": "tabs"});
 		self.view.render({"name": "tags"});
 		self.view.render({"name": "markers"});
+
+		var collapse = function() {
+			self.cardProcessing = false;
+			if (self.config.get("collapseOn.postComplete")) {
+				self.collapse();
+			}
+		};
+		if (self.config.get("confirmation.enabled")) {
+			var confirmation = self.view.get("confirmation").show();
+			setTimeout(function() {
+				confirmation.slideUp(self.config.get("confirmation.hidingTimeout"), collapse);
+			}, self.config.get("confirmation.timeout"));
+			return;
+		}
+		collapse();
 	});
 	subscribe("Error", "normal", function(params) {
 		var request = params.request || {};
+		self.cardProcessing = false;
 		if (request.state && request.state.critical) {
 			self._showError(params);
 		}
