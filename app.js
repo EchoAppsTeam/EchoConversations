@@ -805,16 +805,6 @@ conversations.methods._viewportChange = function() {
 	}, this.config.get("viewportChangeTimeout"));
 };
 
-conversations.methods._moveStreamingStateCursor = function(event) {
-	var cursor = this.view.get("streamingStateCursor");
-	if (cursor) {
-		cursor.css({
-			"left": event.clientX,
-			"top": event.clientY
-		});
-	}
-};
-
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 	// StreamServer config
 	var ssConfig = this.config.get("dependencies.StreamServer");
