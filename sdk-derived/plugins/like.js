@@ -439,7 +439,7 @@ plugin.component.renderers.avatar = function() {
 
 plugin.css =
 	'.{plugin.class:pale} { opacity: 0.2; }' +
-	'.{plugin.class:adminUnlike} { cursor: pointer; position: absolute; top: 3px; left: 4px; opacity: 0.8; }';
+	'.{plugin.class:adminUnlike} { cursor: pointer; position: absolute; top: 4px; left: 4px; opacity: 0.8; }';
 
 Echo.Plugin.create(plugin);
 
