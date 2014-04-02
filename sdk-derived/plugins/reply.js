@@ -94,9 +94,9 @@ plugin.methods._showComposer = function(mode, target) {
 	var composer = this.get("composer");
 	target = target || this.view.get("composer");
 
-	var collapsed = composer && composer.get("collapsed");
-	if (collapsed && mode !== "collapsed") {
-		composer.expand();
+	if (composer) {
+		var toExpand = composer.get("collapsed") && mode !== "collapsed";
+		toExpand && composer.expand();
 		return;
 	}
 
