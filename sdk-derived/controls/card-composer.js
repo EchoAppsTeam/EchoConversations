@@ -526,7 +526,7 @@ composer.renderers.container = function(element) {
 			if (isInTarget) return;
 			self.collapse();
 		};
-		$(document).on("mousedown", this.toggleModeHandler);
+		$(document).on("mouseup", this.toggleModeHandler);
 	}
 
 	return element;
