@@ -107,6 +107,13 @@ auth.config = {
 	}
 };
 
+auth.events = {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() { this.refresh(); }
+	}
+};
+
 auth.dependencies = [{
 	"loaded": function() { return !!Echo.GUI; },
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.js"

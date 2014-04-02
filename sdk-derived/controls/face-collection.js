@@ -74,6 +74,12 @@ if (Echo.Control.isDefined(collection)) return;
  * Triggered when the app is rerendered.
  */
 
+collection.events = {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() { this.refresh(); }
+	}
+};
 
 collection.init = function() {
 	if (!this.checkAppKey()) return;

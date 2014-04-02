@@ -73,6 +73,13 @@ plugin.labels = {
 };
 
 plugin.events = {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() {
+			this._updateUserStatus();
+			this._updateItemStatus();
+		}
+	},
 	"Echo.StreamServer.Controls.Card.onRerender": function() {
 		var item = this.component;
 		if (item.user.is("admin")) {
@@ -120,6 +127,7 @@ plugin.templates.buttonLabels = {
 plugin.component.renderers.avatar = function(element) {
 	var item = this.component;
 
+	this._updateUserStatus();
 	if (item.user.is("admin")) {
 		var status = item.get("data.actor.status") || "Untouched";
 		element.addClass(this.cssPrefix + "actorStatus-" + status);
@@ -128,17 +136,11 @@ plugin.component.renderers.avatar = function(element) {
 };
 
 plugin.component.renderers.container = function(element) {
-	var item = this.component;
-
-	if (item.user.is("admin")) {
-		var status = this.get("itemStatus") || "Untouched";
-		element.addClass(this.cssPrefix + "status-" + status);
-	}
-
+	this._updateItemStatus();
 	return this.parentRenderer("container", arguments);
 };
 
-plugin.statuses = [
+var statuses = [
 	"Untouched",
 	"ModeratorApproved",
 	"ModeratorDeleted",
@@ -147,6 +149,40 @@ plugin.statuses = [
 	"ModeratorFlagged",
 	"SystemFlagged"
 ];
+
+plugin.methods._updateUserStatus = function() {
+	var item = this.component;
+	var self = this;
+	var avatar = item.view.get("avatar");
+
+	if (avatar) {
+		avatar.removeClass($.map(statuses, function(status) {
+			return self.cssPrefix + "actorStatus-" + status;
+		}).join(" "));
+
+		if (item.user.is("admin")) {
+			var status = item.get("data.actor.status") || "Untouched";
+			avatar.addClass(this.cssPrefix + "actorStatus-" + status);
+		}
+	}
+};
+
+plugin.methods._updateItemStatus = function() {
+	var item = this.component;
+	var self = this;
+	var container = item.view.get("container");
+
+	if (container) {
+		container.removeClass($.map(statuses, function(status) {
+			return self.cssPrefix + "status-" + status;
+		}).join(" "));
+
+		if (item.user.is("admin")) {
+			var status = this.get("itemStatus") || "Untouched";
+			container.addClass(this.cssPrefix + "status-" + status);
+		}
+	}
+};
 
 plugin.button2status = {
 	"Spam": "ModeratorFlagged",

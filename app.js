@@ -6,6 +6,7 @@ if (Echo.App.isDefined("Echo.Apps.Conversations")) return;
 var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 
 conversations.config = {
+	"refreshOnUserInvalidate": false,
 	"targetURL": "",
 	"bozoFilter": false,
 	"viewportChangeTimeout": 50,
@@ -303,7 +304,6 @@ conversations.events = {
 
 conversations.init = function() {
 	var app = this;
-	this._removeUserInvalidationFrom(this);
 	this._retrieveData(function() {
 		app.render();
 		app.ready();
@@ -497,12 +497,7 @@ conversations.renderers.postComposer = function(element) {
 				"enabled": enableBundledIdentity,
 				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
 				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
-			}], plugins),
-			"data": {
-				"object": {
-					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
-				}
-			}
+			}], plugins)
 		})
 	});
 	return element;
@@ -1243,23 +1238,6 @@ conversations.methods._mergeSpecsByName = function(specs) {
 			}
 		}
 		specs[id] = $.extend(true, {}, specs[id], extender);
-	});
-};
-
-// removing "Echo.UserSession.onInvalidate" subscription from an app
-// to avoid double-handling of the same evernt (by Canvas and by the widget itself)
-conversations.methods._removeUserInvalidationFrom = function() {
-	var topic = "Echo.UserSession.onInvalidate";
-	$.map(Array.prototype.slice.call(arguments), function(inst) {
-		$.each(inst.subscriptionIDs, function(id) {
-			var obj = $.grep(Echo.Events._subscriptions[topic].global.handlers, function(o) {
-				return o.id === id;
-			})[0];
-			if (obj && obj.id) {
-				Echo.Events.unsubscribe({"handlerId": obj.id});
-				return false;
-			}
-		});
 	});
 };
 

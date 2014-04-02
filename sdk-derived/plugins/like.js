@@ -230,17 +230,17 @@ plugin.methods._publishEventComplete = function(args) {
 };
 
 plugin.methods._requestLoginPrompt = function() {
-        Backplane.response([{
-                // IMPORTANT: we use ID of the last received message
-                // from the server-side to avoid same messages re-processing
-                // because of the "since" parameter cleanup...
-                "id": Backplane.since,
-                "channel_name": Backplane.getChannelName(),
-                "message": {
-                        "type": "identity/login/request",
-                        "payload": this.component.user.data || {}
-                }
-        }]);
+	Backplane.response([{
+		// IMPORTANT: we use ID of the last received message
+		// from the server-side to avoid same messages re-processing
+		// because of the "since" parameter cleanup...
+		"id": Backplane.since,
+		"channel_name": Backplane.getChannelName(),
+		"message": {
+			"type": "identity/login/request",
+			"payload": this.component.user.data || {}
+		}
+	}]);
 };
 
 plugin.methods._assembleButton = function(name) {
