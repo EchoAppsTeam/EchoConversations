@@ -76,6 +76,14 @@ if (Echo.Control.isDefined(face)) return;
  * @echo_event Echo.StreamServer.Controls.Face.onRerender
  * Triggered when the app is rerendered.
  */
+face.events = {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() {
+			this.view.render({"name": "title"});
+		}
+	}
+};
 
 face.config = {
 	/**
