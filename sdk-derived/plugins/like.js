@@ -285,9 +285,7 @@ plugin.methods._assembleButton = function(name) {
 
 plugin.css =
 	'.{plugin.class:likesArea} { float: right; }' +
-	'.{plugin.class:likedBy} { float: left; margin-right: 3px; }' +
-	// TODO: get rid of this rule
-	'.{plugin.class} .echo-streamserver-controls-face-container { position: relative; }';
+	'.{plugin.class:likedBy} { float: left; margin-right: 3px; }';
 
 Echo.Plugin.create(plugin);
 
@@ -439,7 +437,8 @@ plugin.component.renderers.avatar = function() {
 
 plugin.css =
 	'.{plugin.class:pale} { opacity: 0.2; }' +
-	'.{plugin.class:adminUnlike} { cursor: pointer; position: absolute; top: 4px; left: 4px; opacity: 0.8; }';
+	'.{plugin.class} .{class:container} { position: relative; }' +
+	'.{plugin.class:adminUnlike} { cursor: pointer; position: absolute; top: -2px; left: 4px; opacity: 0.8; }';
 
 Echo.Plugin.create(plugin);
 

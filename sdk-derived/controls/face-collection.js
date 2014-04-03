@@ -302,7 +302,8 @@ collection.renderers.actors = function(element) {
 		});
 	};
 	$.map(this.get("users").slice(0, this.get("count.visible")), function(user) {
-		usersDOM.push(user.instance.render());
+		user.instance.render();
+		usersDOM.push(user.instance.config.get("target"));
 	});
 	var last;
 	var delimiter = this.config.get("item.text") ? ", " : "";
@@ -497,7 +498,7 @@ collection.methods._initItem = function(entry, callback) {
 	var config = $.extend({
 		"apiBaseURL": this.config.get("apiBaseURL"),
 		"submissionProxyURL": this.config.get("submissionProxyURL"),
-		"target": $("<div>"),
+		"target": $("<span>"),
 		"appkey": this.config.get("appkey"),
 		"parent": this.config.getAsHash(),
 		"plugins": this.config.get("plugins"),
@@ -564,8 +565,9 @@ collection.methods._intersperse = function(object, separator) {
 };
 
 collection.css =
-	'.{class:container} { vertical-align: top; }' +
-	'.{class:more} { white-space: nowrap; }' +
+	'.{class:container} { vertical-align: top; line-height: 22px; }' +
+	'.{class:more} { white-space: nowrap; vertical-align: middle; }' +
+	'.{class:suffixText}, .{class:delimiter}, .{class:and} { vertical-align: middle; }' +
 	'.{class:more}.echo-linkColor a, .{class:more}.echo-linkColor a:hover { color: #476CB8; text-decoration: underline; }' +
 	'.{class:more} .echo-control-message-icon { display: inline; margin: 0px 5px; }';
 

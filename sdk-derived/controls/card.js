@@ -1794,7 +1794,7 @@ card.css =
 	'.{class:children} .{class:avatar}, .{class:childrenByCurrentActorLive} .{class:avatar} { width: 28px; height: 28px; }' +
 
 	'.{class:content} { background: #f8f8f8; border-radius: 3px; }' +
-	'.{class:buttons} { white-space: nowrap; float: left; }' +
+	'.{class:buttons} { white-space: nowrap; float: left; height: 23px; }' +
 	'.{class:metadata} { margin-bottom: 8px; }' +
 	'.{class:body} { padding-top: 0px; margin-bottom: 8px; overflow: hidden; }' +
 	'.{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
@@ -1812,7 +1812,7 @@ card.css =
 	'.{class:children} .{class:containerWrapper} { padding-top: 0px; background: none; border: none; }' +
 
 	'.echo-sdk-ui .{class:buttons} a:focus { outline: none; }' +
-	'.{class:button} { margin-right: 10px; line-height: 21px; }' +
+	'.{class:button} { margin-right: 10px; line-height: 22px; }' +
 	'.{class:buttons} .dropdown .{class:button} { margin-right: 0px; }' +
 	'.{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
