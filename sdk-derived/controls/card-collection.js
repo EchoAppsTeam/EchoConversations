@@ -1742,13 +1742,6 @@ collection.methods._applyStructureUpdates = function(action, item, options) {
 	}
 };
 
-collection.methods.normalizeEntryContent = function(content) {
-	return Echo.Utils.safelyExecute(function() {
-		var $content = $("<div/>").append(content);
-		return $("div[data-oembed]", $content).data("oembed") || {};
-	});
-};
-
 collection.methods.normalizeEntry = function(entry) {
 	if (entry.normalized) return entry;
 	var self = this;
@@ -1762,8 +1755,6 @@ collection.methods.normalizeEntry = function(entry) {
 				entry.target = target;
 		}
 	});
-
-	entry.oembed = this.normalizeEntryContent(entry.object.content);
 
 	entry.object.content_type = entry.object.content_type || "text";
 	entry.object.accumulators = entry.object.accumulators || {};
