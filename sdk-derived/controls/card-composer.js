@@ -123,7 +123,7 @@ composer.destroy = function() {
 	this.auth && this.auth.destroy();
 	this.tabs && this.tabs.destroy();
 	this.mediaContainer && this.mediaContainer.destroy();
-	this.toggleModeHandler && $(document).off("mousedown", this.toggleModeHandler);
+	this.toggleModeHandler && $(document).off("mouseup", this.toggleModeHandler);
 };
 
 composer.config = {
