@@ -799,7 +799,9 @@ card.renderers.body = function(element) {
 	$.each(this._getBodyTransformations(), function(i, trasformation) {
 		data = trasformation.apply(self, data);
 		if (!/\S/.test(data[0])) {
-			data[0] = self.labels.get("sharedThisOn", {"service": data[1].source});
+			if (data[1].source === "Twitter") {
+				data[0] = self.labels.get("sharedThisOn", {"service": data[1].source});
+			}
 			return false;
 		}
 	});
