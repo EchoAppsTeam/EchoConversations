@@ -69,8 +69,10 @@ plugin.templates.topSpacing =
  */
 plugin.renderers.composer = function(element) {
 	var item = this.component;
-	element.empty()
+	element
+		.empty()
 		.addClass(item.get("cssPrefix") + "depth-" + (item.get("depth") + 1));
+	this._removeComposer();
 	if (this._isCompactFormVisible()) {
 		element.show();
 		this._showComposer("collapsed", element);
@@ -87,6 +89,10 @@ plugin.renderers.topSpacing = function(element) {
 	return this._isCompactFormVisible()
 		? element.show()
 		: element.hide();
+};
+
+plugin.methods.destroy = function() {
+	this._removeComposer();
 };
 
 plugin.methods._showComposer = function(mode, target) {
@@ -142,6 +148,13 @@ plugin.methods._assembleButton = function() {
 
 plugin.methods._isCompactFormVisible = function() {
 	return !this.component.get("depth") && this.config.get("displayCompactForm");
+};
+
+plugin.methods._removeComposer = function() {
+	if (this.composer) {
+		this.composer.destroy();
+		this.remove("composer");
+	}
 };
 
 plugin.css =
