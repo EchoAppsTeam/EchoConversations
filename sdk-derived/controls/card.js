@@ -1824,7 +1824,7 @@ card.css =
 	'.{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
 
 	'.echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
-	'.{class:date} { float: left; color: #d3d3d3; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; max-width: 100%; }' +
+	'.{class:date} { font-size: 12px; float: left; color: #d3d3d3; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; max-width: 100%; }' +
 
 	'.{class:avatar} { width: 36px; height: 36px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; }' +
 	'.{class:children} .{class:avatar}, .{class:childrenByCurrentActorLive} .{class:avatar} { width: 28px; height: 28px; }' +

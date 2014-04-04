@@ -191,6 +191,7 @@ plugin.css =
 	'.{class:depth-0}.{plugin.class:enabled} .{class:body} { margin-bottom: 0px; overflow: visible; }' +
 	'.{class:depth-0}.{plugin.class:enabled} .{class:data} { padding-top: 0px; }' +
 	'.{class:depth-0}.{plugin.class:enabled} .{class:authorName} { color: #FFFFFF; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); }' +
+	'.{class:depth-0}.{plugin.class:enabled} .{class:date} { line-height: 20px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); padding-right: 1px; }' +
 	'.{plugin.class:photoLabel} { ' + transition('max-height ease 300ms') + '; }';
 
 Echo.Plugin.create(plugin);
