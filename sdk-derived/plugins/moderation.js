@@ -76,7 +76,7 @@ plugin.events = {
 	"Echo.StreamServer.Controls.Card.onRerender": function() {
 		var item = this.component;
 		if (item.user.is("admin")) {
-			var element = item.view.get("container");
+			var element = item.view.get("content");
 			var indicator = item.view.get("indicator");
 			var itemStatus = this.get("itemStatus") || "Untouched";
 			var newStatus = item.get("data.object.status") || "Untouched";
@@ -127,7 +127,7 @@ plugin.component.renderers.avatar = function(element) {
 	return this.parentRenderer("avatar", arguments);
 };
 
-plugin.component.renderers.container = function(element) {
+plugin.component.renderers.content = function(element) {
 	var item = this.component;
 
 	if (item.user.is("admin")) {
@@ -135,7 +135,7 @@ plugin.component.renderers.container = function(element) {
 		element.addClass(this.cssPrefix + "status-" + status);
 	}
 
-	return this.parentRenderer("container", arguments);
+	return this.parentRenderer("content", arguments);
 };
 
 plugin.statuses = [

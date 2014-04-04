@@ -361,43 +361,45 @@ card.templates.metadata = {
  * @echo_template
  */
 card.templates.mainHeader =
-	'<div class="{class:content}">' +
-		'<div class="{class:container}">' +
-			'<div class="{class:indicator}"></div>' +
-			'<div class="{class:avatar-wrapper}">' +
-				'<div class="{class:avatar}"></div>' +
-			'</div>' +
-			'<div class="{class:wrapper}">' +
-				'<div class="{class:subwrapper}">' +
-					'<div class="{class:header-container}">' +
-						'<div class="{class:header-centered}">' +
-							'<div class="{class:authorName}"></div>' +
-							'<div class="{class:date}"></div>' +
+	'<div class="{class:container}">' +
+		'<div class="{class:subcontainer}">' +
+			'<div class="{class:content}">' +
+				'<div class="{class:indicator}"></div>' +
+				'<div class="{class:avatar-wrapper}">' +
+					'<div class="{class:avatar}"></div>' +
+				'</div>' +
+				'<div class="{class:wrapper}">' +
+					'<div class="{class:subwrapper}">' +
+						'<div class="{class:header-container}">' +
+							'<div class="{class:header-centered}">' +
+								'<div class="{class:authorName}"></div>' +
+								'<div class="{class:date}"></div>' +
+								'<div class="echo-clear"></div>' +
+							'</div>' +
+						'</div>' +
+						'<div class="{class:modeSwitch} echo-clickable"></div>' +
+						'<div class="{class:data}">' +
+							'<div class="{class:re}"></div>' +
+							'<div class="{class:body} echo-primaryColor"> ' +
+								'<span class="{class:text}"></span>' +
+								'<span class="{class:textEllipses}">...</span>' +
+								'<span class="{class:textToggleTruncated} echo-linkColor echo-clickable"></span>' +
+							'</div>' +
+							'<div class="{class:seeMore}">{label:seeMore}</div>' +
+						'</div>' +
+						'<div class="{class:metadata}"></div>' +
+						'<div class="{class:footer} echo-secondaryColor echo-secondaryFont">' +
+							'<img class="{class:sourceIcon} echo-clickable">' +
+							'<div class="{class:from}"></div>' +
+							'<div class="{class:via}"></div>' +
+							'<div class="{class:buttons}"></div>' +
 							'<div class="echo-clear"></div>' +
 						'</div>' +
 					'</div>' +
-					'<div class="{class:modeSwitch} echo-clickable"></div>' +
-					'<div class="{class:data}">' +
-						'<div class="{class:re}"></div>' +
-						'<div class="{class:body} echo-primaryColor"> ' +
-							'<span class="{class:text}"></span>' +
-							'<span class="{class:textEllipses}">...</span>' +
-							'<span class="{class:textToggleTruncated} echo-linkColor echo-clickable"></span>' +
-						'</div>' +
-						'<div class="{class:seeMore}">{label:seeMore}</div>' +
-					'</div>' +
-					'<div class="{class:metadata}"></div>' +
-					'<div class="{class:footer} echo-secondaryColor echo-secondaryFont">' +
-						'<img class="{class:sourceIcon} echo-clickable">' +
-						'<div class="{class:from}"></div>' +
-						'<div class="{class:via}"></div>' +
-						'<div class="{class:buttons}"></div>' +
-						'<div class="echo-clear"></div>' +
-					'</div>' +
 				'</div>' +
+				'<div class="echo-clear"></div>' +
+				'<div class="{class:childrenMarker}"></div>' +
 			'</div>' +
-			'<div class="echo-clear"></div>' +
-			'<div class="{class:childrenMarker}"></div>' +
 		'</div>';
 
 /**
@@ -406,9 +408,6 @@ card.templates.mainHeader =
 card.templates.mainFooter =
 		'<div class="{class:childrenByCurrentActorLive}"></div>' +
 	'</div>';
-
-card.templates.wrapper =
-	'<div class="{class:containerWrapper}"></div>';
 
 /**
  * @echo_template
@@ -491,7 +490,7 @@ card.renderers.indicator = function(element) {
 /**
  * @echo_renderer
  */
-card.renderers.container = function(element) {
+card.renderers.content = function(element) {
 	var self = this;
 	if (this.get("isItemNew")) {
 		var liveUpdate = this.cssPrefix + "new";
@@ -536,11 +535,7 @@ card.renderers.container = function(element) {
 			switchClasses("remove");
 		});
 	}
-	return this.view.rendered()
-		? element
-		: element.wrap(this.substitute({
-			"template": card.templates.wrapper
-		}));
+	return element;
 };
 
 /**
@@ -895,23 +890,23 @@ card.renderers.expandChildren = function(element, extra) {
 
 card.methods._maybeRemoveLiveUpdateIndicator = function() {
 	var self = this;
-	var container = this.view.get("container");
-	// Item can be created but not rendered. So we check if container exists here.
+	var content = this.view.get("content");
+	// Item can be created but not rendered. So we check if item content exists here.
 	if (
 		this.config.get("markAsRead") !== "viewportenter"
-		|| !container
-		|| !$.inviewport(container, {"threshold": 0})
+		|| !content
+		|| !$.inviewport(content, {"threshold": 0})
 	) {
 		return;
 	}
 	this.set("isItemNew", false);
 	if (this._transitionSupported()) {
-		container.removeClass(this.cssPrefix + "new");
+		content.removeClass(this.cssPrefix + "new");
 	} else {
 		setTimeout(function() {
 			// IE 8-9 doesn't support transition, so we just remove the highlighting.
 			// Maybe we should use jquery.animate (animating colors requires jQuery UI) ?
-			container.removeClass(self.cssPrefix + "new");
+			content.removeClass(self.cssPrefix + "new");
 		}, this.config.get("fadeTimeout"));
 	}
 };
@@ -1364,10 +1359,10 @@ card.methods.traverse = function(tree, callback, acc) {
 card.methods.block = function(label) {
 	if (this.blocked) return;
 	this.blocked = true;
-	// Due to container have padding and we can't calculate width, we should take its parent (wrapper) instead.
-	var content = this.view.get("container").parent();
+	// Due to item content element have padding and we can't calculate width, we should take its parent (wrapper) instead.
+	var content = this.view.get("content").parent();
 	var width = content.width();
-	// we should take into account that the container has a 10px 0px padding value
+	// we should take into account that the item content element has a 10px 0px padding value
 	var height = content.outerHeight();
 	this.blockers = {
 		"backdrop": $('<div class="' + this.cssPrefix + 'blocker-backdrop"></div>').css({
@@ -1394,7 +1389,7 @@ card.methods.unblock = function() {
 	this.blocked = false;
 	this.blockers.backdrop.remove();
 	this.blockers.message.remove();
-	this.view.get("container").removeClass("echo-relative");
+	this.view.get("content").removeClass("echo-relative");
 };
 
 /**
@@ -1771,11 +1766,11 @@ card.methods._sortButtons = function() {
 var cardDepthRules = [];
 // 100 is a maximum level of children in query, but we can apply styles for ~20
 for (var i = 0; i <= 20; i++) {
-	cardDepthRules.push('.{class:content} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 12 + (i - 1) * 39 : 16) + 'px; }');
+	cardDepthRules.push('.{class:container} .{class:depth}-' + i + ' { margin-left: 0px; padding-left: ' + (i ? 12 + (i - 1) * 39 : 16) + 'px; }');
 }
 
 card.css =
-	'.{class:content} { word-wrap: break-word; }' +
+	'.{class:container} { word-wrap: break-word; }' +
 	'.{class:container-root} { padding: 10px 0px 10px 10px; }' +
 	'.{class:container-root-thread} { padding: 10px 0px 0px 10px; }' +
 	'.{class:container-child} { padding: 10px; margin: 0px 20px 2px 0px; }' +
@@ -1820,9 +1815,9 @@ card.css =
 	'.echo-sdk-ui .{class:dropdownButton} { display: inline; margin-left: 0px; }' +
 	'.echo-sdk-ui .{class:dropdownButton} > .dropdown { display: inline; }' +
 	'.echo-sdk-ui .{class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
-	'.{class:containerWrapper} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
-	'.{class:container} { background: #ffffff; position: relative; }' +
-	'.{class:container}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
+	'.{class:subcontainer} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
+	'.{class:content} { background: #ffffff; position: relative; }' +
+	'.{class:content}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
 
 	'.echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
 	'.{class:date} { font-size: 12px; float: left; color: #d3d3d3; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; max-width: 100%; }' +
@@ -1830,7 +1825,7 @@ card.css =
 	'.{class:avatar} { width: 36px; height: 36px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; }' +
 	'.{class:children} .{class:avatar}, .{class:childrenByCurrentActorLive} .{class:avatar} { width: 28px; height: 28px; }' +
 
-	'.{class:content} { background: #f8f8f8; border-radius: 3px; }' +
+	'.{class:container} { background: #f8f8f8; border-radius: 3px; }' +
 	'.{class:buttons} { white-space: nowrap; float: left; height: 23px; }' +
 	'.{class:metadata} { margin-bottom: 8px; }' +
 	'.{class:body} { padding-top: 0px; margin-bottom: 8px; overflow: hidden; }' +
@@ -1842,11 +1837,11 @@ card.css =
 	'.{class:children} .{class} { margin: 0px; padding: 0px; box-shadow: 0 0 0; border: 0px; background: #F8F8F8; }' +
 	'.{class:children} .{class} { padding-top: 0px; background: none; border: none; }' +
 
-	'.{class:content} .{class:container-child-thread} { padding: 8px 0px 10px 8px; margin: 0px 16px 2px 0px; }' +
+	'.{class:container} .{class:container-child-thread} { padding: 8px 0px 10px 8px; margin: 0px 16px 2px 0px; }' +
 
 	'.{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
-	'.{class:children} .{class:containerWrapper} { padding-top: 0px; background: none; border: none; }' +
+	'.{class:children} .{class:subcontainer} { padding-top: 0px; background: none; border: none; }' +
 
 	'.echo-sdk-ui .{class:buttons} a:focus { outline: none; }' +
 	'.{class:button} { margin-right: 10px; line-height: 22px; }' +
@@ -1862,10 +1857,10 @@ card.css =
 		'.{class:buttons} a.{class:button}.echo-linkColor,' +
 		'.echo-sdk-ui .{class:button}:active,' +
 		'.echo-sdk-ui .{class:button}:focus { text-decoration: none; color: #c6c6c6; }' +
-	'.{class:container}:hover a.{class:button} { color: #262626; text-decoration: none; }' +
+	'.{class:content}:hover a.{class:button} { color: #262626; text-decoration: none; }' +
 	'.{class:buttonLabel} { vertical-align: middle; font-size: 12px; }' +
 	'.{class:buttons} a.{class:button}.echo-linkColor .{class:buttonIcon},' +
-		'.{class:container}:hover .{class:buttonIcon},' +
+		'.{class:content}:hover .{class:buttonIcon},' +
 		'.{class:buttons} a.{class:button}:hover .{class:buttonIcon} { opacity: 0.8; }' +
 
 	'.{class:depth-0} .{class:date} { line-height: 40px; }' +
@@ -1890,7 +1885,7 @@ card.css =
 	'.{class:depth-0} .{class:date} { line-height: 18px; }' +
 
 	'.{class:data} { padding: 7px 0px 0px 0px; }' +
-	'.{class:content} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
+	'.{class:container} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
 	'.{class} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
 	'.{class} { margin: 0px 0px 10px 0px; padding: 0px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; background: #ffffff; }' +
 
@@ -1903,7 +1898,7 @@ card.css =
 	'.{class:modeSwitch} { width: 0px; height: 0px; display: none !important; }' +
 
 	// indicator
-	'.{class:container} { position: relative; }' +
+	'.{class:content} { position: relative; }' +
 	'.{class:indicator} { position: absolute; left: 0px; top: 0px; bottom: 0px; width: 4px; background-color: transparent; z-index: 10; }' +
 	'.{class:new} .{class:indicator} { background-color: #f5ba47; }' +
 

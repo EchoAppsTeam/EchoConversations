@@ -89,7 +89,7 @@ plugin.renderers.photoThumbnail = function(element) {
 };
 
 plugin.renderers.photoContainer = function(element) {
-	this.component.view.get("container")
+	this.component.view.get("content")
 		.addClass(this.cssPrefix + "enabled");
 	var expanded = this.cssPrefix + "expanded";
 	var self = this;

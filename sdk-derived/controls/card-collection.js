@@ -1264,7 +1264,7 @@ collection.methods._spotUpdates.add = function(item, options) {
 	} else {
 		var parent = this._getParentItem(item);
 		if (parent && parent.view.rendered()) {
-			parent.view.render({"name": "container"});
+			parent.view.render({"name": "content"});
 			parent.view.render({"name": "children"});
 			parent.view.render({"name": "childrenByCurrentActorLive"});
 		}
@@ -1297,7 +1297,7 @@ collection.methods._spotUpdates.replace = function(item, options) {
 		}
 	}
 	if (item && item.view.rendered()) {
-		item.view.render({"name": "container", "recursive": true});
+		item.view.render({"name": "content", "recursive": true});
 		/**
 		 * @member Echo.StreamServer.Controls.Card
 		 * @echo_event Echo.StreamServer.Controls.Card.onRerender
@@ -1331,7 +1331,7 @@ collection.methods._spotUpdates.remove = function(item, options) {
 				"extra": options
 			});
 			this._applyStructureUpdates("delete", item, options);
-			parent.view.render({"name": "container"});
+			parent.view.render({"name": "content"});
 		}
 	}
 };
@@ -1354,7 +1354,7 @@ collection.methods._spotUpdates.animate.add = function(item) {
 		// to avoid element jumping during the animation effect
 		var height = item.config.get("target").show().css("height");
 		item.config.get("target").css("overflow", "hidden");
-		item.view.get("content")
+		item.view.get("container")
 			.css("margin-top", "-" + height)
 			.animate(
 				{"margin-top": "0px"},
@@ -1363,7 +1363,7 @@ collection.methods._spotUpdates.animate.add = function(item) {
 					// we should remove temporary set of css styles
 					// as soon as the animation is complete
 					item.config.get("target").css("overflow", "");
-					item.view.get("content").css("margin-top", "");
+					item.view.get("container").css("margin-top", "");
 					next();
 				}
 			);

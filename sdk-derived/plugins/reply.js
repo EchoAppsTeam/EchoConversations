@@ -42,7 +42,7 @@ plugin.labels = {
 plugin.init = function() {
 	var item = this.component;
 	item.addButtonSpec("Reply", this._assembleButton());
-	this.extendTemplate("insertAsLastChild", "content", plugin.templates.form);
+	this.extendTemplate("insertAsLastChild", "container", plugin.templates.form);
 	this.extendTemplate("insertBefore", "expandChildren", plugin.templates.topSpacing);
 };
 
