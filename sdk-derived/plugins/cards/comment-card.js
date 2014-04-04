@@ -106,3 +106,127 @@ plugin.css =
 Echo.Plugin.create(plugin);
 
 })(Echo.jQuery);
+
+(function($) {
+"use strict";
+
+/**
+ * @class Echo.StreamServer.Controls.CardComposer.Plugins.CommentCard
+ * Adds custom composer to CardComposer control allowing to post comments.
+ *
+ *		new Echo.StreamServer.Controls.CardComposer({
+ *			"target": document.getElementById("composer"),
+ *			"appkey": "echo.jssdk.demo.aboutecho.com",
+ *			"plugins": [{
+ *				"name": "CommentCard"
+ *			}]
+ *		});
+ *
+ * More information regarding the plugins installation can be found
+ * in the [“How to initialize Echo components”](#!/guide/how_to_initialize_components-section-initializing-plugins) guide.
+ *
+ * @extends Echo.Plugin
+ *
+ * @package streamserver/plugins.pack.js
+ * @package streamserver.pack.js
+ */
+var plugin = Echo.Plugin.manifest("CommentCard", "Echo.StreamServer.Controls.CardComposer");
+
+if (Echo.Plugin.isDefined(plugin)) return;
+
+plugin.init = function() {
+	this.component.registerComposer({
+		"id": "comment",
+		"label": this.labels.get("comment"),
+		"icon": "icon-comment",
+		"composer": $.proxy(this.buildComposer, this),
+		"getData": $.proxy(this.getData, this),
+		"setData": $.proxy(this.setData, this),
+		"objectType": "http://activitystrea.ms/schema/1.0/comment"
+	});
+};
+
+plugin.vars = {
+	"composer": null
+};
+
+plugin.labels = {
+	/**
+	 * @echo_label
+	 */
+	"comment": "Comment",
+	/**
+	 * @echo_label
+	 */
+	"textPlaceholder": "What's on your mind?"
+};
+
+plugin.methods.buildComposer = function() {
+	var self = this, timer;
+	this.composer = $("<div>").append(
+		'<div class="echo-cardcomposer-field-wrapper">' +
+			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("textPlaceholder") + '">' +
+		'</div>'
+	);
+	this.composer.find(".echo-comment-composer-text").on("keyup paste", function() {
+		clearTimeout(timer);
+		var el = $(this);
+		timer = setTimeout(function() {
+			self.component.attachMedia({
+				"fromElement": el
+			});
+		}, 1000);
+	});
+	return this.composer;
+};
+
+plugin.methods.getData = function() {
+	return {
+		"text": this.composer.find(".echo-comment-composer-text").val(),
+		"media": this._getMediaContent()
+	};
+};
+
+plugin.methods.setData = function(data) {
+	this.composer.find(".echo-comment-composer-text").val(data.text);
+};
+
+plugin.methods._getMediaContent = function() {
+	var self = this;
+	var media = this.component.formData.media;
+	if (!media.length) return "";
+	return $.map(media, function(item) {
+		return self.component.substitute({
+			"template": self._mediaTemplate(),
+			"data": $.extend(true, {}, item, {
+				"oembed": self.component._htmlEncode(item)
+			})
+		});
+	}).join("");
+};
+
+plugin.methods._mediaTemplate = function() {
+	return '<div class="echo-media-item" data-oembed="{data:oembed}">' +
+		'<div class="echo-item-article">' +
+			'<div class="echo-item-template-article-thumbnail" style="width: 30%; float: left; max-width: 120px; max-height: 120px; text-align: center; overflow: hidden;">' +
+				'<img src="{data:thumbnail_url}" style="width: auto; height: auto; max-height: 120px; max-width: 120px;">' +
+			'</div>' +
+			'<div class="echo-item-template-article" style="width: 70%; float: left;">' +
+				'<div class="echo-item-template-article-title" style="margin-left: 10px;">' +
+					'<a href="{data:url}" target="_blank">{data:title}</a>' +
+				'</div>' +
+				'<div class="echo-item-template-article-descriptionContainer">' +
+					'<div class="echo-item-template-article-description" style="margin-left: 10px;">{data:description}</div>' +
+				'</div>' +
+			'</div>' +
+			'<div class="echo-clear"></div>' +
+		'</div>' +
+	'</div>';
+};
+
+plugin.css =
+	'.echo-sdk-ui textarea.echo-comment-composer-text { height: 75px; }';
+
+Echo.Plugin.create(plugin);
+
+})(Echo.jQuery);

@@ -77,7 +77,7 @@ plugin.methods.buildComposer = function() {
 		var el = $(this);
 		timer = setTimeout(function() {
 			self.component.attachMedia({
-				"url": el.val(),
+				"fromElement": el,
 				"removeOld": true
 			});
 		}, 1000);

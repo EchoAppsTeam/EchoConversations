@@ -488,6 +488,8 @@ conversations.renderers.postComposer = function(element) {
 			"submitPermissions": this._getSubmitPermissions(),
 			"dependencies": this.config.get("dependencies"),
 			"plugins": this._mergeSpecsByName([{
+				"name": "CommentCard"
+			}, {
 				"name": "PhotoCard"
 			}, {
 				"name": "LinkCard"
@@ -885,6 +887,8 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"extraActions": moderationExtraActions,
 		"topMarkers": this.config.get("topMarkers")
 	}, {
+		"name": "CommentCard"
+	}, {
 		"name": "PhotoCard"
 	}, {
 		"name": "VideoCard"
@@ -932,6 +936,8 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"submitPermissions": this._getSubmitPermissions(),
 		"dependencies": this.config.get("dependencies"),
 		"nestedPlugins": this._mergeSpecsByName([{
+			"name": "CommentCard"
+		}, {
 			"name": "PhotoCard"
 		}, {
 			"name": "LinkCard"
@@ -951,6 +957,8 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"requestMethod": "POST",
 		"dependencies": this.config.get("dependencies"),
 		"nestedPlugins": [{
+			"name": "CommentCard"
+		}, {
 			"name": "PhotoCard"
 		}, {
 			"name": "LinkCard"

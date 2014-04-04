@@ -937,16 +937,18 @@ composer.methods.highlightField = function(element, message) {
 };
 
 composer.methods.attachMedia = function(params) {
-	var self = this;
+	var self = this, urls = [];
 	params = $.extend({
 		"urls": [],
-		"removeOld": false,
-		"render": true
+		"removeOld": false
 	}, params);
-	var urls = params.urls.length && params.urls || [params.url || ""];
-	urls = $.map(urls, function(url) {
-		return $.trim(url);
-	});
+	if (params.urls.length) {
+		urls = $.map(params.urls, function(url) {
+			return $.trim(url);
+		});
+	} else if (params.fromElement) {
+		urls = this.resolver.extractURLs(params.fromElement.val());
+	}
 	this.resolver.resolve(urls, function(data) {
 		if (params.removeOld) {
 			self.removeMedia();
