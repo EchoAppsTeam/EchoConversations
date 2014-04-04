@@ -81,7 +81,8 @@ plugin.methods.normalizer = function() {
 };
 
 plugin.methods.isEnabled = function() {
-	return ~$.inArray("http://activitystrea.ms/schema/1.0/video", this.component.get("data.object.objectTypes"));
+	var item = this.component;
+	return item.isRoot() && ~$.inArray("http://activitystrea.ms/schema/1.0/video", item.get("data.object.objectTypes"));
 };
 
 plugin.css =

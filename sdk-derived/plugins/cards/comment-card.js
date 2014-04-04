@@ -73,10 +73,22 @@ plugin.renderers.mediaContent = function(element) {
 
 plugin.methods.isEnabled = function() {
 	var result = false;
-	$.each(this.component.get("data.object.objectTypes", []), function(i, objectType) {
-		if (objectType === "http://activitystrea.ms/schema/1.0/note" ||
-				objectType === "http://activitystrea.ms/schema/1.0/comment" ||
-				objectType === "http://echoenabled.com/schema/1.0/link"
+	var availableTypes = {
+		"all": [
+			"http://activitystrea.ms/schema/1.0/note",
+			"http://activitystrea.ms/schema/1.0/comment",
+			"http://echoenabled.com/schema/1.0/link"
+		],
+		"child": [
+			"http://activitystrea.ms/schema/1.0/article",
+			"http://activitystrea.ms/schema/1.0/image",
+			"http://activitystrea.ms/schema/1.0/video"
+		]
+	};
+	var item = this.component;
+	$.each(item.get("data.object.objectTypes", []), function(i, objectType) {
+		if (~$.inArray(objectType, availableTypes.all) ||
+				!item.isRoot() && ~$.inArray(objectType, availableTypes.child)
 		) {
 			result = true;
 			return false;
