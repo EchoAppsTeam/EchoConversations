@@ -584,7 +584,24 @@ composer.renderers.media = function(element) {
 			"displayAuthor": false,
 			"onRemove": function(data) {
 				self.removeMedia(self._getDefinedMediaIndex(data));
+				/**
+				 * @echo_event Echo.StreamServer.Controls.CardComposer.onMediaDetached
+				 * Triggered when attached media preview was removed
+				 */
+				self.events.publish({
+					"topic": "onMediaDetached"
+				});
 			}
+		},
+		"ready": function() {
+			/**
+			 * @echo_event Echo.StreamServer.Controls.CardComposer.onMediaContainerReady
+			 * Triggered when attached media was resolved
+			 */
+			self.events.publish({
+				"topic": "onMediaContainerReady"
+			});
+			self._setPostButtonState("normal");
 		}
 	});
 	return element;

@@ -252,7 +252,20 @@ plugin.labels = {
 	/**
 	 * @echo_label
 	 */
-	"URL": "URL"
+	"URL": "URL",
+	/**
+	 * @echo_label
+	 */
+	"plus": "+",
+	/**
+	 * @echo_label
+	 */
+	"initialUploadingTooltip": "Drag file here or press \"+\" to upload image",
+	/**
+	 * @echo_label
+	 */
+	"loading": "Loading"
+
 };
 
 plugin.dependencies = [{
@@ -262,38 +275,93 @@ plugin.dependencies = [{
 	}
 }];
 
+plugin.events = {
+	"Echo.StreamServer.Controls.CardComposer.onMediaContainerReady": function() {
+		this.composer.find(".echo-cardcomposer-drop-panel").slideUp();
+	}
+};
+
+$.map(["Echo.StreamServer.Controls.CardComposer.onMediaDetached",
+	"Echo.StreamServer.Controls.CardComposer.onPostComplete"], function(eventName) {
+	plugin.events[eventName] = function() {
+		this.renewMediaPanel();
+		this.composer.find(".echo-cardcomposer-drop-panel").slideDown();
+	};
+});
+
+plugin.methods.renewMediaPanel = function() {
+	this.composer.find(".echo-cardcomposer-drop-panel").removeAttr("disabled");
+	this.composer.find(".echo-cardcomposer-uploading-tooltip")
+		.text(this.labels.get("initialUploadingTooltip"));
+
+	this.composer.find(".echo-cardcomposer-plus-button")
+		.text(this.labels.get("plus"))
+		.removeClass("echo-cardcomposer-filepicker-loading");
+};
 
 plugin.methods.buildComposer = function() {
 	var self = this;
-	var unique = "filepicker-" + Echo.Utils.getUniqueString();
-	this.composer = $("<div>").append(
-		'<div class="echo-cardcomposer-field-wrapper">' +
-			'<input type="text" class="echo-photo-composer-title" placeholder="' + this.labels.get("title") + '">' +
-		'</div>' +
-		'<div class="echo-cardcomposer-delimiter"></div>' +
-		'<iframe class="echo-photo-composer-iframe" id="' + unique + '"></iframe>'
-	);
-	setTimeout(function() {
-		// iframe for filepicker is dead, nothing to do
-		if (!$("#" + unique).length) return;
+	this.composer = $("<div>").append([
+		'<div class="echo-cardcomposer-field-wrapper">',
+			'<input type="text" class="echo-photo-composer-title" placeholder="', this.labels.get("title"), '">',
+		'</div>',
+		'<div class="echo-cardcomposer-delimiter"></div>',
+		'<div class="echo-cardcomposer-drop-panel">',
+			'<div class="echo-cardcomposer-drop-panel-wrapper">',
+				'<div class="echo-cardcomposer-drop-panel-container strippedBackground">',
+					'<div class="echo-cardcomposer-plus-button">',
+						this.labels.get("plus"),
+					'</div>',
+					'<span class="echo-cardcomposer-uploading-tooltip">',
+						this.labels.get("initialUploadingTooltip"),
+					'</span>',
+				'</div>',
+			'</div>',
+		'</div>'
+	].join(""));
 
-		var filepickerKey = window.filepicker.apikey;
+	var attachMedia = function(url) {
+		self.component.attachMedia({
+			"url": url,
+			"removeOld": true
+		});
+	};
+
+	setTimeout(function() {
+		var plusButton = self.composer.find(".echo-cardcomposer-plus-button");
+		var tooltip = self.composer.find(".echo-cardcomposer-uploading-tooltip");
 		window.filepicker.setKey(self.component.config.get("dependencies.FilePicker.apiKey"));
-		window.filepicker.pick({
+		window.filepicker.makeDropPane(self.composer.find(".echo-cardcomposer-drop-panel")[0], {
+			"multiple": false,
 			"mimetype": "image/*",
-			"container": unique
-		}, function(InkBlob) {
-			window.filepicker.setKey(filepickerKey);
-			self.component.attachMedia({
-				"url": InkBlob.url,
-				"removeOld": true
+			"onStart": function(files) {
+				plusButton.addClass("echo-cardcomposer-filepicker-loading").empty();
+				tooltip.text(self.labels.get("loading"));
+				self.component._setPostButtonState("disabled");
+			},
+			"onSuccess": function(InkBlobs) {
+				attachMedia(InkBlobs[0].url);
+			},
+			"onError": function(type, message) {
+				self.log(message);
+				self.renewMediaPanel();
+			}
+		});
+
+		plusButton.click(function(event) {
+			self.component._setPostButtonState("disabled");
+			window.filepicker.pick({
+				"mimetype": "image/*",
+				"container": "modal"
+			}, function(InkBlob) {
+				attachMedia(InkBlob.url);
+			}, function(FPError) {
+				self.component._setPostButtonState("normal");
+				self.log(FPError);
 			});
-			self.log(JSON.stringify(InkBlob));
-		}, function(FPError) {
-			self.log(FPError);
-			window.filepicker.setKey(filepickerKey);
 		});
 	}, 0);
+
 	return this.composer;
 };
 
@@ -331,8 +399,24 @@ plugin.methods._mediaTemplate = function() {
 	'</div>';
 };
 
+var gradientStyle = function(value) {
+	var propertyName = "background-image";
+	return $.map(["linear-gradient", "-webkit-linear-gradient", "-moz-linear-gradient", "-ms-linear-gradient", "-o-linear-gradient"], function(propertySpecific) {
+		return propertyName +': ' + propertySpecific + "(" + value + ")";
+	}).join(";");
+};
+
 plugin.css =
-	'.echo-photo-composer-iframe { border: 0px; width: 100%; min-height: 405px; display: block; }';
+	'.echo-cardcomposer-drop-panel { width: 100%; height: 100%; max-height: 388px; cursor: pointer; background-color: #eee; text-align: center; font-size: 16px; font-family: "Helvetica Neue", arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; }' +
+	'.echo-cardcomposer-plus-button { font-size: 128px; line-height: 128px; font-weight: bold; width: 128px; height: 128px; margin: 0 auto; }' +
+	'.strippedBackground { ' +
+		gradientStyle("left top, #e3e3e3 0%, #e3e3e3 25%, #eee 25%, #eee 50%, #e3e3e3 50%, #e3e3e3 75%, #eee 75%") + '; ' +
+		'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#e3e3e3", endColorstr="#eeeeee",GradientType=0 ); ' +
+		'background-size: 70px 70px;' +
+	'}' +
+	'.echo-cardcomposer-drop-panel-wrapper { border: 1px solid #C4C4C4; margin: 5px; border-radius: 2px; }' +
+	'.echo-cardcomposer-drop-panel-container { padding: 10px 0 40px 0; margin: 5px; }' +
+	'.echo-cardcomposer-filepicker-loading {background-image: url("{%= baseURL %}/images/loading.gif"); }';
 
 Echo.Plugin.create(plugin);
 
