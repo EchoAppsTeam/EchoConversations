@@ -416,7 +416,7 @@ card.templates.wrapper =
 card.templates.childrenTop =
 	'<div class="{class:children}"></div>' +
 	'<div class="{class:expandChildren} {class:container-child} echo-trinaryBackgroundColor echo-clickable">' +
-		'<span class="{class:expandChildrenLabel} echo-message-icon"></span>' +
+		'<span class="{class:expandChildrenLabel}"></span>' +
 		'<span class="{class:chevron} icon-chevron-down"></span>' +
 	'</div>';
 
@@ -425,7 +425,8 @@ card.templates.childrenTop =
  */
 card.templates.childrenBottom =
 	'<div class="{class:expandChildren} {class:container-child} echo-trinaryBackgroundColor echo-clickable">' +
-		'<span class="{class:expandChildrenLabel} echo-message-icon"></span>' +
+		'<span class="{class:expandChildrenLabel}"></span>' +
+		'<span class="{class:chevron} icon-chevron-down"></span>' +
 	'</div>' +
 	'<div class="{class:children}"></div>';
 
@@ -1812,7 +1813,7 @@ card.css =
 	'.{class:textToggleTruncated} { margin-left: 5px; }' +
 	'.{class:blocker-backdrop} { position: absolute; left: 0px; top: 0px; background: #FFFFFF; opacity: 0.7; z-index: 100; }' +
 	'.{class:blocker-message} { position: absolute; z-index: 200; width: 200px; height: 20px; line-height: 20px; text-align: center; background-color: #FFFF99; border: 1px solid #C6C677; opacity: 0.7; -moz-border-radius: 0.5em 0.5em 0.5em 0.5em; }' +
-	'.{class:expandChildren} { display: none; text-align: center; padding: 8px 0px; margin-bottom: 0px; }' +
+	'.{class:expandChildren} { display: none; text-align: center; padding: 8px 0px; margin-bottom: 0px;  font-size: 12px;}' +
 	'.{class:expandChildren} .{class:expandChildrenLabel} { display: inline-block; padding-left: 22px; }' +
 	'.{class:expandChildren} .echo-message-icon { background: url("{config:cdnBaseURL.sdk-assets}/images/whirlpool.png") no-repeat 5px 4px; }' +
 	'.{class:expandChildren} .{class:message-loading} { background: no-repeat left top url("{config:cdnBaseURL.sdk-assets}/images/loading.gif"); }' +
