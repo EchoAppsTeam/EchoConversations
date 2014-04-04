@@ -328,7 +328,7 @@ plugin.methods.buildComposer = function() {
 
 	var attachMedia = function(url) {
 		self.component.attachMedia({
-			"url": url,
+			"urls": [url],
 			"removeOld": true
 		});
 	};
