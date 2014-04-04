@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Echo Conversations v1.3 Demo</title>
+</head>
+
+<body style="margin: 0;">
+
+	<script type="text/javascript" src="http://cdn.echoenabled.com/sdk/v3/loader.js"></script>
+	<div class="echo-canvas" data-canvas-id="echo/c996p4ynqs" data-canvas-mode="dev" style="margin: 0px auto;"></div>
+
+	<script type="text/javascript">
+
+		Echo.Loader.override("echo/c996p4ynqs", "2ghkabb5s0", {
+			"streamingControl": {
+				"displayStreamingStateHeader": true
+			},
+			"postComposer": {
+				"contentTypes": {
+					"comments": {
+						"attachments": {"visible": true}
+					}
+				}
+			},
+			"replyComposer": {
+				"contentTypes": {
+					"comments": {
+						"attachments": {"visible": true}
+					}
+				}
+			},
+			"auth": {
+				"allowAnonymousSubmission": true
+			}
+		});
+
+		Echo.Loader.init();
+
+	</script>
+
+</body>
+</html>

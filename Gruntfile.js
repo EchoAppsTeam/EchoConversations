@@ -29,7 +29,10 @@ module.exports = function(grunt) {
 		"demo": [
 			"demo.html",
 			"premoderation.html",
-			"demo-dev.html"
+			"demo-dev.html",
+			"comparison.html",
+			"v1.3.html",
+			"v1.4.html"
 		]
 	};
 
