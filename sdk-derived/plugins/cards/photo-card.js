@@ -260,7 +260,7 @@ plugin.labels = {
 	/**
 	 * @echo_label
 	 */
-	"initialUploadingTooltip": "Drag file here or press \"+\" to upload image",
+	"initialUploadingTooltip": "Drag file here or click \"+\" to upload an image",
 	/**
 	 * @echo_label
 	 */
@@ -277,26 +277,32 @@ plugin.dependencies = [{
 
 plugin.events = {
 	"Echo.StreamServer.Controls.CardComposer.onMediaContainerReady": function() {
-		this.composer.find(".echo-cardcomposer-drop-panel").slideUp();
+		if (!this.isPhotoComposerActive()) return;
+		this.composer.find(".echo-photo-composer-drop-panel").slideUp();
 	}
 };
 
 $.map(["Echo.StreamServer.Controls.CardComposer.onMediaDetached",
 	"Echo.StreamServer.Controls.CardComposer.onPostComplete"], function(eventName) {
 	plugin.events[eventName] = function() {
+		if (!this.isPhotoComposerActive()) return;
 		this.renewMediaPanel();
-		this.composer.find(".echo-cardcomposer-drop-panel").slideDown();
+		this.composer.find(".echo-photo-composer-drop-panel").slideDown();
 	};
 });
 
+plugin.methods.isPhotoComposerActive = function() {
+	return this.component.currentComposer.id === "photo";
+};
+
 plugin.methods.renewMediaPanel = function() {
-	this.composer.find(".echo-cardcomposer-drop-panel").removeAttr("disabled");
-	this.composer.find(".echo-cardcomposer-uploading-tooltip")
+	this.composer.find(".echo-photo-composer-drop-panel").removeAttr("disabled");
+	this.composer.find(".echo-photo-composer-uploading-tooltip")
 		.text(this.labels.get("initialUploadingTooltip"));
 
-	this.composer.find(".echo-cardcomposer-plus-button")
+	this.composer.find(".echo-photo-composer-plus-button")
 		.text(this.labels.get("plus"))
-		.removeClass("echo-cardcomposer-filepicker-loading");
+		.removeClass("echo-photo-composer-filepicker-loading");
 };
 
 plugin.methods.buildComposer = function() {
@@ -306,13 +312,13 @@ plugin.methods.buildComposer = function() {
 			'<input type="text" class="echo-photo-composer-title" placeholder="', this.labels.get("title"), '">',
 		'</div>',
 		'<div class="echo-cardcomposer-delimiter"></div>',
-		'<div class="echo-cardcomposer-drop-panel">',
-			'<div class="echo-cardcomposer-drop-panel-wrapper">',
-				'<div class="echo-cardcomposer-drop-panel-container strippedBackground">',
-					'<div class="echo-cardcomposer-plus-button">',
+		'<div class="echo-photo-composer-drop-panel">',
+			'<div class="echo-photo-composer-drop-panel-wrapper">',
+				'<div class="echo-photo-composer-drop-panel-container strippedBackground">',
+					'<div class="echo-photo-composer-plus-button">',
 						this.labels.get("plus"),
 					'</div>',
-					'<span class="echo-cardcomposer-uploading-tooltip">',
+					'<span class="echo-photo-composer-uploading-tooltip">',
 						this.labels.get("initialUploadingTooltip"),
 					'</span>',
 				'</div>',
@@ -328,14 +334,14 @@ plugin.methods.buildComposer = function() {
 	};
 
 	setTimeout(function() {
-		var plusButton = self.composer.find(".echo-cardcomposer-plus-button");
-		var tooltip = self.composer.find(".echo-cardcomposer-uploading-tooltip");
+		var plusButton = self.composer.find(".echo-photo-composer-plus-button");
+		var tooltip = self.composer.find(".echo-photo-composer-uploading-tooltip");
 		window.filepicker.setKey(self.component.config.get("dependencies.FilePicker.apiKey"));
-		window.filepicker.makeDropPane(self.composer.find(".echo-cardcomposer-drop-panel")[0], {
+		window.filepicker.makeDropPane(self.composer.find(".echo-photo-composer-drop-panel")[0], {
 			"multiple": false,
 			"mimetype": "image/*",
 			"onStart": function(files) {
-				plusButton.addClass("echo-cardcomposer-filepicker-loading").empty();
+				plusButton.addClass("echo-photo-composer-filepicker-loading").empty();
 				tooltip.text(self.labels.get("loading"));
 				self.component._setPostButtonState("disabled");
 			},
@@ -407,16 +413,16 @@ var gradientStyle = function(value) {
 };
 
 plugin.css =
-	'.echo-cardcomposer-drop-panel { width: 100%; height: 100%; max-height: 388px; cursor: pointer; background-color: #eee; text-align: center; font-size: 16px; font-family: "Helvetica Neue", arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; }' +
-	'.echo-cardcomposer-plus-button { font-size: 128px; line-height: 128px; font-weight: bold; width: 128px; height: 128px; margin: 0 auto; }' +
+	'.echo-photo-composer-drop-panel { width: 100%; height: 100%; max-height: 388px; cursor: pointer; background-color: #eee; text-align: center; font-size: 16px; font-family: "Helvetica Neue", arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; }' +
+	'.echo-photo-composer-plus-button { font-size: 128px; line-height: 128px; font-weight: bold; width: 128px; height: 128px; margin: 0 auto; }' +
 	'.strippedBackground { ' +
 		gradientStyle("left top, #e3e3e3 0%, #e3e3e3 25%, #eee 25%, #eee 50%, #e3e3e3 50%, #e3e3e3 75%, #eee 75%") + '; ' +
 		'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#e3e3e3", endColorstr="#eeeeee",GradientType=0 ); ' +
 		'background-size: 70px 70px;' +
 	'}' +
-	'.echo-cardcomposer-drop-panel-wrapper { border: 1px solid #C4C4C4; margin: 5px; border-radius: 2px; }' +
-	'.echo-cardcomposer-drop-panel-container { padding: 10px 0 40px 0; margin: 5px; }' +
-	'.echo-cardcomposer-filepicker-loading {background-image: url("{%= baseURL %}/images/loading.gif"); }';
+	'.echo-photo-composer-drop-panel-wrapper { border: 1px solid #C4C4C4; margin: 5px; border-radius: 2px; }' +
+	'.echo-photo-composer-drop-panel-container { padding: 10px 0 40px 0; margin: 5px; }' +
+	'.echo-photo-composer-filepicker-loading {background-image: url("{%= baseURL %}/images/loading.gif"); }';
 
 Echo.Plugin.create(plugin);
 
