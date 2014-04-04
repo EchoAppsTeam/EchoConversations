@@ -14,51 +14,64 @@ plugin.dependencies = [{
 }];
 
 plugin.init = function() {
-	this.extendTemplate("insertAsLastChild", "data", plugin.templates.media);
+	var self = this;
+	this.component.registerModificator({
+		"isEnabled": $.proxy(this.isEnabled, this),
+		"init": function () {
+			self.events.subscribe({
+				"topic": "Echo.StreamServer.Controls.Card.onUpdate",
+				"handler": function() {
+					self.normalizer();
+				}
+			});
+			self.normalizer();
+			self.extendTemplate("insertAsLastChild", "data", plugin.templates.media);
+		}
+	});
+};
+
+plugin.methods.normalizer = function() {
+	var content = $("<div/>").append(this.component.get("data.object.content"));
+	var attachments = $("div[data-oembed]", content).map(function() {
+		return $(this).data("oembed");
+	}).get();
+
+	if (attachments.length) {
+		$("div[data-oembed]", content).remove();
+	}
+
+	this.component.set("data.content", content.html());
+	this.component.set("data.attachments", attachments);
 };
 
 plugin.templates.media = '<div class="{plugin.class:mediaContent}"></div>';
 
 plugin.component.renderers.body = function(element) {
-	var self = this;
 	var item = this.component;
 
 	var original = item.get("data.object.content");
-	var content = $("<div/>").append(original);
-	var media = self._getMediaAttachments();
-	$("div[oembed], div[data-oembed]", content).remove();
-
-	Echo.Utils.safelyExecute(function() {
-		var text = $(".echo-item-text", content);
-		if (media.length && text.length) {
-			item.set("data.object.content", text.html());
-		} else if (media.length) {
-			item.set("data.object.content", content.html());
-		}
-	});
-
+	var content = this.component.get("data.content");
+	item.set("data.object.content", content);
 	this.parentRenderer("body", arguments);
-
 	item.set("data.object.content", original);
 
 	return element;
 };
 
 plugin.renderers.mediaContent = function(element) {
-	var media = this._getMediaAttachments();
-	var cardConfig = {
-		"maxMediaWidth": this.component.config.get("limits.maxMediaWidth")
-	};
+	var attachments = this.component.get("data.attachments");
 	new Echo.Conversations.MediaContainer(this.config.assemble({
 		"target": element.empty(),
-		"data": media,
-		"card": cardConfig
+		"data": attachments,
+		"card": {
+			"maxMediaWidth": this.component.config.get("limits.maxMediaWidth")
+		}
 	}));
 
-	return element.addClass(this.cssPrefix + (media.length > 1 ? "multiple" : "single"));
+	return element.addClass(this.cssPrefix + (attachments.length > 1 ? "multiple" : "single"));
 };
 
-plugin.enabled = function() {
+plugin.methods.isEnabled = function() {
 	var result = false;
 	$.each(this.component.get("data.object.objectTypes", []), function(i, objectType) {
 		if (objectType === "http://activitystrea.ms/schema/1.0/note" ||
@@ -70,22 +83,6 @@ plugin.enabled = function() {
 		}
 	});
 	return result;
-};
-
-plugin.methods._getMediaAttachments = function() {
-	var item = this.component;
-	if (this.get("content") !== item.get("data.object.content") || typeof this.get("media") === "undefined") {
-		var result = [];
-		Echo.Utils.safelyExecute(function() {
-			var content = $("<div/>").append(item.get("data.object.content"));
-			result = $("div[oembed], div[data-oembed]", content).map(function() {
-				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
-			}).get();
-		});
-		this.set("content", item.get("data.object.content"));
-		this.set("media", result);
-	}
-	return this.get("media", []);
 };
 
 plugin.css =

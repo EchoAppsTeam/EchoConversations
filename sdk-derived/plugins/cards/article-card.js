@@ -6,7 +6,20 @@ var plugin = Echo.Plugin.manifest("ArticleCard", "Echo.StreamServer.Controls.Car
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	this.extendTemplate("replace", "data", plugin.templates.main);
+	var self = this;
+	this.component.registerModificator({
+		"isEnabled": $.proxy(this.isEnabled, this),
+		"init": function () {
+			self.events.subscribe({
+				"topic": "Echo.StreamServer.Controls.Card.onUpdate",
+				"handler": function() {
+					self.normalizer();
+				}
+			});
+			self.normalizer();
+			self.extendTemplate("replace", "data", plugin.templates.main);
+		}
+	});
 };
 
 plugin.templates.main =
@@ -38,7 +51,14 @@ plugin.renderers.article = function(element) {
 	return element;
 };
 
-plugin.enabled = function() {
+plugin.methods.normalizer = function() {
+	var content = $("<div/>")
+		.append(this.component.get("data.object.content"));
+	var oembed = $("div[data-oembed]", content).data("oembed") || {};
+	this.component.set("data.oembed", oembed);
+};
+
+plugin.methods.isEnabled = function() {
 	return ~$.inArray("http://activitystrea.ms/schema/1.0/article", this.component.get("data.object.objectTypes"));
 };
 
@@ -47,9 +67,6 @@ plugin.css =
 	'.{plugin.class:item} { text-align: left; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; max-width: 100%; vertical-align: top; margin-bottom: 8px; }' +
 	'.{plugin.class:description} { overflow: hidden; }' +
 
-	// close button
-	'.{plugin.class:closeButton} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
-	'.{plugin.class:closeButton}:hover { opacity: 1; filter: alpha(opacity=100); }' +
 	// article
 	'.{plugin.class:article} { padding: 10px 0 0 0; min-width: 200px; }' +
 	'.{plugin.class:article} .{plugin.class:sourceIcon} > img { padding: 10px 0 0 0; }' +

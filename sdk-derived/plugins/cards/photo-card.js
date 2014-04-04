@@ -6,8 +6,20 @@ var plugin = Echo.Plugin.manifest("PhotoCard", "Echo.StreamServer.Controls.Card"
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	this.extendTemplate("remove", "seeMore");
-	this.extendTemplate("insertAsFirstChild", "body", plugin.templates.main);
+	var self = this;
+	this.component.registerModificator({
+		"isEnabled": $.proxy(this.isEnabled, this),
+		"init": function () {
+			self.events.subscribe({
+				"topic": "Echo.StreamServer.Controls.Card.onUpdate",
+				"handler": function() {
+					self.normalizer();
+				}
+			});
+			self.normalizer();
+			self.extendTemplate("replace", "data", plugin.templates.main);
+		}
+	});
 };
 
 plugin.config = {
@@ -44,11 +56,6 @@ plugin.events = {
 	}
 };
 
-plugin.component.renderers.container = function(element) {
-	return this.parentRenderer("container", arguments)
-		.addClass(this.cssPrefix + "enabled");
-};
-
 plugin.renderers.title = function(element) {
 	return this.component.get("data.oembed.title") ? element : element.hide();
 };
@@ -82,6 +89,8 @@ plugin.renderers.photoThumbnail = function(element) {
 };
 
 plugin.renderers.photoContainer = function(element) {
+	this.component.view.get("container")
+		.addClass(this.cssPrefix + "enabled");
 	var expanded = this.cssPrefix + "expanded";
 	var self = this;
 	var oembed = this.component.get("data.oembed", {});
@@ -142,7 +151,14 @@ plugin.renderers.photoLabelContainer = function(element) {
 	return element;
 };
 
-plugin.enabled = function() {
+plugin.methods.normalizer = function() {
+	var content = $("<div/>")
+		.append(this.component.get("data.object.content"));
+	var oembed = $("div[data-oembed]", content).data("oembed") || {};
+	this.component.set("data.oembed", oembed);
+};
+
+plugin.methods.isEnabled = function() {
 	var item = this.component;
 	var isArticle = ~$.inArray("http://activitystrea.ms/schema/1.0/article", item.get("data.object.objectTypes"));
 	var isPhoto = ~$.inArray("http://activitystrea.ms/schema/1.0/image", item.get("data.object.objectTypes"));

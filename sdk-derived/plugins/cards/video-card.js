@@ -6,7 +6,20 @@ var plugin = Echo.Plugin.manifest("VideoCard", "Echo.StreamServer.Controls.Card"
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	this.extendTemplate("replace", "data", plugin.templates.main);
+	var self = this;
+	this.component.registerModificator({
+		"isEnabled": $.proxy(this.isEnabled, this),
+		"init": function () {
+			self.events.subscribe({
+				"topic": "Echo.StreamServer.Controls.Card.onUpdate",
+				"handler": function() {
+					self.normalizer();
+				}
+			});
+			self.normalizer();
+			self.extendTemplate("replace", "data", plugin.templates.main);
+		}
+	});
 };
 
 plugin.templates.main =
@@ -60,7 +73,14 @@ plugin.renderers.videoWrapper = function(element) {
 	return element.css("width", maxWidth && maxWidth < width ? maxWidth : width);
 };
 
-plugin.enabled = function() {
+plugin.methods.normalizer = function() {
+	var content = $("<div/>")
+		.append(this.component.get("data.object.content"));
+	var oembed = $("div[data-oembed]", content).data("oembed") || {};
+	this.component.set("data.oembed", oembed);
+};
+
+plugin.methods.isEnabled = function() {
 	return ~$.inArray("http://activitystrea.ms/schema/1.0/video", this.component.get("data.object.objectTypes"));
 };
 

@@ -93,7 +93,9 @@ card.events = {
 card.init = function() {
 	this.timestamp = Echo.Utils.timestampFromW3CDTF(this.get("data.object.published"));
 	this.set("isItemNew", this.config.get("live"));
+	this._initModificator();
 	this.ready();
+
 	if (!this.config.get("manualRendering")) {
 		this.render();
 	}
@@ -274,7 +276,9 @@ card.vars = {
 	"buttonSpecs": {},
 	"buttons": {},
 	"buttonsLayout": "inline",
-	"content": undefined
+	"content": undefined,
+	"modificatorList": [],
+	"modificator": undefined
 };
 
 card.labels = {
@@ -1265,6 +1269,36 @@ card.methods._getItemRenderType = function() {
 	});
 
 	return result;
+};
+
+card.methods._getActiveModificator = function() {
+	var self = this;
+	if (!this.modificator) {
+		$.each(this.modificatorList, function(_, modificator) {
+			if (modificator.isEnabled()) {
+				self.modificator = modificator;
+				return false;
+			}
+		});
+	}
+	return this.modificator;
+};
+
+card.methods._initModificator = function() {
+	var modificator = this._getActiveModificator();
+	if (modificator) {
+		modificator.init();
+	}
+};
+
+/**
+ * Method allows register custom item content modificato
+ *
+ * @param {object} config
+ *
+ */
+card.methods.registerModificator = function(config) {
+	this.modificatorList.push(config);
 };
 
 /**
