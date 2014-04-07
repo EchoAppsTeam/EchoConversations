@@ -140,6 +140,7 @@ module.exports = function(grunt) {
 			"streamserver.pack": {
 				"src": [
 					"<%= dirs.build %>/sdk-derived/url-resolver.js",
+					"<%= dirs.build %>/sdk-derived/utils.js",
 					"<%= dirs.build %>/sdk-derived/controls/*.js",
 					"<%= dirs.build %>/sdk-derived/plugins/**/*.js"
 				],
@@ -148,7 +149,6 @@ module.exports = function(grunt) {
 			"app": {
 				"src": [
 					"<%= dirs.build %>/app.js",
-					"<%= dirs.build %>/sdk-derived/utils.js",
 					"<%= dirs.build %>/plugins/*.js"
 				],
 				"dest": "<%= dirs.build %>/app.js"
