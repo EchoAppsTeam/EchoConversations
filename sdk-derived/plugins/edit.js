@@ -238,12 +238,11 @@ plugin.component.renderers.container = function(element) {
  */
 plugin.renderers.avatar = function(element) {
 	var component = this.component;
-	component.placeImage({
-		"container": element,
-		"image": component.get("data.actor.avatar"),
-		"defaultImage": component.config.get("defaultAvatar")
+	return Echo.Utils.placeAvatar({
+		"target": element,
+		"avatar": component.get("data.actor.avatar"),
+		"defaultAvatar": component.config.get("defaultAvatar")
 	});
-	return element;
 };
 
 /**
@@ -339,11 +338,11 @@ plugin.css =
 	'.{plugin.class:noneditable} .echo-clear { display: inherit; }' +
 	'.{plugin.class} .{class:container} { border: none; padding: 0px; }' +
 	'.{plugin.class} .{class:nameContainer}, .{plugin.class} .{class:controls}, .{plugin.class} .{class:composers} { background-color: #fff; }' +
-	'.{plugin.class:avatar-wrapper} { margin-right: 5px; float: left; position: relative; }' +
+	'.{plugin.class:avatar-wrapper} { float: left; margin-right: 5px; }' +
+	'.{plugin.class:avatar} { width: 48px; height: 48px; display: inline-block; }' +
 	'.{plugin.class:header} { line-height: 48px; margin-bottom: 3px; }' +
-	'.echo-streamserver-controls-stream-item-children .{plugin.class:header}, .echo-streamserver-controls-stream-item-childrenByCurrentActorLive .{plugin.class:header} { line-height: 24px; }' +
-	'.{plugin.class:avatar} { width: 48px; height: 48px; }' +
-	'.echo-streamserver-controls-stream-item-children .{plugin.class:avatar}, .echo-streamserver-controls-stream-item-childrenByCurrentActorLive .{plugin.class:avatar} { width: 24px; height: 24px; }' +
+	'.echo-streamserver-controls-card-children .{plugin.class:header}, .echo-streamserver-controls-card-childrenByCurrentActorLive .{plugin.class:header} { line-height: 24px; }' +
+	'.echo-streamserver-controls-card-children .{plugin.class:avatar}, .echo-streamserver-controls-card-childrenByCurrentActorLive .{plugin.class:avatar} { width: 24px; height: 24px; }' +
 	'';
 
 Echo.Plugin.create(plugin);
