@@ -1,7 +1,7 @@
 (function($) {
 "use strict";
 
-var card = Echo.App.manifest("Echo.Conversations.NestedCard");
+var card = Echo.App.manifest("Echo.StreamServer.Controls.NestedCard");
 
 if (Echo.App.isDefined(card)) return;
 

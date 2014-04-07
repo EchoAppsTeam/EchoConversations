@@ -348,11 +348,8 @@ composer.vars = {
 };
 
 composer.dependencies = [{
-	"url": "{%= baseURLs.prod %}/sdk-derived/controls/nested-card.js",
-	"loaded": function() { return !!Echo.Conversations.NestedCard; }
-}, {
 	"url": "{%= baseURLs.prod %}/sdk-derived/controls/media-container.js",
-	"loaded": function() { return !!Echo.Conversations.MediaContainer; }
+	"loaded": function() { return !!Echo.StreamServer.Controls.MediaContainer; }
 }, {
 	"url": "{%= baseURLs.prod %}/third-party/jquery.placeholder.js",
 	"loaded": function() { return !!$.placeholder; }
@@ -576,7 +573,7 @@ composer.renderers.media = function(element) {
 	this.mediaContainer && this.mediaContainer.destroy();
 	if (!this.formData.media.length) return element;
 
-	this.mediaContainer = new Echo.Conversations.MediaContainer({
+	this.mediaContainer = new Echo.StreamServer.Controls.NestedCard({
 		"target": element.empty(),
 		"data": this.formData.media,
 		"card": {

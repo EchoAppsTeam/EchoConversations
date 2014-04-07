@@ -1,9 +1,14 @@
 (function($) {
 "use strict";
 
-var media = Echo.App.manifest("Echo.Conversations.MediaContainer");
+var media = Echo.App.manifest("Echo.StreamServer.Controls.MediaContainer");
 
 if (Echo.App.isDefined(media)) return;
+
+media.dependencies = [{
+	"url": "{%= baseURLs.prod %}/sdk-derived/controls/nested-card.js",
+	"loaded": function() { return !!Echo.StreamServer.Controls.NestedCard; }
+}];
 
 media.templates.main = function() {
 	return '<div class="{class:container}"></div>';
@@ -36,7 +41,7 @@ media.renderers.container = function(element) {
 		config.parent = this.itemParentConfig;
 
 		this.cards = $.map(media, function(item) {
-			return new Echo.Conversations.NestedCard($.extend({
+			return new Echo.StreamServer.Controls.NestedCard($.extend({
 				"data": item
 			}, config));
 		});

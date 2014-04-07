@@ -6,10 +6,7 @@ var plugin = Echo.Plugin.manifest("CommentCard", "Echo.StreamServer.Controls.Car
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.dependencies = [{
-	"loaded": function() { return !!Echo.Conversations.NestedCard; },
-	"url": "{%= baseURLs.prod %}/sdk-derived/controls/nested-card.js"
-}, {
-	"loaded": function() { return !!Echo.Conversations.MediaContainer; },
+	"loaded": function() { return !!Echo.StreamServer.Controls.MediaContainer; },
 	"url": "{%= baseURLs.prod %}/sdk-derived/controls/media-container.js"
 }];
 
@@ -60,7 +57,7 @@ plugin.component.renderers.body = function(element) {
 
 plugin.renderers.mediaContent = function(element) {
 	var attachments = this.component.get("data.attachments");
-	new Echo.Conversations.MediaContainer(this.config.assemble({
+	new Echo.StreamServer.Controls.MediaContainer(this.config.assemble({
 		"target": element.empty(),
 		"data": attachments,
 		"card": {
