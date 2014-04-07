@@ -18,6 +18,7 @@ Echo.Utils.placeAvatar = function(args) {
 				"progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + args.avatar + "', sizingMethod='scale')"
 		});
 	}
+	return element;
 };
 
 Echo.Utils.addCSS(
