@@ -162,20 +162,17 @@ plugin.labels = {
 };
 
 plugin.methods.buildComposer = function() {
-	var self = this, timer;
+	var self = this;
 	this.composer = $("<div>").append(
 		'<div class="echo-cardcomposer-field-wrapper">' +
 			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("textPlaceholder") + '">' +
 		'</div>'
 	);
 	this.composer.find(".echo-comment-composer-text").on("keyup paste", function() {
-		clearTimeout(timer);
-		var el = $(this);
-		timer = setTimeout(function() {
-			self.component.attachMedia({
-				"fromElement": el
-			});
-		}, 1000);
+		self.component.attachMedia({
+			"fromElement": $(this),
+			"delay": 1000
+		});
 	});
 	return this.composer;
 };

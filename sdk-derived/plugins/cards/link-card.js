@@ -62,7 +62,7 @@ plugin.labels = {
 };
 
 plugin.methods.buildComposer = function() {
-	var self = this, timer;
+	var self = this;
 	this.composer = $("<div>").append(
 		'<div class="echo-cardcomposer-field-wrapper">' +
 			'<input type="text" class="echo-link-composer-title" placeholder="' + this.labels.get("title") + '">' +
@@ -73,14 +73,11 @@ plugin.methods.buildComposer = function() {
 		'</div>'
 	);
 	this.composer.find(".echo-link-composer-link").on("keyup paste", function() {
-		clearTimeout(timer);
-		var el = $(this);
-		timer = setTimeout(function() {
-			self.component.attachMedia({
-				"fromElement": el,
-				"removeOld": true
-			});
-		}, 1000);
+		self.component.attachMedia({
+			"fromElement": $(this),
+			"removeOld": true,
+			"delay": 1000
+		});
 	});
 	return this.composer;
 };

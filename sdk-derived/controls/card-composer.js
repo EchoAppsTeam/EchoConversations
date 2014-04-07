@@ -938,6 +938,17 @@ composer.methods.highlightField = function(element, message) {
 
 composer.methods.attachMedia = function(params) {
 	var self = this, urls = [];
+	if (this.attachMediaTimer) {
+		clearTimeout(this.attachMediaTimer);
+	}
+	if (params.delay) {
+		this.attachMediaTimer = setTimeout(function() {
+			self.attachMedia.call(self, params);
+		}, params.delay);
+		// delayed function above should never be delayed again
+		delete params.delay;
+		return;
+	}
 	params = $.extend({
 		"urls": [],
 		"removeOld": false
