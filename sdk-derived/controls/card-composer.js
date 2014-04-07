@@ -1443,8 +1443,7 @@ composer.css =
 	'.{class:error} input, .{class:error} textarea { background: no-repeat center right url({config:cdnBaseURL.sdk-assets}/images/warning.gif); }' +
 
 	'.{class:resolving} { background: no-repeat bottom right url({%=baseURLs.prod%}/images/resolving.gif); }' +
-
-	'.{class:media} .echo-conversations-mediacontainer-multiple { border: 1px solid #DEDEDE; border-top-style: dashed; border-bottom: 0px; background-color: #F1F1F1; }' +
+	'.{class:media} .echo-streamserver-controls-mediacontainer-multiple { border: 1px solid #DEDEDE; border-top-style: dashed; border-bottom: 0px; background-color: #F1F1F1; }' +
 
 	// display modes
 	'.{class:normal} .{class:compactFieldWrapper},' +
