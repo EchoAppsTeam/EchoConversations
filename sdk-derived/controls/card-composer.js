@@ -348,10 +348,10 @@ composer.vars = {
 };
 
 composer.dependencies = [{
-	"url": "{%= baseURLs.prod %}/controls/nested-card.js",
+	"url": "{%= baseURLs.prod %}/sdk-derived/controls/nested-card.js",
 	"loaded": function() { return !!Echo.Conversations.NestedCard; }
 }, {
-	"url": "{%= baseURLs.prod %}/controls/media-container.js",
+	"url": "{%= baseURLs.prod %}/sdk-derived/controls/media-container.js",
 	"loaded": function() { return !!Echo.Conversations.MediaContainer; }
 }, {
 	"url": "{%= baseURLs.prod %}/third-party/jquery.placeholder.js",
