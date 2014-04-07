@@ -573,7 +573,7 @@ composer.renderers.media = function(element) {
 	this.mediaContainer && this.mediaContainer.destroy();
 	if (!this.formData.media.length) return element;
 
-	this.mediaContainer = new Echo.StreamServer.Controls.NestedCard({
+	this.mediaContainer = new Echo.StreamServer.Controls.MediaContainer({
 		"target": element.empty(),
 		"data": this.formData.media,
 		"card": {
