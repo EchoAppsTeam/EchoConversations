@@ -959,6 +959,7 @@ composer.methods.attachMedia = function(params) {
 		});
 	} else if (params.fromElement) {
 		urls = this.resolver.extractURLs(params.fromElement.val());
+		params.fromElement.parent().addClass(this.cssPrefix + "resolving");
 	}
 	this.resolver.resolve(urls, function(data) {
 		if (params.removeOld) {
@@ -967,6 +968,7 @@ composer.methods.attachMedia = function(params) {
 		data = $.grep(data, function(oembed) {
 			return !$.isEmptyObject(oembed) && !~self._getDefinedMediaIndex(oembed);
 		});
+		params.fromElement && params.fromElement.parent().removeClass(self.cssPrefix + "resolving");
 		if (!data.length) return;
 		$.each(data, function(i, oembed) {
 			self.formData.media.push(oembed);
@@ -1386,6 +1388,8 @@ composer.css =
 
 	'.{class:error} { border: 1px solid red; }' +
 	'.{class:error} input, .{class:error} textarea { background: no-repeat center right url({config:cdnBaseURL.sdk-assets}/images/warning.gif); }' +
+
+	'.{class:resolving} { background: no-repeat bottom right url({%=baseURLs.prod%}/images/resolving.gif); }' +
 
 	'.{class:media} .echo-conversations-mediacontainer-multiple { border: 1px solid #DEDEDE; border-top-style: dashed; border-bottom: 0px; background-color: #F1F1F1; }' +
 
