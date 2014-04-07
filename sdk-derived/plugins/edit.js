@@ -76,11 +76,13 @@ plugin.methods._assembleButton = function() {
 				var config = plugin._composerConfig(item, item.view.get("content"));
 				config["parent"] = plugin.component.config.getAsHash();
 				config["targetQuery"] = plugin.config.get("query", "");
+				config["ready"] = function() {
+					this.focus();
+				};
 				config.plugins.push({
 					"name": "Edit"
 				});
 				new Echo.StreamServer.Controls.CardComposer(config);
-				item.config.get("target").get(0).scrollIntoView(true);
 			}
 		};
 	};

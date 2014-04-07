@@ -1032,6 +1032,18 @@ composer.methods.collapse = function() {
 	this.events.publish({"topic": "onCollapse"});
 };
 
+composer.methods.focus = function() {
+	var target = this.config.get("target");
+	var container = this.view.get("composers");
+
+	var element = container.find("input[type=text]:first-of-type, textarea:first-of-type");
+	if (element.length) {
+		element.focus();
+		return;
+	}
+	target.get(0).scrollIntoView(true);
+};
+
 composer.methods._initCurrentComposer = function() {
 	if (this.collapsed) return;
 	var self = this;

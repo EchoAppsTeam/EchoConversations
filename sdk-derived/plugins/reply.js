@@ -120,6 +120,7 @@ plugin.methods._showComposer = function(mode, target) {
 		"ready": function() {
 			plugin.set("composer", this);
 			this.config.get("target").show();
+			mode === "expanded" && this.focus();
 		}
 	});
 	config.plugins.push({
@@ -247,14 +248,9 @@ plugin.init = function() {
 
 plugin.events = {
 	"Echo.StreamServer.Controls.CardComposer.onExpand": function() {
-		var target = this.component.config.get("target");
-		target.show();
-		var element = target.find("input[type=text]:first-of-type, textarea:first-of-type");
-		if (element.length) {
-			element.focus();
-		} else {
-			target.get(0).scrollIntoView(true);
-		}
+		var composer = this.component;
+		composer.config.get("target").show();
+		composer.focus();
 	},
 	"Echo.StreamServer.Controls.CardComposer.onCollapse": function() {
 		var composer = this.component;
