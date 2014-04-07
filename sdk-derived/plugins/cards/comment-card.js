@@ -139,6 +139,7 @@ plugin.init = function() {
 		"composer": $.proxy(this.buildComposer, this),
 		"getData": $.proxy(this.getData, this),
 		"setData": $.proxy(this.setData, this),
+		"requiresMedia": false,
 		"objectType": "http://activitystrea.ms/schema/1.0/comment"
 	});
 };

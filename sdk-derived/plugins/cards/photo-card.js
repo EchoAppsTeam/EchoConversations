@@ -279,6 +279,7 @@ plugin.dependencies = [{
 plugin.events = {
 	"Echo.StreamServer.Controls.CardComposer.onMediaContainerReady": function() {
 		if (!this.isPhotoComposerActive()) return;
+		this.component.enablePostButtonBy("photo-uploading");
 		this.composer.find(".echo-photo-composer-drop-panel").slideUp();
 	}
 };
@@ -344,21 +345,22 @@ plugin.methods.buildComposer = function() {
 		"onStart": function(files) {
 			plusButton.addClass("echo-photo-composer-filepicker-loading").empty();
 			tooltip.text(self.labels.get("loading"));
-			self.component._setPostButtonState("disabled");
+			self.component.disablePostButtonBy("photo-uploading");
 		},
 		"onSuccess": function(InkBlobs) {
 			attachMedia(InkBlobs[0].url);
 		},
 		"onError": function(type, message) {
+			self.component.enablePostButtonBy("photo-uploading");
 			self.log(message);
 			self.renewMediaPanel();
 		}
 	});
 
 	dropPanel.click(function(event) {
+		self.component.disablePostButtonBy("photo-uploading");
 		plusButton.addClass("echo-photo-composer-filepicker-loading").empty();
 		tooltip.text(self.labels.get("loading"));
-		self.component._setPostButtonState("disabled");
 		window.filepicker.pick({
 			"mimetype": "image/*",
 			"container": "modal",
@@ -366,7 +368,7 @@ plugin.methods.buildComposer = function() {
 		}, function(InkBlob) {
 			attachMedia(InkBlob.url);
 		}, function(FPError) {
-			self.component._setPostButtonState("normal");
+			self.component.enablePostButtonBy("photo-uploading");
 			self.renewMediaPanel();
 			self.log(FPError);
 		});

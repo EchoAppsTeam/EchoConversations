@@ -571,7 +571,14 @@ composer.renderers.tabs = function(element) {
 composer.renderers.media = function(element) {
 	var self = this;
 	this.mediaContainer && this.mediaContainer.destroy();
-	if (!this.formData.media.length) return element;
+	if (!this.formData.media.length) {
+		if (this.currentComposer && this.currentComposer.requiresMedia) {
+			this.disablePostButtonBy("media-required");
+		} else {
+			this.enablePostButtonBy("media-required");
+		}
+		return element;
+	}
 
 	this.mediaContainer = new Echo.StreamServer.Controls.MediaContainer({
 		"target": element.empty(),
@@ -598,7 +605,7 @@ composer.renderers.media = function(element) {
 			self.events.publish({
 				"topic": "onMediaContainerReady"
 			});
-			self._setPostButtonState("normal");
+			self.enablePostButtonBy("media-required");
 		}
 	});
 	return element;
@@ -958,6 +965,7 @@ composer.methods.attachMedia = function(params) {
 		urls = this.resolver.extractURLs(params.fromElement.val());
 		params.fromElement.parent().addClass(this.cssPrefix + "resolving");
 	}
+	this.disablePostButtonBy("media-resolving");
 	this.resolver.resolve(urls, function(data) {
 		if (params.removeOld) {
 			self.removeMedia();
@@ -966,6 +974,7 @@ composer.methods.attachMedia = function(params) {
 			return !$.isEmptyObject(oembed) && !~self._getDefinedMediaIndex(oembed);
 		});
 		params.fromElement && params.fromElement.parent().removeClass(self.cssPrefix + "resolving");
+		self.enablePostButtonBy("media-resolving");
 		if (!data.length) return;
 		$.each(data, function(i, oembed) {
 			self.formData.media.push(oembed);
@@ -992,6 +1001,9 @@ composer.methods.registerComposer = function(config) {
 	if (!config || !config.id) {
 		this.log({"message": "Invalid composer configuration"});
 		return;
+	}
+	if (typeof config.requiresMedia === "undefined") {
+		config.requiresMedia = true;
 	}
 	this.composers.push(config);
 };
@@ -1044,10 +1056,24 @@ composer.methods.focus = function() {
 	target.get(0).scrollIntoView(true);
 };
 
+composer.methods.enablePostButtonBy = function(reason) {
+	this._refreshPostButtonBy(reason, "enable");
+};
+
+composer.methods.disablePostButtonBy = function(reason) {
+	this._refreshPostButtonBy(reason, "disable");
+};
+
 composer.methods._initCurrentComposer = function() {
 	if (this.collapsed) return;
 	var self = this;
 	var composer = this.currentComposer;
+	this.postButtonTriggers = {};
+	if (composer.requiresMedia && !this.formData.media.length) {
+		this.disablePostButtonBy("media-required");
+	} else {
+		this.enablePostButtonBy("media-required");
+	}
 	if (!composer.panel.children().length) {
 		composer.panel.append(composer.composer());
 		composer.setData($.extend(true, {}, this.formData));
@@ -1131,10 +1157,9 @@ composer.methods._getDefinedMediaIndex = function(oembed) {
 };
 
 composer.methods._initFormFields = function() {
-	var self = this, nonEmpty = {};
+	var self = this;
 	var init = function(container, id) {
 		var timer;
-		nonEmpty[id] = [];
 		var fields = container.find("input[type=text][required], textarea[required]");
 		if (id === "_global") {
 			// filter out composer fields while searching for global fields
@@ -1153,18 +1178,23 @@ composer.methods._initFormFields = function() {
 				timer = setTimeout(function() {
 					process(el, id);
 				}, 100);
+			}).each(function() {
+				var el = $(this);
+				var unique = el.data("composer-internal-id");
+				if (!unique) {
+					unique = id + "-required-" + Echo.Utils.getUniqueString();
+					el.data("composer-internal-id", unique);
+				}
+				self.disablePostButtonBy(unique);
 			});
 	};
 	var process = function(el, id) {
-		var idx = nonEmpty[id].indexOf(el);
+		var unique = $(el).data("composer-internal-id");
 		if ($.trim($(el).val())) {
-			if (idx === -1) nonEmpty[id].push(el);
+			self.enablePostButtonBy(unique);
 		} else {
-			if (idx !== -1) nonEmpty[id].splice(idx, 1);
+			self.disablePostButtonBy(unique);
 		}
-		var actual = nonEmpty["_global"].length + nonEmpty[self.currentComposer.id].length;
-		var expected = globalFields.length + composerFields.length;
-		self._setPostButtonState(actual === expected ? "normal" : "disabled");
 	};
 
 	this.config.get("target")
@@ -1185,7 +1215,6 @@ composer.methods._initFormFields = function() {
 	var globalFields = init(this.config.get("target"), "_global");
 	var composerFields = init(this.currentComposer.panel, this.currentComposer.id);
 	if (!globalFields.length && !composerFields.length) {
-		this._setPostButtonState("normal");
 		return;
 	}
 
@@ -1195,6 +1224,21 @@ composer.methods._initFormFields = function() {
 	composerFields.each(function(i, el) {
 		process(el, self.currentComposer.id);
 	});
+};
+
+composer.methods._refreshPostButtonBy = function(reason, action) {
+	var triggers = this.postButtonTriggers = this.postButtonTriggers || {};
+	if (triggers[reason] === action) return;
+
+	triggers[reason] = action;
+	var enabled = true;
+	$.each(triggers, function(k, v) {
+		if (v !== "enable") {
+			enabled = false;
+			return false;
+		}
+	});
+	this._setPostButtonState(enabled ? "normal" : "disabled");
 };
 
 composer.methods._setPostButtonState = function(state) {
