@@ -279,6 +279,15 @@ conversations.dependencies = [{
 }];
 
 conversations.events = {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() {
+			// re-render allPosts to show moderationQueue if it is enabled.
+			if (this._moderationQueueEnabled()) {
+				this.view.render({"name": "allPosts"});
+			}
+		}
+	},
 	"Echo.StreamServer.Controls.CardCollection.onActivitiesCountChange": function(_, data) {
 		var allPosts = this.getComponent("allPosts");
 		// display activities for 'allPosts' section only.
