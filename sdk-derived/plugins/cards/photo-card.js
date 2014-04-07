@@ -355,6 +355,8 @@ plugin.methods.buildComposer = function() {
 	});
 
 	plusButton.click(function(event) {
+		plusButton.addClass("echo-photo-composer-filepicker-loading").empty();
+		tooltip.text(self.labels.get("loading"));
 		self.component._setPostButtonState("disabled");
 		window.filepicker.pick({
 			"mimetype": "image/*",
@@ -364,6 +366,7 @@ plugin.methods.buildComposer = function() {
 			attachMedia(InkBlob.url);
 		}, function(FPError) {
 			self.component._setPostButtonState("normal");
+			self.renewMediaPanel();
 			self.log(FPError);
 		});
 	});
