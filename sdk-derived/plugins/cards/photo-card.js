@@ -428,7 +428,7 @@ plugin.css =
 	'}' +
 	'.echo-photo-composer-drop-panel-wrapper { border: 1px solid #C4C4C4; margin: 5px; border-radius: 2px; }' +
 	'.echo-photo-composer-drop-panel-container { padding: 10px 0 40px 0; margin: 5px; }' +
-	'.echo-photo-composer-filepicker-loading {background-image: url("{%= baseURL %}/images/loading.gif"); }';
+	'.echo-photo-composer-filepicker-loading {background-image: url("{%= baseURLs.prod %}/images/loading.gif"); }';
 
 Echo.Plugin.create(plugin);
 
