@@ -176,15 +176,15 @@ card.renderers.sourceIcon = function(element) {
 };
 
 card.renderers.avatar = function(element) {
-	// we have to do it because filter must work in IE8 only
-	// in other cases we will have square avatar in IE 9
-	var isIE8 = document.all && document.querySelector && !document.addEventListener;
-	if (isIE8) {
-		element.children()[0].style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.config.get("defaultAvatar") + "', sizingMethod='scale')";
+	if (this.displayAuthor()) {
+		Echo.Utils.placeAvatar({
+			"target": element.children()[0],
+			"avatar": this.config.get("defaultAvatar")
+		});
+		return element;
+	} else {
+		return element.hide();
 	}
-	return this.displayAuthor()
-		? element
-		: element.hide();
 };
 
 card.renderers.title = function(element) {
@@ -356,7 +356,7 @@ card.css =
 	'.{class:item} { text-align: left; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; position: relative; }' +
 	'.{class:border} { white-space: normal; word-break: break-word; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; }' +
 	'.{class:item} .{class:sourceIcon} > img { width: 18px; height: 18px; }' +
-	'.echo-sdk-ui .{class:avatar} > div { width: 28px; height: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; margin-right: 6px; }' +
+	'.echo-sdk-ui .{class:avatar} > div { width: 28px; height: 28px; display:inline-block; margin-right: 6px; }' +
 	'.{class:description} { overflow: hidden; }' +
 
 	// close button

@@ -595,21 +595,11 @@ card.renderers.wrapper = function(element) {
  * @echo_renderer
  */
 card.renderers.avatar = function(element) {
-	var defaultAvatar = this.config.get("defaultAvatar");
-	var avatarURL = this.get("data.actor.avatar", "");
-
-	element.css("background-image", "url('" + avatarURL + "'), url('" + defaultAvatar + "')");
-
-	// we have to do it because filter must work in IE8 only
-	// in other cases we will have square avatar in IE 9
-	var isIE8 = document.all && document.querySelector && !document.addEventListener;
-	if (isIE8) {
-		element.css({
-			"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + defaultAvatar + "', sizingMethod='scale'), progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + avatarURL + "', sizingMethod='scale')"
-		});
-	}
-
-	return element;
+	return Echo.Utils.placeAvatar({
+		"target": element,
+		"avatar": this.get("data.actor.avatar", ""),
+		"defaultAvatar": this.config.get("defaultAvatar")
+	});
 };
 
 /**
@@ -1822,7 +1812,7 @@ card.css =
 	'.echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
 	'.{class:date} { font-size: 12px; float: left; color: #d3d3d3; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; max-width: 100%; }' +
 
-	'.{class:avatar} { width: 36px; height: 36px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; }' +
+	'.{class:avatar} { width: 36px; height: 36px; display:inline-block; }' +
 	'.{class:children} .{class:avatar}, .{class:childrenByCurrentActorLive} .{class:avatar} { width: 28px; height: 28px; }' +
 
 	'.{class:container} { background: #f8f8f8; border-radius: 3px; }' +

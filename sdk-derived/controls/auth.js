@@ -216,15 +216,11 @@ auth.renderers.or = function(element) {
  * @echo_renderer
  */
 auth.renderers.avatar = function(element) {
-	var avatarURL = this.user.get("avatar") || this.config.get("defaultAvatar");
-	element.css("background-image", "url('" + avatarURL + "')");
-
-	// we have to do it because filter must work in IE8 only
-	// in other cases we will have square avatar in IE 9
-	var isIE8 = document.all && document.querySelector && !document.addEventListener;
-	return isIE8
-		? element.css({ "filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + avatarURL + "', sizingMethod='scale')" })
-		: element;
+	return Echo.Utils.placeAvatar({
+		"target": element,
+		"avatar": this.user.get("avatar"),
+		"defaultAvatar": this.config.get("defaultAvatar")
+	});
 };
 
 /**
@@ -318,7 +314,7 @@ auth.css =
 	'.{class:userAnonymous} { text-align: left; }' +
 	'.{class:name} { float: none; margin: 3px 0px 0px 15px; font-weight: normal; }' +
 	'.{class:avatarContainer} { float: left; width: 48px; height: 48px; border-radius: 50%; }' +
-	'.{class:avatar} { border-radius: 50%; width: 48px; height: 48px; background-size: cover; display: inline-block; background-position: center; }';
+	'.{class:avatar} { width: 48px; height: 48px; display: inline-block; }';
 
 Echo.Control.create(auth);
 

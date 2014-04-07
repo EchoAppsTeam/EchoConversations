@@ -149,6 +149,7 @@ module.exports = function(grunt) {
 			"app": {
 				"src": [
 					"<%= dirs.build %>/app.js",
+					"<%= dirs.build %>/sdk-derived/utils.js",
 					"<%= dirs.build %>/controls/*.js",
 					"<%= dirs.build %>/plugins/*.js"
 				],
