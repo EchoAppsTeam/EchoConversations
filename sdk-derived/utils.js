@@ -10,12 +10,19 @@ Echo.Utils.placeAvatar = function(args) {
 	element
 		.addClass("echo-avatar")
 		.css({
-			"background-image": "url('" + args.avatar + "'), url('" + args.defaultAvatar + "')"
+			"background-image": $.map(["avatar", "defaultAvatar"], function(key) {
+				return args[key]
+					? "url('" + args[key] + "')"
+					: null;
+			}).join(", ")
 		});
 	if (isIE8) {
 		element.css({
-			"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + args.defaultAvatar + "', sizingMethod='scale'), " +
-				"progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + args.avatar + "', sizingMethod='scale')"
+			"filter": $.map(["defaultAvatar", "avatar"], function(key) {
+				return args[key]
+					? "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + args[key] + "', sizingMethod='scale')"
+					: null;
+			}).join(", ")
 		});
 	}
 	return element;
