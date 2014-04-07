@@ -85,6 +85,7 @@ plugin.events = {
 	"Echo.UserSession.onInvalidate": {
 		"context": "global",
 		"handler": function() {
+			this.view.render({"name": "likedBy"});
 			if (this.deferredActivity) {
 				this.deferredActivity();
 				delete this.deferredActivity;
@@ -111,19 +112,11 @@ plugin.renderers.likedBy = function(element) {
 		return element.hide();
 	}
 
-	var youLike = false;
 	var visibleUsersCount = this.get("collection") && !this.config.get("staticInitialCount")
 		? this.get("collection").getVisibleUsersCount()
 		: this.config.get("likesPerPage");
 
-	var userId = item.user.get("identityUrl");
 	var users = item.get("data.object.likes");
-	$.each(users, function(i, like) {
-		if (like.actor.id === userId) {
-			youLike = true;
-			return false; // break
-		}
-	});
 	var config = this.config.assemble({
 		"target": element.get(0),
 		"data": {

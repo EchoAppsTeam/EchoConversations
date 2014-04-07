@@ -75,6 +75,7 @@ card.events = {
 			this.view.render({"name": "buttons"});
 			this.view.render({"name": "metadata"});
 			this.view.render({"name": "modeSwitch"});
+			this._pageLayoutChange();
 		}
 	},
 	"Echo.StreamServer.Controls.Card.onRender": function() {
