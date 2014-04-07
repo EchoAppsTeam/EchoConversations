@@ -334,40 +334,39 @@ plugin.methods.buildComposer = function() {
 		});
 	};
 
-	setTimeout(function() {
-		var plusButton = self.composer.find(".echo-photo-composer-plus-button");
-		var tooltip = self.composer.find(".echo-photo-composer-uploading-tooltip");
-		window.filepicker.setKey(self.component.config.get("dependencies.FilePicker.apiKey"));
-		window.filepicker.makeDropPane(self.composer.find(".echo-photo-composer-drop-panel")[0], {
-			"multiple": false,
-			"mimetype": "image/*",
-			"onStart": function(files) {
-				plusButton.addClass("echo-photo-composer-filepicker-loading").empty();
-				tooltip.text(self.labels.get("loading"));
-				self.component._setPostButtonState("disabled");
-			},
-			"onSuccess": function(InkBlobs) {
-				attachMedia(InkBlobs[0].url);
-			},
-			"onError": function(type, message) {
-				self.log(message);
-				self.renewMediaPanel();
-			}
-		});
-
-		plusButton.click(function(event) {
+	var plusButton = self.composer.find(".echo-photo-composer-plus-button");
+	var tooltip = self.composer.find(".echo-photo-composer-uploading-tooltip");
+	window.filepicker.setKey(self.component.config.get("dependencies.FilePicker.apiKey"));
+	window.filepicker.makeDropPane(self.composer.find(".echo-photo-composer-drop-panel")[0], {
+		"multiple": false,
+		"mimetype": "image/*",
+		"onStart": function(files) {
+			plusButton.addClass("echo-photo-composer-filepicker-loading").empty();
+			tooltip.text(self.labels.get("loading"));
 			self.component._setPostButtonState("disabled");
-			window.filepicker.pick({
-				"mimetype": "image/*",
-				"container": "modal"
-			}, function(InkBlob) {
-				attachMedia(InkBlob.url);
-			}, function(FPError) {
-				self.component._setPostButtonState("normal");
-				self.log(FPError);
-			});
+		},
+		"onSuccess": function(InkBlobs) {
+			attachMedia(InkBlobs[0].url);
+		},
+		"onError": function(type, message) {
+			self.log(message);
+			self.renewMediaPanel();
+		}
+	});
+
+	plusButton.click(function(event) {
+		self.component._setPostButtonState("disabled");
+		window.filepicker.pick({
+			"mimetype": "image/*",
+			"container": "modal",
+			"mobile": Echo.Utils.isMobileDevice()
+		}, function(InkBlob) {
+			attachMedia(InkBlob.url);
+		}, function(FPError) {
+			self.component._setPostButtonState("normal");
+			self.log(FPError);
 		});
-	}, 0);
+	});
 
 	return this.composer;
 };
