@@ -261,7 +261,7 @@ plugin.labels = {
 	/**
 	 * @echo_label
 	 */
-	"initialUploadingTooltip": "Drag file here or click \"+\" to upload an image",
+	"initialUploadingTooltip": "Drag file here or click to upload an image",
 	/**
 	 * @echo_label
 	 */
@@ -336,8 +336,9 @@ plugin.methods.buildComposer = function() {
 
 	var plusButton = self.composer.find(".echo-photo-composer-plus-button");
 	var tooltip = self.composer.find(".echo-photo-composer-uploading-tooltip");
+	var dropPanel = self.composer.find(".echo-photo-composer-drop-panel");
 	window.filepicker.setKey(self.component.config.get("dependencies.FilePicker.apiKey"));
-	window.filepicker.makeDropPane(self.composer.find(".echo-photo-composer-drop-panel")[0], {
+	window.filepicker.makeDropPane(dropPanel[0], {
 		"multiple": false,
 		"mimetype": "image/*",
 		"onStart": function(files) {
@@ -354,7 +355,7 @@ plugin.methods.buildComposer = function() {
 		}
 	});
 
-	plusButton.click(function(event) {
+	dropPanel.click(function(event) {
 		plusButton.addClass("echo-photo-composer-filepicker-loading").empty();
 		tooltip.text(self.labels.get("loading"));
 		self.component._setPostButtonState("disabled");
