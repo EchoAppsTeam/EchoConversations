@@ -37,7 +37,7 @@ plugin.templates.main =
 	'<div class="{plugin.class:item}">' +
 		'<div class="{plugin.class:photo}">' +
 			'<div class="{plugin.class:photoContainer}">' +
-				'<img class="{plugin.class:photoThumbnail}" src="{data:oembed.thumbnail_url}" title="{data:oembed.title}"/>' +
+				'<img class="{plugin.class:photoThumbnail}" src="{data:oembed.url}" title="{data:oembed.title}"/>' +
 			'</div>' +
 			'<div class="{plugin.class:photoLabel}">' +
 				'<div class="{plugin.class:photoLabelContainer}">' +
@@ -57,11 +57,25 @@ plugin.events = {
 };
 
 plugin.renderers.title = function(element) {
-	return this.component.get("data.oembed.title") ? element : element.hide();
+	var title = this.component.get("data.oembed.title");
+	var url = this.component.get("data.oembed.url");
+	if (title) {
+		element.attr("title", title)
+			.find("a").text(title).attr("href", url);
+	} else {
+		element.hide();
+	}
+	return element;
 };
 
 plugin.renderers.description = function(element) {
-	return this.component.get("data.oembed.description") ? element : element.hide();
+	var description = this.component.get("data.oembed.description");
+	if (description) {
+		element.html(description);
+	} else {
+		element.hide();
+	}
+	return element;
 };
 
 plugin.renderers.photoThumbnail = function(element) {
@@ -180,7 +194,7 @@ plugin.css =
 
 	'.echo-sdk-ui .{plugin.class:photoLabel} a:link, .echo-sdk-ui .{plugin.class:photoLabel} a:visited, .echo-sdk-ui .{plugin.class:photoLabel} a:hover, .echo-sdk-ui .{plugin.class:photoLabel} a:active { color: #fff; }' +
 	'.{plugin.class:photoLabelContainer} { padding: 10px; }' +
-	'.{plugin.class:photoTitle} { margin: 0 0 5px 0; }' +
+	'.{plugin.class:photoTitle} { margin: 0 0 5px 0; font-weight: bold; }' +
 
 	'.{plugin.class:photoLabel} { overflow: hidden; }' +
 	'.{plugin.class:photo}:hover .{plugin.class:photoLabel} { max-height: 60% !important; }' +
@@ -428,7 +442,7 @@ plugin.css =
 	'.echo-photo-composer-drop-panel-wrapper { border: 1px solid #C4C4C4; margin: 5px; border-radius: 2px; }' +
 	'.echo-photo-composer-drop-panel-container { padding: 10px 0 40px 0; margin: 5px; }' +
 	'.echo-photo-composer-uploading-tooltip { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px;}' +
-	'.echo-photo-composer-filepicker-loading {background-image: url("{%= baseURLs.prod %}/images/loading.gif"); background-size: 80px; background-repeat: no-repeat; background-position: 24px 39px; }';
+	'.echo-photo-composer-filepicker-loading { background-image: url("{%= baseURLs.prod %}/images/loading.gif"); background-size: 80px; background-repeat: no-repeat; background-position: 24px 39px; }';
 
 Echo.Plugin.create(plugin);
 
