@@ -1045,15 +1045,14 @@ composer.methods.collapse = function() {
 };
 
 composer.methods.focus = function() {
-	var target = this.config.get("target");
-	var container = this.view.get("composers");
-
-	var element = container.find("input[type=text]:first-of-type, textarea:first-of-type");
-	if (element.length) {
-		element.focus();
+	if (!this.currentComposer) return;
+	var container = this.currentComposer.panel;
+	var elements = container.find("input[type=text]:first-of-type, textarea:first-of-type");
+	if (elements.length) {
+		elements.first().focus();
 		return;
 	}
-	target.get(0).scrollIntoView(true);
+	this.config.get("target").get(0).scrollIntoView(true);
 };
 
 composer.methods.enablePostButtonBy = function(reason) {
