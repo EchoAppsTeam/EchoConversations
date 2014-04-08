@@ -62,6 +62,16 @@ dashboard.vars = {
 			"desc": "Specifies the initial number of posts to show when the stream loads"
 		}
 	}, {
+		"component": "Input",
+		"name": "maxMediaWidth",
+		"type": "number",
+		"config": {
+			"title": "Maximum Media Width",
+			"desc": "Specify a maximum media content width (in pixels) which should be defined when an item is being displayed.",
+			"options": [],
+			"data": {"sample": 500}
+		}
+	}, {
 		"component": "Select",
 		"name": "initialIntentsDisplayMode",
 		"type": "string",
@@ -419,9 +429,8 @@ dashboard.config = {
 			"name": "minWidth",
 			"type": "number",
 			"config": {
-				"title": "Minimum width",
+				"title": "Minimum Width",
 				"desc": "Specify a minimum width (in pixels) of an App container.",
-				"options": [],
 				"data": {"sample": 320}
 			}
 		}, {
@@ -429,9 +438,8 @@ dashboard.config = {
 			"name": "maxHeight",
 			"type": "number",
 			"config": {
-				"title": "Maximum height",
+				"title": "Maximum Height",
 				"desc": "Specify a maximum height (in pixels) of an App container. If an App context exceeds the defined max height, a vertical scrollbar appears.",
-				"options": [],
 				"data": {"sample": 700}
 			}
 		}, {
@@ -439,20 +447,9 @@ dashboard.config = {
 			"name": "maxWidth",
 			"type": "number",
 			"config": {
-				"title": "Maximum width",
+				"title": "Maximum Width",
 				"desc": "Specify a maximum width (in pixels) of an App container.",
-				"options": [],
 				"data": {"sample": 700}
-			}
-		}, {
-			"component": "Input",
-			"name": "maxMediaWidth",
-			"type": "number",
-			"config": {
-				"title": "Maximum media width",
-				"desc": "Specify a maximum media content width (in pixels) which should be defined when an item is being displayed.",
-				"options": [],
-				"data": {"sample": 500}
 			}
 		}]
 	}, {
@@ -628,10 +625,10 @@ dashboard.config.normalizer = {
 					var items = assembleBaseECL.call(this);
 
 					items[3]["default"] = 5; // override initialItemsPerPage value
-					items[17]["items"][0]["default"] = true;
+					items[18]["items"][0]["default"] = true;
 					items.pop();
 
-					items.splice(5, 0, {
+					items.splice(6, 0, {
 						"component": "Checkbox",
 						"name": "includeTopContributors",
 						"type": "boolean",
@@ -647,8 +644,8 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
-					items[17]["items"].push(component.get("premoderationECL"));
-					items.splice(11, 0, {
+					items[18]["items"].push(component.get("premoderationECL"));
+					items.splice(12, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
 						"type": "boolean",

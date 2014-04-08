@@ -68,6 +68,7 @@ conversations.config = {
 		"label": "Top Posts",
 		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",
+		"maxMediaWidth": undefined,
 		"maxItemBodyHeight": 110, // px
 		"initialItemsPerPage": 5,
 		"initialSortOrder": "reverseChronological",
@@ -115,6 +116,7 @@ conversations.config = {
 		"label": "All Posts",
 		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",
+		"maxMediaWidth": undefined,
 		"maxItemBodyHeight": 110, // px
 		"initialItemsPerPage": 15,
 		"initialSortOrder": "reverseChronological",
@@ -204,8 +206,7 @@ conversations.config = {
 	"presentation": {
 		"minWidth": 320,
 		"maxHeight": undefined,
-		"maxWidth": undefined,
-		"maxMediaWidth": undefined
+		"maxWidth": undefined
 	}
 };
 
@@ -832,7 +833,7 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 		"item": {
 			"limits": {
 				"maxBodyHeight": config.maxItemBodyHeight,
-				"maxMediaWidth": this.config.get("presentation.maxMediaWidth")
+				"maxMediaWidth": config.maxMediaWidth
 			},
 			"reTag": false,
 			"markAsRead": config.markItemsAsReadOn,
