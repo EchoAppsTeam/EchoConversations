@@ -405,7 +405,7 @@ plugin.methods._getMediaContent = function() {
 plugin.methods._mediaTemplate = function() {
 	return '<div class="echo-media-item" data-oembed="{data:oembed}">' +
 		'<a href="{data:original_url}" target="_blank">' +
-			'<img src="{data:thumbnail_url}">' +
+			'<img src="{data:url}">' +
 		'</a>' +
 	'</div>';
 };
