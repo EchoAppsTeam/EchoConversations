@@ -403,7 +403,6 @@ plugin.methods._getMediaContent = function() {
 };
 
 plugin.methods._mediaTemplate = function() {
-	this.component.formData.media[0].title = this.composer.find(".echo-photo-composer-title").val();
 	return '<div class="echo-media-item" data-oembed="{data:oembed}">' +
 		'<a href="{data:original_url}" target="_blank">' +
 			'<img src="{data:thumbnail_url}">' +
