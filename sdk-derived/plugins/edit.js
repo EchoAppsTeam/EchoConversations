@@ -341,6 +341,8 @@ plugin.css =
 	'.{plugin.class} .{class:container} { border: none; padding: 0px; }' +
 	'.{plugin.class} .{class:nameContainer}, .{plugin.class} .{class:controls}, .{plugin.class} .{class:composers} { background-color: #fff; }' +
 	'.{plugin.class:avatar-wrapper} { float: left; margin-right: 5px; }' +
+	'.{plugin.class} .{class:tabs} { display: none; }' +
+	'.{plugin.class} .{class:formWrapper} { border-top: 1px solid #d8d8d8; }' +
 	'.{plugin.class:avatar} { width: 48px; height: 48px; display: inline-block; }' +
 	'.{plugin.class:header} { line-height: 48px; margin-bottom: 3px; }' +
 	'.echo-streamserver-controls-card-children .{plugin.class:header}, .echo-streamserver-controls-card-childrenByCurrentActorLive .{plugin.class:header} { line-height: 24px; }' +
