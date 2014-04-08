@@ -163,7 +163,7 @@ plugin.methods.buildComposer = function() {
 	var self = this;
 	this.composer = $("<div>").append(
 		'<div class="echo-cardcomposer-field-wrapper">' +
-			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("textPlaceholder") + '">' +
+			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("textPlaceholder") + '"></textarea>' +
 		'</div>'
 	);
 	this.composer.find(".echo-comment-composer-text").on("keyup paste", function() {
