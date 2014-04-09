@@ -30,7 +30,6 @@ plugin.init = function() {
 		"id": "link",
 		"label": this.labels.get("link"),
 		"icon": "icon-globe",
-		"isValid": $.proxy(this.isValid, this),
 		"composer": $.proxy(this.buildComposer, this),
 		"getData": $.proxy(this.getData, this),
 		"setData": $.proxy(this.setData, this),
@@ -54,11 +53,7 @@ plugin.labels = {
 	/**
 	 * @echo_label
 	 */
-	"URL": "URL",
-	/**
-	 * @echo_label
-	 */
-	"invalidURL": "Should be an URL"
+	"URL": "URL"
 };
 
 plugin.methods.buildComposer = function() {
@@ -95,17 +90,6 @@ plugin.methods.setData = function(data) {
 		var media = data.media[0];
 		this.composer.find(".echo-link-composer-link").val(media.original_url || media.url);
 	}
-};
-
-plugin.methods.isValid = function() {
-	if (!this.composer) return true;
-	var link = this.composer.find(".echo-link-composer-link");
-	// TODO: better interface for URL checking
-	if (!this.component.resolver.normalizeURL($.trim(link.val()))) {
-		this.component.highlightField(link, this.labels.get("invalidURL"));
-		return false;
-	}
-	return true;
 };
 
 plugin.methods._getMediaContent = function() {

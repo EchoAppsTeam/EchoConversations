@@ -921,25 +921,6 @@ composer.methods.post = function() {
 	}).send();
 };
 
-/**
- * Method highlighting the input data fields
- */
-// TODO: better name
-composer.methods.highlightField = function(element, message) {
-	if (!element) return;
-	var css = this.cssPrefix + "error";
-	element.parent().addClass(css);
-	element.tooltip({
-		"title": message,
-		"placement": "right",
-		"trigger": "hover"
-	});
-	element.focus(function() {
-		$(this).tooltip("destroy");
-		$(this).parent().removeClass(css);
-	});
-};
-
 composer.methods.attachMedia = function(params) {
 	var self = this, urls = [];
 	if (this.attachMediaTimer) {
