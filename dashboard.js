@@ -293,7 +293,7 @@ dashboard.vars = {
 			},
 			"items": [{
 				"component": "Checkbox",
-				"name": "visible",
+				"name": "enabled",
 				"type": "boolean",
 				"default": true,
 				"config": {
@@ -356,13 +356,63 @@ dashboard.vars = {
 						}
 					}
 				}, {
-					//TODO: make it using templates and renderer
 					"component": "TextField",
 					"name": "sourcesHelp",
 					"config": {
 						"data": {"value": "<a href=\"//developers.inkfilepicker.com/docs/web/#pick\" target=\"_blank\">Documentation</a>"}
 					}
 		                }]
+			}]
+		}, {
+			"component": "Group",
+			"name": "photos",
+			"type": "object",
+			"config": {
+				"title": "Photos"
+			},
+			"items": [{
+				"component": "Checkbox",
+				"name": "enabled",
+				"type": "boolean",
+				"default": true,
+				"config": {
+					"title": "Visible",
+					"desc": "If enabled, users can submit Photos"
+				}
+			}]
+		}, {
+			"component": "Group",
+			"name": "links",
+			"type": "object",
+			"config": {
+				"title": "Links"
+			},
+			"items": [{
+				"component": "Checkbox",
+				"name": "enabled",
+				"type": "boolean",
+				"default": true,
+				"config": {
+					"title": "Visible",
+					"desc": "If enabled, users can submit Links"
+				}
+			}]
+		}, {
+			"component": "Group",
+			"name": "videos",
+			"type": "object",
+			"config": {
+				"title": "Videos"
+			},
+			"items": [{
+				"component": "Checkbox",
+				"name": "enabled",
+				"type": "boolean",
+				"default": true,
+				"config": {
+					"title": "Visible",
+					"desc": "If enabled, users can submit Videos"
+				}
 			}]
 		}]
 	}],
