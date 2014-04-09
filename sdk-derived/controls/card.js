@@ -93,7 +93,7 @@ card.events = {
 card.init = function() {
 	this.timestamp = Echo.Utils.timestampFromW3CDTF(this.get("data.object.published"));
 	this.set("isItemNew", this.config.get("live"));
-	this._initModificator();
+	this._initModifier();
 	this.ready();
 
 	if (!this.config.get("manualRendering")) {
@@ -277,8 +277,8 @@ card.vars = {
 	"buttons": {},
 	"buttonsLayout": "inline",
 	"content": undefined,
-	"modificatorList": [],
-	"modificator": undefined
+	"modifierList": [],
+	"modifier": undefined
 };
 
 card.labels = {
@@ -1259,23 +1259,23 @@ card.methods._getItemRenderType = function() {
 	return result;
 };
 
-card.methods._getActiveModificator = function() {
+card.methods._getActiveModifier = function() {
 	var self = this;
-	if (!this.modificator) {
-		$.each(this.modificatorList, function(_, modificator) {
-			if (modificator.isEnabled()) {
-				self.modificator = modificator;
+	if (!this.modifier) {
+		$.each(this.modifierList, function(_, modifier) {
+			if (modifier.isEnabled()) {
+				self.modifier = modifier;
 				return false;
 			}
 		});
 	}
-	return this.modificator;
+	return this.modifier;
 };
 
-card.methods._initModificator = function() {
-	var modificator = this._getActiveModificator();
-	if (modificator) {
-		modificator.init();
+card.methods._initModifier = function() {
+	var modifier = this._getActiveModifier();
+	if (modifier) {
+		modifier.init();
 	}
 };
 
@@ -1285,8 +1285,8 @@ card.methods._initModificator = function() {
  * @param {object} config
  *
  */
-card.methods.registerModificator = function(config) {
-	this.modificatorList.push(config);
+card.methods.registerModifier = function(config) {
+	this.modifierList.push(config);
 };
 
 /**

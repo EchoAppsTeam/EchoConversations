@@ -7,7 +7,7 @@ if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
 	var self = this;
-	this.component.registerModificator({
+	this.component.registerModifier({
 		"isEnabled": $.proxy(this.isEnabled, this),
 		"init": function () {
 			self.events.subscribe({
