@@ -176,7 +176,15 @@ plugin.methods.isEnabled = function() {
 	var item = this.component;
 	var isArticle = ~$.inArray("http://activitystrea.ms/schema/1.0/article", item.get("data.object.objectTypes"));
 	var isPhoto = ~$.inArray("http://activitystrea.ms/schema/1.0/image", item.get("data.object.objectTypes"));
-	return item.isRoot() && (isPhoto || isArticle && item.get("data.oembed.thumbnail_width") >= this.config.get("minArticleImageWidth"));
+
+	if (item.isRoot() && isPhoto) {
+		return true;
+	} else if (item.isRoot() && isArticle) {
+		this.normalizer();
+		return item.get("data.oembed.thumbnail_width") >= this.config.get("minArticleImageWidth");
+	} else {
+		return false;
+	}
 };
 
 var transition = function(value) {
