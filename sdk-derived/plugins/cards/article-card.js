@@ -28,7 +28,6 @@ plugin.templates.main =
 			'<div class="{plugin.class:article}">' +
 				'<div class="{plugin.class:articleThumbnail}">' +
 					'<img src="{data:oembed.thumbnail_url}"/>' +
-					'<img src="{data:oembed.url}"/>' +
 				'</div>' +
 				'<div class="{plugin.class:articleTemplate}">' +
 					'<div class="{plugin.class:title} {plugin.class:articleTitle}" title="{data:oembed.title}">' +
@@ -39,7 +38,6 @@ plugin.templates.main =
 					'</div>' +
 				'</div>' +
 				'<div class="echo-clear"></div>' +
-				'<a class="{plugin.class:sourceIcon}" target="_blank"></a>' +
 			'</div>' +
 		'</div>' +
 	'</div>';
@@ -70,7 +68,6 @@ plugin.css =
 
 	// article
 	'.{plugin.class:article} { padding: 10px 0 0 0; min-width: 200px; }' +
-	'.{plugin.class:article} .{plugin.class:sourceIcon} > img { padding: 10px 0 0 0; }' +
 	'.{plugin.class:article} .{plugin.class:articleTitle} > a { color: #42474A; font-weight: bold; }' +
 	'.{plugin.class:article} .{plugin.class:articleTitle} > a:hover { color: #42474A; }' +
 	'.{plugin.class:articleTitle} { margin-left: 10px; margin-top: 0px; line-height: 16px; }' +
