@@ -19,10 +19,8 @@ conversations.config = {
 		"displaySharingOnPost": true,
 		"contentTypes": {
 			"comments": {
-				"visible": true,
-				"renderer": {
-					"name": "CommentCard"
-				},
+				"renderer": "CommentCard",
+				"enabled": true,
 				"prompt": "What's on your mind?",
 				"resolveURLs": true,
 				"attachments": {
@@ -31,22 +29,15 @@ conversations.config = {
 				}
 			},
 			"photos": {
-				"visible": true,
-				"renderer": {
-					"name": "PhotoCard"
-				}
+				"renderer": "PhotoCard",
+				"enabled": true
 			},
 			"links": {
-				"visible": true,
-				"renderer": {
-					"name": "LinkCard"
-				},
+				"renderer": "LinkCard",
+				"enabled": true,
 				"blockedDomains": []
 			},
-			"videos": {
-				"visible": true,
-				"renderer": {}
-			}
+			"videos": {}
 		},
 		"confirmation": {
 			"enabled": true,
@@ -66,10 +57,8 @@ conversations.config = {
 		},
 		"contentTypes": {
 			"comments": {
-				"visible": true,
-				"renderer": {
-					"name": "CommentCard"
-				},
+				"renderer": "CommentCard",
+				"enabled": true,
 				"prompt": "What's on your mind?",
 				"resolveURLs": true,
 				"attachments": {
@@ -78,22 +67,15 @@ conversations.config = {
 				}
 			},
 			"photos": {
-				"visible": true,
-				"renderer": {
-					"name": "PhotoCard"
-				}
+				"renderer": "PhotoCard",
+				"enabled": true
 			},
 			"links": {
-				"visible": true,
-				"blockedDomains": [],
-				"renderer": {
-					"name": "LinkCard"
-				}
+				"renderer": "LinkCard",
+				"enabled": true,
+				"blockedDomains": []
 			},
-			"videos": {
-				"visible": true,
-				"renderer": {}
-			}
+			"videos": {}
 		},
 		"confirmation": {
 			"enabled": true,
@@ -148,7 +130,26 @@ conversations.config = {
 		"events": {
 			"onPostCountUpdate": null
 		},
-		"plugins": []
+		"plugins": [],
+		"contentTypes": {
+			"comments": {
+				"renderer": "CommentCard",
+				"enabled": true
+			},
+			"photos": {
+				"renderer": "PhotoCard",
+				"enabled": true
+			},
+			"links": {
+				"name": "LinkCard",
+				"enabled": true
+			},
+			"articles": {
+				"renderer": "ArticleCard",
+				"enabled": true
+			},
+			"videos": {}
+		}
 	},
 	"allPosts": {
 		"visible": true,
@@ -201,7 +202,26 @@ conversations.config = {
 		"events": {
 			"onPostCountUpdate": null
 		},
-		"plugins": []
+		"plugins": [],
+		"contentTypes": {
+			"comments": {
+				"renderer": "CommentCard",
+				"enabled": true
+			},
+			"photos": {
+				"renderer": "PhotoCard",
+				"enabled": true
+			},
+			"links": {
+				"renderer": "LinkCard",
+				"enabled": true
+			},
+			"articles": {
+				"renderer": "ArticleCard",
+				"enabled": true
+			},
+			"videos": {}
+		}
 	},
 	"moderationQueue": {
 		"label": "Moderation Queue",
@@ -497,8 +517,9 @@ conversations.renderers.content = function(element) {
 };
 
 conversations.renderers.postComposer = function(element) {
-	var conditionalPlugins = this._getConditionalComposerPluginList("postComposer");
-	if (!conditionalPlugins.length) {
+	var postComposer = $.extend(true, {}, this.config.get("postComposer"));
+	var contentTypePlugins = this._getContentTypePlugins("postComposer");
+	if (!postComposer.visible || !contentTypePlugins.length) {
 		return element;
 	}
 
@@ -506,7 +527,6 @@ conversations.renderers.postComposer = function(element) {
 	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	var ssConfig = this.config.get("dependencies.StreamServer");
 
-	var postComposer = $.extend(true, {}, this.config.get("postComposer"));
 	var plugins = postComposer.plugins;
 	delete postComposer.plugins;
 
@@ -534,7 +554,7 @@ conversations.renderers.postComposer = function(element) {
 				"enabled": enableBundledIdentity,
 				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
 				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
-			}].concat(conditionalPlugins), plugins),
+			}].concat(contentTypePlugins), plugins),
 			"data": {
 				"object": {
 					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
@@ -921,19 +941,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"name": "Moderation",
 		"extraActions": moderationExtraActions,
 		"topMarkers": this.config.get("topMarkers")
-	}, {
-		"name": "CommentCard"
-	}, {
-		"name": "PhotoCard"
-	}, {
-		"name": "VideoCard"
-	}, {
-		"name": "ArticleCard"
-	}, {
-		"name": "CommentCard"
-	}, {
-		"name": "LinkCard"
-	}]);
+	}], this._getContentTypePlugins(componentID));
 
 	return this._mergeSpecsByName(plugins, config.plugins);
 };
@@ -941,7 +949,7 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	var auth = this.config.get("auth");
 	var config = this.config.get(componentID);
-	var replyConditionalPlugins = this._getConditionalComposerPluginList("replyComposer");
+	var replyContentTypePlugins = this._getContentTypePlugins("replyComposer");
 
 	var replyComposer = $.extend(true, {}, this.config.get("replyComposer"));
 	var composerPlugins = replyComposer.plugins;
@@ -962,7 +970,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	}, $.extend(true, replyComposer, {
 		"intentID": "Reply",
 		"name": "Reply",
-		"enabled": replyConditionalPlugins.length,
+		"enabled": replyComposer.visible && replyContentTypePlugins.length,
 		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
 		"pauseTimeout": +(this._isModerationRequired() && replyComposer.confirmation.timeout),
 		"requestMethod": "POST",
@@ -971,22 +979,20 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 			"enabled": this._isModerationRequired() && replyComposer.confirmation.enabled
 		},
 		"submitPermissions": this._getSubmitPermissions(),
-		"dependencies": this.config.get("dependencies"),
 		"nestedPlugins": this._mergeSpecsByName([{
 			"name": "JanrainBackplaneHandler",
 			"appId": this.config.get("dependencies.Janrain.appId"),
 			"enabled": auth.enableBundledIdentity,
 			"authWidgetConfig": auth.authWidgetConfig,
 			"sharingWidgetConfig": auth.sharingWidgetConfig
-		}].concat(replyConditionalPlugins), composerPlugins)
+		}].concat(replyContentTypePlugins), composerPlugins)
 	}), {
 		"intentID": "Sharing",
 		"name": "SocialSharing"
 	}, {
 		"intentID": "Edit",
 		"name": "Edit",
-		"requestMethod": "POST",
-		"dependencies": this.config.get("dependencies")
+		"requestMethod": "POST"
 	}];
 
 	return $.grep(plugins, function(plugin) {
@@ -994,20 +1000,12 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	});
 };
 
-conversations.methods._getConditionalComposerPluginList = function(componentID) {
-	var config = this.config.get(componentID + ".contentTypes");
-
-	var normalizeConfig = function(_config) {
-		return Echo.Utils.foldl({}, _config, function(value, acc, key) {
-			if (!~$.inArray(key, ["visible", "renderer"])) {
-				acc[key] = value;
-			}
-		});
-	};
-
-	return $.map(config, function(value, key) {
-		var enabled = !!value.visible && !!Echo.Utils.get(value, "renderer.name");
-		return enabled ? $.extend(value.renderer, normalizeConfig(value)) : undefined;
+conversations.methods._getContentTypePlugins = function(componentID) {
+	//TODO: we should somehow determine order of content type plugins
+	return $.map(this.config.get(componentID + ".contentTypes"), function(value) {
+		if (!value.enabled && !!value.renderer) return;
+		value.name = value.renderer;
+		return value;
 	});
 };
 
