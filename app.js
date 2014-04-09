@@ -20,12 +20,32 @@ conversations.config = {
 		"contentTypes": {
 			"comments": {
 				"visible": true,
+				"renderer": {
+					"name": "CommentCard"
+				},
 				"prompt": "What's on your mind?",
 				"resolveURLs": true,
 				"attachments": {
 					"visible": false,
 					"sources": ""
 				}
+			},
+			"photos": {
+				"visible": true,
+				"renderer": {
+					"name": "PhotoCard"
+				}
+			},
+			"links": {
+				"visible": true,
+				"renderer": {
+					"name": "LinkCard"
+				},
+				"blockedDomains": []
+			},
+			"videos": {
+				"visible": true,
+				"renderer": {}
 			}
 		},
 		"confirmation": {
@@ -47,13 +67,32 @@ conversations.config = {
 		"contentTypes": {
 			"comments": {
 				"visible": true,
+				"renderer": {
+					"name": "CommentCard"
+				},
 				"prompt": "What's on your mind?",
 				"resolveURLs": true,
 				"attachments": {
 					"visible": false,
 					"sources": ""
 				}
-
+			},
+			"photos": {
+				"visible": true,
+				"renderer": {
+					"name": "PhotoCard"
+				}
+			},
+			"links": {
+				"visible": true,
+				"blockedDomains": [],
+				"renderer": {
+					"name": "LinkCard"
+				}
+			},
+			"videos": {
+				"visible": true,
+				"renderer": {}
 			}
 		},
 		"confirmation": {
@@ -458,13 +497,15 @@ conversations.renderers.content = function(element) {
 };
 
 conversations.renderers.postComposer = function(element) {
-	if (!this._isComposerVisible("postComposer")) {
+	var conditionalPlugins = this._getConditionalComposerPluginList("postComposer");
+	if (!conditionalPlugins.length) {
 		return element;
 	}
 
 	var targetURL = this.config.get("targetURL");
 	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	var ssConfig = this.config.get("dependencies.StreamServer");
+
 	var postComposer = $.extend(true, {}, this.config.get("postComposer"));
 	var plugins = postComposer.plugins;
 	delete postComposer.plugins;
@@ -488,18 +529,12 @@ conversations.renderers.postComposer = function(element) {
 			"submitPermissions": this._getSubmitPermissions(),
 			"dependencies": this.config.get("dependencies"),
 			"plugins": this._mergeSpecsByName([{
-				"name": "CommentCard"
-			}, {
-				"name": "PhotoCard"
-			}, {
-				"name": "LinkCard"
-			}, {
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
 				"enabled": enableBundledIdentity,
 				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
 				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
-			}], plugins),
+			}].concat(conditionalPlugins), plugins),
 			"data": {
 				"object": {
 					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
@@ -906,6 +941,8 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	var auth = this.config.get("auth");
 	var config = this.config.get(componentID);
+	var replyConditionalPlugins = this._getConditionalComposerPluginList("replyComposer");
+
 	var replyComposer = $.extend(true, {}, this.config.get("replyComposer"));
 	var composerPlugins = replyComposer.plugins;
 	delete replyComposer.plugins;
@@ -925,7 +962,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	}, $.extend(true, replyComposer, {
 		"intentID": "Reply",
 		"name": "Reply",
-		"enabled": this._isComposerVisible("replyComposer"),
+		"enabled": replyConditionalPlugins.length,
 		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
 		"pauseTimeout": +(this._isModerationRequired() && replyComposer.confirmation.timeout),
 		"requestMethod": "POST",
@@ -936,18 +973,12 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"submitPermissions": this._getSubmitPermissions(),
 		"dependencies": this.config.get("dependencies"),
 		"nestedPlugins": this._mergeSpecsByName([{
-			"name": "CommentCard"
-		}, {
-			"name": "PhotoCard"
-		}, {
-			"name": "LinkCard"
-		}, {
 			"name": "JanrainBackplaneHandler",
 			"appId": this.config.get("dependencies.Janrain.appId"),
 			"enabled": auth.enableBundledIdentity,
 			"authWidgetConfig": auth.authWidgetConfig,
 			"sharingWidgetConfig": auth.sharingWidgetConfig
-		}], composerPlugins)
+		}].concat(replyConditionalPlugins), composerPlugins)
 	}), {
 		"intentID": "Sharing",
 		"name": "SocialSharing"
@@ -955,14 +986,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 		"intentID": "Edit",
 		"name": "Edit",
 		"requestMethod": "POST",
-		"dependencies": this.config.get("dependencies"),
-		"nestedPlugins": [{
-			"name": "CommentCard"
-		}, {
-			"name": "PhotoCard"
-		}, {
-			"name": "LinkCard"
-		}]
+		"dependencies": this.config.get("dependencies")
 	}];
 
 	return $.grep(plugins, function(plugin) {
@@ -970,27 +994,21 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	});
 };
 
-conversations.methods._getResolverSettingForEditPlugin = function() {
-	var postComposer = this.config.get("postComposer.contentTypes.comments.resolveURLs");
-	var replyComposer = this.config.get("replyComposer.contentTypes.comments.resolveURLs");
-	var setting;
-	if (postComposer && replyComposer) {
-		setting = "all";
-	} else if (postComposer) {
-		setting = "only-roots";
-	} else if (replyComposer) {
-		setting = "only-children";
-	} else {
-		setting = "disabled";
-	}
-	return setting;
-};
+conversations.methods._getConditionalComposerPluginList = function(componentID) {
+	var config = this.config.get(componentID + ".contentTypes");
 
-conversations.methods._isComposerVisible = function(composerID) {
-	var config = this.config.get(composerID);
-	return config.visible && !!$.map(config.contentTypes, function(type) {
-		return type.visible ? type : undefined;
-	}).length;
+	var normalizeConfig = function(_config) {
+		return Echo.Utils.foldl({}, _config, function(value, acc, key) {
+			if (!~$.inArray(key, ["visible", "renderer"])) {
+				acc[key] = value;
+			}
+		});
+	};
+
+	return $.map(config, function(value, key) {
+		var enabled = !!value.visible && !!Echo.Utils.get(value, "renderer.name");
+		return enabled ? $.extend(value.renderer, normalizeConfig(value)) : undefined;
+	});
 };
 
 conversations.methods._getSubmitPermissions = function() {
