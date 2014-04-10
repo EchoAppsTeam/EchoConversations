@@ -71,7 +71,7 @@ plugin.renderers.title = function(element) {
 plugin.renderers.description = function(element) {
 	var description = this.component.get("data.oembed.description");
 	if (description) {
-		element.html(description);
+		element.text(Echo.Utils.stripTags(description));
 	} else {
 		element.hide();
 	}
