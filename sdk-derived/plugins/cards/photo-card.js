@@ -305,7 +305,6 @@ plugin.methods.initMedia = function() {
 				"mobile": Echo.Utils.isMobileDevice()
 			},
 			"beforeCallback": function(event) {
-				console.log("hello from beforeCallback");
 				self.component.disablePostButtonBy("photo-uploading");
 			},
 			"onSuccess": function(InkBlob) {

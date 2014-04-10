@@ -134,7 +134,7 @@ media.methods.initAttachmentsPanel = function(panelConfig) {
 	this.set("attachmentsPanel.isActive", true);
 	this.set("attachmentsPanel.allowMultiple", panelConfig.allowMultiple || false);
 	container.append(panel);
-	if(this.config.get("data", []).length < 0 || this.get("attachmentsPanel.allowMultiple")) {
+	if(this.config.get("data", []).length <= 0 || this.get("attachmentsPanel.allowMultiple")) {
 		panel.slideDown();
 	}
 	var target = container.find("." + this.cssPrefix + "drop-panel");
@@ -214,13 +214,11 @@ media.methods._initFilePickerPanel = function(target, config) {
 		}
 		window.filepicker.pick($.extend({}, config.clickPanelOptions.filepickerOptions),
 		function(InkBlob) {
-			console.log("success", InkBlob);
 			if (typeof config.clickPanelOptions.onSuccess === "function") {
 				config.clickPanelOptions.onSuccess.apply(this, arguments);
 			}
 		},
 		function(FPError) {
-			console.log("fail", FPError);
 			self._changeAttachmentsPanelLayout("normal", target);
 			if (typeof config.clickPanelOptions.onError === "function") {
 				config.clickPanelOptions.onError.apply(this, arguments);
@@ -243,7 +241,7 @@ var gradientStyle = function(value) {
 };
 
 media.css =
-	'.{class:container} { line-height: 1px; word-wrap: normal; white-space: nowrap; overflow-x: auto; overflow-y: hidden; }' + //padding: 8px 0px 8px 8px; }' +
+	'.{class:container} { line-height: 1px; word-wrap: normal; white-space: nowrap; overflow-x: auto; overflow-y: hidden; }' +
 	'.{class:container} > div { display: inline-block; max-width: 90%; vertical-align: top; }' +
 	'.{class:container} > div > div { margin-right: 8px; }' +
 
@@ -251,7 +249,7 @@ media.css =
 	'.{class:container}.{class:single} { padding: 0px; border: 0px; }' +
 	'.{class:container}.{class:single} > div { max-width: 100%; display: block; }' +
 	'.{class:container}.{class:single} > div > div { margin-right: 0; }' +
-	
+
 	// multiple cards
 	'.{class:container}.{class:multiple} { padding: 8px; }' +
 
@@ -259,7 +257,7 @@ media.css =
 	'.{class:container}::-webkit-scrollbar { height: 10px; }' +
 	'.{class:container}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
 	'.{class:container}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }' +
-	
+
 	// attachment panel
 	'.{class:container}.{class:multiple} > .{class:drop-panel} { border: 1px solid #C2C2C2; }' +
 	'.{class:container} > div.{class:drop-panel} { width: 100%; height: 100%; max-height: 388px; cursor: pointer; background-color: #eee; text-align: center; font-size: 16px; font-family: "Helvetica Neue", arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; max-width: 100%; }' +
