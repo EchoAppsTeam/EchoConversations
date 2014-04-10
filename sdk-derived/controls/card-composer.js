@@ -598,8 +598,10 @@ composer.renderers.media = function(element) {
 			}
 		},
 		"ready": function() {
-			if (typeof self.currentComposer.initMedia === "function" && !self.collapsed) {
-				//self.currentComposer.initMedia();
+			if (typeof self.currentComposer.initMedia === "function" && self.currentComposer.requiresMedia) {
+				setTimeout(function() {
+					self.currentComposer.initMedia();
+				}, 0);
 			}
 			/**
 			 * @echo_event Echo.StreamServer.Controls.CardComposer.onMediaContainerReady
@@ -983,13 +985,12 @@ composer.methods.attachMedia = function(params) {
 			self.formData.media.push(oembed);
 		});
 		self.mediaContainer.updateAttachments(self.formData.media);
-		//self.view.render({"name": "media"});
 	});
 };
 
 composer.methods.initAttachmentsPanel = function(panelConfig) {
 	if (!this.mediaContainer) {
-		this.view.render({"name": "media"});
+		return;
 	}
 	this.mediaContainer.initAttachmentsPanel(panelConfig);
 };
@@ -1003,7 +1004,6 @@ composer.methods.removeMedia = function(index) {
 		this.formData.media.splice(index, 1);
 	}
 	this.mediaContainer.updateAttachments(this.formData.media);
-	//this.view.render({"name": "media"});
 };
 
 /**
@@ -1095,7 +1095,7 @@ composer.methods._initCurrentComposer = function() {
 	if (this.mediaContainer) {
 		this.mediaContainer.clearOut();
 		// TODO: this is a bad move. We shoud reduce fasciation in it
-		if (typeof composer.initMedia === "function") {
+		if (typeof composer.initMedia === "function" && composer.requiresMedia) {
 			composer.initMedia();
 		}
 	}

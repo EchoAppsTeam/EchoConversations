@@ -37,7 +37,8 @@ media.templates.main = function() {
 media.vars = {
 	"cards": [],
 	"attachmentsPanel": {
-		"isActive": false
+		"isActive": false,
+		"allowMultiple": false
 	}
 };
 
@@ -131,11 +132,13 @@ media.methods.initAttachmentsPanel = function(panelConfig) {
 	var container = this.view.get("container");
 	var panel = this._getAttachmentsPanel();
 	this.set("attachmentsPanel.isActive", true);
+	this.set("attachmentsPanel.allowMultiple", panelConfig.allowMultiple || false);
 	container.append(panel);
-	panel.slideDown();
+	if(this.config.get("data", []).length < 0 || this.get("attachmentsPanel.allowMultiple")) {
+		panel.slideDown();
+	}
 	var target = container.find("." + this.cssPrefix + "drop-panel");
 	this._initFilePickerPanel(target, panelConfig);
-	this.set("attachmentsPanel.allowMultiple", panelConfig.allowMultiple || false);
 };
 
 media.methods._showAttachmentsPanel = function() {
@@ -151,7 +154,6 @@ media.methods._showAttachmentsPanel = function() {
 };
 
 media.methods._hideAttachmentsPanel = function() {
-	if (!this.get("attachmentsPanel.isActive")) return;
 	var panel = this.view.get("container").find("." + this.cssPrefix + "drop-panel");
 	panel.slideUp();
 	this._changeAttachmentsPanelLayout("normal", panel);
@@ -203,7 +205,7 @@ media.methods._initFilePickerPanel = function(target, config) {
 			}
 		}
 	}));
-	
+
 	if (!config.clickPanelOptions) return;
 	target.click(function(event) {
 		self._changeAttachmentsPanelLayout("loading", target);

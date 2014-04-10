@@ -185,7 +185,6 @@ plugin.methods.initMedia = function() {
 			}),
 			"removeOld": false
 		});
-		// TODO: replace it in any way to the end of resolving...
 		self.component.enablePostButtonBy("photo-uploading");
 	};
 
@@ -218,7 +217,6 @@ plugin.methods.initMedia = function() {
 					"urls": [InkBlob.url],
 					"removeOld": false
 				});
-				// TODO: replace it in any way to the end of resolving...
 				self.component.enablePostButtonBy("photo-uploading");
 			},
 			"onError": function(err) {
