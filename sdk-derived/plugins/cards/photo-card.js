@@ -440,7 +440,7 @@ var gradientStyle = function(value) {
 };
 
 plugin.css =
-	'.echo-photo-composer-drop-panel { width: 100%; height: 100%; max-height: 388px; cursor: pointer; background-color: #eee; text-align: center; font-size: 16px; font-family: "Helvetica Neue", arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; }' +
+	'.echo-photo-composer-drop-panel { width: 100%; height: 100%; max-height: 388px; cursor: pointer; background-color: #eee; text-align: center; font-size: 16px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; }' +
 	'.echo-photo-composer-plus-button { font-size: 128px; line-height: 128px; font-weight: bold; width: 128px; height: 128px; margin: 0 auto; }' +
 	'.strippedBackground { ' +
 		gradientStyle("left top, #e3e3e3 0%, #e3e3e3 25%, #eee 25%, #eee 50%, #e3e3e3 50%, #e3e3e3 75%, #eee 75%") + '; ' +
@@ -449,7 +449,7 @@ plugin.css =
 	'}' +
 	'.echo-photo-composer-drop-panel-wrapper { border: 1px solid #C4C4C4; margin: 5px; border-radius: 2px; }' +
 	'.echo-photo-composer-drop-panel-container { padding: 10px 0 40px 0; margin: 5px; }' +
-	'.echo-photo-composer-uploading-tooltip { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px;}' +
+	'.echo-photo-composer-uploading-tooltip { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; }' +
 	'.echo-photo-composer-filepicker-loading { background-image: url("{%= baseURLs.prod %}/images/loading.gif"); background-size: 80px; background-repeat: no-repeat; background-position: 24px 39px; }';
 
 Echo.Plugin.create(plugin);

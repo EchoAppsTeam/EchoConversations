@@ -87,7 +87,7 @@ plugin.methods.isEnabled = function() {
 
 plugin.css =
 	'.{plugin.class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{plugin.class:item} { text-align: left; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; max-width: 100%; vertical-align: top; }' +
+	'.{plugin.class:item} { text-align: left; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; max-width: 100%; vertical-align: top; }' +
 	'.{plugin.class:description} { overflow: hidden; }' +
 
 	// play button

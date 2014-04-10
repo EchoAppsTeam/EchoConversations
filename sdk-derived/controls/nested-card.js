@@ -353,7 +353,7 @@ var transition = function(value) {
 
 card.css =
 	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:item} { text-align: left; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; position: relative; }' +
+	'.{class:item} { text-align: left; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; position: relative; }' +
 	'.{class:border} { white-space: normal; word-break: break-word; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; }' +
 	'.{class:item} .{class:sourceIcon} > img { width: 18px; height: 18px; }' +
 	'.echo-sdk-ui .{class:avatar} > div { width: 28px; height: 28px; display:inline-block; margin-right: 6px; }' +

@@ -1284,7 +1284,7 @@ conversations.css =
 	'.{class:streamCounter} { font-size: 14px; }' +
 
 	// streaming state
-	'.{class:streamingStateContainer} { text-align: left; margin-bottom: 5px; font-family: "Helvetica Neue", arial, sans-serif; }' +
+	'.{class:streamingStateContainer} { text-align: left; margin-bottom: 5px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }' +
 	'.{class:streamingState} { padding-left: 15px; float: right; font-size: 13px; color: #c6c6c6; }' +
 	'.{class:streamingState-live} { background: url({config:cdnBaseURL.sdk-assets}/images/control_play.png) no-repeat left 3px; }' +
 	'.{class:streamingState-paused} { background: url({config:cdnBaseURL.sdk-assets}/images/control_pause.png) no-repeat left 3px; }' +
@@ -1321,14 +1321,14 @@ conversations.css =
 	'.echo-sdk-ui .nav.{class:tabs} .dropdown-menu { border-radius: 6px; }' +
 
 	// common
-	'.{class:container} .echo-control-message { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px; }' +
+	'.{class:container} .echo-control-message { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{class:container} { position:relative; }' +
 	'.{class:resizeFrame} { position:absolute; z-index:-1; border:0; padding:0; }' +
 	'.{class:container} li > a, ' +
 	'.{class:container} .echo-primaryFont,' +
 	'.{class:container} .echo-secondaryFont,' +
 	'.{class:container} .echo-linkColor ' +
-		'{ font-family: "Helvetica Neue", arial, sans-serif; }' +
+		'{ font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }' +
 	'.{class:postComposer} { margin-bottom: 10px; }' +
 	'.{class:topPosts} > div { margin-bottom: 25px; }' +
 	// set box-sizing property for all nested elements to default (content-box)

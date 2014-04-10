@@ -1397,7 +1397,7 @@ composer.css =
 	'.{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; background-color: transparent; }' +
 	'.{class:confirmation} { margin-bottom: 10px; display: none; }' +
 	'.{class:attachers} { display: none; margin: 5px; float: left; }' +
-	'.{class:postButtonWrapper} { float: right; font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; }' +
+	'.{class:postButtonWrapper} { float: right; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }' +
 	'.{class:postButtonWrapper} .dropdown-menu { min-width: 100px; }' +
 	'.{class:postButtonWrapper} .{class:postButton}.btn { padding: 3px 12px 5px 12px; }' +
 	'.{class:tagsContainer} { display: none !important; }' +
