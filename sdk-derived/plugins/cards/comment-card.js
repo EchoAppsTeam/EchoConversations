@@ -141,7 +141,7 @@ plugin.init = function() {
 		"setData": $.proxy(this.setData, this),
 		"requiresMedia": false,
 		"objectType": "http://activitystrea.ms/schema/1.0/comment",
-		"initMedia": $.proxy(this.initMedia, this)
+		"attachmentsCallback": $.proxy(this.initMedia, this)
 	});
 };
 

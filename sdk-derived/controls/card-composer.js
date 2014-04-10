@@ -481,7 +481,7 @@ composer.templates.main =
 						'<li><a href="#" class="{class:switchToPostAndShare}">{label:postAndShare}</a></li>' +
 					'</ul>' +
 				'</div>' +
-				'<div class="{class:attachers}">' +
+				'<div class="{class:attacher}">' +
 					'<img class="{class:attachPic}" src="{%= baseURLs.prod %}/images/attach.png">' +
 				'</div>' +
 				'<div class="echo-clear"></div>' +
@@ -1090,7 +1090,7 @@ composer.methods._initCurrentComposer = function() {
 		composer.panel.append(composer.composer());
 		composer.setData($.extend(true, {}, this.formData));
 	}
-	
+
 	//TODO: we shoud save states for each single composer and refresh media container due to that states...
 	if (this.mediaContainer) {
 		this.mediaContainer.clearOut();
@@ -1098,6 +1098,13 @@ composer.methods._initCurrentComposer = function() {
 		if (typeof composer.initMedia === "function" && composer.requiresMedia) {
 			composer.initMedia();
 		}
+	}
+	var attacher = this.view.get("attacher");
+	if (typeof composer.attachmentsCallback === "function") {
+		attacher.show();
+		attacher.click(composer.attachmentsCallback);
+	} else {
+		attacher.hide();
 	}
 	// timeout allows form fields to be added to target element DOM
 	setTimeout(function() {
@@ -1439,7 +1446,7 @@ composer.css =
 	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 0px 1px; }' +
 	'.{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; background-color: transparent; }' +
 	'.{class:confirmation} { margin-bottom: 10px; display: none; }' +
-	'.{class:attachers} { display: none; margin: 5px; float: left; cursor: pointer; }' +
+	'.{class:attacher} { display: none; margin: 5px; float: left; cursor: pointer; }' +
 	'.{class:postButtonWrapper} { float: right; font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; }' +
 	'.{class:postButtonWrapper} .dropdown-menu { min-width: 100px; }' +
 	'.{class:postButtonWrapper} .{class:postButton}.btn { padding: 3px 12px 5px 12px; }' +

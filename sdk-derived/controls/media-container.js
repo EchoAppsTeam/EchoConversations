@@ -134,11 +134,15 @@ media.methods.initAttachmentsPanel = function(panelConfig) {
 	this.set("attachmentsPanel.isActive", true);
 	this.set("attachmentsPanel.allowMultiple", panelConfig.allowMultiple || false);
 	container.append(panel);
-	if(this.config.get("data", []).length <= 0 || this.get("attachmentsPanel.allowMultiple")) {
+	var mediaLength = this.config.get("data", []).length;
+	if (!mediaLength || this.get("attachmentsPanel.allowMultiple")) {
 		panel.slideDown();
 	}
-	var target = container.find("." + this.cssPrefix + "drop-panel");
-	this._initFilePickerPanel(target, panelConfig);
+	if (mediaLength && this.get("attachmentsPanel.allowMultiple")) {
+		container.removeClass(this.cssPrefix + "single")
+			.addClass(this.cssPrefix + "multiple");
+	}
+	this._initFilePickerPanel(panel, panelConfig);
 };
 
 media.methods._showAttachmentsPanel = function() {
