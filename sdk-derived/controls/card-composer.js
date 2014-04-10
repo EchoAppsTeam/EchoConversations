@@ -1442,7 +1442,8 @@ composer.css =
 		'.echo-sdk-ui .{class:smallest} .nav-tabs { border-bottom-width: 0px; }' +
 
 	// tabs
-	'.{class:icon} { vertical-align: middle; margin-right: 2px; }' +
+	'.{class:tabs} .{class:icon} { margin-right: 2px; }' +
+	'.{class:tabs} .{class:label} { vertical-align: middle; }' +
 	'.echo-sdk-ui .{class:tabs} .nav { margin-bottom: 0px; }' +
 	'.echo-sdk-ui .{class:tabs} .nav > li > a { padding: 0px; margin-right: 10px; border: 0px; color: #3c3c3c; background-color: transparent; opacity: 0.5; }' +
 	'.echo-sdk-ui .{class:tabs} .nav > li > a:hover, .echo-sdk-ui .{class:tabs} .nav > li > a:focus { background-color: transparent; border: 0px; }' +
