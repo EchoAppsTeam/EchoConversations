@@ -33,4 +33,25 @@ Echo.Utils.addCSS(
 	'echo-utils'
 );
 
+Echo.Utils.oEmbedValidate = function(oembed) {
+	var fields = {
+		"photo": ["url", "width", "height"],
+		"link": ["url", "title"],
+		"video": ["html", "width", "height"],
+		"rich": ["html", "width", "height"]
+	};
+
+	if ($.isPlainObject(oembed) &&
+			oembed.type &&
+			oembed.version &&
+			fields[oembed.type]
+	) {
+		return !$.grep(fields[oembed.type], function(field) {
+			return !oembed[field];
+		}).length;
+	} else {
+		return false;
+	}
+};
+
 })(Echo.jQuery);

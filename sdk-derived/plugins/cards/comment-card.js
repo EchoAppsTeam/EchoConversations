@@ -30,7 +30,8 @@ plugin.init = function() {
 plugin.methods.normalizer = function() {
 	var content = $("<div/>").append(this.component.get("data.object.content"));
 	var attachments = $("div[data-oembed]", content).map(function() {
-		return $(this).data("oembed");
+		var oembed = $(this).data("oembed");
+		return Echo.Utils.oEmbedValidate(oembed) ? oembed : null;
 	}).get();
 
 	if (attachments.length) {
@@ -45,12 +46,17 @@ plugin.templates.media = '<div class="{plugin.class:mediaContent}"></div>';
 
 plugin.component.renderers.body = function(element) {
 	var item = this.component;
+	var attachments = item.get("data.attachments", []);
 
-	var original = item.get("data.object.content");
-	var content = this.component.get("data.content");
-	item.set("data.object.content", content);
-	this.parentRenderer("body", arguments);
-	item.set("data.object.content", original);
+	if (attachments.length) {
+		var original = item.get("data.object.content");
+		var content = item.get("data.content");
+		item.set("data.object.content", content);
+		this.parentRenderer("body", arguments);
+		item.set("data.object.content", original);
+	} else {
+		this.parentRenderer("body", arguments);
+	}
 
 	return element;
 };
@@ -91,6 +97,13 @@ plugin.methods.isEnabled = function() {
 			return false;
 		}
 	});
+
+	if (result) {
+			this.normalizer();
+			if (!item.get("data.attachments", []).length) {
+				result = false;
+			}
+	}
 	return result;
 };
 
