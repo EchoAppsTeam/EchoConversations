@@ -584,8 +584,6 @@ composer.renderers.media = function(element) {
 		"target": element.empty(),
 		"data": this.formData.media,
 		"card": {
-			"displaySourceIcon": false,
-			"displayAuthor": false,
 			"onRemove": function(data) {
 				self.removeMedia(self._getDefinedMediaIndex(data));
 				/**
@@ -1422,7 +1420,7 @@ composer.css =
 	'.{class:error} { border: 1px solid red; }' +
 	'.{class:error} input, .{class:error} textarea { background: no-repeat center right url({config:cdnBaseURL.sdk-assets}/images/warning.gif); }' +
 
-	'.{class:resolving} { background: no-repeat bottom right url({%=baseURLs.prod%}/images/resolving.gif); }' +
+	'.{class:resolving} { background: no-repeat bottom center url({%=baseURLs.prod%}/images/resolving.gif); }' +
 	'.{class:media} .echo-streamserver-controls-mediacontainer-multiple { border: 1px solid #DEDEDE; border-top-style: dashed; border-bottom: 0px; background-color: #F1F1F1; }' +
 
 	// display modes
