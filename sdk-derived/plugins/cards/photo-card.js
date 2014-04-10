@@ -202,7 +202,8 @@ plugin.css =
 
 	'.echo-sdk-ui .{plugin.class:photoLabel} a:link, .echo-sdk-ui .{plugin.class:photoLabel} a:visited, .echo-sdk-ui .{plugin.class:photoLabel} a:hover, .echo-sdk-ui .{plugin.class:photoLabel} a:active { color: #fff; }' +
 	'.{plugin.class:photoLabelContainer} { padding: 10px; }' +
-	'.{plugin.class:photoTitle} { margin: 0 0 5px 0; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
+	'.{plugin.class:photoLabelContainer} > div:nth-child(2) { margin: 5px 0 0 0; }' +
+	'.{plugin.class:photoTitle} { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 
 	'.{plugin.class:photoLabel} { overflow: hidden; }' +
 	'.{plugin.class:photo}:hover .{plugin.class:photoLabel} { max-height: 60% !important; }' +

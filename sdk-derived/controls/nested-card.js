@@ -375,7 +375,8 @@ card.css =
 
 	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
 	'.{class:photoLabelContainer} { padding: 10px; }' +
-	'.{class:photoTitle} { margin: 0 0 5px 0; }' +
+	'.{class:photoLabelContainer} > div:nth-child(2) { margin: 5px 0 0 0; }' +
+	'.{class:photoTitle} { margin: 0; }' +
 
 	'.{class:photoLabel} { overflow: hidden; }' +
 	'.{class:photo}:hover .{class:photoLabel} { max-height: 60% !important; }' +
