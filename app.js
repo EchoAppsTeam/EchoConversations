@@ -37,7 +37,10 @@ conversations.config = {
 				"enabled": true,
 				"blockedDomains": []
 			},
-			"videos": {}
+			"videos": {
+				"renderer": "VideoCard",
+				"enabled": true
+			}
 		},
 		"confirmation": {
 			"enabled": true,
@@ -75,7 +78,10 @@ conversations.config = {
 				"enabled": true,
 				"blockedDomains": []
 			},
-			"videos": {}
+			"videos": {
+				"renderer": "VideoCard",
+				"enabled": true
+			}
 		},
 		"confirmation": {
 			"enabled": true,
@@ -148,7 +154,10 @@ conversations.config = {
 				"renderer": "ArticleCard",
 				"enabled": true
 			},
-			"videos": {}
+			"videos": {
+				"renderer": "VideoCard",
+				"enabled": true
+			}
 		}
 	},
 	"allPosts": {
@@ -220,7 +229,10 @@ conversations.config = {
 				"renderer": "ArticleCard",
 				"enabled": true
 			},
-			"videos": {}
+			"videos": {
+				"renderer": "VideoCard",
+				"enabled": true
+			}
 		}
 	},
 	"moderationQueue": {
