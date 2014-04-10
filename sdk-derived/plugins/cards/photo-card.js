@@ -233,7 +233,8 @@ plugin.init = function() {
 		"composer": $.proxy(this.buildComposer, this),
 		"getData": $.proxy(this.getData, this),
 		"setData": $.proxy(this.setData, this),
-		"objectType": "http://activitystrea.ms/schema/1.0/image"
+		"objectType": "http://activitystrea.ms/schema/1.0/image",
+		"initMedia": $.proxy(this.initMedia, this)
 	});
 };
 
@@ -253,128 +254,75 @@ plugin.labels = {
 	/**
 	 * @echo_label
 	 */
-	"URL": "URL",
-	/**
-	 * @echo_label
-	 */
-	"plus": "+",
-	/**
-	 * @echo_label
-	 */
-	"initialUploadingTooltip": "Drag file here or click to upload an image",
-	/**
-	 * @echo_label
-	 */
-	"loading": "Loading"
-
+	"URL": "URL"
 };
 
-plugin.dependencies = [{
-	"url": "//api.filepicker.io/v1/filepicker.js",
-	"loaded": function() {
-		return !!(window.filepicker && window.filepicker.pick);
-	}
-}];
-
-plugin.events = {
-	"Echo.StreamServer.Controls.CardComposer.onMediaContainerReady": function() {
-		if (!this.isPhotoComposerActive()) return;
-		this.component.enablePostButtonBy("photo-uploading");
-		this.composer.find(".echo-photo-composer-drop-panel").slideUp();
-	}
-};
-
-$.map(["Echo.StreamServer.Controls.CardComposer.onMediaDetached",
-	"Echo.StreamServer.Controls.CardComposer.onPostComplete"], function(eventName) {
-	plugin.events[eventName] = function() {
-		if (!this.isPhotoComposerActive()) return;
-		this.renewMediaPanel();
-		this.composer.find(".echo-photo-composer-drop-panel").slideDown();
-	};
-});
 
 plugin.methods.isPhotoComposerActive = function() {
 	return this.component.currentComposer.id === "photo";
 };
 
-plugin.methods.renewMediaPanel = function() {
-	this.composer.find(".echo-photo-composer-drop-panel").removeAttr("disabled");
-	this.composer.find(".echo-photo-composer-uploading-tooltip")
-		.text(this.labels.get("initialUploadingTooltip"));
-
-	this.composer.find(".echo-photo-composer-plus-button")
-		.text(this.labels.get("plus"))
-		.removeClass("echo-photo-composer-filepicker-loading");
-};
-
 plugin.methods.buildComposer = function() {
-	var self = this;
 	this.composer = $("<div>").append([
 		'<div class="echo-cardcomposer-field-wrapper">',
 			'<input type="text" class="echo-photo-composer-title" placeholder="', this.labels.get("title"), '">',
 		'</div>',
-		'<div class="echo-cardcomposer-delimiter"></div>',
-		'<div class="echo-photo-composer-drop-panel">',
-			'<div class="echo-photo-composer-drop-panel-wrapper">',
-				'<div class="echo-photo-composer-drop-panel-container strippedBackground">',
-					'<div class="echo-photo-composer-plus-button">',
-						this.labels.get("plus"),
-					'</div>',
-					'<span class="echo-photo-composer-uploading-tooltip">',
-						this.labels.get("initialUploadingTooltip"),
-					'</span>',
-				'</div>',
-			'</div>',
-		'</div>'
+		'<div class="echo-cardcomposer-delimiter"></div>'
 	].join(""));
-
-	var attachMedia = function(url) {
-		self.component.attachMedia({
-			"urls": [url],
-			"removeOld": true
-		});
-	};
-
-	var plusButton = self.composer.find(".echo-photo-composer-plus-button");
-	var tooltip = self.composer.find(".echo-photo-composer-uploading-tooltip");
-	var dropPanel = self.composer.find(".echo-photo-composer-drop-panel");
-	window.filepicker.setKey(self.component.config.get("dependencies.FilePicker.apiKey"));
-	window.filepicker.makeDropPane(dropPanel[0], {
-		"multiple": false,
-		"mimetype": "image/*",
-		"onStart": function(files) {
-			plusButton.addClass("echo-photo-composer-filepicker-loading").empty();
-			tooltip.text(self.labels.get("loading"));
-			self.component.disablePostButtonBy("photo-uploading");
-		},
-		"onSuccess": function(InkBlobs) {
-			attachMedia(InkBlobs[0].url);
-		},
-		"onError": function(type, message) {
-			self.component.enablePostButtonBy("photo-uploading");
-			self.log(message);
-			self.renewMediaPanel();
-		}
-	});
-
-	dropPanel.click(function(event) {
-		self.component.disablePostButtonBy("photo-uploading");
-		plusButton.addClass("echo-photo-composer-filepicker-loading").empty();
-		tooltip.text(self.labels.get("loading"));
-		window.filepicker.pick({
-			"mimetype": "image/*",
-			"container": "modal",
-			"mobile": Echo.Utils.isMobileDevice()
-		}, function(InkBlob) {
-			attachMedia(InkBlob.url);
-		}, function(FPError) {
-			self.component.enablePostButtonBy("photo-uploading");
-			self.renewMediaPanel();
-			self.log(FPError);
-		});
-	});
-
 	return this.composer;
+};
+
+plugin.methods.initMedia = function() {
+	var self = this;
+	this.component.initAttachmentsPanel({
+		"dragAndDropPanelOptions": {
+			"filepickerOptions": {
+				"multiple": false,
+				"mimetype": "image/*"
+			},
+			"onStart": function(files) {
+				self.component.disablePostButtonBy("photo-uploading");
+			},
+			"onSuccess": function(InkBlobs) {
+				self.component.attachMedia({
+					"urls": $.map(InkBlobs, function(picture) {
+						return picture.url;
+					}),
+					"removeOld": true
+				});
+				// TODO: replace it in any way to the end of resolving...
+				self.component.enablePostButtonBy("photo-uploading");
+
+			},
+			"onError": function(type, message) {
+				self.component.enablePostButtonBy("photo-uploading");
+			}
+		},
+		"clickPanelOptions": {
+			"filepickerOptions": {
+				"mimetype": "image/*",
+				"container": "modal",
+				"mobile": Echo.Utils.isMobileDevice()
+			},
+			"beforeCallback": function(event) {
+				console.log("hello from beforeCallback");
+				self.component.disablePostButtonBy("photo-uploading");
+			},
+			"onSuccess": function(InkBlob) {
+				self.component.attachMedia({
+					"urls": [InkBlob.url],
+					"removeOld": true
+				});
+				// TODO: replace it in any way to the end of resolving...
+				self.component.enablePostButtonBy("photo-uploading");
+			},
+			"onError": function(err) {
+				self.component.enablePostButtonBy("photo-uploading");
+			}
+		},
+		"filepickerAPIKey": self.component.config.get("dependencies.FilePicker.apiKey"),
+		"allowMultiple": false
+	});
 };
 
 plugin.methods.getData = function() {
@@ -410,26 +358,6 @@ plugin.methods._mediaTemplate = function() {
 		'</a>' +
 	'</div>';
 };
-
-var gradientStyle = function(value) {
-	var propertyName = "background-image";
-	return $.map(["linear-gradient", "-webkit-linear-gradient", "-moz-linear-gradient", "-ms-linear-gradient", "-o-linear-gradient"], function(propertySpecific) {
-		return propertyName +': ' + propertySpecific + "(" + value + ")";
-	}).join(";");
-};
-
-plugin.css =
-	'.echo-photo-composer-drop-panel { width: 100%; height: 100%; max-height: 388px; cursor: pointer; background-color: #eee; text-align: center; font-size: 16px; font-family: "Helvetica Neue", arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; }' +
-	'.echo-photo-composer-plus-button { font-size: 128px; line-height: 128px; font-weight: bold; width: 128px; height: 128px; margin: 0 auto; }' +
-	'.strippedBackground { ' +
-		gradientStyle("left top, #e3e3e3 0%, #e3e3e3 25%, #eee 25%, #eee 50%, #e3e3e3 50%, #e3e3e3 75%, #eee 75%") + '; ' +
-		'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#e3e3e3", endColorstr="#eeeeee",GradientType=0 ); ' +
-		'background-size: 70px 70px;' +
-	'}' +
-	'.echo-photo-composer-drop-panel-wrapper { border: 1px solid #C4C4C4; margin: 5px; border-radius: 2px; }' +
-	'.echo-photo-composer-drop-panel-container { padding: 10px 0 40px 0; margin: 5px; }' +
-	'.echo-photo-composer-uploading-tooltip { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px;}' +
-	'.echo-photo-composer-filepicker-loading {background-image: url("{%= baseURLs.prod %}/images/loading.gif"); background-size: 80px; background-repeat: no-repeat; background-position: 24px 39px; }';
 
 Echo.Plugin.create(plugin);
 

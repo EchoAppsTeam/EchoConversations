@@ -140,7 +140,8 @@ plugin.init = function() {
 		"getData": $.proxy(this.getData, this),
 		"setData": $.proxy(this.setData, this),
 		"requiresMedia": false,
-		"objectType": "http://activitystrea.ms/schema/1.0/comment"
+		"objectType": "http://activitystrea.ms/schema/1.0/comment",
+		"initMedia": $.proxy(this.initMedia, this)
 	});
 };
 
@@ -173,6 +174,60 @@ plugin.methods.buildComposer = function() {
 		});
 	});
 	return this.composer;
+};
+
+plugin.methods.initMedia = function() {
+	var self = this;
+	var successCallback = function(InkBlobs) {
+		self.component.attachMedia({
+			"urls": $.map(InkBlobs, function(picture) {
+				return picture.url;
+			}),
+			"removeOld": false
+		});
+		// TODO: replace it in any way to the end of resolving...
+		self.component.enablePostButtonBy("photo-uploading");
+	};
+
+	this.component.initAttachmentsPanel({
+		"dragAndDropPanelOptions": {
+			"filepickerOptions": {
+				"multiple": false,
+				"mimetype": "image/*"
+			},
+			"onStart": function(files) {
+				self.component.disablePostButtonBy("photo-uploading");
+			},
+			"onSuccess": successCallback,
+			"onError": function(type, message) {
+				self.component.enablePostButtonBy("photo-uploading");
+			}
+		},
+		"clickPanelOptions": {
+			"filepickerOptions": {
+				"mimetype": "image/*",
+				"container": "modal",
+				"mobile": Echo.Utils.isMobileDevice()
+			},
+			"beforeCallback": function(event) {
+				console.log("hello from beforeCallback");
+				self.component.disablePostButtonBy("photo-uploading");
+			},
+			"onSuccess": function(InkBlob) {
+				self.component.attachMedia({
+					"urls": [InkBlob.url],
+					"removeOld": false
+				});
+				// TODO: replace it in any way to the end of resolving...
+				self.component.enablePostButtonBy("photo-uploading");
+			},
+			"onError": function(err) {
+				self.component.enablePostButtonBy("photo-uploading");
+			}
+		},
+		"filepickerAPIKey": self.component.config.get("dependencies.FilePicker.apiKey"),
+		"allowMultiple": true
+	});
 };
 
 plugin.methods.getData = function() {

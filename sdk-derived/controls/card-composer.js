@@ -570,19 +570,19 @@ composer.renderers.tabs = function(element) {
  */
 composer.renderers.media = function(element) {
 	var self = this;
-	this.mediaContainer && this.mediaContainer.destroy();
-	if (!this.formData.media.length) {
-		if (this.currentComposer && this.currentComposer.requiresMedia) {
-			this.disablePostButtonBy("media-required");
-		} else {
-			this.enablePostButtonBy("media-required");
-		}
+	if (this.currentComposer && this.currentComposer.requiresMedia) {
+		this.disablePostButtonBy("media-required");
+	} else {
+		this.enablePostButtonBy("media-required");
+	}
+	if (this.mediaContainer) {
 		return element;
 	}
 
 	this.mediaContainer = new Echo.StreamServer.Controls.MediaContainer({
 		"target": element.empty(),
 		"data": this.formData.media,
+		"context": this.config.get("context"),
 		"card": {
 			"displaySourceIcon": false,
 			"displayAuthor": false,
@@ -598,6 +598,9 @@ composer.renderers.media = function(element) {
 			}
 		},
 		"ready": function() {
+			if (typeof self.currentComposer.initMedia === "function" && !self.collapsed) {
+				//self.currentComposer.initMedia();
+			}
 			/**
 			 * @echo_event Echo.StreamServer.Controls.CardComposer.onMediaContainerReady
 			 * Triggered when attached media was resolved
@@ -979,8 +982,16 @@ composer.methods.attachMedia = function(params) {
 		$.each(data, function(i, oembed) {
 			self.formData.media.push(oembed);
 		});
-		self.view.render({"name": "media"});
+		self.mediaContainer.updateAttachments(self.formData.media);
+		//self.view.render({"name": "media"});
 	});
+};
+
+composer.methods.initAttachmentsPanel = function(panelConfig) {
+	if (!this.mediaContainer) {
+		this.view.render({"name": "media"});
+	}
+	this.mediaContainer.initAttachmentsPanel(panelConfig);
 };
 
 composer.methods.removeMedia = function(index) {
@@ -991,7 +1002,8 @@ composer.methods.removeMedia = function(index) {
 	} else {
 		this.formData.media.splice(index, 1);
 	}
-	this.view.render({"name": "media"});
+	this.mediaContainer.updateAttachments(this.formData.media);
+	//this.view.render({"name": "media"});
 };
 
 /**
@@ -1077,6 +1089,15 @@ composer.methods._initCurrentComposer = function() {
 	if (!composer.panel.children().length) {
 		composer.panel.append(composer.composer());
 		composer.setData($.extend(true, {}, this.formData));
+	}
+	
+	//TODO: we shoud save states for each single composer and refresh media container due to that states...
+	if (this.mediaContainer) {
+		this.mediaContainer.clearOut();
+		// TODO: this is a bad move. We shoud reduce fasciation in it
+		if (typeof composer.initMedia === "function") {
+			composer.initMedia();
+		}
 	}
 	// timeout allows form fields to be added to target element DOM
 	setTimeout(function() {
@@ -1418,7 +1439,7 @@ composer.css =
 	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 0px 1px; }' +
 	'.{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; background-color: transparent; }' +
 	'.{class:confirmation} { margin-bottom: 10px; display: none; }' +
-	'.{class:attachers} { display: none; margin: 5px; float: left; }' +
+	'.{class:attachers} { display: none; margin: 5px; float: left; cursor: pointer; }' +
 	'.{class:postButtonWrapper} { float: right; font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; }' +
 	'.{class:postButtonWrapper} .dropdown-menu { min-width: 100px; }' +
 	'.{class:postButtonWrapper} .{class:postButton}.btn { padding: 3px 12px 5px 12px; }' +
@@ -1427,6 +1448,7 @@ composer.css =
 	'.{class:border} { border: 1px solid #d8d8d8; }' +
 	'.{class:mandatory} { border: 1px solid red; }' +
 	'.{class:queriesViewOption} { padding-right: 5px; }' +
+	'.{class:media} .echo-streamserver-controls-mediacontainer-single .echo-streamserver-controls-nestedcard-border { border-bottom: 0; }' +
 
 	'.echo-sdk-ui .{class:composers} input[type=text], .echo-sdk-ui .{class:composers} textarea { width: 100%; border: 0px; resize: none; outline: none; box-shadow: none; padding: 0px; margin: 0px; background-color: transparent; }' +
 	'.echo-sdk-ui .{class:container} input[type=text]:focus, .echo-sdk-ui .{class:composers} textarea:focus { outline: none; box-shadow: none; }' +
