@@ -21,7 +21,6 @@ conversations.config = {
 			"comments": {
 				"renderer": "CommentCard",
 				"enabled": true,
-				"prompt": "What's on your mind?",
 				"resolveURLs": true,
 				"attachments": {
 					"visible": false,

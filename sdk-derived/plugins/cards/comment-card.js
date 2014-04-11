@@ -169,14 +169,14 @@ plugin.labels = {
 	/**
 	 * @echo_label
 	 */
-	"textPlaceholder": "What's on your mind?"
+	"prompt": "What's on your mind?"
 };
 
 plugin.methods.buildComposer = function() {
 	var self = this;
 	this.composer = $("<div>").append(
 		'<div class="echo-cardcomposer-field-wrapper">' +
-			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("textPlaceholder") + '"></textarea>' +
+			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("prompt") + '"></textarea>' +
 		'</div>'
 	);
 	this.composer.find(".echo-comment-composer-text").on("keyup paste", function() {

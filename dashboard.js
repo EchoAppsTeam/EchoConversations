@@ -16,11 +16,17 @@ dashboard.mappings = {
 	"dependencies.janrainapp": {
 		"key": "dependencies.Janrain.appId"
 	},
-	"replyComposer.contentTypes.comments.confirmationMessage": {
+	"postComposer.confirmationMessage": {
+		"key": "postComposer.confirmation.message"
+	},
+	"replyComposer.confirmationMessage": {
 		"key": "replyComposer.confirmation.message"
 	},
-	"postComposer.contentTypes.comments.confirmationMessage": {
-		"key": "postComposer.confirmation.message"
+	"postComposer.contentTypes.comments.prompt": {
+		"key": "postComposer.contentTypes.comments.labels.prompt"
+	},
+	"replyComposer.contentTypes.comments.prompt": {
+		"key": "replyComposer.contentTypes.comments.labels.prompt"
 	}
 };
 
@@ -278,6 +284,15 @@ dashboard.vars = {
 			"desc": "If enabled, users will be given the option to share their Posts on submit"
 		}
 	}, {
+		"component": "Input",
+		"name": "confirmationMessage",
+		"type": "string",
+		"config": {
+			"title": "Confirmation message",
+			"desc": "Specifies the confirmation message text displayed after successful submission if pre-moderation mode is enabled",
+			"data": {"sample": "Thanks, your post has been submitted for review"}
+		}
+	}, {
 		"component": "Group",
 		"name": "contentTypes",
 		"type": "object",
@@ -308,15 +323,6 @@ dashboard.vars = {
 					"title": "Prompt",
 					"desc": "Specifies the ghost text displayed in the Comment Prompt",
 					"data": {"sample": "What's on your mind?"}
-				}
-			}, {
-				"component": "Input",
-				"name": "confirmationMessage",
-				"type": "string",
-				"config": {
-					"title": "Confirmation message",
-					"desc": "Specifies the confirmation message text displayed after successful submission if pre-moderation mode is enabled",
-					"data": {"sample": "Thanks, your post has been submitted for review"}
 				}
 			}, {
 				"component": "Checkbox",
@@ -395,23 +401,6 @@ dashboard.vars = {
 				"config": {
 					"title": "Visible",
 					"desc": "If enabled, users can submit Links"
-				}
-			}]
-		}, {
-			"component": "Group",
-			"name": "videos",
-			"type": "object",
-			"config": {
-				"title": "Videos"
-			},
-			"items": [{
-				"component": "Checkbox",
-				"name": "enabled",
-				"type": "boolean",
-				"default": true,
-				"config": {
-					"title": "Visible",
-					"desc": "If enabled, users can submit Videos"
 				}
 			}]
 		}]
