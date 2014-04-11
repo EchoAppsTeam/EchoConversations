@@ -290,8 +290,8 @@ plugin.methods.initMedia = function() {
 					}),
 					"removeOld": true
 				});
-				// TODO: replace it in any way to the end of resolving...
 				self.component.enablePostButtonBy("photo-uploading");
+				self.component.enablePostButtonBy("media-required");
 
 			},
 			"onError": function(type, message) {
@@ -312,8 +312,8 @@ plugin.methods.initMedia = function() {
 					"urls": [InkBlob.url],
 					"removeOld": true
 				});
-				// TODO: replace it in any way to the end of resolving...
 				self.component.enablePostButtonBy("photo-uploading");
+				self.component.enablePostButtonBy("media-required");
 			},
 			"onError": function(err) {
 				self.component.enablePostButtonBy("photo-uploading");

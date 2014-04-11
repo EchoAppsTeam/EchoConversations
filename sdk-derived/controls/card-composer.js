@@ -579,6 +579,15 @@ composer.renderers.media = function(element) {
 		return element;
 	}
 
+	var refreshPostButtonState = function() {
+		var mediaRequired = self.currentComposer && self.currentComposer.requiresMedia;
+		if (mediaRequired && !self.formData.media.length) {
+			self.disablePostButtonBy("media-required");
+		} else {
+			self.enablePostButtonBy("media-required");
+		}
+	};
+
 	this.mediaContainer = new Echo.StreamServer.Controls.MediaContainer({
 		"target": element.empty(),
 		"data": this.formData.media,
@@ -588,13 +597,7 @@ composer.renderers.media = function(element) {
 			"displayAuthor": false,
 			"onRemove": function(data) {
 				self.removeMedia(self._getDefinedMediaIndex(data));
-				/**
-				 * @echo_event Echo.StreamServer.Controls.CardComposer.onMediaDetached
-				 * Triggered when attached media preview was removed
-				 */
-				self.events.publish({
-					"topic": "onMediaDetached"
-				});
+				refreshPostButtonState();
 			}
 		},
 		"ready": function() {
@@ -603,13 +606,6 @@ composer.renderers.media = function(element) {
 					self.currentComposer.initMedia();
 				}, 0);
 			}
-			/**
-			 * @echo_event Echo.StreamServer.Controls.CardComposer.onMediaContainerReady
-			 * Triggered when attached media was resolved
-			 */
-			self.events.publish({
-				"topic": "onMediaContainerReady"
-			});
 			self.enablePostButtonBy("media-required");
 		}
 	});
@@ -1094,7 +1090,7 @@ composer.methods._initCurrentComposer = function() {
 	//TODO: we shoud save states for each single composer and refresh media container due to that states...
 	if (this.mediaContainer) {
 		this.mediaContainer.clearOut();
-		// TODO: this is a bad move. We shoud reduce fasciation in it
+		// TODO: this is a bad move. We shoud reduce enchainment here (m.b. using Events)
 		if (typeof composer.initMedia === "function" && composer.requiresMedia) {
 			composer.initMedia();
 		}

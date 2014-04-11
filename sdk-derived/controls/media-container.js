@@ -8,11 +8,6 @@ if (Echo.App.isDefined(media)) return;
 media.dependencies = [{
 	"url": "{%= baseURLs.prod %}/sdk-derived/controls/nested-card.js",
 	"loaded": function() { return !!Echo.StreamServer.Controls.NestedCard; }
-}, { // TODO: replace it into "initAttachmentsPanel" call
-	"url": "//api.filepicker.io/v1/filepicker.js",
-	"loaded": function() {
-		return !!(window.filepicker && window.filepicker.pick);
-	}
 }];
 
 media.labels = {
@@ -122,7 +117,6 @@ media.methods.clearOut = function() {
 
 media.methods.updateAttachments = function(attachments) {
 	attachments = attachments || [];
-	// TODO: not sure that we have to do it
 	this.config.set("data", attachments);
 	this.view.render({"name": "container"});
 };
@@ -131,6 +125,7 @@ media.methods.initAttachmentsPanel = function(panelConfig) {
 	if (this.get("attachmentsPanel.isActive")) return;
 	var container = this.view.get("container");
 	var panel = this._getAttachmentsPanel();
+	var self = this;
 	this.set("attachmentsPanel.isActive", true);
 	this.set("attachmentsPanel.allowMultiple", panelConfig.allowMultiple || false);
 	container.append(panel);
@@ -142,7 +137,11 @@ media.methods.initAttachmentsPanel = function(panelConfig) {
 		container.removeClass(this.cssPrefix + "single")
 			.addClass(this.cssPrefix + "multiple");
 	}
-	this._initFilePickerPanel(panel, panelConfig);
+	Echo.Loader.download([{
+		"url": "//api.filepicker.io/v1/filepicker.js"
+	}], function() {
+		self._initFilePickerPanel(panel, panelConfig);
+	});
 };
 
 media.methods._showAttachmentsPanel = function() {
