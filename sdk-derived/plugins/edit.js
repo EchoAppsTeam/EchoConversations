@@ -343,7 +343,7 @@ plugin.css =
 		'.{plugin.class:noneditable} .{plugin.class:cancelButtonContainer} { display: block; }' +
 	'.{plugin.class:noneditable} .{plugin.class:cancelButtonContainer} { margin: 0px; }' +
 	'.{plugin.class:noneditable} .echo-clear { display: inherit; }' +
-	'.{plugin.class} .{class:container} { border: none; padding: 0px; }' +
+	'.{plugin.class} .{class:container} { border: none; padding: 0px; margin-bottom: 15px; }' +
 	'.{plugin.class} .{class:nameContainer}, .{plugin.class} .{class:controls}, .{plugin.class} .{class:composers} { background-color: #fff; }' +
 	'.{plugin.class:avatar-wrapper} { float: left; margin-right: 5px; }' +
 	'.{plugin.class} .{class:tabs} { display: none; }' +
