@@ -386,6 +386,7 @@ plugin.methods.buildComposer = function() {
 		tooltip.text(self.labels.get("loading"));
 		window.filepicker.pick({
 			"mimetype": "image/*",
+			"services": $.map(self.component.config.get("contentTypes.photos.sources").split(","), $.trim),
 			"container": "modal",
 			"mobile": Echo.Utils.isMobileDevice()
 		}, function(InkBlob) {

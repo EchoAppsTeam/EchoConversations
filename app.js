@@ -24,12 +24,13 @@ conversations.config = {
 				"resolveURLs": true,
 				"attachments": {
 					"visible": false,
-					"sources": ""
+					"sources": "COMPUTER, IMAGE_SEARCH, INSTAGRAM, PICASA, FLICKR, FACEBOOK, DROPBOX, URL, WEBCAM"
 				}
 			},
 			"photos": {
 				"renderer": "PhotoCard",
-				"enabled": true
+				"enabled": true,
+				"sources": "COMPUTER, IMAGE_SEARCH, INSTAGRAM, PICASA, FLICKR, FACEBOOK, DROPBOX, URL, WEBCAM"
 			},
 			"links": {
 				"renderer": "LinkCard",
@@ -65,12 +66,13 @@ conversations.config = {
 				"resolveURLs": true,
 				"attachments": {
 					"visible": false,
-					"sources": ""
+					"sources": "COMPUTER, IMAGE_SEARCH, INSTAGRAM, PICASA, FLICKR, FACEBOOK, DROPBOX, URL, WEBCAM"
 				}
 			},
 			"photos": {
 				"renderer": "PhotoCard",
-				"enabled": true
+				"enabled": true,
+				"sources": "COMPUTER, IMAGE_SEARCH, INSTAGRAM, PICASA, FLICKR, FACEBOOK, DROPBOX, URL, WEBCAM"
 			},
 			"links": {
 				"renderer": "LinkCard",
