@@ -24,21 +24,17 @@ plugin.init = function() {
 
 plugin.templates.main =
 	'<div class="{plugin.class:item}">' +
-		'<div class="{plugin.class:border}">' +
-			'<div class="{plugin.class:article}">' +
-				'<div class="{plugin.class:articleThumbnail}">' +
-					'<img src="{data:oembed.thumbnail_url}"/>' +
-				'</div>' +
-				'<div class="{plugin.class:articleTemplate}">' +
-					'<div class="{plugin.class:title} {plugin.class:articleTitle}" title="{data:oembed.title}">' +
-						'<a href="{data:oembed.url}" target="_blank">{data:oembed.title}</a>' +
-					'</div>' +
-					'<div class="{plugin.class:articleDescriptionContainer}">' +
-						'<div class="{plugin.class:articleDescription}">{data:oembed.description}</div>' +
-					'</div>' +
-				'</div>' +
-				'<div class="echo-clear"></div>' +
+		'<div class="{plugin.class:article}">' +
+			'<div class="{plugin.class:articleThumbnail}">' +
+				'<img src="{data:oembed.thumbnail_url}"/>' +
 			'</div>' +
+			'<div class="{plugin.class:articleTemplate}">' +
+				'<div class="{plugin.class:title}" title="{data:oembed.title}">' +
+					'<a href="{data:oembed.url}" target="_blank">{data:oembed.title}</a>' +
+				'</div>' +
+				'<div class="{plugin.class:description}">{data:oembed.description}</div>' +
+			'</div>' +
+			'<div class="echo-clear"></div>' +
 		'</div>' +
 	'</div>';
 
@@ -62,21 +58,19 @@ plugin.methods.isEnabled = function() {
 };
 
 plugin.css =
-	'.{plugin.class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{plugin.class:item} { text-align: left; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; max-width: 100%; vertical-align: top; margin-bottom: 8px; }' +
-	'.{plugin.class:description} { overflow: hidden; }' +
+	'.{plugin.class:title} { font-weight: bold; margin: 0 0 0 10px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 18px; line-height: 22px; }' +
+	'.{plugin.class:item} { text-align: left; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; max-width: 100%; vertical-align: top; padding: 15px 0 10px 0; }' +
+	'.{plugin.class:description} { overflow: hidden; margin-left: 10px; line-height: 21px; font-size: 15px; margin-top: 5px; }' +
 
 	// article
-	'.{plugin.class:article} { padding: 10px 0 0 0; min-width: 200px; }' +
-	'.{plugin.class:article} .{plugin.class:articleTitle} > a { color: #42474A; font-weight: bold; }' +
-	'.{plugin.class:article} .{plugin.class:articleTitle} > a:hover { color: #42474A; }' +
-	'.{plugin.class:articleTitle} { margin-left: 10px; margin-top: 0px; line-height: 16px; }' +
-	'.{plugin.class:articleDescription} { margin-left: 10px; font-size: 13px; line-height: 16px; }' +
+	'.{plugin.class:article} { min-width: 200px; }' +
+	'.{plugin.class:article} .{plugin.class:title} > a { color: #42474A; font-weight: bold; }' +
+	'.{plugin.class:article} .{plugin.class:title} > a:hover { color: #42474A; }' +
 	'.{plugin.class:articleThumbnail} { width: 30%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden; }' +
 	'.{plugin.class:articleThumbnail} img { width: auto; height: auto; max-height:120px; max-width:120px; }' +
 	'.{plugin.class:articleTemplate} { width: 70%; float: left; }' +
-	'.{plugin.class:article}.{plugin.class:withoutPhoto} .{plugin.class:articleTitle} { margin-left: 0px; }' +
-	'.{plugin.class:article}.{plugin.class:withoutPhoto} .{plugin.class:articleDescription} { margin-left: 0px; }' +
+	'.{plugin.class:article}.{plugin.class:withoutPhoto} .{plugin.class:title} { margin-left: 0px; }' +
+	'.{plugin.class:article}.{plugin.class:withoutPhoto} .{plugin.class:description} { margin-left: 0px; }' +
 	'.{plugin.class:article}.{plugin.class:withoutPhoto} .{plugin.class:articleThumbnail} { display: none; }' +
 	'.{plugin.class:article}.{plugin.class:withoutPhoto} .{plugin.class:articleTemplate} { width: 100%; }';
 

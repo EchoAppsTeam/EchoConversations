@@ -17,12 +17,13 @@ plugin.init = function() {
 				}
 			});
 			self.normalizer();
-			self.extendTemplate("replace", "data", plugin.templates.main);
+			self.extendTemplate("replace", "data", plugin.templates.label);
+			self.extendTemplate("insertAsFirstChild", "subwrapper", plugin.templates.video);
 		}
 	});
 };
 
-plugin.templates.main =
+plugin.templates.video =
 	'<div class="{plugin.class:item}">' +
 		'<div class="{plugin.class:video}">' +
 			'<div class="{plugin.class:videoContainer}">' +
@@ -33,9 +34,13 @@ plugin.templates.main =
 					'</div>' +
 				'</div>' +
 			'</div>' +
-			'<div class="{plugin.class:title} {plugin.class:videoTitle}" title="{data:oembed.title}">{data:oembed.title}</div>' +
-			'<div class="{plugin.class:description} {plugin.class:videoDescription}">{data:oembed.description}</div>' +
 		'</div>' +
+	'</div>';
+
+plugin.templates.label =
+	'<div class="{plugin.class:label}">' +
+		'<div class="{plugin.class:title}" title="{data:oembed.title}">{data:oembed.title}</div>' +
+		'<div class="{plugin.class:description}">{data:oembed.description}</div>' +
 	'</div>';
 
 plugin.renderers.title = function(element) {
@@ -86,9 +91,11 @@ plugin.methods.isEnabled = function() {
 };
 
 plugin.css =
-	'.{plugin.class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{plugin.class:item} { text-align: left; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; max-width: 100%; vertical-align: top; }' +
-	'.{plugin.class:description} { overflow: hidden; }' +
+	'.{class:depth-0} .{plugin.class:item} { margin: -15px -16px 15px -16px; }' +
+	'.{plugin.class:label} { text-align: left; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; max-width: 100%; vertical-align: top; padding: 15px 0 10px 0; }' +
+	'.{plugin.class:title} { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 18px; line-height: 22px; }' +
+	'.{plugin.class:description} { line-height: 21px; font-size: 15px; }' +
+	'.{plugin.class:label} > div:nth-child(2) { margin: 5px 0 0 0; }' +
 
 	// play button
 	'.{plugin.class:playButton} { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 10; }' +
@@ -97,9 +104,6 @@ plugin.css =
 	'.{plugin.class:playButton}:hover { background-color: #3498DB; }' +
 
 	// video
-	'.{plugin.class:video} { padding: 10px 0 0 0; }' +
-	'.{plugin.class:videoTitle} { margin: 10px 0 0 0; }' +
-	'.{plugin.class:videoDescription} { margin: 5px 0 0 0; }' +
 	'.{plugin.class:videoWrapper} { background: #000; max-width: 100%; margin: 0 auto; }' +
 	'.{plugin.class:videoContainer} { background: #000; }' +
 	'.{plugin.class:videoPlaceholder} img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }' +

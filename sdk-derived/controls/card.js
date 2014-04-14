@@ -365,11 +365,11 @@ card.templates.mainHeader =
 		'<div class="{class:subcontainer}">' +
 			'<div class="{class:content}">' +
 				'<div class="{class:indicator}"></div>' +
-				'<div class="{class:avatar-wrapper}">' +
-					'<div class="{class:avatar}"></div>' +
-				'</div>' +
 				'<div class="{class:wrapper}">' +
 					'<div class="{class:subwrapper}">' +
+						'<div class="{class:avatar-wrapper}">' +
+							'<div class="{class:avatar}"></div>' +
+						'</div>' +
 						'<div class="{class:header-container}">' +
 							'<div class="{class:header-centered}">' +
 								'<div class="{class:authorName}"></div>' +
@@ -1766,10 +1766,12 @@ card.css =
 	'.{class:container-child} { padding: 10px; margin: 0px 20px 2px 0px; }' +
 	'.{class:container-child-thread} { padding: 10px; margin: 0px 20px 2px 0px; }' +
 	'.{class:avatar-wrapper} { margin-right: -58px; float: left; position: relative; }' +
-	'.{class:children} .{class:avatar-wrapper}, .{class:childrenByCurrentActorLive} .{class:avatar-wrapper} { margin-right: -34px; }' +
+	'.{class:children} .{class:avatar-wrapper}, .{class:childrenByCurrentActorLive} .{class:avatar-wrapper} { margin: 10px -34px 0 0; }' +
 	'.{class:wrapper} { float: left; width: 100%; }' +
 	'.{class:subwrapper} { position: relative; }' +
-	'.{class:children} .{class:subwrapper}, .{class:childrenByCurrentActorLive} .{class:subwrapper} { margin-left: 34px; }' +
+
+	'.{class:children} .{class:data}, .{class:childrenByCurrentActorLive} .{class:data} { margin-left: 34px; }' +
+	'.{class:children} .{class:footer}, .{class:childrenByCurrentActorLive} .{class:footer} { margin-left: 34px; }' +
 	'.{class:markers} { line-height: 16px; background: url("{config:cdnBaseURL.sdk-assets}/images/curation/metadata/marker.png") no-repeat; padding: 0px 0px 4px 21px; margin-top: 7px; }' +
 	'.{class:tags} { line-height: 16px; background: url("{config:cdnBaseURL.sdk-assets}/images/tag_blue.png") no-repeat; padding: 0px 0px 4px 21px; }' +
 	'.{class:metadata-title} { font-weight: bold; line-height: 25px; height: 25px; margin-right: 5px; }' +
@@ -1829,7 +1831,6 @@ card.css =
 
 	'.{class:container} .{class:container-child-thread} { padding: 8px 0px 10px 8px; margin: 0px 16px 2px 0px; }' +
 
-	'.{class:children} .{class:avatar-wrapper} { margin-top: 5px; }' +
 	'.{class:children} .{class:data} { margin-top: 2px; padding-top: 0px; }' +
 	'.{class:children} .{class:subcontainer} { padding-top: 0px; background: none; border: none; }' +
 
@@ -1870,8 +1871,9 @@ card.css =
 	'.{class:depth-0} .{class:childrenMarker} { display: none; }' +
 
 	'.{class:depth-0} .{class:header-container} { height: 36px; margin-right: 18px; margin-left: 45px; }' +
-	'.{class:depth-0} .{class:header-container}:before { content: ""; display: inline-block; height: 100%; vertical-align: middle; }' +
-	'.{class:depth-0} .{class:header-centered} { display: inline-block; vertical-align: middle; max-width: 100%; max-width: 90%\\9; }' +
+	'.{class:header-container} { height: 28px; margin-right: 18px; margin-left: 34px; }' +
+	'.{class:header-container}:before { content: ""; display: inline-block; height: 100%; vertical-align: middle; }' +
+	'.{class:header-centered} { display: inline-block; vertical-align: middle; max-width: 100%; max-width: 90%\\9; }' +
 	'.{class:depth-0} .{class:date} { line-height: 18px; }' +
 
 	'.{class:data} { padding: 7px 0px 0px 0px; }' +

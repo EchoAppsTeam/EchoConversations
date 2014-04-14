@@ -6,7 +6,7 @@ var plugin = Echo.Plugin.manifest("TopPostIndicator", "Echo.StreamServer.Control
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	this.extendTemplate("insertAsFirstChild", "subwrapper", plugin.templates.main);
+	this.extendTemplate("insertAsFirstChild", "content", plugin.templates.main);
 };
 
 plugin.labels = {
@@ -31,7 +31,7 @@ plugin.renderers.indicator = function(element) {
 };
 
 plugin.css =
-	'.{plugin.class:indicator} { float: right; position: absolute; top: -19px; right: 0px; z-index: 10;}';
+	'.{plugin.class:indicator} { float: right; position: absolute; top: -4px; right: 15px; z-index: 10;}';
 
 Echo.Plugin.create(plugin);
 

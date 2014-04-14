@@ -17,7 +17,9 @@ plugin.init = function() {
 				}
 			});
 			self.normalizer();
-			self.extendTemplate("replace", "data", plugin.templates.main);
+
+			self.extendTemplate("replace", "data", plugin.templates.label);
+			self.extendTemplate("insertAsFirstChild", "subwrapper", plugin.templates.photo);
 		}
 	});
 };
@@ -33,20 +35,22 @@ plugin.labels = {
 	"clickToExpand": "Click to expand"
 };
 
-plugin.templates.main =
+plugin.templates.photo =
 	'<div class="{plugin.class:item}">' +
 		'<div class="{plugin.class:photo}">' +
 			'<div class="{plugin.class:photoContainer}">' +
 				'<img class="{plugin.class:photoThumbnail}" src="{data:oembed.url}" title="{data:oembed.title}"/>' +
 			'</div>' +
-			'<div class="{plugin.class:photoLabel}">' +
-				'<div class="{plugin.class:photoLabelContainer}">' +
-					'<div class="{plugin.class:title} {plugin.class:photoTitle}" title="{data:oembed.title}">' +
-						'<a class="echo-clickable" href="{data:oembed.url}" target="_blank">{data:oembed.title}</a>' +
-					'</div>' +
-					'<div class="{plugin.class:description} {plugin.class:photoDescription}">{data:oembed.description}</div>' +
-				'</div>' +
+		'</div>' +
+	'</div>';
+
+plugin.templates.label =
+	'<div class="{plugin.class:photoLabel}">' +
+		'<div class="{plugin.class:photoLabelContainer}">' +
+			'<div class="{plugin.class:title}" title="{data:oembed.title}">' +
+				'<a class="echo-clickable" href="{data:oembed.url}" target="_blank">{data:oembed.title}</a>' +
 			'</div>' +
+			'<div class="{plugin.class:description}">{data:oembed.description}</div>' +
 		'</div>' +
 	'</div>';
 
@@ -144,21 +148,11 @@ plugin.renderers.photoContainer = function(element) {
 };
 
 plugin.renderers.photoLabelContainer = function(element) {
-	// calculate photoLabel max-height
-	var photoLabelHeight = 20 // photoLabelContainer padding
-		+ 2*16; // photoDescription line-height * lines count
-
-	if (this.component.get("data.oembed.title")) {
-		photoLabelHeight += 16 // photoTitle width
-			+ 5; // photoTitle margin
-	}
-	this.view.get("photoLabel").css("max-height", photoLabelHeight);
-
 	if (!this.component.get("data.oembed.description") && !this.component.get("data.oembed.title")) {
 		element.hide();
 	} else {
 		this.view.get("photoContainer").css({
-			"min-height": 55 + photoLabelHeight, // first number is added for default item avatar
+			"min-height": 55, // first number is added for default item avatar
 			"min-width": 200
 		});
 	}
@@ -187,35 +181,20 @@ plugin.methods.isEnabled = function() {
 	}
 };
 
-var transition = function(value) {
-	return $.map(["", "-o-", "-ms-", "-moz-", "-webkit-"], function(prefix) {
-		return prefix + "transition: " + value;
-	}).join(";");
-};
-
 plugin.css =
-	'.{class:depth-0} .{plugin.class:item} { margin: -51px -16px 0 -16px; }' +
+	'.{class:depth-0} .{plugin.class:item} { margin: -15px -16px 15px -16px; }' +
 	'.{plugin.class:photo} .{plugin.class:noMediaAvailable} { position: relative; min-height: 145px; padding: 75px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
 	'.{plugin.class:photo} { position: relative; left: 0; top: 0; zoom: 1; }' +
-	'.{plugin.class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
 	'.{plugin.class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; }' +
 
-	'.echo-sdk-ui .{plugin.class:photoLabel} a:link, .echo-sdk-ui .{plugin.class:photoLabel} a:visited, .echo-sdk-ui .{plugin.class:photoLabel} a:hover, .echo-sdk-ui .{plugin.class:photoLabel} a:active { color: #fff; }' +
-	'.{plugin.class:photoLabelContainer} { padding: 10px; }' +
+	'.echo-sdk-ui .{plugin.class:photoLabel} a:link, .echo-sdk-ui .{plugin.class:photoLabel} a:visited, .echo-sdk-ui .{plugin.class:photoLabel} a:hover, .echo-sdk-ui .{plugin.class:photoLabel} a:active { color: #000000; }' +
+	'.{plugin.class:photoLabelContainer} { padding: 15px 0 10px 0; }' +
 	'.{plugin.class:photoLabelContainer} > div:nth-child(2) { margin: 5px 0 0 0; }' +
-	'.{plugin.class:photoTitle} { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
+	'.{plugin.class:title} { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 18px; line-height: 22px; }' +
+	'.{plugin.class:description} { line-height: 21px; font-size: 15px; }' +
 
-	'.{plugin.class:photoLabel} { overflow: hidden; }' +
-	'.{plugin.class:photo}:hover .{plugin.class:photoLabel} { max-height: 60% !important; }' +
-
-	'.{plugin.class:enabled} .{class:avatar-wrapper} { z-index: 10; }' +
-	'.{class:depth-0}.{plugin.class:enabled} .{class:header-container} { position: relative; z-index: 10; }' +
-	'.{plugin.class:enabled} .{class:text} { display: none; }' +
 	'.{class:depth-0}.{plugin.class:enabled} .{class:body} { margin-bottom: 0px; overflow: visible; }' +
-	'.{class:depth-0}.{plugin.class:enabled} .{class:data} { padding-top: 0px; }' +
-	'.{class:depth-0}.{plugin.class:enabled} .{class:authorName} { color: #FFFFFF; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); }' +
-	'.{class:depth-0}.{plugin.class:enabled} .{class:date} { line-height: 20px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); padding-right: 1px; }' +
-	'.{plugin.class:photoLabel} { ' + transition('max-height ease 300ms') + '; }';
+	'.{class:depth-0}.{plugin.class:enabled} .{class:data} { padding-top: 0px; }';
 
 Echo.Plugin.create(plugin);
 
