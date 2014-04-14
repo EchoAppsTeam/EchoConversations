@@ -257,23 +257,28 @@ plugin.labels = {
 	"URL": "URL"
 };
 
-
-plugin.methods.isPhotoComposerActive = function() {
-	return this.component.currentComposer.id === "photo";
-};
-
 plugin.methods.buildComposer = function() {
 	this.composer = $("<div>").append([
 		'<div class="echo-cardcomposer-field-wrapper">',
 			'<input type="text" class="echo-photo-composer-title" placeholder="', this.labels.get("title"), '">',
-		'</div>',
-		'<div class="echo-cardcomposer-delimiter"></div>'
+		'</div>'
 	].join(""));
 	return this.composer;
 };
 
 plugin.methods.initMedia = function() {
 	var self = this;
+	var successCallback = function(InkBlobs) {
+		InkBlobs = InkBlobs.length ? InkBlobs : [InkBlobs];
+		self.component.attachMedia({
+			"urls": $.map(InkBlobs, function(picture) {
+				return picture.url;
+			}),
+			"removeOld": true
+		});
+		self.component.enablePostButtonBy("photo-uploading");
+		self.component.enablePostButtonBy("media-required");
+	};
 	this.component.initAttachmentsPanel({
 		"dragAndDropPanelOptions": {
 			"filepickerOptions": {
@@ -283,19 +288,10 @@ plugin.methods.initMedia = function() {
 			"onStart": function(files) {
 				self.component.disablePostButtonBy("photo-uploading");
 			},
-			"onSuccess": function(InkBlobs) {
-				self.component.attachMedia({
-					"urls": $.map(InkBlobs, function(picture) {
-						return picture.url;
-					}),
-					"removeOld": true
-				});
-				self.component.enablePostButtonBy("photo-uploading");
-				self.component.enablePostButtonBy("media-required");
-
-			},
+			"onSuccess": successCallback,
 			"onError": function(type, message) {
 				self.component.enablePostButtonBy("photo-uploading");
+				self.log(message);
 			}
 		},
 		"clickPanelOptions": {
@@ -307,16 +303,10 @@ plugin.methods.initMedia = function() {
 			"beforeCallback": function(event) {
 				self.component.disablePostButtonBy("photo-uploading");
 			},
-			"onSuccess": function(InkBlob) {
-				self.component.attachMedia({
-					"urls": [InkBlob.url],
-					"removeOld": true
-				});
-				self.component.enablePostButtonBy("photo-uploading");
-				self.component.enablePostButtonBy("media-required");
-			},
+			"onSuccess": successCallback,
 			"onError": function(err) {
 				self.component.enablePostButtonBy("photo-uploading");
+				self.log(err);
 			}
 		},
 		"filepickerAPIKey": self.component.config.get("dependencies.FilePicker.apiKey"),

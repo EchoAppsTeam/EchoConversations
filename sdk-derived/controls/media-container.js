@@ -25,15 +25,44 @@ media.labels = {
 	"loading": "Loading"
 };
 
-media.templates.main = function() {
-	return '<div class="{class:container}"></div>';
-};
+media.templates.main = '<div class="{class:container}"></div>';
+
+media.templates.attachmentsPanel = [
+	'<div class="{class:drop-panel}" style="display: none;">',
+		'<div class="{class:drop-panel-wrapper}">',
+			'<div class="{class:drop-panel-container} {class:strippedBackground}">',
+				'<div class="{class:plus-button}">',
+					'{data:plus}',
+				'</div>',
+				'<span class="{class:uploading-tooltip}">',
+					'{data:tooltip}',
+				'</span>',
+			'</div>',
+		'</div>',
+	'</div>'
+].join("");
 
 media.vars = {
 	"cards": [],
 	"attachmentsPanel": {
-		"isActive": false,
-		"allowMultiple": false
+		"element": undefined,
+		"config": {
+			"dragAndDropPanelOptions": {
+				"filepickerOptions": {},
+				"onStart": function() {},
+				"onSuccess": function() {},
+				"onError": function() {}
+			},
+			"clickPanelOptions": {
+				"filepickerOptions": {},
+				"beforeCallback": function() {},
+				"onSuccess": function() {},
+				"onError": function() {}
+			},
+			"filepickerAPIKey": undefined,
+			"allowMultiple": false,
+			"extraCallback": undefined
+		}
 	}
 };
 
@@ -66,14 +95,7 @@ media.renderers.container = function(element) {
 			}, config));
 		});
 
-		if (media.length === 1 && !this.get("attachmentsPanel.allowMultiple")) {
-			element.removeClass(this.cssPrefix + "multiple")
-				.addClass(this.cssPrefix + "single");
-		} else {
-			element.removeClass(this.cssPrefix + "single")
-				.addClass(this.cssPrefix + "multiple");
-		}
-		if (this.get("attachmentsPanel.allowMultiple")) {
+		if (this.get("attachmentsPanel.config.allowMultiple")) {
 			this._showAttachmentsPanel();
 		} else {
 			this._hideAttachmentsPanel();
@@ -86,86 +108,89 @@ media.renderers.container = function(element) {
 			element.children(":not(." + this.cssPrefix + "drop-panel)").remove();
 		}
 		this._showAttachmentsPanel();
-		element.removeClass(this.cssPrefix + "multiple");
-		element.addClass(this.cssPrefix + "single");
 	}
+	this.changeContainerCapacity(media.length, this.get("attachmentsPanel.config.allowMultiple"));
 	return element;
 };
 
-media.methods._getAttachmentsPanel = function() {
-	return $(['<div class="', this.cssPrefix, 'drop-panel">',
-			'<div class="', this.cssPrefix, 'drop-panel-wrapper">',
-				'<div class="', this.cssPrefix, 'drop-panel-container strippedBackground">',
-					'<div class="', this.cssPrefix, 'plus-button">',
-						media.labels["plus"],
-					'</div>',
-					'<span class="', this.cssPrefix, 'uploading-tooltip">',
-						media.labels["initialUploadingTooltip"],
-					'</span>',
-				'</div>',
-			'</div>',
-		'</div>'
-	].join("")).hide();
+media.methods.changeContainerCapacity = function(mediaLength, multipleAttachmentsEnabled) {
+	var self = this;
+	var setContainerCapacity = function(capacity) {
+		var container = self.view.get("container");
+		var prefix = self.cssPrefix;
+		if (capacity === "single") {
+			container
+				.removeClass(prefix + "multiple")
+				.addClass(prefix + "single");
+		} else {
+			container
+				.removeClass(prefix + "single")
+				.addClass(prefix + "multiple");
+		}
+	};
+	setContainerCapacity((mediaLength && multipleAttachmentsEnabled) ? "multiple" : "single");
 };
 
-media.methods.clearOut = function() {
-	this.updateAttachments();
-	this.set("attachmentsPanel.isActive", false);
-	this.set("attachmentsPanel.allowMultiple", false);
-	this.view.get("container").empty();
+media.methods.cleanUp = function() {
+	this.set("attachmentsPanel.config.allowMultiple", false);
+	this.config.set("data", []);
+	this.refresh();
 };
 
 media.methods.updateAttachments = function(attachments) {
-	attachments = attachments || [];
-	this.config.set("data", attachments);
+	this.config.set("data", attachments || []);
 	this.view.render({"name": "container"});
 };
 
 media.methods.initAttachmentsPanel = function(panelConfig) {
-	if (this.get("attachmentsPanel.isActive")) return;
-	var container = this.view.get("container");
-	var panel = this._getAttachmentsPanel();
+	if (this.get("attachmentsPanel.element")) return;
+
 	var self = this;
-	this.set("attachmentsPanel.isActive", true);
-	this.set("attachmentsPanel.allowMultiple", panelConfig.allowMultiple || false);
-	container.append(panel);
+	this.set("attachmentsPanel.config", $.extend(this.get("attachmentsPanel.config"), panelConfig));
+	var panel = $(this.substitute({
+		"template": this.templates.attachmentsPanel,
+		"data" : {
+			"plus": this.labels.get("plus"),
+			"tooltip": this.labels.get("initialUploadingTooltip")
+		}
+	}));
+	this.set("attachmentsPanel.element", panel);
+	this.view.get("container").append(panel);
+
 	var mediaLength = this.config.get("data", []).length;
-	if (!mediaLength || this.get("attachmentsPanel.allowMultiple")) {
+	this.changeContainerCapacity(mediaLength, this.get("attachmentsPanel.config.allowMultiple"));
+	if (!mediaLength || this.get("attachmentsPanel.config.allowMultiple")) {
 		panel.slideDown();
 	}
-	if (mediaLength && this.get("attachmentsPanel.allowMultiple")) {
-		container.removeClass(this.cssPrefix + "single")
-			.addClass(this.cssPrefix + "multiple");
-	}
+
 	Echo.Loader.download([{
-		"url": "//api.filepicker.io/v1/filepicker.js"
+		"url": "//api.filepicker.io/v1/filepicker.js",
+		"loaded": function() {
+			return !!(window.filepicker && window.filepicker.pick);
+		}
 	}], function() {
-		self._initFilePickerPanel(panel, panelConfig);
+		self._initFilePickerPanel();
 	});
 };
 
 media.methods._showAttachmentsPanel = function() {
-	if (!this.get("attachmentsPanel.isActive")) return;
-	var container = this.view.get("container");
-	if(container.is(":hidden")) {
-		container.show();
-	}
-	var panel = container.find("." + this.cssPrefix + "drop-panel");
-	this._changeAttachmentsPanelLayout("normal", panel);
-	container.append(panel);
+	var panel = this.get("attachmentsPanel.element");
+	if (!panel) return;
+	this._changePanelLayoutState("normal");
+	this.view.get("container").append(panel);
 	panel.slideDown();
 };
 
 media.methods._hideAttachmentsPanel = function() {
-	var panel = this.view.get("container").find("." + this.cssPrefix + "drop-panel");
+	var panel = this.get("attachmentsPanel.element");
+	if (!panel) return;
 	panel.slideUp();
-	this._changeAttachmentsPanelLayout("normal", panel);
+	this._changePanelLayoutState("normal");
 };
 
-media.methods._changeAttachmentsPanelLayout = function(state, panel) {
+media.methods._changePanelLayoutState = function(state) {
 	state = state || "normal";
-	panel = panel || this.view.get("container").find("." + this.cssPrefix + "drop-panel");
-
+	var panel = this.get("attachmentsPanel.element");
 	var plusButton = panel.find("." + this.cssPrefix + "plus-button");
 	var tooltip = panel.find("." + this.cssPrefix + "uploading-tooltip");
 
@@ -173,60 +198,53 @@ media.methods._changeAttachmentsPanelLayout = function(state, panel) {
 		plusButton.addClass(this.cssPrefix + "loading-animation").empty();
 		tooltip.text(this.labels.get("loading"));
 	} else {
+		// filepicker widget adds "disabled" attribute to panel DOMElement on loading start, but doesn`t remove it.
 		panel.removeAttr("disabled");
 		tooltip.text(this.labels.get("initialUploadingTooltip"));
 		plusButton.text(this.labels.get("plus")).removeClass(this.cssPrefix + "loading-animation");
 	}
 };
 
-media.methods._initFilePickerPanel = function(target, config) {
+media.methods._initFilePickerPanel = function() {
 	var self = this;
-	if (!config || !config.filepickerAPIKey) {
-		if (config && config.extraCallback) {
-			return config.extraCallback(target);
-		}
-		return;
-	}
-	window.filepicker.setKey(config.filepickerAPIKey);
+	var panel = this.get("attachmentsPanel.element");
+	var config = this.get("attachmentsPanel.config");
 
-	if (!config.dragAndDropPanelOptions) return;
-	window.filepicker.makeDropPane(target[0], $.extend({}, config.dragAndDropPanelOptions.filepickerOptions, {
+	config.extraCallback && config.extraCallback(panel);
+	if (!config.filepickerAPIKey) return;
+
+	var panelOptions = config.dragAndDropPanelOptions;
+	if (!panelOptions) return;
+
+	window.filepicker.setKey(config.filepickerAPIKey);
+	window.filepicker.makeDropPane(panel[0], $.extend({}, panelOptions.filepickerOptions, {
 		"onStart": function(files) {
-			self._changeAttachmentsPanelLayout("loading", target);
-			if (typeof config.dragAndDropPanelOptions.onStart === "function") {
-				config.dragAndDropPanelOptions.onStart.apply(this, arguments);
-			}
+			self._changePanelLayoutState("loading");
+			panelOptions.onStart.apply(this, arguments);
 		},
 		"onSuccess": function(InkBlobs) {
-			if (typeof config.dragAndDropPanelOptions.onSuccess === "function") {
-				config.dragAndDropPanelOptions.onSuccess.apply(this, arguments);
-			}
+			panelOptions.onSuccess.apply(this, arguments);
 		},
 		"onError": function(type, message) {
-			if (typeof config.dragAndDropPanelOptions.onError === "function") {
-				config.dragAndDropPanelOptions.onError.apply(this, arguments);
-			}
+			panelOptions.onError.apply(this, arguments);
 		}
 	}));
 
-	if (!config.clickPanelOptions) return;
-	target.click(function(event) {
-		self._changeAttachmentsPanelLayout("loading", target);
-		if (typeof config.clickPanelOptions.beforeCallback === "function") {
-			config.clickPanelOptions.beforeCallback.apply(this, arguments);
-		}
-		window.filepicker.pick($.extend({}, config.clickPanelOptions.filepickerOptions),
-		function(InkBlob) {
-			if (typeof config.clickPanelOptions.onSuccess === "function") {
-				config.clickPanelOptions.onSuccess.apply(this, arguments);
+	var clickOptions = config.clickPanelOptions;
+	if (!clickOptions) return;
+
+	panel.click(function(event) {
+		self._changePanelLayoutState("loading");
+		clickOptions.beforeCallback.apply(this, arguments);
+		window.filepicker.pick(clickOptions.filepickerOptions,
+			function(InkBlob) {
+				clickOptions.onSuccess.apply(this, arguments);
+			},
+			function(FPError) {
+				self._changePanelLayoutState("normal");
+				clickOptions.onError.apply(this, arguments);
 			}
-		},
-		function(FPError) {
-			self._changeAttachmentsPanelLayout("normal", target);
-			if (typeof config.clickPanelOptions.onError === "function") {
-				config.clickPanelOptions.onError.apply(this, arguments);
-			}
-		});
+		);
 	});
 };
 
@@ -237,10 +255,9 @@ media.destroy = function() {
 };
 
 var gradientStyle = function(value) {
-	var propertyName = "background-image";
-	return $.map(["linear-gradient", "-webkit-linear-gradient", "-moz-linear-gradient", "-ms-linear-gradient", "-o-linear-gradient"], function(propertySpecific) {
-		return propertyName +': ' + propertySpecific + "(" + value + ")";
-	}).join(";");
+	return $.map(["", "-webkit-", "-moz-", "-ms-", "-o-"], function(prefix) {
+		return "background-image: " + prefix + "linear-gradient(" + value + ");";
+	}).join("");
 };
 
 media.css =
@@ -261,11 +278,16 @@ media.css =
 	'.{class:container}::-webkit-scrollbar-track { box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }' +
 	'.{class:container}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }' +
 
-	// attachment panel
-	'.{class:container}.{class:multiple} > .{class:drop-panel} { border: 1px solid #C2C2C2; }' +
-	'.{class:container} > div.{class:drop-panel} { width: 100%; height: 100%; max-height: 388px; cursor: pointer; background-color: #eee; text-align: center; font-size: 16px; font-family: "Helvetica Neue", arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; max-width: 100%; }' +
+	// single > attachments panel
+	'.{class:single} > .{class:drop-panel} { border: 1px solid #D8D8D8; border-bottom: 0; }' +
+
+	// multiple > attachments panel
+	'.{class:container}.{class:multiple} > .{class:drop-panel} { border: 1px solid #C2C2C2; width: 100%; }' +
+
+	// attachments panel
+	'.{class:container} > div.{class:drop-panel} { height: 100%; max-height: 388px; cursor: pointer; background-color: #eee; text-align: center; font-size: 16px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; max-width: 100%; }' +
 	'.{class:plus-button} { font-size: 128px; line-height: 128px; font-weight: bold; width: 128px; height: 128px; margin: 0 auto; }' +
-	'.strippedBackground { ' +
+	'.{class:strippedBackground} { ' +
 		gradientStyle("left top, #e3e3e3 0%, #e3e3e3 25%, #eee 25%, #eee 50%, #e3e3e3 50%, #e3e3e3 75%, #eee 75%") + '; ' +
 		'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#e3e3e3", endColorstr="#eeeeee",GradientType=0 ); ' +
 		'background-size: 70px 70px;' +

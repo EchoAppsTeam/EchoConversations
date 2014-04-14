@@ -162,11 +162,11 @@ plugin.labels = {
 
 plugin.methods.buildComposer = function() {
 	var self = this;
-	this.composer = $("<div>").append(
-		'<div class="echo-cardcomposer-field-wrapper">' +
-			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("textPlaceholder") + '">' +
+	this.composer = $("<div>").append([
+		'<div class="echo-cardcomposer-field-wrapper">',
+			'<textarea class="echo-comment-composer-text" placeholder="', this.labels.get("textPlaceholder"), '"/>',
 		'</div>'
-	);
+	].join(""));
 	this.composer.find(".echo-comment-composer-text").on("keyup paste", function() {
 		self.component.attachMedia({
 			"fromElement": $(this),
@@ -179,6 +179,7 @@ plugin.methods.buildComposer = function() {
 plugin.methods.initMedia = function() {
 	var self = this;
 	var successCallback = function(InkBlobs) {
+		InkBlobs = InkBlobs.length ? InkBlobs : [InkBlobs];
 		self.component.attachMedia({
 			"urls": $.map(InkBlobs, function(picture) {
 				return picture.url;
@@ -200,6 +201,7 @@ plugin.methods.initMedia = function() {
 			"onSuccess": successCallback,
 			"onError": function(type, message) {
 				self.component.enablePostButtonBy("photo-uploading");
+				self.log(message);
 			}
 		},
 		"clickPanelOptions": {
@@ -211,15 +213,10 @@ plugin.methods.initMedia = function() {
 			"beforeCallback": function(event) {
 				self.component.disablePostButtonBy("photo-uploading");
 			},
-			"onSuccess": function(InkBlob) {
-				self.component.attachMedia({
-					"urls": [InkBlob.url],
-					"removeOld": false
-				});
-				self.component.enablePostButtonBy("photo-uploading");
-			},
+			"onSuccess": successCallback,
 			"onError": function(err) {
 				self.component.enablePostButtonBy("photo-uploading");
+				self.log(err);
 			}
 		},
 		"filepickerAPIKey": self.component.config.get("dependencies.FilePicker.apiKey"),

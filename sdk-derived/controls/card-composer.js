@@ -570,13 +570,14 @@ composer.renderers.tabs = function(element) {
  */
 composer.renderers.media = function(element) {
 	var self = this;
+	if (this.mediaContainer) {
+		return element;
+	}
+
 	if (this.currentComposer && this.currentComposer.requiresMedia) {
 		this.disablePostButtonBy("media-required");
 	} else {
 		this.enablePostButtonBy("media-required");
-	}
-	if (this.mediaContainer) {
-		return element;
 	}
 
 	var refreshPostButtonState = function() {
@@ -1089,7 +1090,7 @@ composer.methods._initCurrentComposer = function() {
 
 	//TODO: we shoud save states for each single composer and refresh media container due to that states...
 	if (this.mediaContainer) {
-		this.mediaContainer.clearOut();
+		this.mediaContainer.cleanUp();
 		// TODO: this is a bad move. We shoud reduce enchainment here (m.b. using Events)
 		if (typeof composer.initMedia === "function" && composer.requiresMedia) {
 			composer.initMedia();
@@ -1098,6 +1099,7 @@ composer.methods._initCurrentComposer = function() {
 	var attacher = this.view.get("attacher");
 	if (typeof composer.attachmentsCallback === "function") {
 		attacher.show();
+		attacher.off("click");
 		attacher.click(composer.attachmentsCallback);
 	} else {
 		attacher.hide();
@@ -1451,7 +1453,6 @@ composer.css =
 	'.{class:border} { border: 1px solid #d8d8d8; }' +
 	'.{class:mandatory} { border: 1px solid red; }' +
 	'.{class:queriesViewOption} { padding-right: 5px; }' +
-	'.{class:media} .echo-streamserver-controls-mediacontainer-single .echo-streamserver-controls-nestedcard-border { border-bottom: 0; }' +
 
 	'.echo-sdk-ui .{class:composers} input[type=text], .echo-sdk-ui .{class:composers} textarea { width: 100%; border: 0px; resize: none; outline: none; box-shadow: none; padding: 0px; margin: 0px; background-color: transparent; }' +
 	'.echo-sdk-ui .{class:container} input[type=text]:focus, .echo-sdk-ui .{class:composers} textarea:focus { outline: none; box-shadow: none; }' +
