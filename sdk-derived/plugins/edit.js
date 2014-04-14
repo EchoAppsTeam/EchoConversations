@@ -73,6 +73,11 @@ plugin.methods._assembleButton = function() {
 			"label": plugin.labels.get("editButton"),
 			"visible": item.user.is("admin") || item.user.has("identity", item.get("data.actor.id")),
 			"callback": function() {
+				var nestedPlugins = plugin.config.get("nestedPlugins", []).concat(
+					plugin.config.get((!item.get("depth") ? "root" : "child") + "NestedPlugins")
+				);
+				plugin.config.set("nestedPlugins", nestedPlugins);
+
 				var config = plugin._composerConfig(item, item.view.get("content"));
 				config["parent"] = plugin.component.config.getAsHash();
 				config["targetQuery"] = plugin.config.get("query", "");

@@ -1005,6 +1005,8 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	}, {
 		"intentID": "Edit",
 		"name": "Edit",
+		"rootNestedPlugins": this._getContentTypePlugins("postComposer"),
+		"childNestedPlugins": replyContentTypePlugins,
 		"requestMethod": "POST"
 	}];
 
