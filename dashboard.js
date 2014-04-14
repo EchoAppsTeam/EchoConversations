@@ -384,16 +384,15 @@ dashboard.vars = {
 					"validators": [function(value) {
 						var availableSources = ["BOX", "COMPUTER", "DROPBOX", "EVERNOTE", "FACEBOOK", "FLICKR", "FTP", "GITHUB", "GOOGLE_DRIVE", "SKYDRIVE", "PICASA", "WEBDAV", "GMAIL", "IMAGE_SEARCH", "INSTAGRAM", "URL", "VIDEO", "WEBCAM"];
 						var sources = $.map(value.split(","), function(source) { return source ? $.trim(source) : undefined; });
-console.log( "sources: ", sources);
 						var unknownSources = $.grep(sources, function(source) {
 							return !~$.inArray(source, availableSources);
 						});
 						return unknownSources.length === 0
 							? {"valid": true}
 							: {
-									"valid:": false,
-									"message": "Unknown sources: " + unknownSources.join(", ")
-								};
+								"valid:": false,
+								"message": "Unknown sources: " + unknownSources.join(", ")
+							};
 					}],
 					"data": {
 						"sample": "COMPUTER, INSTAGRAM, FACEBOOK, FLICKR, DROPBOX, PICASA, EVERNOTE, FTP, GITHUB, BOX, GOOGLE_DRIVE, SKYDRIVE, WEBDAV, GMAIL, IMAGE_SEARCH, URL, VIDEO, WEBCAM"
