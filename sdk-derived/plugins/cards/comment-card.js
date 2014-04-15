@@ -180,7 +180,7 @@ plugin.methods.buildComposer = function() {
 		'<div class="echo-cardcomposer-field-wrapper">' +
 			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("prompt") + '"></textarea>' +
 		'</div>'
-	].join(""));
+	);
 	this.composer.find(".echo-comment-composer-text").on("keyup paste", function() {
 		self.component.attachMedia({
 			"fromElement": $(this),
