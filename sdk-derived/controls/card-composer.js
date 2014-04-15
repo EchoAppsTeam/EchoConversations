@@ -481,7 +481,7 @@ composer.templates.main =
 						'<li><a href="#" class="{class:switchToPostAndShare}">{label:postAndShare}</a></li>' +
 					'</ul>' +
 				'</div>' +
-				'<div class="{class:attacher}">' +
+				'<div class="{class:clipButton}">' +
 					'<img class="{class:attachPic}" src="{%= baseURLs.prod %}/images/attach.png">' +
 				'</div>' +
 				'<div class="echo-clear"></div>' +
@@ -590,10 +590,10 @@ composer.renderers.media = function(element) {
 		? this.currentComposer.getMediaConfig()
 		: {};
 
-	var mediaExpanded = Boolean(this.view.get("attacher").attr("data-media-expanded"));
-	this.mediaContainer = new Echo.StreamServer.Controls.MediaContainer($.extend(mediaConfig, {
+	var mediaExpanded = !!this.view.get("clipButton").data("media-expanded");
+	this.mediaContainer = new Echo.StreamServer.Controls.MediaContainer($.extend(true, mediaConfig, {
 		"target": element.empty(),
-		"attachments-panel-required": this.currentComposer.attachmentsPanelRequired || mediaExpanded,
+		"attachmentsPanelRequired": this.currentComposer.attachmentsPanelRequired || mediaExpanded,
 		"data": this.formData.media,
 		"context": this.config.get("context"),
 		"card": {
@@ -1069,28 +1069,22 @@ composer.methods._initCurrentComposer = function() {
 	var self = this;
 	var composer = this.currentComposer;
 	this.postButtonTriggers = {};
-	if (composer.requiresMedia && !this.formData.media.length) {
-		this.disablePostButtonBy("media-required");
-	} else {
-		this.enablePostButtonBy("media-required");
-	}
+
 	if (!composer.panel.children().length) {
 		composer.panel.append(composer.composer());
 		composer.setData($.extend(true, {}, this.formData));
 	}
+
 	this.view.render({"name": "media"});
 
-	var attacher = this.view.get("attacher");
-	if (composer.showAttacher) {
-		attacher.show();
-		attacher.off("click");
-		attacher.click(function() {
-			attacher.attr("data-media-expanded", true);
+	var clipButton = this.view.get("clipButton");
+	if (composer.showClipButton) {
+		clipButton.show().off("click").click(function() {
+			clipButton.data("media-expanded", true);
 			self.view.render({"name": "media"});
 		});
 	} else {
-		attacher.removeAttr("data-media-expanded");
-		attacher.hide();
+		clipButton.removeData("media-expanded").hide();
 	}
 	// timeout allows form fields to be added to target element DOM
 	setTimeout(function() {
@@ -1432,7 +1426,7 @@ composer.css =
 	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 0px 1px; }' +
 	'.{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; background-color: transparent; }' +
 	'.{class:confirmation} { margin-bottom: 10px; display: none; }' +
-	'.{class:attacher} { display: none; margin: 5px; float: left; cursor: pointer; }' +
+	'.{class:clipButton} { display: none; margin: 5px; float: left; cursor: pointer; }' +
 	'.{class:postButtonWrapper} { float: right; font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; }' +
 	'.{class:postButtonWrapper} .dropdown-menu { min-width: 100px; }' +
 	'.{class:postButtonWrapper} .{class:postButton}.btn { padding: 3px 12px 5px 12px; }' +

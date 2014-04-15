@@ -297,6 +297,7 @@ plugin.methods.getMediaConfig = function() {
 		"clickOptions": {
 			"filepickerOptions": {
 				"mimetype": "image/*",
+				"multiple": false,
 				"container": "modal",
 				"mobile": Echo.Utils.isMobileDevice()
 			},

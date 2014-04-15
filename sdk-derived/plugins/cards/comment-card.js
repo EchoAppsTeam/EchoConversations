@@ -141,7 +141,7 @@ plugin.init = function() {
 		"setData": $.proxy(this.setData, this),
 		"requiresMedia": false,
 		"objectType": "http://activitystrea.ms/schema/1.0/comment",
-		"showAttacher": true,
+		"showClipButton": true,
 		"getMediaConfig": $.proxy(this.getMediaConfig, this)
 	});
 };
@@ -184,8 +184,7 @@ plugin.methods.getMediaConfig = function() {
 		self.component.attachMedia({
 			"urls": $.map(InkBlobs, function(picture) {
 				return picture.url;
-			}),
-			"removeOld": false
+			})
 		});
 		self.component.enablePostButtonBy("photo-uploading");
 	};

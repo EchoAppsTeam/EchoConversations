@@ -36,8 +36,8 @@ media.templates.attachmentsPanel =
 	'</div>';
 
 media.templates.main = function() {
-	return this.config.get("attachments-panel-required")
-		? ('<div class="{class:container}">' + this.templates.attachmentsPanel + '</div>')
+	return this.config.get("attachmentsPanelRequired")
+		? '<div class="{class:container}">' + this.templates.attachmentsPanel + '</div>'
 		: '<div class="{class:container}"></div>';
 };
 
@@ -55,8 +55,7 @@ media.config = {
 		"onError": function() {}
 	},
 	"filepickerAPIKey": undefined,
-	"allowMultiple": false,
-	"extraCallback": undefined
+	"allowMultiple": false
 };
 
 media.vars = {
@@ -91,7 +90,7 @@ media.renderers.container = function(element) {
 			}, config));
 		});
 	}
-	this.changeContainerCapacity(media.length, this.config.get("allowMultiple"));
+	this.changeContainerCapacity(media.length);
 	return element;
 };
 
@@ -116,8 +115,8 @@ media.renderers.attachmentsPanel = function(element) {
 	return element;
 };
 
-media.methods.changeContainerCapacity = function(mediaLength, multipleAttachmentsEnabled) {
-	var capacity = (mediaLength && multipleAttachmentsEnabled) ? "multiple" : "single";
+media.methods.changeContainerCapacity = function(mediaLength) {
+	var capacity = (mediaLength && this.config.get("allowMultiple")) ? "multiple" : "single";
 	var prefix = this.cssPrefix;
 	if (capacity === "single") {
 		this.view.get("container")
@@ -134,8 +133,13 @@ media.methods._showAttachmentsPanel = function() {
 	var panel = this.view.get("attachmentsPanel");
 	if (!panel) return;
 	this._changePanelLayoutState("normal");
+	// this append call also helps to keep attachmentsPanel
+	// as the last of mediaContainer DOM element childrens
 	this.view.get("container").append(panel);
-	panel.show().css("display", "");
+	// we use css() instead of show to avoid adding of "display: block"
+	// which we don`t need here.
+	// TODO: it should be replaced by animation or proper show function.
+	panel.css("display", "");
 };
 
 media.methods._hideAttachmentsPanel = function() {
@@ -159,11 +163,6 @@ media.methods._changePanelLayoutState = function(state) {
 media.methods._initFilePickerPanel = function() {
 	var self = this;
 	var panel = this.view.get("attachmentsPanel");
-
-	// this function is added to provide an ability implement some functionality,
-	// connected with attachments without using default filepicker panel and click event.
-	var extraCallback = this.config.get("extraCallback");
-	extraCallback && extraCallback(panel);
 
 	var filepickerAPIKey = this.config.get("filepickerAPIKey");
 	if (!filepickerAPIKey) return;
