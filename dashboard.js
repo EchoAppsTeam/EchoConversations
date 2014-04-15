@@ -30,6 +30,20 @@ dashboard.mappings = {
 	}
 };
 
+var sourcesValidator = function(value) {
+	var availableSources = ["BOX", "COMPUTER", "DROPBOX", "EVERNOTE", "FACEBOOK", "FLICKR", "FTP", "GITHUB", "GOOGLE_DRIVE", "SKYDRIVE", "PICASA", "WEBDAV", "GMAIL", "IMAGE_SEARCH", "INSTAGRAM", "URL", "VIDEO", "WEBCAM"];
+	var sources = $.map(value.split(","), function(source) { return source ? $.trim(source) : undefined; });
+	var unknownSources = $.grep(sources, function(source) {
+		return !~$.inArray(source, availableSources);
+	});
+	return unknownSources.length === 0
+		? {"valid": true}
+		: {
+			"valid:": false,
+			"message": "Unknown sources: " + unknownSources.join(", ")
+		};
+};
+
 dashboard.vars = {
 	"baseStreamECL": [{
 		"component": "Checkbox",
@@ -350,12 +364,25 @@ dashboard.vars = {
 						"desc": "If enabled, users can submit Comments with attachments (Resolve URLs enabled required)"
 					}
 				}, {
+					"component": "Input",
+					"name": "sources",
+					"type": "string",
+					"default": "",
+					"config": {
+						"title": "Uploading sources",
+						"desc": "Here can be specified list of attachment sources, check filepicker.io documentation for full information",
+						"validators": [sourcesValidator],
+						"data": {
+							"sample": "COMPUTER, INSTAGRAM, FACEBOOK, FLICKR, DROPBOX, PICASA, EVERNOTE, FTP, GITHUB, BOX, GOOGLE_DRIVE, SKYDRIVE, WEBDAV, GMAIL, IMAGE_SEARCH, URL, VIDEO, WEBCAM"
+						}
+					}
+				}, {
 					"component": "TextField",
 					"name": "sourcesHelp",
 					"config": {
 						"data": {"value": "<a href=\"//developers.inkfilepicker.com/docs/web/#pick\" target=\"_blank\">Documentation</a>"}
 					}
-		                }]
+				}]
 			}]
 		}, {
 			"component": "Group",
@@ -381,22 +408,16 @@ dashboard.vars = {
 				"config": {
 					"title": "Uploading sources",
 					"desc": "Here can be specified list of attachment sources, check filepicker.io documentation for full information",
-					"validators": [function(value) {
-						var availableSources = ["BOX", "COMPUTER", "DROPBOX", "EVERNOTE", "FACEBOOK", "FLICKR", "FTP", "GITHUB", "GOOGLE_DRIVE", "SKYDRIVE", "PICASA", "WEBDAV", "GMAIL", "IMAGE_SEARCH", "INSTAGRAM", "URL", "VIDEO", "WEBCAM"];
-						var sources = $.map(value.split(","), function(source) { return source ? $.trim(source) : undefined; });
-						var unknownSources = $.grep(sources, function(source) {
-							return !~$.inArray(source, availableSources);
-						});
-						return unknownSources.length === 0
-							? {"valid": true}
-							: {
-								"valid:": false,
-								"message": "Unknown sources: " + unknownSources.join(", ")
-							};
-					}],
+					"validators": [sourcesValidator],
 					"data": {
 						"sample": "COMPUTER, INSTAGRAM, FACEBOOK, FLICKR, DROPBOX, PICASA, EVERNOTE, FTP, GITHUB, BOX, GOOGLE_DRIVE, SKYDRIVE, WEBDAV, GMAIL, IMAGE_SEARCH, URL, VIDEO, WEBCAM"
 					}
+				}
+			}, {
+				"component": "TextField",
+				"name": "sourcesHelp",
+				"config": {
+					"data": {"value": "<a href=\"//developers.inkfilepicker.com/docs/web/#pick\" target=\"_blank\">Documentation</a>"}
 				}
 			}]
 		}, {

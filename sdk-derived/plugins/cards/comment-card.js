@@ -219,6 +219,7 @@ plugin.methods.getMediaConfig = function() {
 		"clickOptions": {
 			"filepickerOptions": {
 				"mimetype": "image/*",
+				"services": $.map(this.config.get("attachments.sources", "").split(","), $.trim),
 				"container": "modal",
 				"mobile": Echo.Utils.isMobileDevice()
 			},
