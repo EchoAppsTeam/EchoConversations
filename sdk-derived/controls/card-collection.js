@@ -1638,6 +1638,7 @@ collection.methods._initItem = function(entry, isLive, callback) {
 		"useSecureAPI": this.config.get("useSecureAPI"),
 		"apiBaseURL": this.config.get("apiBaseURL"),
 		"submissionProxyURL": this.config.get("submissionProxyURL"),
+		"dependencies": this.config.get("dependencies"),
 		"data": entry,
 		"user": this.user,
 		"live": isLive,
