@@ -191,6 +191,12 @@ card.renderers.avatar = function(element) {
 	}
 };
 
+card.renderers.label = function(element) {
+	return !this.get("data.title") && !this.get("data.description")
+		? element.hide()
+		: element;
+};
+
 card.renderers.title = function(element) {
 	return this.get("data.title") ? element : element.hide();
 };
@@ -342,20 +348,18 @@ card.methods.getRenderType = function() {
 card.css =
 	'.{class:item} { text-align: left; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; position: relative; }' +
 	'.{class:border} { white-space: normal; word-break: break-word; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; }' +
-	'.{class:item} .{class:sourceIcon} > img { width: 18px; height: 18px; margin: 0 0 10px 16px; }' +
+	'.{class:item} .{class:sourceIcon} > img { width: 18px; height: 18px; margin: 10px 0 10px 16px; }' +
 	'.{class:avatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; width: 36px; height: 36px; display:inline-block; margin-right: 6px; }' +
 	'.{class:avatar} { margin: 15px 16px 0 16px; font-size: 17px; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:description} { overflow: hidden; }' +
 
-	//'.{class:content} { padding: 0 16px 10px 16px; }' +
 	'.echo-sdk-ui .{class:label} a:link, ' +
 		'.echo-sdk-ui .{class:label} a:visited, ' +
 		'.echo-sdk-ui .{class:label} a:hover, ' +
 		'.echo-sdk-ui .{class:label} a:active { color: #42474A; }' +
 
-	'.{class:label} > div:last-child { margin-bottom: 10px; }' +
-	//'.{class:label} { padding: 15px 0 10px 0; }' +
-	'.{class:title} { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 16px; line-height: 22px; margin: 15px 16px 0 16px; }' +
+	'.{class:label} { padding: 15px 0 10px 0; }' +
+	'.{class:title} { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 16px; line-height: 22px; margin: 0 16px; }' +
 	'.{class:description} { line-height: 21px; font-size: 15px; margin: 5px 16px 0 16px; }' +
 
 	// close button
