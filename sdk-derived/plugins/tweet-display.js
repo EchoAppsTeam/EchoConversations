@@ -164,7 +164,7 @@ plugin.labels = {
 
 plugin.dependencies = [{
 	"loaded": function() { return !!window.twttr; },
-	"url": "http://platform.twitter.com/widgets.js"
+	"url": "//platform.twitter.com/widgets.js"
 }];
 
 plugin.enabled = function() {
