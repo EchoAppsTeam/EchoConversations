@@ -116,7 +116,6 @@ plugin.methods._showComposer = function(mode, target) {
 			"postComplete": true
 		},
 		"parent": item.config.getAsHash(),
-		"dependencies": item.config.get("dependencies"),
 		"data": this.get("data") || {},
 		"ready": function() {
 			plugin.set("composer", this);

@@ -269,6 +269,9 @@ conversations.config = {
 		},
 		"FilePicker": {
 			"apiKey": undefined
+		},
+		"embedly": {
+			"apiKey": undefined
 		}
 	},
 	"topMarkers": {

@@ -223,6 +223,7 @@ card.config = {
 		"icon": false,
 		"text": false
 	},
+	"dependencies": {},
 	"fadeTimeout": 5000, // 5 seconds
 	"mediaWidth": 340,
 	"manualRendering": false
