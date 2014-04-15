@@ -153,7 +153,9 @@ plugin.init = function() {
 		"getData": $.proxy(this.getData, this),
 		"setData": $.proxy(this.setData, this),
 		"requiresMedia": false,
-		"objectType": "http://activitystrea.ms/schema/1.0/comment"
+		"objectType": "http://activitystrea.ms/schema/1.0/comment",
+		"showClipButton": true,
+		"getMediaConfig": $.proxy(this.getMediaConfig, this)
 	});
 };
 
@@ -178,7 +180,7 @@ plugin.methods.buildComposer = function() {
 		'<div class="echo-cardcomposer-field-wrapper">' +
 			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("prompt") + '"></textarea>' +
 		'</div>'
-	);
+	].join(""));
 	this.composer.find(".echo-comment-composer-text").on("keyup paste", function() {
 		self.component.attachMedia({
 			"fromElement": $(this),
@@ -186,6 +188,52 @@ plugin.methods.buildComposer = function() {
 		});
 	});
 	return this.composer;
+};
+
+plugin.methods.getMediaConfig = function() {
+	var self = this;
+	var successCallback = function(InkBlobs) {
+		InkBlobs = InkBlobs.length ? InkBlobs : [InkBlobs];
+		self.component.attachMedia({
+			"urls": $.map(InkBlobs, function(picture) {
+				return picture.url;
+			})
+		});
+		self.component.enablePostButtonBy("photo-uploading");
+	};
+	return {
+		"dragAndDropOptions": {
+			"filepickerOptions": {
+				"multiple": false,
+				"mimetype": "image/*"
+			},
+			"onStart": function(files) {
+				self.component.disablePostButtonBy("photo-uploading");
+			},
+			"onSuccess": successCallback,
+			"onError": function(type, message) {
+				self.component.enablePostButtonBy("photo-uploading");
+				self.log(message);
+			}
+		},
+		"clickOptions": {
+			"filepickerOptions": {
+				"mimetype": "image/*",
+				"container": "modal",
+				"mobile": Echo.Utils.isMobileDevice()
+			},
+			"beforeCallback": function(event) {
+				self.component.disablePostButtonBy("photo-uploading");
+			},
+			"onSuccess": successCallback,
+			"onError": function(err) {
+				self.component.enablePostButtonBy("photo-uploading");
+				self.log(err);
+			}
+		},
+		"filepickerAPIKey": self.component.config.get("dependencies.FilePicker.apiKey"),
+		"allowMultiple": true
+	};
 };
 
 plugin.methods.getData = function() {

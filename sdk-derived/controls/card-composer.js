@@ -481,7 +481,7 @@ composer.templates.main =
 						'<li><a href="#" class="{class:switchToPostAndShare}">{label:postAndShare}</a></li>' +
 					'</ul>' +
 				'</div>' +
-				'<div class="{class:attachers}">' +
+				'<div class="{class:clipButton}">' +
 					'<img class="{class:attachPic}" src="{%= baseURLs.prod %}/images/attach.png">' +
 				'</div>' +
 				'<div class="echo-clear"></div>' +
@@ -571,41 +571,41 @@ composer.renderers.tabs = function(element) {
 composer.renderers.media = function(element) {
 	var self = this;
 	this.mediaContainer && this.mediaContainer.destroy();
-	if (!this.formData.media.length) {
-		if (this.currentComposer && this.currentComposer.requiresMedia) {
-			this.disablePostButtonBy("media-required");
-		} else {
-			this.enablePostButtonBy("media-required");
-		}
-		return element;
+
+	if (this.currentComposer && this.currentComposer.requiresMedia) {
+		this.disablePostButtonBy("media-required");
+	} else {
+		this.enablePostButtonBy("media-required");
 	}
 
-	this.mediaContainer = new Echo.StreamServer.Controls.MediaContainer({
+	var refreshPostButtonState = function() {
+		var mediaRequired = self.currentComposer && self.currentComposer.requiresMedia;
+		if (mediaRequired && !self.formData.media.length) {
+			self.disablePostButtonBy("media-required");
+		} else {
+			self.enablePostButtonBy("media-required");
+		}
+	};
+	var mediaConfig = this.currentComposer.getMediaConfig
+		? this.currentComposer.getMediaConfig()
+		: {};
+
+	var mediaExpanded = !!this.view.get("clipButton").data("media-expanded");
+	this.mediaContainer = new Echo.StreamServer.Controls.MediaContainer($.extend(true, mediaConfig, {
 		"target": element.empty(),
+		"attachmentsPanelRequired": this.currentComposer.attachmentsPanelRequired || mediaExpanded,
 		"data": this.formData.media,
+		"context": this.config.get("context"),
 		"card": {
 			"onRemove": function(data) {
 				self.removeMedia(self._getDefinedMediaIndex(data));
-				/**
-				 * @echo_event Echo.StreamServer.Controls.CardComposer.onMediaDetached
-				 * Triggered when attached media preview was removed
-				 */
-				self.events.publish({
-					"topic": "onMediaDetached"
-				});
+				refreshPostButtonState();
 			}
 		},
 		"ready": function() {
-			/**
-			 * @echo_event Echo.StreamServer.Controls.CardComposer.onMediaContainerReady
-			 * Triggered when attached media was resolved
-			 */
-			self.events.publish({
-				"topic": "onMediaContainerReady"
-			});
-			self.enablePostButtonBy("media-required");
+			refreshPostButtonState();
 		}
-	});
+	}));
 	return element;
 };
 
@@ -1047,14 +1047,22 @@ composer.methods._initCurrentComposer = function() {
 	var self = this;
 	var composer = this.currentComposer;
 	this.postButtonTriggers = {};
-	if (composer.requiresMedia && !this.formData.media.length) {
-		this.disablePostButtonBy("media-required");
-	} else {
-		this.enablePostButtonBy("media-required");
-	}
+
 	if (!composer.panel.children().length) {
 		composer.panel.append(composer.composer());
 		composer.setData($.extend(true, {}, this.formData));
+	}
+
+	this.view.render({"name": "media"});
+
+	var clipButton = this.view.get("clipButton");
+	if (composer.showClipButton) {
+		clipButton.show().off("click").click(function() {
+			clipButton.data("media-expanded", true);
+			self.view.render({"name": "media"});
+		});
+	} else {
+		clipButton.removeData("media-expanded").hide();
 	}
 	// timeout allows form fields to be added to target element DOM
 	setTimeout(function() {
@@ -1396,7 +1404,7 @@ composer.css =
 	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 0px 1px; }' +
 	'.{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; background-color: transparent; }' +
 	'.{class:confirmation} { margin-bottom: 10px; display: none; }' +
-	'.{class:attachers} { display: none; margin: 5px; float: left; }' +
+	'.{class:clipButton} { display: none; margin: 5px; float: left; cursor: pointer; }' +
 	'.{class:postButtonWrapper} { float: right; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }' +
 	'.{class:postButtonWrapper} .dropdown-menu { min-width: 100px; }' +
 	'.{class:postButtonWrapper} .{class:postButton}.btn { padding: 3px 12px 5px 12px; }' +
