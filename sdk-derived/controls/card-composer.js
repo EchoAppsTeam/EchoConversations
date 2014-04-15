@@ -344,7 +344,8 @@ composer.vars = {
 		"media": []
 	},
 	"composers": [],
-	"validators": []
+	"validators": [],
+	"previousComposerId": undefined
 };
 
 composer.dependencies = [{
@@ -1047,6 +1048,22 @@ composer.methods._initCurrentComposer = function() {
 	var self = this;
 	var composer = this.currentComposer;
 	this.postButtonTriggers = {};
+	// TODO: this is temporal implementation of composers states
+	// caching. It should be done in another way (we shell save
+	// formData for each plugin separately).
+	var previousComposerId = this.get("previousComposerId");
+	if (previousComposerId) {
+		for (var i = 0; i < this.composers.length; i++) {
+			if (this.composers[i].id === previousComposerId) {
+				this.composers[i].cachedData = $.extend(true, {}, this.formData);
+				this.formData = {"text":"", "media": []};
+			}
+		}
+	}
+	this.set("previousComposerId", composer.id);
+	if (composer.cachedData) {
+		this.formData = composer.cachedData;
+	}
 
 	if (!composer.panel.children().length) {
 		composer.panel.append(composer.composer());
