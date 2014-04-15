@@ -1790,7 +1790,7 @@ card.css =
 	'.{class:body} { padding-top: 4px; }' +
 	'.{class:buttons} a.{class:button} { color: #C6C6C6; }' +
 	'.{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #476CB8; text-decoration: none; }' +
-	'.{class:sourceIcon} { height: 16px; width: 16px; }' +
+	'.echo-sdk-ui .{class:sourceIcon} { height: 16px; width: 16px; }' +
 	'.{class:sourceIconLink} { float: left; display: block; line-height: 20px; margin-right: 10px; }' +
 	'.{class:date}, .{class:from}, .{class:via} { float: left; }' +
 	'.{class:from} a, .{class:via} a { text-decoration: none; color: #C6C6C6; }' +
