@@ -117,21 +117,17 @@ media.renderers.attachmentsPanel = function(element) {
 };
 
 media.methods.changeContainerCapacity = function(mediaLength, multipleAttachmentsEnabled) {
-	var self = this;
-	var setCapacity = function(capacity) {
-		var container = self.view.get("container");
-		var prefix = self.cssPrefix;
-		if (capacity === "single") {
-			container
-				.removeClass(prefix + "multiple")
-				.addClass(prefix + "single");
-		} else {
-			container
-				.removeClass(prefix + "single")
-				.addClass(prefix + "multiple");
-		}
-	};
-	setCapacity((mediaLength && multipleAttachmentsEnabled) ? "multiple" : "single");
+	var capacity = (mediaLength && multipleAttachmentsEnabled) ? "multiple" : "single";
+	var prefix = this.cssPrefix;
+	if (capacity === "single") {
+		this.view.get("container")
+			.removeClass(prefix + "multiple")
+			.addClass(prefix + "single");
+	} else {
+		this.view.get("container")
+			.removeClass(prefix + "single")
+			.addClass(prefix + "multiple");
+	}
 };
 
 media.methods._showAttachmentsPanel = function() {
