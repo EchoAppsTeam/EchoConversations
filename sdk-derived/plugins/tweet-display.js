@@ -333,7 +333,7 @@ plugin.css =
 	".{plugin.css:screenName} { margin-left: 4px; font-size: 11px; font-weight: normal; padding-top: 1px; }" +
 	".{plugin.class:userName} a, .{plugin.class:tweetUserName} a, .{plugin.class:intentControl} { text-decoration: none; }" +
 	".{plugin.class:intentControl} { margin-right: 10px }" +
-	".{plugin.class:tweetUserName} { margin-left: 4px; padding-right: 5px; float: left; }" +
+	".{plugin.class:tweetUserName} { padding-right: 5px; float: left; max-width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }" +
 	".{plugin.class:date} { text-decoration: none; color: #C6C6C6; }" +
 	".{plugin.class:tweetScreenName} a { text-decoration: none; color: #333333; }" +
 	".{plugin.class:tweetDate} a.echo-secondaryFont { text-decoration: none; color: #C6C6C6; }" +
