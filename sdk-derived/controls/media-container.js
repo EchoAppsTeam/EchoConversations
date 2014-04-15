@@ -116,7 +116,7 @@ media.renderers.attachmentsPanel = function(element) {
 };
 
 media.methods.changeContainerCapacity = function(mediaLength) {
-	var capacity = (mediaLength && this.config.get("allowMultiple")) ? "multiple" : "single";
+	var capacity = (mediaLength > 1 || (mediaLength === 1 && this.config.get("allowMultiple"))) ? "multiple" : "single";
 	var prefix = this.cssPrefix;
 	if (capacity === "single") {
 		this.view.get("container")
