@@ -570,9 +570,7 @@ composer.renderers.tabs = function(element) {
  */
 composer.renderers.media = function(element) {
 	var self = this;
-	if (this.mediaContainer) {
-		return element;
-	}
+	this.mediaContainer && this.mediaContainer.destroy();
 
 	if (this.currentComposer && this.currentComposer.requiresMedia) {
 		this.disablePostButtonBy("media-required");
@@ -588,9 +586,14 @@ composer.renderers.media = function(element) {
 			self.enablePostButtonBy("media-required");
 		}
 	};
+	var mediaConfig = this.currentComposer.getMediaConfig
+		? this.currentComposer.getMediaConfig()
+		: {};
 
-	this.mediaContainer = new Echo.StreamServer.Controls.MediaContainer({
+	var mediaExpanded = Boolean(this.view.get("attacher").attr("data-media-expanded"));
+	this.mediaContainer = new Echo.StreamServer.Controls.MediaContainer($.extend(mediaConfig, {
 		"target": element.empty(),
+		"attachments-panel-required": this.currentComposer.attachmentsPanelRequired || mediaExpanded,
 		"data": this.formData.media,
 		"context": this.config.get("context"),
 		"card": {
@@ -602,14 +605,9 @@ composer.renderers.media = function(element) {
 			}
 		},
 		"ready": function() {
-			if (typeof self.currentComposer.initMedia === "function" && self.currentComposer.requiresMedia) {
-				setTimeout(function() {
-					self.currentComposer.initMedia();
-				}, 0);
-			}
-			self.enablePostButtonBy("media-required");
+			refreshPostButtonState();
 		}
-	});
+	}));
 	return element;
 };
 
@@ -981,15 +979,8 @@ composer.methods.attachMedia = function(params) {
 		$.each(data, function(i, oembed) {
 			self.formData.media.push(oembed);
 		});
-		self.mediaContainer.updateAttachments(self.formData.media);
+		self.view.render({"name": "media"});
 	});
-};
-
-composer.methods.initAttachmentsPanel = function(panelConfig) {
-	if (!this.mediaContainer) {
-		return;
-	}
-	this.mediaContainer.initAttachmentsPanel(panelConfig);
 };
 
 composer.methods.removeMedia = function(index) {
@@ -1000,7 +991,7 @@ composer.methods.removeMedia = function(index) {
 	} else {
 		this.formData.media.splice(index, 1);
 	}
-	this.mediaContainer.updateAttachments(this.formData.media);
+	this.view.render({"name": "media"});
 };
 
 /**
@@ -1087,21 +1078,18 @@ composer.methods._initCurrentComposer = function() {
 		composer.panel.append(composer.composer());
 		composer.setData($.extend(true, {}, this.formData));
 	}
+	this.view.render({"name": "media"});
 
-	//TODO: we shoud save states for each single composer and refresh media container due to that states...
-	if (this.mediaContainer) {
-		this.mediaContainer.cleanUp();
-		// TODO: this is a bad move. We shoud reduce enchainment here (m.b. using Events)
-		if (typeof composer.initMedia === "function" && composer.requiresMedia) {
-			composer.initMedia();
-		}
-	}
 	var attacher = this.view.get("attacher");
-	if (typeof composer.attachmentsCallback === "function") {
+	if (composer.showAttacher) {
 		attacher.show();
 		attacher.off("click");
-		attacher.click(composer.attachmentsCallback);
+		attacher.click(function() {
+			attacher.attr("data-media-expanded", true);
+			self.view.render({"name": "media"});
+		});
 	} else {
+		attacher.removeAttr("data-media-expanded");
 		attacher.hide();
 	}
 	// timeout allows form fields to be added to target element DOM

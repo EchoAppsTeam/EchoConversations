@@ -141,7 +141,8 @@ plugin.init = function() {
 		"setData": $.proxy(this.setData, this),
 		"requiresMedia": false,
 		"objectType": "http://activitystrea.ms/schema/1.0/comment",
-		"attachmentsCallback": $.proxy(this.initMedia, this)
+		"showAttacher": true,
+		"getMediaConfig": $.proxy(this.getMediaConfig, this)
 	});
 };
 
@@ -176,7 +177,7 @@ plugin.methods.buildComposer = function() {
 	return this.composer;
 };
 
-plugin.methods.initMedia = function() {
+plugin.methods.getMediaConfig = function() {
 	var self = this;
 	var successCallback = function(InkBlobs) {
 		InkBlobs = InkBlobs.length ? InkBlobs : [InkBlobs];
@@ -188,9 +189,8 @@ plugin.methods.initMedia = function() {
 		});
 		self.component.enablePostButtonBy("photo-uploading");
 	};
-
-	this.component.initAttachmentsPanel({
-		"dragAndDropPanelOptions": {
+	return {
+		"dragAndDropOptions": {
 			"filepickerOptions": {
 				"multiple": false,
 				"mimetype": "image/*"
@@ -204,7 +204,7 @@ plugin.methods.initMedia = function() {
 				self.log(message);
 			}
 		},
-		"clickPanelOptions": {
+		"clickOptions": {
 			"filepickerOptions": {
 				"mimetype": "image/*",
 				"container": "modal",
@@ -221,7 +221,7 @@ plugin.methods.initMedia = function() {
 		},
 		"filepickerAPIKey": self.component.config.get("dependencies.FilePicker.apiKey"),
 		"allowMultiple": true
-	});
+	};
 };
 
 plugin.methods.getData = function() {
