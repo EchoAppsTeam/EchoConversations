@@ -236,10 +236,11 @@ media.css =
 	'.{class:single} > .{class:attachmentsPanel} { border: 1px solid #D8D8D8; border-bottom: 0; }' +
 
 	// multiple > attachments panel
-	'.{class:container}.{class:multiple} > .{class:attachmentsPanel} { border: 1px solid #C2C2C2; width: 100%; margin-right: 8px; }' +
+	'.{class:container}.{class:multiple} > .{class:attachmentsPanel} { width: 90%; }' +
+	'.{class:container}.{class:multiple} > .{class:attachmentsPanel} > .{class:attachmentsPanel-wrapper} { margin: 0px 8px 0px 0px; }' +
 
 	// attachments panel
-	'.{class:container} > div.{class:attachmentsPanel} { height: 100%; max-height: 388px; cursor: pointer; background-color: #eee; text-align: center; font-size: 16px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; max-width: 100%; }' +
+	'.{class:container} > div.{class:attachmentsPanel} { height: 100%; max-height: 388px; cursor: pointer; background-color: #f1f1f1; text-align: center; font-size: 16px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; max-width: 100%; }' +
 	'.{class:attachmentsPanel-plus} { font-size: 128px; line-height: 128px; font-weight: bold; width: 128px; height: 128px; margin: 0 auto; }' +
 	'.{class:strippedBackground} { ' +
 		gradientStyle("left top, #e3e3e3 0%, #e3e3e3 25%, #eee 25%, #eee 50%, #e3e3e3 50%, #e3e3e3 75%, #eee 75%") + '; ' +
