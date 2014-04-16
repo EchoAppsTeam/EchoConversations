@@ -363,7 +363,7 @@ card.css =
 	'.{class:description} { line-height: 21px; font-size: 15px; margin: 5px 16px 0 16px; }' +
 
 	// close button
-	'.{class:closeButton} { line-height: 1; opacity: 0.7; filter: alpha(opacity=70); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #FFF; text-shadow: 0 0 1px #000; }' +
+	'.{class:closeButton} { line-height: 1; opacity: 0.8; filter: alpha(opacity=80); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #000; text-shadow: 0 0 1px #FFF; }' +
 	'.{class:closeButton}:hover { opacity: 1; filter: alpha(opacity=100); }' +
 
 	// photo
