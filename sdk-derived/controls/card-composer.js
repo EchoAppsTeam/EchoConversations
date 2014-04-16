@@ -1070,8 +1070,6 @@ composer.methods._initCurrentComposer = function() {
 		composer.setData($.extend(true, {}, this.formData));
 	}
 
-	this.view.render({"name": "media"});
-
 	var clipButton = this.view.get("clipButton");
 	if (composer.showClipButton) {
 		clipButton.show().off("click").click(function() {
@@ -1081,6 +1079,8 @@ composer.methods._initCurrentComposer = function() {
 	} else {
 		clipButton.removeData("media-expanded").hide();
 	}
+
+	this.view.render({"name": "media"});
 	// timeout allows form fields to be added to target element DOM
 	setTimeout(function() {
 		self._initFormFields();
