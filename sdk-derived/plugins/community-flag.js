@@ -49,6 +49,15 @@ plugin.config = {
 	"showUserList": true
 };
 
+plugin.events = {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() {
+			this.view.render({"name": "flaggedBy"});
+		}
+	}
+};
+
 plugin.labels = {
 	/**
 	 * @echo_label

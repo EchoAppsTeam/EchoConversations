@@ -73,13 +73,20 @@ plugin.labels = {
 };
 
 plugin.events = {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() {
+			this._updateUserStatus();
+			this._updateItemStatus();
+		}
+	},
 	"Echo.StreamServer.Controls.Card.onRerender": function() {
 		var item = this.component;
 		if (item.user.is("admin")) {
 			var element = item.view.get("content");
 			var indicator = item.view.get("indicator");
-			var itemStatus = this.get("itemStatus") || "Untouched";
-			var newStatus = item.get("data.object.status") || "Untouched";
+			var itemStatus = this.get("itemStatus", "Untouched");
+			var newStatus = item.get("data.object.status", "Untouched");
 
 			if (itemStatus !== newStatus) {
 				var transition = "background-color " + this.config.get("statusAnimationTimeout") + "ms linear";
@@ -118,12 +125,7 @@ plugin.templates.buttonLabels = {
 };
 
 plugin.component.renderers.avatar = function(element) {
-	var item = this.component;
-
-	if (item.user.is("admin")) {
-		var status = item.get("data.actor.status") || "Untouched";
-		element.addClass(this.cssPrefix + "actorStatus-" + status);
-	}
+	this._updateUserStatus();
 	return this.parentRenderer("avatar", arguments);
 };
 
@@ -138,6 +140,11 @@ plugin.component.renderers.content = function(element) {
 	return this.parentRenderer("content", arguments);
 };
 
+plugin.component.renderers.container = function(element) {
+	this._updateItemStatus();
+	return this.parentRenderer("container", arguments);
+};
+
 plugin.statuses = [
 	"Untouched",
 	"ModeratorApproved",
@@ -147,6 +154,40 @@ plugin.statuses = [
 	"ModeratorFlagged",
 	"SystemFlagged"
 ];
+
+plugin.methods._updateUserStatus = function() {
+	var item = this.component;
+	var self = this;
+	var avatar = item.view.get("avatar");
+
+	if (avatar) {
+		avatar.removeClass($.map(plugin.statuses, function(status) {
+			return self.cssPrefix + "actorStatus-" + status;
+		}).join(" "));
+
+		if (item.user.is("admin")) {
+			var status = item.get("data.actor.status", "Untouched");
+			avatar.addClass(this.cssPrefix + "actorStatus-" + status);
+		}
+	}
+};
+
+plugin.methods._updateItemStatus = function() {
+	var item = this.component;
+	var self = this;
+	var container = item.view.get("container");
+
+	if (container) {
+		container.removeClass($.map(plugin.statuses, function(status) {
+			return self.cssPrefix + "status-" + status;
+		}).join(" "));
+
+		if (item.user.is("admin")) {
+			var status = this.get("itemStatus", "Untouched");
+			container.addClass(this.cssPrefix + "status-" + status);
+		}
+	}
+};
 
 plugin.button2status = {
 	"Spam": "ModeratorFlagged",

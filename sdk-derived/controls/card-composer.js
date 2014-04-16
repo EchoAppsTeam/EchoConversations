@@ -28,9 +28,9 @@ var $ = jQuery;
  * @param {Object} config
  * Configuration options
  */
-var composer = Echo.Control.manifest("Echo.StreamServer.Controls.CardComposer");
+var composer = Echo.App.manifest("Echo.StreamServer.Controls.CardComposer");
 
-if (Echo.Control.isDefined(composer)) return;
+if (Echo.App.isDefined(composer)) return;
 
 /** @hide @cfg apiBaseURL */
 /** @hide @method placeImage */
@@ -85,6 +85,7 @@ if (Echo.Control.isDefined(composer)) return;
  * Triggered when the app is rerendered.
  */
 
+
 composer.init = function() {
 	var self = this;
 	if (!this.checkAppKey()) return;
@@ -120,7 +121,6 @@ composer.init = function() {
 };
 
 composer.destroy = function() {
-	this.auth && this.auth.destroy();
 	this.tabs && this.tabs.destroy();
 	this.mediaContainer && this.mediaContainer.destroy();
 	this.toggleModeHandler && $(document).off("mouseup", this.toggleModeHandler);
@@ -413,13 +413,10 @@ composer.events = {
 	"Echo.UserSession.onInvalidate": {
 		"context": "global",
 		"handler": function() {
-			if (this.get("_deferredActivity")) {
-				this.get("_deferredActivity")();
-				this.remove("_deferredActivity");
-				// clearing up saved text...
-				var targetURL = this.config.get("targetURL");
-				Echo.Utils.set(Echo.Variables, targetURL, "");
-			}
+			this.view.render({"name": "nameContainer"});
+			this.view.render({"name": "markersContainer"});
+			this.view.render({"name": "tagsContainer"});
+			this._updateUserStatus();
 		}
 	},
 	"Echo.StreamServer.Controls.CardComposer.onAutoSharingToggle": {
@@ -503,6 +500,7 @@ composer.templates.post =
  */
 composer.renderers.container = function(element) {
 	var self = this;
+
 	var classes = $.map(["normal", "small", "smallest", "inline"], function(_class) {
 		return self.cssPrefix + _class;
 	});
@@ -511,10 +509,7 @@ composer.renderers.container = function(element) {
 	var _class = this.collapsed ? this.config.get("compact.layout") : "normal";
 	element.addClass(this.cssPrefix + _class);
 
-	_class = this.substitute({"template": "{class:logged} {class:anonymous} {class:forcedLogin}"});
-	element
-		.removeClass(_class)
-		.addClass(this.cssPrefix + this._userStatus());
+	this._updateUserStatus();
 
 	if (this.config.get("collapseOn.documentClick") && !this.toggleModeHandler) {
 		this.toggleModeHandler = function(event) {
@@ -666,8 +661,11 @@ composer.renderers.auth = function(element) {
 		"apiBaseURL": this.config.get("apiBaseURL"),
 		"cdnBaseURL": this.config.get("cdnBaseURL")
 	}, this.config.get("auth"));
-	this.auth && this.auth.destroy();
-	this.auth = new Echo.StreamServer.Controls.Auth(config);
+	this.initComponent({
+		"id": "auth",
+		"component": "Echo.StreamServer.Controls.Auth",
+		"config": config
+	});
 	return element;
 };
 
@@ -1041,6 +1039,13 @@ composer.methods.enablePostButtonBy = function(reason) {
 
 composer.methods.disablePostButtonBy = function(reason) {
 	this._refreshPostButtonBy(reason, "disable");
+};
+
+composer.methods._updateUserStatus = function() {
+	var _class = this.substitute({"template": "{class:logged} {class:anonymous} {class:forcedLogin}"});
+	this.view.get("container")
+		.removeClass(_class)
+		.addClass(this.cssPrefix + this._userStatus());
 };
 
 composer.methods._initCurrentComposer = function() {
@@ -1479,6 +1484,6 @@ composer.css =
 		'.echo-sdk-ui .{class:tabs} .nav > li.active > a:active { border: 0px; border-bottom: 4px solid #d8d8d8; color: #3c3c3c; background-color: transparent; opacity: 1; }' +
 	'';
 
-Echo.Control.create(composer);
+Echo.App.create(composer);
 
 })(Echo.jQuery);

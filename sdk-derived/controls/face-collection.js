@@ -73,8 +73,6 @@ if (Echo.Control.isDefined(collection)) return;
  * @echo_event Echo.StreamServer.Controls.FaceCollection.onRerender
  * Triggered when the app is rerendered.
  */
-
-
 collection.init = function() {
 	if (!this.checkAppKey()) return;
 

@@ -69,6 +69,15 @@ card.dependencies = [{
  */
 
 card.events = {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() {
+			this.view.render({"name": "buttons"});
+			this.view.render({"name": "metadata"});
+			this.view.render({"name": "modeSwitch"});
+			this._pageLayoutChange();
+		}
+	},
 	"Echo.StreamServer.Controls.Card.onRender": function() {
 		this._pageLayoutChange();
 	},
