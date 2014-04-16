@@ -225,7 +225,7 @@ media.css =
 	'.{class:container}.{class:single} > div > div { margin-right: 0; }' +
 
 	// multiple cards
-	'.{class:container}.{class:multiple} { padding: 8px; }' +
+	'.{class:container}.{class:multiple} { padding: 8px 0px 8px 8px; }' +
 
 	// scrollbar
 	'.{class:container}::-webkit-scrollbar { height: 10px; }' +
@@ -236,7 +236,7 @@ media.css =
 	'.{class:single} > .{class:attachmentsPanel} { border: 1px solid #D8D8D8; border-bottom: 0; }' +
 
 	// multiple > attachments panel
-	'.{class:container}.{class:multiple} > .{class:attachmentsPanel} { border: 1px solid #C2C2C2; width: 100%; }' +
+	'.{class:container}.{class:multiple} > .{class:attachmentsPanel} { border: 1px solid #C2C2C2; width: 100%; margin-right: 8px; }' +
 
 	// attachments panel
 	'.{class:container} > div.{class:attachmentsPanel} { height: 100%; max-height: 388px; cursor: pointer; background-color: #eee; text-align: center; font-size: 16px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; max-width: 100%; }' +
