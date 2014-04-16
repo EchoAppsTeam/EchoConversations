@@ -7,17 +7,15 @@ if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
 	var self = this;
-	this.component.registerModifier({
-		"isEnabled": $.proxy(this.isEnabled, this),
-		"init": function () {
-			self.events.subscribe({
-				"topic": "Echo.StreamServer.Controls.Card.onUpdate",
-				"handler": function() {
-					self.normalizer();
-				}
-			});
-			self.normalizer();
-
+	this.component.registerVisualizer({
+		"id": "photo",
+		"objectTypes": {
+			"http://activitystrea.ms/schema/1.0/image": ["rootItems"],
+			"http://activitystrea.ms/schema/1.0/article": ["rootItems", function() {
+				return self.component.get("data.object.parsedContent.oembed.thumbnail_width") >= self.config.get("minArticleImageWidth");
+			}]
+		},
+		"init": function() {
 			self.extendTemplate("replace", "data", plugin.templates.label);
 			self.extendTemplate("insertAsFirstChild", "subwrapper", plugin.templates.photo);
 		}
@@ -39,7 +37,7 @@ plugin.templates.photo =
 	'<div class="{plugin.class:item}">' +
 		'<div class="{plugin.class:photo}">' +
 			'<div class="{plugin.class:photoContainer}">' +
-				'<img class="{plugin.class:photoThumbnail}" src="{data:oembed.url}" title="{data:oembed.title}"/>' +
+				'<img class="{plugin.class:photoThumbnail}" src="{data:object.parsedContent.oembed.url}" title="{data:object.parsedContent.oembed.title}">' +
 			'</div>' +
 		'</div>' +
 	'</div>';
@@ -47,10 +45,10 @@ plugin.templates.photo =
 plugin.templates.label =
 	'<div class="{plugin.class:photoLabel}">' +
 		'<div class="{plugin.class:photoLabelContainer}">' +
-			'<div class="{plugin.class:title}" title="{data:oembed.title}">' +
-				'<a class="echo-clickable" href="{data:oembed.url}" target="_blank">{data:oembed.title}</a>' +
+			'<div class="{plugin.class:title}" title="{data:object.parsedContent.oembed.title}">' +
+				'<a class="echo-clickable" href="{data:object.parsedContent.oembed.url}" target="_blank">{data:object.parsedContent.oembed.title}</a>' +
 			'</div>' +
-			'<div class="{plugin.class:description}">{data:oembed.description}</div>' +
+			'<div class="{plugin.class:description}">{data:object.parsedContent.oembed.description}</div>' +
 		'</div>' +
 	'</div>';
 
@@ -61,9 +59,10 @@ plugin.events = {
 };
 
 plugin.renderers.title = function(element) {
-	var title = this.component.get("data.oembed.title");
-	var url = this.component.get("data.oembed.url");
+	var title = this.component.get("data.object.parsedContent.oembed.title");
+	var url = this.component.get("data.object.parsedContent.oembed.url");
 	if (title) {
+		// this is needed due to bug in SDK which doesn't update "data" placeholders
 		element.attr("title", title)
 			.find("a").text(title).attr("href", url);
 	} else {
@@ -73,7 +72,7 @@ plugin.renderers.title = function(element) {
 };
 
 plugin.renderers.description = function(element) {
-	var description = this.component.get("data.oembed.description");
+	var description = this.component.get("data.object.parsedContent.oembed.description");
 	if (description) {
 		element.text(Echo.Utils.stripTags(description));
 	} else {
@@ -84,9 +83,9 @@ plugin.renderers.description = function(element) {
 
 plugin.renderers.photoThumbnail = function(element) {
 	var self = this;
-	var thumbnail = this.component.get("data.oembed.type") === "link"
-		? this.component.get("data.oembed.thumbnail_url")
-		: this.component.get("data.oembed.url");
+	var thumbnail = this.component.get("data.object.parsedContent.oembed.type") === "link"
+		? this.component.get("data.object.parsedContent.oembed.thumbnail_url")
+		: this.component.get("data.object.parsedContent.oembed.url");
 	// we are to create empty img tag because of IE.
 	// If we have an empty src attribute it triggers
 	// error event all the time.
@@ -111,7 +110,7 @@ plugin.renderers.photoContainer = function(element) {
 		.addClass(this.cssPrefix + "enabled");
 	var expanded = this.cssPrefix + "expanded";
 	var self = this;
-	var oembed = this.component.get("data.oembed", {});
+	var oembed = this.component.get("data.object.parsedContent.oembed", {});
 	var thumbnailWidth = this.view.get("photoThumbnail").width();
 	var expandedHeight = oembed.height;
 	var collapsedHeight = (thumbnailWidth || oembed.width) * 9 / 16;
@@ -148,7 +147,7 @@ plugin.renderers.photoContainer = function(element) {
 };
 
 plugin.renderers.photoLabelContainer = function(element) {
-	if (!this.component.get("data.oembed.description") && !this.component.get("data.oembed.title")) {
+	if (!this.component.get("data.object.parsedContent.oembed.description") && !this.component.get("data.object.parsedContent.oembed.title")) {
 		element.hide();
 	} else {
 		this.view.get("photoContainer").css({
@@ -157,28 +156,6 @@ plugin.renderers.photoLabelContainer = function(element) {
 		});
 	}
 	return element;
-};
-
-plugin.methods.normalizer = function() {
-	var content = $("<div/>")
-		.append(this.component.get("data.object.content"));
-	var oembed = $("div[data-oembed]", content).data("oembed") || {};
-	this.component.set("data.oembed", oembed);
-};
-
-plugin.methods.isEnabled = function() {
-	var item = this.component;
-	var isArticle = ~$.inArray("http://activitystrea.ms/schema/1.0/article", item.get("data.object.objectTypes"));
-	var isPhoto = ~$.inArray("http://activitystrea.ms/schema/1.0/image", item.get("data.object.objectTypes"));
-
-	if (item.isRoot() && isPhoto) {
-		return true;
-	} else if (item.isRoot() && isArticle) {
-		this.normalizer();
-		return item.get("data.oembed.thumbnail_width") >= this.config.get("minArticleImageWidth");
-	} else {
-		return false;
-	}
 };
 
 plugin.css =
@@ -326,8 +303,6 @@ plugin.methods.getData = function() {
 
 plugin.methods.setData = function(data) {
 	this.composer.find(".echo-photo-composer-title").val(data.text);
-	if (data.media.length) {
-	}
 };
 
 plugin.methods._getMediaContent = function() {

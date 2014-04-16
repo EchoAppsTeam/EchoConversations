@@ -1669,11 +1669,7 @@ collection.methods._updateItem = function(entry) {
 			item.set("forceInject", true);
 		}
 	}
-	item.events.publish({
-		"topic": "onUpdate",
-		"global": false,
-		"propagation": false
-	});
+	item.parseContent();
 	return item;
 };
 

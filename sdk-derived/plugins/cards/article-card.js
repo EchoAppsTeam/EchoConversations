@@ -7,16 +7,12 @@ if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
 	var self = this;
-	this.component.registerModifier({
-		"isEnabled": $.proxy(this.isEnabled, this),
-		"init": function () {
-			self.events.subscribe({
-				"topic": "Echo.StreamServer.Controls.Card.onUpdate",
-				"handler": function() {
-					self.normalizer();
-				}
-			});
-			self.normalizer();
+	this.component.registerVisualizer({
+		"id": "article",
+		"objectTypes": {
+			"http://activitystrea.ms/schema/1.0/article": ["rootItems"]
+		},
+		"init": function() {
 			self.extendTemplate("replace", "data", plugin.templates.main);
 		}
 	});
@@ -26,35 +22,23 @@ plugin.templates.main =
 	'<div class="{plugin.class:item}">' +
 		'<div class="{plugin.class:article}">' +
 			'<div class="{plugin.class:articleThumbnail}">' +
-				'<img src="{data:oembed.thumbnail_url}"/>' +
+				'<img src="{data:object.parsedContent.oembed.thumbnail_url}">' +
 			'</div>' +
 			'<div class="{plugin.class:articleTemplate}">' +
-				'<div class="{plugin.class:title}" title="{data:oembed.title}">' +
-					'<a href="{data:oembed.url}" target="_blank">{data:oembed.title}</a>' +
+				'<div class="{plugin.class:title}" title="{data:object.parsedContent.oembed.title}">' +
+					'<a href="{data:object.parsedContent.oembed.url}" target="_blank">{data:object.parsedContent.oembed.title}</a>' +
 				'</div>' +
-				'<div class="{plugin.class:description}">{data:oembed.description}</div>' +
+				'<div class="{plugin.class:description}">{data:object.parsedContent.oembed.description}</div>' +
 			'</div>' +
 			'<div class="echo-clear"></div>' +
 		'</div>' +
 	'</div>';
 
 plugin.renderers.article = function(element) {
-	if (!this.component.get("data.oembed.thumbnail_url")) {
+	if (!this.component.get("data.object.parsedContent.oembed.thumbnail_url")) {
 		element.addClass(this.cssPrefix + "withoutPhoto");
 	}
 	return element;
-};
-
-plugin.methods.normalizer = function() {
-	var content = $("<div/>")
-		.append(this.component.get("data.object.content"));
-	var oembed = $("div[data-oembed]", content).data("oembed") || {};
-	this.component.set("data.oembed", oembed);
-};
-
-plugin.methods.isEnabled = function() {
-	var item = this.component;
-	return item.isRoot() && ~$.inArray("http://activitystrea.ms/schema/1.0/article", item.get("data.object.objectTypes"));
 };
 
 plugin.css =
