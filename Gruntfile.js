@@ -23,7 +23,7 @@ module.exports = function(grunt) {
 			"dashboard/*.js"
 		],
 		"images": [
-			"images/**"
+			"sdk-derived/images/**"
 		],
 		"demo": [
 			"demo.html",

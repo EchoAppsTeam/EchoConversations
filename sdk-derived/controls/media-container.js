@@ -250,7 +250,7 @@ media.css =
 	'.{class:container} > .{class:attachmentsPanel} > .{class:attachmentsPanel-wrapper} { border: 1px solid #C4C4C4; margin: 5px; border-radius: 2px; }' +
 	'.{class:attachmentsPanel-container} { padding: 10px 0 40px 0; margin: 5px; }' +
 	'.{class:attachmentsPanel-tooltip} { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px;}' +
-	'.{class:loading-animation} {background-image: url("{%= baseURLs.prod %}/images/loading.gif"); background-size: 80px; background-repeat: no-repeat; background-position: 24px 39px; }';
+	'.{class:loading-animation} {background-image: url("{%= baseURLs.prod %}/sdk-derived/images/loading.gif"); background-size: 80px; background-repeat: no-repeat; background-position: 24px 39px; }';
 
 
 Echo.App.create(media);

@@ -1321,7 +1321,7 @@ conversations.css =
 	// streamSorter dropdown
 	'.{class:streamSorter} { font-size: 13px; }' +
 	'.echo-sdk-ui .{class:streamSorter}:focus { outline: none; }' +
-	'.{class:streamSorter} > ul > li > a { background: url("{%= baseURLs.prod %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
+	'.{class:streamSorter} > ul > li > a { background: url("{%= baseURLs.prod %}/sdk-derived/images/marker.png") no-repeat right center; padding-right: 20px; }' +
 	'.{class:streamSorter} ul.nav { margin-bottom: 0px; font-size: 13px; }' +
 	'.{class:streamSorter} ul.nav > li > a { text-decoration: none; color: #C6C6C6; line-height: 18px; }' +
 	'.{class:streamSorter} .dropdown-menu { float: right; left: auto; right: 0; }' +
