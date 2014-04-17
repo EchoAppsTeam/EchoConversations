@@ -318,7 +318,7 @@ composer.config = {
 	"initialMode": "expanded", // expanded || collapsed
 	"compact": {
 		"layout": "inline", // small || smallest || inline
-		"prompt": "Contribute here"
+		"prompt": "What's on your mind?"
 	},
 	"collapseOn": {
 		"documentClick": false,
