@@ -582,14 +582,14 @@ composer.renderers.media = function(element) {
 			self.enablePostButtonBy("media-required");
 		}
 	};
-	var mediaConfig = this.currentComposer.getMediaConfig
+	var mediaConfig = (this.currentComposer && this.currentComposer.getMediaConfig)
 		? this.currentComposer.getMediaConfig()
 		: {};
 
 	var mediaExpanded = !!this.view.get("clipButton").data("media-expanded");
 	this.mediaContainer = new Echo.StreamServer.Controls.MediaContainer($.extend(true, mediaConfig, {
 		"target": element.empty(),
-		"attachmentsPanelRequired": this.currentComposer.attachmentsPanelRequired || mediaExpanded,
+		"attachmentsPanelRequired": this.currentComposer && this.currentComposer.attachmentsPanelRequired || mediaExpanded,
 		"data": this.formData.media,
 		"context": this.config.get("context"),
 		"card": {
