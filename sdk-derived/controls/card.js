@@ -1179,15 +1179,15 @@ card.methods.registerVisualizer = function(config) {
 		return;
 	}
 	var self = this;
-	var validHandlers = {
+	var conditionHandlers = {
 		"rootItems": function() { return self.isRoot(); },
 		"childItems": function() { return !self.isRoot(); },
 		"allItems": function() { return true; }
 	};
-	$.each(config.objectTypes, function(type, validators) {
-		$.each(validators, function(i, valid) {
-			if (typeof valid === "string") {
-				validators[i] = validHandlers[valid] || validHandlers.allItems;
+	$.each(config.objectTypes, function(type, conditions) {
+		$.each(conditions, function(i, condition) {
+			if (typeof condition === "string") {
+				conditions[i] = conditionHandlers[condition] || conditionHandlers.allItems;
 			}
 		});
 	});
@@ -1450,14 +1450,17 @@ card.methods._getActiveVisualizer = function() {
 	if (!this.visualizer) {
 		var itemTypes = this.get("data.object.objectTypes");
 		$.each(this.visualizers, function(_, visualizer) {
+			self.parseContent(visualizer);
 			var handledTypes = visualizer.objectTypes;
 			var found = false;
-			$.each(handledTypes, function(type, validators) {
+			$.each(handledTypes, function(type, conditions) {
+				// visualizer doesn't know what to do with this card at all
 				if (!~$.inArray(type, itemTypes)) return;
-				self.parseContent(visualizer);
-				$.each(validators, function(i, valid) {
-					if (!valid()) {
-						found = false;
+				$.each(conditions, function(i, condition) {
+					// first condition that fails for the checked
+					// type and visualizer means we should move to
+					// the next type and/or next visualizer
+					if (!condition()) {
 						return false;
 					}
 					found = true;
@@ -1471,6 +1474,7 @@ card.methods._getActiveVisualizer = function() {
 		});
 	}
 	if (!this.visualizer) {
+		// cleanup after our search process if we failed
 		this.remove("data.object.parsedContent");
 	}
 	return this.visualizer;
