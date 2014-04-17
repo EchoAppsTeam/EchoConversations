@@ -154,7 +154,7 @@ plugin.init = function() {
 		"setData": $.proxy(this.setData, this),
 		"requiresMedia": false,
 		"objectType": "http://activitystrea.ms/schema/1.0/comment",
-		"showClipButton": true,
+		"showClipButton": this.config.get("attachments.visible"),
 		"getMediaConfig": $.proxy(this.getMediaConfig, this)
 	});
 };
@@ -181,12 +181,14 @@ plugin.methods.buildComposer = function() {
 			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("prompt") + '"></textarea>' +
 		'</div>'
 	);
-	this.composer.find(".echo-comment-composer-text").on("keyup paste", function() {
-		self.component.attachMedia({
-			"fromElement": $(this),
-			"delay": 1000
+	if (this.config.get("resolveURLs")) {
+		this.composer.find(".echo-comment-composer-text").on("keyup paste", function() {
+			self.component.attachMedia({
+				"fromElement": $(this),
+				"delay": 1000
+			});
 		});
-	});
+	}
 	return this.composer;
 };
 
