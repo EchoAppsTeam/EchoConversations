@@ -37,10 +37,6 @@ conversations.config = {
 				"renderer": "LinkCard",
 				"enabled": true,
 				"blockedDomains": []
-			},
-			"videos": {
-				"renderer": "VideoCard",
-				"enabled": true
 			}
 		},
 		"confirmation": {
@@ -79,10 +75,6 @@ conversations.config = {
 				"renderer": "LinkCard",
 				"enabled": true,
 				"blockedDomains": []
-			},
-			"videos": {
-				"renderer": "VideoCard",
-				"enabled": true
 			}
 		},
 		"confirmation": {
