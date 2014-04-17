@@ -53,7 +53,7 @@ conversations.config = {
 		"displayCompactForm": true,
 		"compact": {
 			"mode": "inline",
-			"prompt": "Add a comment..."
+			"prompt": "What's on your mind?"
 		},
 		"contentTypes": {
 			"comments": {
