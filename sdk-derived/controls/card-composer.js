@@ -993,20 +993,6 @@ composer.methods.addPostValidator = function(validator, priority) {
 	this.validators[priority === "low" ? "push" : "unshift"](validator);
 };
 
-/**
- * Method implements the refresh logic for the Submit Composer control.
- */
-/*composer.methods.refresh = function() {
-	var self = this;
-	this.config.set("data.object.content", this.view.get("text").val());
-	$.map(["tags", "markers"], function(field) {
-		var elements = self.view.get(field).val().split(", ");
-		self.config.set("data.object." + field, elements || []);
-	});
-	var component = Echo.Utils.getComponent("Echo.StreamServer.Controls.CardComposer");
-	component.parent.refresh.call(this);
-};*/
-
 composer.methods.expand = function() {
 	if (!this.collapsed) return;
 	this.collapsed = false;
