@@ -30,7 +30,7 @@ media.templates.attachmentsPanel =
 		'<div class="{class:attachmentsPanel-wrapper}">' +
 			'<div class="{class:attachmentsPanel-container} {class:strippedBackground}">' +
 				'<div class="{class:attachmentsPanel-plus}">{label:plus}</div>' +
-				'<span class="{class:attachmentsPanel-tooltip}">{label:initialTooltip}</span>' +
+				'<div class="{class:attachmentsPanel-tooltip}">{label:initialTooltip}</div>' +
 			'</div>' +
 		'</div>' +
 	'</div>';
@@ -249,8 +249,8 @@ media.css =
 	'}' +
 	'.{class:container} > .{class:attachmentsPanel} > .{class:attachmentsPanel-wrapper} { border: 1px solid #C4C4C4; margin: 5px; border-radius: 2px; }' +
 	'.{class:attachmentsPanel-container} { padding: 10px 0 40px 0; margin: 5px; }' +
-	'.{class:attachmentsPanel-tooltip} { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px;}' +
-	'.{class:loading-animation} {background-image: url("{%= baseURLs.prod %}/sdk-derived/images/loading.gif"); background-size: 80px; background-repeat: no-repeat; background-position: 24px 39px; }';
+	'.{class:attachmentsPanel-tooltip} { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; white-space: nowrap; text-overflow: ellipsis; line-height: 16px; overflow: hidden; }' +
+	'.{class:loading-animation} {background-image: url("{%= baseURLs.prod %}/sdk-derived/images/loading.gif"); background-repeat: no-repeat; background-position: 24px 39px; }';
 
 
 Echo.App.create(media);
