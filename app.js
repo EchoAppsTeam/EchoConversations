@@ -572,12 +572,7 @@ conversations.renderers.postComposer = function(element) {
 				"enabled": enableBundledIdentity,
 				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
 				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
-			}].concat(contentTypePlugins), plugins),
-			"data": {
-				"object": {
-					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
-				}
-			}
+			}].concat(contentTypePlugins), plugins)
 		})
 	});
 	return element;

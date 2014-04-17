@@ -115,7 +115,7 @@ composer.init = function() {
 	});
 
 	this.collapsed = this.config.get("initialMode") === "collapsed";
-	this._extractInfoFromExternalData();
+	this._identifyCurrentComposer();
 	this.render();
 	this.ready();
 };
@@ -343,6 +343,7 @@ composer.vars = {
 		"text": "",
 		"media": []
 	},
+	"currentComposer": undefined,
 	"composers": [],
 	"validators": [],
 	"previousComposerId": undefined
@@ -532,33 +533,34 @@ composer.renderers.tabs = function(element) {
 	// TODO: support URL in icons
 	var self = this;
 	element.empty();
-	if (!this.composers.length) {
-		this.log({"message": "No composer plugins are found"});
-		return element;
+
+	if (this.currentComposer) {
+		this.tabs = new Echo.GUI.Tabs({
+			"target": element,
+			"classPrefix": this.cssPrefix + "tabs-",
+			"selected": this.currentComposer.index,
+			"entries": $.map(this.composers, function(tab) {
+				tab.panel = $("<div>");
+				return {
+					"id": tab.id,
+					"extraClass": "echo-primaryFont",
+					"panel": tab.panel,
+					"label": self.substitute({
+						"template": '<span class="{class:icon} {data:icon}"></span>' +
+							'<span class="{class:label}">{data:label}</span>',
+						"data": tab
+					})
+				};
+			}),
+			"panels": this.view.get("composers").empty(),
+			"shown": function(tab, panel, id, index) {
+				self.currentComposer = self.composers[index];
+				self._initCurrentComposer();
+			}
+		});
 	}
-	this.tabs = new Echo.GUI.Tabs({
-		"target": element,
-		"classPrefix": this.cssPrefix + "tabs-",
-		"selected": this.currentComposer && this.currentComposer.index,
-		"entries": $.map(this.composers, function(tab) {
-			tab.panel = $("<div>");
-			return {
-				"id": tab.id,
-				"extraClass": "echo-primaryFont",
-				"panel": tab.panel,
-				"label": self.substitute({
-					"template": '<span class="{class:icon} {data:icon}"></span>' +
-						'<span class="{class:label}">{data:label}</span>',
-					"data": tab
-				})
-			};
-		}),
-		"panels": this.view.get("composers").empty(),
-		"shown": function(tab, panel, id, index) {
-			self.currentComposer = self.composers[index];
-			self._initCurrentComposer();
-		}
-	});
+
+	return element;
 };
 
 /**
@@ -1092,28 +1094,32 @@ composer.methods._initCurrentComposer = function() {
 	}, 0);
 };
 
-composer.methods._extractInfoFromExternalData = function() {
+composer.methods._identifyCurrentComposer = function() {
 	var self = this;
-	this.formData = {
-		"text": "",
-		"media": []
-	};
 	var data = this.config.get("data");
-	if (!data || $.isEmptyObject(data)) return;
 
-	Echo.Utils.safelyExecute(function() {
-		var content = $("<div>").append(self.config.get("data.object.content"));
-		//self.set("content", self.config.get("data.object.content"));
-		self.formData.text = $(".echo-item-text", content).html();
-		if (/*self.get("content") !== item.get("data.object.content") || */!self.formData.media.length) {
-			self.formData.media = $("div[oembed], div[data-oembed]", content).map(function() {
-				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
-			}).get();
-		}
-		var composer = $(".echo-item-files", content).data("composer");
-		var types = self.config.get("data.object.objectTypes", []);
-		$.each(self.composers, function(i, data) {
-			if (data.id === composer) {
+	if (!data || $.isEmptyObject(data)) {
+		this.currentComposer = this.composers[0];
+	} else {
+		var content = $("<div>").append(this.config.get("data.object.content"));
+		var composerId = content.find(".echo-item-files").data("composer");
+		var attachments = content.find("div[data-oembed]");
+
+		var oembed = attachments.map(function() {
+			var oembed = $(this).data("oembed");
+			return Echo.Utils.oEmbedValidate(oembed) ? oembed : null;
+		});
+
+		this.formData = {
+			"text": content.find(".echo-item-text").html(),
+			"media": oembed.get()
+		};
+
+		content.remove();
+
+		var types = this.config.get("data.object.objectTypes", []);
+		$.each(this.composers, function(i, data) {
+			if (data.id === composerId) {
 				self.currentComposer = data;
 				return false;
 			}
@@ -1125,7 +1131,7 @@ composer.methods._extractInfoFromExternalData = function() {
 				return false;
 			}
 		});
-	});
+	}
 };
 
 composer.methods._htmlEncode = function(json) {
@@ -1423,7 +1429,7 @@ composer.css =
 	'.{class:container} { padding: 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; }' +
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"] { width: 100%; border: 0; padding: 0px; outline: 0; box-shadow: none; margin-bottom: 0px; }' +
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"]:focus { outline: 0; box-shadow: none; }' +
-	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 0px 1px; }' +
+	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 1px 1px 0 1px; }' +
 	'.{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; background-color: transparent; }' +
 	'.{class:confirmation} { margin-bottom: 10px; display: none; }' +
 	'.{class:clipButton} { display: none; margin: 5px; float: left; cursor: pointer; }' +
@@ -1469,8 +1475,6 @@ composer.css =
 	'.{class:inline} .{class:header} { float: left; margin: 0px; }' +
 	'.{class:inline} .echo-streamserver-controls-auth-avatarContainer,' +
 		'.{class:inline} .echo-streamserver-controls-auth-avatar { width: 28px; height: 28px; }' +
-	'.echo-sdk-ui .{class:small} .nav-tabs,' +
-		'.echo-sdk-ui .{class:smallest} .nav-tabs { border-bottom-width: 0px; }' +
 
 	// tabs
 	'.{class:tabs} .{class:icon} { margin-right: 2px; }' +
@@ -1482,7 +1486,7 @@ composer.css =
 		'.echo-sdk-ui .{class:tabs} .nav > li.active > a:hover,' +
 		'.echo-sdk-ui .{class:tabs} .nav > li.active > a:focus,' +
 		'.echo-sdk-ui .{class:tabs} .nav > li.active > a:active { border: 0px; border-bottom: 4px solid #d8d8d8; color: #3c3c3c; background-color: transparent; opacity: 1; }' +
-	'';
+	'.echo-sdk-ui .{class:tabs} .nav-tabs { border-bottom-width: 0; }';
 
 Echo.App.create(composer);
 
