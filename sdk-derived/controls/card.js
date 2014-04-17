@@ -1427,20 +1427,6 @@ card.methods._transitionSupported = function() {
 	return cache.transitionSupported;
 };
 
-card.methods._getItemRenderType = function() {
-	var availableTypes = ["article", "image", "video"];
-	var result;
-	$.each(this.get("data.object.objectTypes", []), function(i, objectType) {
-		var type = (objectType.match("[^/]+$") || []).pop();
-		if (~$.inArray(type, availableTypes)) {
-			result = type;
-			return false;
-		}
-	});
-
-	return result;
-};
-
 card.methods._getActiveVisualizer = function() {
 	var self = this;
 	if (!this.visualizer) {
