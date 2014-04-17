@@ -1199,13 +1199,22 @@ card.methods.parseContent = function(visualizer) {
 		return;
 	}
 	var content = $("<div>").append(this.get("data.object.content"));
-	var text = content.find(".echo-item-text").html();
-	var oembed = content.find("div[data-oembed]").data("oembed") || {};
-	content.remove();
+	var attachments = content.find("div[data-oembed]");
+	var oembed = attachments.map(function() {
+		var oembed = $(this).data("oembed");
+		return Echo.Utils.oEmbedValidate(oembed) ? oembed : null;
+	});
+	if (visualizer.multipleAttachments) {
+		oembed = oembed.get();
+	} else {
+		oembed = oembed.get(0);
+	}
+	attachments.remove();
 	this.set("data.object.parsedContent", {
-		"text": text,
+		"text": content.html(),
 		"oembed": oembed
 	});
+	content.remove();
 };
 
 /**

@@ -25,7 +25,7 @@ plugin.init = function() {
 			"http://activitystrea.ms/schema/1.0/image": ["childItems", hasAttachments],
 			"http://activitystrea.ms/schema/1.0/video": ["childItems", hasAttachments]
 		},
-		"parseContent": $.proxy(this.parseContent, this),
+		"multipleAttachments": true,
 		"init": function() {
 			self.extendTemplate("insertAsLastChild", "data", plugin.templates.media);
 		}
@@ -45,20 +45,6 @@ plugin.renderers.mediaContent = function(element) {
 	}));
 
 	return element.addClass(this.cssPrefix + (attachments.length > 1 ? "multiple" : "single"));
-};
-
-plugin.methods.parseContent = function() {
-	var content = $("<div>").append(this.component.get("data.object.content"));
-	var attachments = content.find("div[data-oembed]");
-	var oembed = attachments.map(function() {
-		var oembed = $(this).data("oembed");
-		return Echo.Utils.oEmbedValidate(oembed) ? oembed : null;
-	}).get();
-	attachments.remove();
-	this.component.set("data.object.parsedContent", {
-		"text": content.html(),
-		"oembed": oembed
-	});
 };
 
 plugin.css =
