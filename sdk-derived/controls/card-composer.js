@@ -534,31 +534,31 @@ composer.renderers.tabs = function(element) {
 	var self = this;
 	element.empty();
 
-	if (this.currentComposer) {
-		this.tabs = new Echo.GUI.Tabs({
-			"target": element,
-			"classPrefix": this.cssPrefix + "tabs-",
-			"selected": this.currentComposer.index,
-			"entries": $.map(this.composers, function(tab) {
-				tab.panel = $("<div>");
-				return {
-					"id": tab.id,
-					"extraClass": "echo-primaryFont",
-					"panel": tab.panel,
-					"label": self.substitute({
-						"template": '<span class="{class:icon} {data:icon}"></span>' +
-							'<span class="{class:label}">{data:label}</span>',
-						"data": tab
-					})
-				};
-			}),
-			"panels": this.view.get("composers").empty(),
-			"shown": function(tab, panel, id, index) {
-				self.currentComposer = self.composers[index];
-				self._initCurrentComposer();
-			}
-		});
-	}
+	if (!this.currentComposer) return element;
+
+	this.tabs = new Echo.GUI.Tabs({
+		"target": element,
+		"classPrefix": this.cssPrefix + "tabs-",
+		"selected": this.currentComposer.index,
+		"entries": $.map(this.composers, function(tab) {
+			tab.panel = $("<div>");
+			return {
+				"id": tab.id,
+				"extraClass": "echo-primaryFont",
+				"panel": tab.panel,
+				"label": self.substitute({
+					"template": '<span class="{class:icon} {data:icon}"></span>' +
+						'<span class="{class:label}">{data:label}</span>',
+					"data": tab
+				})
+			};
+		}),
+		"panels": this.view.get("composers").empty(),
+		"shown": function(tab, panel, id, index) {
+			self.currentComposer = self.composers[index];
+			self._initCurrentComposer();
+		}
+	});
 
 	return element;
 };
@@ -1100,38 +1100,39 @@ composer.methods._identifyCurrentComposer = function() {
 
 	if (!data || $.isEmptyObject(data)) {
 		this.currentComposer = this.composers[0];
-	} else {
-		var content = $("<div>").append(this.config.get("data.object.content"));
-		var composerId = content.find(".echo-item-files").data("composer");
-		var attachments = content.find("div[data-oembed]");
-
-		var oembed = attachments.map(function() {
-			var oembed = $(this).data("oembed");
-			return Echo.Utils.oEmbedValidate(oembed) ? oembed : null;
-		});
-
-		this.formData = {
-			"text": content.find(".echo-item-text").html(),
-			"media": oembed.get()
-		};
-
-		content.remove();
-
-		var types = this.config.get("data.object.objectTypes", []);
-		$.each(this.composers, function(i, data) {
-			if (data.id === composerId) {
-				self.currentComposer = data;
-				return false;
-			}
-			var matches = $.grep(types, function(type) {
-				return data.objectType === type;
-			});
-			if (matches.length) {
-				self.currentComposer = data;
-				return false;
-			}
-		});
+		return;
 	}
+
+	var content = $("<div>").append(this.config.get("data.object.content"));
+	var composerId = content.find(".echo-item-files").data("composer");
+	var attachments = content.find("div[data-oembed]");
+
+	var oembed = attachments.map(function() {
+		var oembed = $(this).data("oembed");
+		return Echo.Utils.oEmbedValidate(oembed) ? oembed : null;
+	});
+
+	this.formData = {
+		"text": content.find(".echo-item-text").html(),
+		"media": oembed.get()
+	};
+
+	content.remove();
+
+	var types = this.config.get("data.object.objectTypes", []);
+	$.each(this.composers, function(i, data) {
+		if (data.id === composerId) {
+			self.currentComposer = data;
+			return false;
+		}
+		var matches = $.grep(types, function(type) {
+			return data.objectType === type;
+		});
+		if (matches.length) {
+			self.currentComposer = data;
+			return false;
+		}
+	});
 };
 
 composer.methods._htmlEncode = function(json) {
