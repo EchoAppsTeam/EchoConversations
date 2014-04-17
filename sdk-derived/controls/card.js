@@ -102,7 +102,7 @@ card.events = {
 card.init = function() {
 	this.timestamp = Echo.Utils.timestampFromW3CDTF(this.get("data.object.published"));
 	this.set("isItemNew", this.config.get("live"));
-	this._initModifier();
+	this._initVisualizer();
 	this.ready();
 
 	if (!this.config.get("manualRendering")) {
@@ -287,8 +287,8 @@ card.vars = {
 	"buttons": {},
 	"buttonsLayout": "inline",
 	"content": undefined,
-	"modifierList": [],
-	"modifier": undefined
+	"visualizers": [],
+	"visualizer": undefined
 };
 
 card.labels = {
@@ -784,7 +784,7 @@ card.renderers.textToggleTruncated = function(element) {
  */
 card.renderers.body = function(element) {
 	var self = this;
-	var itemContent = this.get("data.object.content");
+	var itemContent = this.get("data.object.parsedContent.text", this.get("data.object.content"));
 
 	var data = [itemContent, {
 		"source": this.get("data.source.name"),
@@ -1168,135 +1168,62 @@ card.renderers._button = function(element, extra) {
 	return element.append(button);
 };
 
-card.methods._pageLayoutChange = function() {
-	var footer = this.view.get("footer");
-	var buttons = this.view.get("buttons");
-	var buttonsStates = [
-		"inline",
-		"compact",
-		"dropdown"
-	];
-	if (!this.get("buttonsStates")) {
-		this.set("buttonsStates", buttonsStates);
-	}
-	var configuredButtonsState = this.config.get("initialIntentsDisplayMode") ||  buttonsStates[0];
-
-	var currentState = this.get("buttonsLayout");
-	if (!currentState) {
-		currentState = configuredButtonsState;
-		this.set("buttonsLayout", currentState);
-	}
-	if (!footer || !buttons || !footer.is(":visible")) {
-		this._checkItemContentHeight();
+/**
+ * Allows to register custom card visualizer
+ *
+ * @param {object} config
+ */
+card.methods.registerVisualizer = function(config) {
+	if (!config.objectTypes || $.isEmptyObject(config.objectTypes)) {
+		this.log({"message": "Invalid visualizer configuration", "args": config});
 		return;
 	}
-	var footerWidth = footer.width();
-	var buttonsWidth = buttons.width();
-
-	var prevFreeSpace = this.get("prevFreeSpace") || 0;
-	var freeSpace = footerWidth - footer.children().eq(0).width() - footer.children().eq(1).width();
-	if (prevFreeSpace !== freeSpace || footerWidth < buttonsWidth) {
-		this.set("prevFreeSpace", freeSpace);
-		var index = $.inArray(currentState, buttonsStates);
-		if (freeSpace < buttonsWidth) {
-			if (buttonsStates[index + 1]) {
-				currentState = buttonsStates[index + 1];
-			}
-			this.set("buttonsLayout", currentState);
-			this.view.render({"name": "buttons"});
-		} else if (freeSpace > (2 * buttonsWidth)) {
-			var indexOfConfiguredState = $.inArray(configuredButtonsState, buttonsStates);
-			if (indexOfConfiguredState < index && buttonsStates[index - 1]) {
-				currentState = buttonsStates[index - 1];
-			} else {
-				currentState = configuredButtonsState;
-			}
-			this.set("buttonsLayout", currentState);
-			this.view.render({"name": "buttons"});
-		}
-	}
-
-	this._checkItemContentHeight();
-};
-
-card.methods._checkItemContentHeight = function() {
-	var body = this.view.get("body");
-	var text = this.view.get("text");
-	var button = this.view.get("seeMore");
-
-	if (body && button) {
-		var maxBodyHeight = this.config.get("limits.maxBodyHeight");
-		var lineHeight = parseInt(text.css("line-height"), 10);
-		var fontSize = parseInt(text.css("font-size"), 10);
-
-		var lineCount = Math.round(maxBodyHeight / lineHeight);
-		var realMaxHeight = lineCount * lineHeight - fontSize / 2;
-		var coeffToShow = 1.2; // we don't need to hide text if it's height <= 120% of maxBodyHeight
-		if (text.height() > realMaxHeight * coeffToShow && !button.is(":visible")) {
-			body.css("max-height", realMaxHeight);
-			button.show();
-		} else if (text.height() < realMaxHeight && button.is(":visible")) {
-			body.css("max-height", "");
-			button.hide();
-		}
-	}
-};
-
-var cache = {};
-card.methods._transitionSupported = function() {
-	if (!cache.transitionSupported) {
-		var s = document.createElement('p').style;
-		cache.transitionSupported = 'transition' in s ||
-			'WebkitTransition' in s ||
-			'MozTransition' in s ||
-			'msTransition' in s ||
-			'OTransition' in s;
-	}
-	return cache.transitionSupported;
-};
-
-card.methods._getItemRenderType = function() {
-	var availableTypes = ["article", "image", "video"];
-	var result;
-	$.each(this.get("data.object.objectTypes", []), function(i, objectType) {
-		var type = (objectType.match("[^/]+$") || []).pop();
-		if (~$.inArray(type, availableTypes)) {
-			result = type;
-			return false;
-		}
-	});
-
-	return result;
-};
-
-card.methods._getActiveModifier = function() {
 	var self = this;
-	if (!this.modifier) {
-		$.each(this.modifierList, function(_, modifier) {
-			if (modifier.isEnabled()) {
-				self.modifier = modifier;
-				return false;
+	var validHandlers = {
+		"rootItems": function() { return self.isRoot(); },
+		"childItems": function() { return !self.isRoot(); },
+		"allItems": function() { return true; }
+	};
+	$.each(config.objectTypes, function(type, validators) {
+		$.each(validators, function(i, valid) {
+			if (typeof valid === "string") {
+				validators[i] = validHandlers[valid] || validHandlers.allItems;
 			}
 		});
+	});
+	if (!config.init) {
+		config.init = $.noop;
 	}
-	return this.modifier;
-};
-
-card.methods._initModifier = function() {
-	var modifier = this._getActiveModifier();
-	if (modifier) {
-		modifier.init();
-	}
+	this.visualizers.push(config);
 };
 
 /**
- * Method allows register custom item content modificato
- *
- * @param {object} config
- *
+ * Generic logic for extracting oembed data from card content.
+ * Can be overridden by custom visualizer method
  */
-card.methods.registerModifier = function(config) {
-	this.modifierList.push(config);
+card.methods.parseContent = function(visualizer) {
+	visualizer = visualizer || this.visualizer;
+	if (visualizer.parseContent) {
+		visualizer.parseContent();
+		return;
+	}
+	var content = $("<div>").append(this.get("data.object.content"));
+	var attachments = content.find("div[data-oembed]");
+	var oembed = attachments.map(function() {
+		var oembed = $(this).data("oembed");
+		return Echo.Utils.oEmbedValidate(oembed) ? oembed : null;
+	});
+	if (visualizer.multipleAttachments) {
+		oembed = oembed.get();
+	} else {
+		oembed = oembed.get(0);
+	}
+	attachments.remove();
+	this.set("data.object.parsedContent", {
+		"text": content.html(),
+		"oembed": oembed
+	});
+	content.remove();
 };
 
 /**
@@ -1429,6 +1356,129 @@ card.methods.addButtonSpec = function(plugin, spec) {
 		this.buttonSpecs[plugin] = [];
 	}
 	this.buttonSpecs[plugin].push(spec);
+};
+
+card.methods._pageLayoutChange = function() {
+	var footer = this.view.get("footer");
+	var buttons = this.view.get("buttons");
+	var buttonsStates = [
+		"inline",
+		"compact",
+		"dropdown"
+	];
+	if (!this.get("buttonsStates")) {
+		this.set("buttonsStates", buttonsStates);
+	}
+	var configuredButtonsState = this.config.get("initialIntentsDisplayMode") ||  buttonsStates[0];
+
+	var currentState = this.get("buttonsLayout");
+	if (!currentState) {
+		currentState = configuredButtonsState;
+		this.set("buttonsLayout", currentState);
+	}
+	if (!footer || !buttons || !footer.is(":visible")) {
+		this._checkItemContentHeight();
+		return;
+	}
+	var footerWidth = footer.width();
+	var buttonsWidth = buttons.width();
+
+	var prevFreeSpace = this.get("prevFreeSpace") || 0;
+	var freeSpace = footerWidth - footer.children().eq(0).width() - footer.children().eq(1).width();
+	if (prevFreeSpace !== freeSpace || footerWidth < buttonsWidth) {
+		this.set("prevFreeSpace", freeSpace);
+		var index = $.inArray(currentState, buttonsStates);
+		if (freeSpace < buttonsWidth) {
+			if (buttonsStates[index + 1]) {
+				currentState = buttonsStates[index + 1];
+			}
+			this.set("buttonsLayout", currentState);
+			this.view.render({"name": "buttons"});
+		} else if (freeSpace > (2 * buttonsWidth)) {
+			var indexOfConfiguredState = $.inArray(configuredButtonsState, buttonsStates);
+			if (indexOfConfiguredState < index && buttonsStates[index - 1]) {
+				currentState = buttonsStates[index - 1];
+			} else {
+				currentState = configuredButtonsState;
+			}
+			this.set("buttonsLayout", currentState);
+			this.view.render({"name": "buttons"});
+		}
+	}
+
+	this._checkItemContentHeight();
+};
+
+card.methods._checkItemContentHeight = function() {
+	var body = this.view.get("body");
+	var text = this.view.get("text");
+	var button = this.view.get("seeMore");
+
+	if (body && button) {
+		var maxBodyHeight = this.config.get("limits.maxBodyHeight");
+		var lineHeight = parseInt(text.css("line-height"), 10);
+		var fontSize = parseInt(text.css("font-size"), 10);
+
+		var lineCount = Math.round(maxBodyHeight / lineHeight);
+		var realMaxHeight = lineCount * lineHeight - fontSize / 2;
+		var coeffToShow = 1.2; // we don't need to hide text if it's height <= 120% of maxBodyHeight
+		if (text.height() > realMaxHeight * coeffToShow && !button.is(":visible")) {
+			body.css("max-height", realMaxHeight);
+			button.show();
+		} else if (text.height() < realMaxHeight && button.is(":visible")) {
+			body.css("max-height", "");
+			button.hide();
+		}
+	}
+};
+
+var cache = {};
+card.methods._transitionSupported = function() {
+	if (!cache.transitionSupported) {
+		var s = document.createElement('p').style;
+		cache.transitionSupported = 'transition' in s ||
+			'WebkitTransition' in s ||
+			'MozTransition' in s ||
+			'msTransition' in s ||
+			'OTransition' in s;
+	}
+	return cache.transitionSupported;
+};
+
+card.methods._getActiveVisualizer = function() {
+	var self = this;
+	if (!this.visualizer) {
+		var itemTypes = this.get("data.object.objectTypes");
+		$.each(this.visualizers, function(_, visualizer) {
+			var handledTypes = visualizer.objectTypes;
+			var found = false;
+			$.each(handledTypes, function(type, validators) {
+				if (!~$.inArray(type, itemTypes)) return;
+				self.parseContent(visualizer);
+				$.each(validators, function(i, valid) {
+					if (!valid()) {
+						found = false;
+						return false;
+					}
+					found = true;
+				});
+				if (found) return false;
+			});
+			if (found) {
+				self.visualizer = visualizer;
+				return false;
+			}
+		});
+	}
+	if (!this.visualizer) {
+		this.remove("data.object.parsedContent");
+	}
+	return this.visualizer;
+};
+
+card.methods._initVisualizer = function() {
+	var visualizer = this._getActiveVisualizer();
+	visualizer && visualizer.init();
 };
 
 card.methods._getDomain = function(url) {

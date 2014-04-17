@@ -977,7 +977,7 @@ composer.methods.removeMedia = function(index) {
  */
 composer.methods.registerComposer = function(config) {
 	if (!config || !config.id) {
-		this.log({"message": "Invalid composer configuration"});
+		this.log({"message": "Invalid composer configuration", "args": config});
 		return;
 	}
 	if (typeof config.requiresMedia === "undefined") {

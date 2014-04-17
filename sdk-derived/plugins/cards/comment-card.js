@@ -12,57 +12,30 @@ plugin.dependencies = [{
 
 plugin.init = function() {
 	var self = this;
-	this.component.registerModifier({
-		"isEnabled": $.proxy(this.isEnabled, this),
-		"init": function () {
-			self.events.subscribe({
-				"topic": "Echo.StreamServer.Controls.Card.onUpdate",
-				"handler": function() {
-					self.normalizer();
-				}
-			});
-			self.normalizer();
+	var hasAttachments = function() {
+		return !!self.component.get("data.object.parsedContent.oembed", []).length;
+	};
+	this.component.registerVisualizer({
+		"id": "comment",
+		"objectTypes": {
+			"http://activitystrea.ms/schema/1.0/note": ["allItems", hasAttachments],
+			"http://activitystrea.ms/schema/1.0/comment": ["allItems", hasAttachments],
+			"http://echoenabled.com/schema/1.0/link": ["allItems", hasAttachments],
+			"http://activitystrea.ms/schema/1.0/article": ["childItems", hasAttachments],
+			"http://activitystrea.ms/schema/1.0/image": ["childItems", hasAttachments],
+			"http://activitystrea.ms/schema/1.0/video": ["childItems", hasAttachments]
+		},
+		"multipleAttachments": true,
+		"init": function() {
 			self.extendTemplate("insertAsLastChild", "data", plugin.templates.media);
 		}
 	});
 };
 
-plugin.methods.normalizer = function() {
-	var content = $("<div/>").append(this.component.get("data.object.content"));
-	var attachments = $("div[data-oembed]", content).map(function() {
-		var oembed = $(this).data("oembed");
-		return Echo.Utils.oEmbedValidate(oembed) ? oembed : null;
-	}).get();
-
-	if (attachments.length) {
-		$("div[data-oembed]", content).remove();
-	}
-
-	this.component.set("data.content", content.html());
-	this.component.set("data.attachments", attachments);
-};
-
 plugin.templates.media = '<div class="{plugin.class:mediaContent}"></div>';
 
-plugin.component.renderers.body = function(element) {
-	var item = this.component;
-	var attachments = item.get("data.attachments", []);
-
-	if (attachments.length) {
-		var original = item.get("data.object.content");
-		var content = item.get("data.content");
-		item.set("data.object.content", content);
-		this.parentRenderer("body", arguments);
-		item.set("data.object.content", original);
-	} else {
-		this.parentRenderer("body", arguments);
-	}
-
-	return element;
-};
-
 plugin.renderers.mediaContent = function(element) {
-	var attachments = this.component.get("data.attachments");
+	var attachments = this.component.get("data.object.parsedContent.oembed");
 	new Echo.StreamServer.Controls.MediaContainer(this.config.assemble({
 		"target": element.empty(),
 		"data": attachments,
@@ -72,39 +45,6 @@ plugin.renderers.mediaContent = function(element) {
 	}));
 
 	return element.addClass(this.cssPrefix + (attachments.length > 1 ? "multiple" : "single"));
-};
-
-plugin.methods.isEnabled = function() {
-	var result = false;
-	var availableTypes = {
-		"all": [
-			"http://activitystrea.ms/schema/1.0/note",
-			"http://activitystrea.ms/schema/1.0/comment",
-			"http://echoenabled.com/schema/1.0/link"
-		],
-		"child": [
-			"http://activitystrea.ms/schema/1.0/article",
-			"http://activitystrea.ms/schema/1.0/image",
-			"http://activitystrea.ms/schema/1.0/video"
-		]
-	};
-	var item = this.component;
-	$.each(item.get("data.object.objectTypes", []), function(i, objectType) {
-		if (~$.inArray(objectType, availableTypes.all) ||
-				!item.isRoot() && ~$.inArray(objectType, availableTypes.child)
-		) {
-			result = true;
-			return false;
-		}
-	});
-
-	if (result) {
-			this.normalizer();
-			if (!item.get("data.attachments", []).length) {
-				result = false;
-			}
-	}
-	return result;
 };
 
 plugin.css =

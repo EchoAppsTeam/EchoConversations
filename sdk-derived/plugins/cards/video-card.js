@@ -7,16 +7,12 @@ if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
 	var self = this;
-	this.component.registerModifier({
-		"isEnabled": $.proxy(this.isEnabled, this),
-		"init": function () {
-			self.events.subscribe({
-				"topic": "Echo.StreamServer.Controls.Card.onUpdate",
-				"handler": function() {
-					self.normalizer();
-				}
-			});
-			self.normalizer();
+	this.component.registerVisualizer({
+		"id": "video",
+		"objectTypes": {
+			"http://activitystrea.ms/schema/1.0/video": ["rootItems"]
+		},
+		"init": function() {
 			self.extendTemplate("replace", "data", plugin.templates.label);
 			self.extendTemplate("insertAsFirstChild", "subwrapper", plugin.templates.video);
 		}
@@ -30,7 +26,7 @@ plugin.templates.video =
 				'<div class="{plugin.class:videoWrapper}">' +
 					'<div class="{plugin.class:videoPlaceholder}">' +
 						'<div class="{plugin.class:playButton}"></div>' +
-						'<img src="{data:oembed.thumbnail_url}" title="{data:oembed.title}"/>' +
+						'<img src="{data:object.parsedContent.oembed.thumbnail_url}" title="{data:object.parsedContent.oembed.title}">' +
 					'</div>' +
 				'</div>' +
 			'</div>' +
@@ -39,21 +35,21 @@ plugin.templates.video =
 
 plugin.templates.label =
 	'<div class="{plugin.class:label}">' +
-		'<div class="{plugin.class:title}" title="{data:oembed.title}">{data:oembed.title}</div>' +
-		'<div class="{plugin.class:description}">{data:oembed.description}</div>' +
+		'<div class="{plugin.class:title}" title="{data:object.parsedContent.oembed.title}">{data:object.parsedContent.oembed.title}</div>' +
+		'<div class="{plugin.class:description}">{data:object.parsedContent.oembed.description}</div>' +
 	'</div>';
 
 plugin.renderers.title = function(element) {
-	return this.component.get("data.oembed.title") ? element : element.hide();
+	return this.component.get("data.object.parsedContent.oembed.title") ? element : element.hide();
 };
 
 plugin.renderers.description = function(element) {
-	return this.component.get("data.oembed.description") ? element : element.hide();
+	return this.component.get("data.object.parsedContent.oembed.description") ? element : element.hide();
 };
 
 plugin.renderers.playButton = function(element) {
 	var self = this;
-	var oembed = this.component.get("data.oembed");
+	var oembed = this.component.get("data.object.parsedContent.oembed");
 	element.on("click", function() {
 		self.view.get("videoPlaceholder").empty().append($(oembed.html));
 	});
@@ -61,7 +57,7 @@ plugin.renderers.playButton = function(element) {
 };
 
 plugin.renderers.videoPlaceholder = function(element) {
-	var oembed = this.component.get("data.oembed");
+	var oembed = this.component.get("data.object.parsedContent.oembed");
 
 	if (!oembed.thumbnail_url) {
 		element.empty().append($(oembed.html));
@@ -72,22 +68,10 @@ plugin.renderers.videoPlaceholder = function(element) {
 
 plugin.renderers.videoWrapper = function(element) {
 	var item = this.component;
-	var width = +item.get("data.oembed.width");
+	var width = +item.get("data.object.parsedContent.oembed.width");
 	var maxWidth = +item.config.get("limits.maxMediaWidth");
 
 	return element.css("width", maxWidth && maxWidth < width ? maxWidth : width);
-};
-
-plugin.methods.normalizer = function() {
-	var content = $("<div/>")
-		.append(this.component.get("data.object.content"));
-	var oembed = $("div[data-oembed]", content).data("oembed") || {};
-	this.component.set("data.oembed", oembed);
-};
-
-plugin.methods.isEnabled = function() {
-	var item = this.component;
-	return item.isRoot() && ~$.inArray("http://activitystrea.ms/schema/1.0/video", item.get("data.object.objectTypes"));
 };
 
 plugin.css =
