@@ -1775,8 +1775,8 @@ card.css =
 	'.{class:container-root-thread} { padding: 10px 0px 0px 10px; }' +
 	'.{class:container-child} { padding: 10px; margin: 0px 20px 2px 0px; }' +
 	'.{class:container-child-thread} { padding: 10px; margin: 0px 20px 2px 0px; }' +
-	'.{class:avatar-wrapper} { margin-right: -58px; float: left; position: relative; }' +
-	'.{class:children} .{class:avatar-wrapper}, .{class:childrenByCurrentActorLive} .{class:avatar-wrapper} { margin: 10px -34px 0 0; }' +
+	'.{class:avatar-wrapper} { float: left; }' +
+	'.{class:children} .{class:avatar-wrapper}, .{class:childrenByCurrentActorLive} .{class:avatar-wrapper} { margin-top: 10px; }' +
 	'.{class:wrapper} { float: left; width: 100%; }' +
 	'.{class:subwrapper} { position: relative; }' +
 
@@ -1793,7 +1793,6 @@ card.css =
 	'.{class:modeSwitch} { float: right; width: 16px; height: 16px; background:url("{config:cdnBaseURL.sdk-assets}/images/curation/metadata/flip.png") no-repeat 0px 3px; }' +
 	'.{class:childrenMarker} { border-color: transparent transparent #ECEFF5; border-width: 0px 11px 11px; border-style: solid; margin: 3px 0px 0px 77px; height: 1px; width: 0px; display: none; }' + // This is magic "arrow up". Only color and margins could be changed
 	'.{class:container-root-thread} .{class:childrenMarker} { display: block; }' +
-	'.{class:authorName} { float: left; font-size: 15px; font-family: Arial, sans-serif; font-weight: bold; }' +
 	'.{class:re} { font-weight: bold; }' +
 	'.{class:re} a:link, .{class:re} a:visited, .{class:re} a:active { text-decoration: none; }' +
 	'.{class:re} a:hover { text-decoration: underline; }' +
@@ -1875,12 +1874,12 @@ card.css =
 	'.echo-sdk-ui .{class:mediaAvatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
 	'.{class:depth-0} .{class:footer} { padding: 8px 0px 10px; }' +
 	'.{class:depth-0} .{class:body} { padding-top: 0px; }' +
-	'.{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 18px; }' +
+	'.{class:depth-0} .{class:authorName} { font-weight: normal; font-size: 17px; line-height: 18px; float: none; }' +
 	'.{class:depth-0} .{class:subwrapper} { margin-left: 0px; }' +
 	'.{class:depth-0} .{class:childrenMarker} { display: none; }' +
 
-	'.{class:depth-0} .{class:header-container} { height: 36px; margin-right: 18px; margin-left: 45px; }' +
-	'.{class:header-container} { height: 28px; margin-right: 18px; margin-left: 34px; }' +
+	'.{class:depth-0} .{class:header-container} { height: 36px; margin-left: 45px; }' +
+	'.{class:header-container} { height: 28px; 18px; margin-left: 34px; }' +
 	'.{class:header-container}:before { content: ""; display: inline-block; height: 100%; vertical-align: middle; }' +
 	'.{class:header-centered} { display: inline-block; vertical-align: middle; max-width: 100%; max-width: 90%\\9; }' +
 	'.{class:depth-0} .{class:date} { line-height: 18px; }' +
