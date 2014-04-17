@@ -52,7 +52,7 @@ conversations.config = {
 		"displaySharingOnPost": true,
 		"displayCompactForm": true,
 		"compact": {
-			"mode": "inline",
+			"layout": "inline",
 			"prompt": "What's on your mind?"
 		},
 		"contentTypes": {
