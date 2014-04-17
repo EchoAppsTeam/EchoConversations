@@ -1445,7 +1445,7 @@ composer.css =
 		'{ color: #3c3c3c; border-color: transparent; box-shadow: none; }' +
 
 	'.echo-cardcomposer-delimiter { height: 0px; border-top: 1px dashed #d8d8d8; }' +
-	'.echo-cardcomposer-field-wrapper { padding: 7px 11px; border: 1px solid transparent; display: inline-block; width: 100%; box-sizing: border-box !important/* XXX: because of conversations*/; }' +
+	'.echo-cardcomposer-field-wrapper { margin: 7px 11px; border: 1px solid transparent; box-sizing: border-box !important/* XXX: because of conversations*/; }' +
 
 	'.{class:error} { border: 1px solid red; }' +
 	'.{class:error} input, .{class:error} textarea { background: no-repeat center right url({config:cdnBaseURL.sdk-assets}/images/warning.gif); }' +
