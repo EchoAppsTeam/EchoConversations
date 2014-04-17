@@ -1817,9 +1817,8 @@ card.css =
 	'.echo-sdk-ui .{class:dropdownButton} { display: inline; margin-left: 0px; }' +
 	'.echo-sdk-ui .{class:dropdownButton} > .dropdown { display: inline; }' +
 	'.echo-sdk-ui .{class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
-	'.{class:subcontainer} { background: #ffffff; border-bottom: 1px solid #e5e5e5; border-radius: 3px 3px 0px 0px; }' +
+	'.{class:subcontainer} { background: #ffffff; border-bottom: 1px solid #e5e5e5; }' +
 	'.{class:content} { background: #ffffff; position: relative; }' +
-	'.{class:content}.{class:depth-0} { border-radius: 2px 3px 0px 0px; }' +
 
 	'.echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
 	'.{class:date} { font-size: 12px; float: left; color: #d3d3d3; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; max-width: 100%; }' +
@@ -1827,7 +1826,7 @@ card.css =
 	'.{class:avatar} { width: 36px; height: 36px; display:inline-block; }' +
 	'.{class:children} .{class:avatar}, .{class:childrenByCurrentActorLive} .{class:avatar} { width: 28px; height: 28px; }' +
 
-	'.{class:container} { background: #f8f8f8; border-radius: 3px; }' +
+	'.{class:container} { background: #f8f8f8; }' +
 	'.{class:buttons} { white-space: nowrap; float: left; height: 23px; }' +
 	'.{class:metadata} { margin-bottom: 8px; }' +
 	'.{class:body} { padding-top: 0px; margin-bottom: 8px; overflow: hidden; }' +
@@ -1889,7 +1888,7 @@ card.css =
 	'.{class:data} { padding: 7px 0px 0px 0px; }' +
 	'.{class:container} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
 	'.{class} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
-	'.{class} { margin: 0px 0px 10px 0px; padding: 0px; border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; background: #ffffff; }' +
+	'.{class} { margin: 0px 0px 10px 0px; padding: 0px; border: 1px solid #d8d8d8; border-bottom-width: 2px; background: #ffffff; }' +
 
 	// see more
 	'.{class:seeMore}:before { content: ""; display: block; height: 3px; box-shadow: 0 -3px 3px rgba(0, 0, 0, 0.08); position: relative; top: 0px; }' +

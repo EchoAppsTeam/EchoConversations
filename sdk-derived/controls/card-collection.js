@@ -1793,10 +1793,10 @@ collection.css =
 	'.{class:state-message} { margin-left: 5px; text-decoration: none; }' +
 	'.echo-clickable a.{class:state-message}:hover { text-decoration: underline; }' +
 	'.{class:more}:hover, .{class:fullStateLayout}:hover { background-color: #E4E4E4; }' +
-	'.{class:more}, .{class:fullStateLayout} { text-align: center; border: solid 1px #E4E4E4; margin-top: 10px; padding: 10px; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; cursor: pointer; font-weight: bold; }' +
+	'.{class:more}, .{class:fullStateLayout} { text-align: center; border: solid 1px #E4E4E4; margin-top: 10px; padding: 10px; cursor: pointer; font-weight: bold; }' +
 	'div.{class:body} > div.echo-streamserver-controls-card:last-child ul.dropdown-menu { top: auto; bottom: 100%; }' +
 	'.{class:more} .echo-app-message { padding: 0; border: none; border-radius: 0; }' +
-	'.{class:more} { border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
+	'.{class:more} { border: 1px solid #d8d8d8; border-bottom-width: 2px; }' +
 	'.{class:messageText} { border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{class:header} { padding: 5px 0px 5px 0px; margin: 0px; font-size: 14px; }' +
 	'.{class:body} .echo-control-message { margin: 0px 0px 10px; border: 1px solid #d2d2d2; box-shadow: 0px 1px 1px #d2d2d2; border-radius: 3px; color: #c6c6c6; padding: 30px 0px 30px 0px; text-align: left;}' +
