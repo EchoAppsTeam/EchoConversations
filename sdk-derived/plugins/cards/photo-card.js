@@ -83,7 +83,8 @@ plugin.renderers.description = function(element) {
 
 plugin.renderers.photoThumbnail = function(element) {
 	var self = this;
-	var thumbnail = this.component.get("data.object.parsedContent.oembed.type") === "link"
+	var isArticle = this.component.get("data.object.parsedContent.oembed.type") === "link";
+	var thumbnail = isArticle
 		? this.component.get("data.object.parsedContent.oembed.thumbnail_url")
 		: this.component.get("data.object.parsedContent.oembed.url");
 	// we are to create empty img tag because of IE.
@@ -98,9 +99,13 @@ plugin.renderers.photoThumbnail = function(element) {
 		img.attr("title", element.attr("title"));
 	}
 	img.error(function(e) {
-		img.replaceWith(self.substitute({
-			"template": '<div class="{plugin.class:noMediaAvailable}"><span>{plugin.label:noMediaAvailable}</span></div>'
-		}));
+		if (isArticle) {
+			self.view.get("photo").hide();
+		} else {
+			img.replaceWith(self.substitute({
+				"template": '<div class="{plugin.class:noMediaAvailable}"><span>{plugin.label:noMediaAvailable}</span></div>'
+			}));
+		}
 	}).attr("src", thumbnail);
 	return element.replaceWith(img);
 };

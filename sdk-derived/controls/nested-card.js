@@ -239,7 +239,8 @@ card.renderers.videoWrapper = function(element) {
  */
 card.renderers.photoThumbnail = function(element) {
 	var self = this;
-	var thumbnail = this.get("data.type") === "link"
+	var isArticle = this.get("data.type") === "link";
+	var thumbnail = isArticle
 		? this.get("data.thumbnail_url")
 		: this.get("data.url");
 	// we are to create empty img tag because of IE.
@@ -258,9 +259,13 @@ card.renderers.photoThumbnail = function(element) {
 			"topic": "onMediaLoad"
 		});
 	}).error(function(e) {
-		img.replaceWith(self.substitute({
-			"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
-		}));
+		if (isArticle) {
+			self.view.get("photo").hide();
+		} else {
+			img.replaceWith(self.substitute({
+				"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
+			}));
+		}
 	}).attr("src", thumbnail);
 
 	return element.replaceWith(img);
