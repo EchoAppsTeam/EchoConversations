@@ -24,7 +24,7 @@ var $ = jQuery;
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
- * 			"name": "TweetDisplayCardUI"
+ * 			"name": "TweetDisplay"
  * 		}]
  * 	});
  *
@@ -32,7 +32,7 @@ var $ = jQuery;
  * work correctly. If {@link Echo.StreamServer.Controls.Stream.Plugins.PinboardVisualization PinboardVisualization}
  * plugin is also enabled in the Stream then this plugin must be placed right after it.
  *
- * <b>Note</b>: if TweetDisplayCardUI plugin is added to the stream then Reply and
+ * <b>Note</b>: if TweetDisplay plugin is added to the stream then Reply and
  * Like plugins will be disabled for tweet items. Moreover Reply control is
  * renamed with Comment on non-tweet items to avoid possible confusion.
  *
@@ -245,7 +245,7 @@ plugin.renderers.tweetUserName = function(element) {
 	return element.html(Echo.Utils.hyperlink({
 		"href": item.get("data.actor.id"),
 		"caption": "@" + this._extractTwitterID(),
-		"class": "echo-streamserver-controls-stream-item-authorName"
+		"class": "echo-streamserver-controls-card-authorName"
 	}, {
 		"openInNewWindow": true,
 		"skipEscaping": true
