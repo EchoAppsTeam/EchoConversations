@@ -688,6 +688,7 @@ plugin.events = {
 			"data": args,
 			"global": false
 		});
+		return {"stop": ["bubble"]};
 	}
 };
 
