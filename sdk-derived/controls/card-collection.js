@@ -239,8 +239,8 @@ collection.config = {
 	 * @cfg {Boolean} [liveUpdates.enabled=true]
 	 * Parameter to enable/disable live updates.
 	 *
-	 * @cfg {String} [liveUpdates.transport="polling"]
-	 * Preferred live updates receiveing machinery transport.
+	 * @cfg {String} [liveUpdates.transport="websockets"]
+	 * Preferred live updates receiving machinery transport.
 	 * The following transports are supported:
 	 *
 	 * + "polling" - periodic requests to check for updates
@@ -272,7 +272,7 @@ collection.config = {
 	 * to keep the connection alive.
 	 */
 	"liveUpdates": {
-		"transport": "polling", // or "websockets"
+		"transport": "websockets", // or "polling"
 		"enabled": true,
 		"polling": {
 			"timeout": 10
