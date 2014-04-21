@@ -121,9 +121,14 @@ composer.init = function() {
 };
 
 composer.destroy = function() {
+	var self = this;
 	this.tabs && this.tabs.destroy();
 	this.mediaContainer && this.mediaContainer.destroy();
 	this.toggleModeHandler && $(document).off("mouseup", this.toggleModeHandler);
+	this.view.get("postButton").off("click");
+	$.each(this.posting.subscriptions, function(id) {
+		self.events.unsubscribe({"handlerId": id});
+	});
 };
 
 composer.config = {
