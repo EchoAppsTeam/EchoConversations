@@ -1203,6 +1203,9 @@ card.methods.registerVisualizer = function(config) {
  */
 card.methods.parseContent = function(visualizer) {
 	visualizer = visualizer || this.visualizer;
+
+	if (!visualizer) return;
+
 	if (visualizer.parseContent) {
 		visualizer.parseContent();
 		return;
