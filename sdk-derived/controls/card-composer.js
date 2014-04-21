@@ -415,9 +415,11 @@ composer.events = {
 		"context": "global",
 		"handler": function() {
 			this.view.render({"name": "nameContainer"});
+			this.view.render({"name": "name"});
 			this.view.render({"name": "markersContainer"});
 			this.view.render({"name": "tagsContainer"});
 			this._updateUserStatus();
+			this._initCurrentComposer();
 		}
 	},
 	"Echo.StreamServer.Controls.CardComposer.onAutoSharingToggle": {
@@ -676,10 +678,17 @@ composer.renderers.auth = function(element) {
  */
 composer.renderers.nameContainer = function(element) {
 	var status = this._userStatus();
-	if (status === "logged" || status === "forcedLogin") {
-		element.remove();
-	}
-	return element;
+	return element[(status === "logged" || status === "forcedLogin") ? "hide" : "show"]();
+};
+
+/**
+ * @echo_renderer
+ */
+composer.renderers.name = function(element) {
+	var status = this._userStatus();
+	return (status === "logged" || status === "forcedLogin")
+		? element.removeAttr("required")
+		: element.attr("required", true);
 };
 
 /**

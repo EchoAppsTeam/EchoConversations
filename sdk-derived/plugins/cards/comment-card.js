@@ -118,7 +118,7 @@ plugin.methods.buildComposer = function() {
 	var self = this;
 	this.composer = $("<div>").append(
 		'<div class="echo-cardcomposer-field-wrapper">' +
-			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("prompt") + '"></textarea>' +
+			'<textarea class="echo-comment-composer-text" placeholder="' + this.labels.get("prompt") + '" required></textarea>' +
 		'</div>'
 	);
 	if (this.config.get("resolveURLs")) {
