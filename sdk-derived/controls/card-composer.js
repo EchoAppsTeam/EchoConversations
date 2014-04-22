@@ -1486,8 +1486,9 @@ composer.css =
 		'.{class:inline}.{class:forcedLogin} .{class:header},' +
 		'.{class:inline} .echo-streamserver-controls-auth-container { display: none; }' +
 	'.{class:inline} .{class:compactFieldWrapper} { margin-left: 38px; }' +
-	'.{class:inline}.{class:anonymous} .{class:compactFieldWrapper} { margin-left: 0px; }' +
-	'.{class:inline}.{class:container}:not(.{class:anonymous}) { padding-left: 12px; }' +
+	'.{class:inline}.{class:anonymous} .{class:compactFieldWrapper},' +
+		'.{class:inline}.{class:forcedLogin} .{class:compactFieldWrapper} { margin-left: 0px; }' +
+	'.{class:inline}.{class:container}.{class:logged} { padding-left: 12px; }' +
 	'.{class:inline} .{class:header} { float: left; margin: 0px; }' +
 	'.{class:inline} .echo-streamserver-controls-auth-avatarContainer,' +
 		'.{class:inline} .echo-streamserver-controls-auth-avatar { width: 28px; height: 28px; }' +
