@@ -1960,7 +1960,7 @@ card.css =
 	// indicator
 	'.{class:content} { position: relative; }' +
 	'.{class:indicator} { position: absolute; left: 0px; top: 0px; bottom: 0px; width: 4px; background-color: transparent; z-index: 10; }' +
-	'.{class:new} .{class:indicator} { background-color: #f5ba47; }' +
+	'.{class:container} .{class:new} .{class:indicator} { background-color: #f5ba47; }' +
 
 	cardDepthRules.join("\n");
 
