@@ -3,7 +3,7 @@
 
 var $ = jQuery;
 
-var plugin = Echo.Plugin.manifest("ItemsRollingWindow", "Echo.StreamServer.Controls.Stream");
+var plugin = Echo.Plugin.manifest("CardsRollingWindow", "Echo.StreamServer.Controls.CardCollection");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -12,7 +12,7 @@ plugin.config = {
 };
 
 plugin.events = {
-	"Echo.StreamServer.Controls.Stream.Item.onRender": function() {
+	"Echo.StreamServer.Controls.Card.onRender": function() {
 		var self = this;
 		var maxCount = this.get("maxCount");
 		var itemsToRemove = this.component.get("threads").slice(maxCount);
@@ -27,10 +27,10 @@ plugin.events = {
 			}
 		}
 	},
-	"Echo.StreamServer.Controls.Stream.onRerender": function() {
+	"Echo.StreamServer.Controls.CardCollection.onRerender": function() {
 		this._setMaxCount();
 	},
-	"Echo.StreamServer.Controls.Stream.onDataReceive": function(topic, args) {
+	"Echo.StreamServer.Controls.CardCollection.onDataReceive": function(topic, args) {
 		if (args.type === "children" || args.type === "live") return;
 		this._setMaxCount(args.type === "more");
 	}

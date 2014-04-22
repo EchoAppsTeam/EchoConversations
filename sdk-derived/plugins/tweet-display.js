@@ -4,7 +4,7 @@
 var $ = jQuery;
 
 /**
- * @class Echo.StreamServer.Controls.Stream.Item.Plugins.TweetDisplayCardUI
+ * @class Echo.StreamServer.Controls.Card.Plugins.TweetDisplay
  * Adds the Twitter intents controls into the item UI and updates the
  * item UI to look and behave like a Twitter item. The item UI update includes:
  *
@@ -20,11 +20,11 @@ var $ = jQuery;
  * To enable this plugin should be taken add the corresponding section into the
  * Echo Stream configuration parameter plugins:
  *
- * 	new Echo.StreamServer.Controls.Stream({
+ * 	new Echo.StreamServer.Controls.CardCollection({
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
- * 			"name": "TweetDisplayCardUI"
+ * 			"name": "TweetDisplay"
  * 		}]
  * 	});
  *
@@ -32,7 +32,7 @@ var $ = jQuery;
  * work correctly. If {@link Echo.StreamServer.Controls.Stream.Plugins.PinboardVisualization PinboardVisualization}
  * plugin is also enabled in the Stream then this plugin must be placed right after it.
  *
- * <b>Note</b>: if TweetDisplayCardUI plugin is added to the stream then Reply and
+ * <b>Note</b>: if TweetDisplay plugin is added to the stream then Reply and
  * Like plugins will be disabled for tweet items. Moreover Reply control is
  * renamed with Comment on non-tweet items to avoid possible confusion.
  *
@@ -44,7 +44,7 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("TweetDisplayCardUI", "Echo.StreamServer.Controls.Stream.Item");
+var plugin = Echo.Plugin.manifest("TweetDisplay", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -57,10 +57,10 @@ plugin.init = function() {
 	});
 
 	item.config.set("contentTransformations", config);
-	item.config.set("plugins.LikeCardUI.enabled", false);
-	item.config.set("plugins.ReplyCardUI.enabled", false);
-	item.config.set("plugins.CardUISocialSharing.enabled", false);
-	item.config.set("plugins.CommunityFlagCardUI.enabled", false);
+	item.config.set("plugins.Like.enabled", false);
+	item.config.set("plugins.Reply.enabled", false);
+	item.config.set("plugins.SocialSharing.enabled", false);
+	item.config.set("plugins.CommunityFlag.enabled", false);
 	// icon must be visible to show that the item is from Twitter
 	item.config.set("viaLabel.icon", true);
 
@@ -172,7 +172,7 @@ plugin.enabled = function() {
 };
 
 plugin.events = {
-	"Echo.StreamServer.Controls.Stream.Item.onRender": function(topic, args) {
+	"Echo.StreamServer.Controls.Card.onRender": function(topic, args) {
 		window.twttr && window.twttr.widgets && window.twttr.widgets.load();
 		$.map(this.component.buttons[this.name], function(name) {
 			if (name && name.element) {
@@ -245,7 +245,7 @@ plugin.renderers.tweetUserName = function(element) {
 	return element.html(Echo.Utils.hyperlink({
 		"href": item.get("data.actor.id"),
 		"caption": "@" + this._extractTwitterID(),
-		"class": "echo-streamserver-controls-stream-item-authorName"
+		"class": "echo-streamserver-controls-card-authorName"
 	}, {
 		"openInNewWindow": true,
 		"skipEscaping": true
@@ -278,7 +278,7 @@ plugin.methods._assembleButton = function(name) {
 				"href": "https://twitter.com/intent/" + name + "?in_reply_to=" + id + "&tweet_id=" + id,
 				"class": "{class:button} intentControl {class:button}-{data:name}",
 				"caption":
-					'<i class="{plugin.class:buttonIcon} icon-{data:name}"></i>' +
+					'<i class="{class:buttonIcon} icon-{data:name}"></i>' +
 					'<span class="echo-primaryFont {class:buttonCaption}">{data:label}</span>'
 			}, {
 				"openInNewWindow": true,
@@ -333,7 +333,7 @@ plugin.css =
 	".{plugin.css:screenName} { margin-left: 4px; font-size: 11px; font-weight: normal; padding-top: 1px; }" +
 	".{plugin.class:userName} a, .{plugin.class:tweetUserName} a, .{plugin.class:intentControl} { text-decoration: none; }" +
 	".{plugin.class:intentControl} { margin-right: 10px }" +
-	".{plugin.class:tweetUserName} { margin-left: 4px; padding-right: 5px; float: left; }" +
+	".{plugin.class:tweetUserName} { padding-right: 5px; float: left; max-width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }" +
 	".{plugin.class:date} { text-decoration: none; color: #C6C6C6; }" +
 	".{plugin.class:tweetScreenName} a { text-decoration: none; color: #333333; }" +
 	".{plugin.class:tweetDate} a.echo-secondaryFont { text-decoration: none; color: #C6C6C6; }" +

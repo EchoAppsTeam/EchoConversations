@@ -1,7 +1,7 @@
 (function($) {
 "use strict";
 
-var card = Echo.App.manifest("Echo.Conversations.NestedCard");
+var card = Echo.App.manifest("Echo.StreamServer.Controls.NestedCard");
 
 if (Echo.App.isDefined(card)) return;
 
@@ -9,34 +9,32 @@ card.templates.photo =
 	'<div class="{class:item}">' +
 		'<div class="{class:border}">' +
 			'<div class="{class:photo}">' +
-				'<div class="{class:photoAvatarWrapper}">' +
-					'<div class="{class:avatar} {class:photoAvatar}" title="{data:author_name}">' +
-						'<div></div>{data:author_name}' +
-					'</div>' +
-				'</div>' +
 				'<div class="{class:photoContainer}">' +
 					'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
 				'</div>' +
-				'<div class="{class:photoLabel}">' +
-					'<div class="{class:photoLabelContainer}">' +
-						'<div class="{class:title} {class:photoTitle}" title="{data:title}">' +
-							'<a class="echo-clickable" href="{data:url}" target="_blank">{data:title}</a>' +
-						'</div>' +
-						'<div class="{class:description} {class:photoDescription}">{data:description}</div>' +
-					'</div>' +
-				'</div>' +
 			'</div>' +
-			'<a class="{class:sourceIcon}" target="_blank"></a>' +
+
+			'<div class={class:content}>' +
+				'<div class="{class:avatar}" title="{data:author_name}">' +
+					'<div></div>{data:author_name}' +
+				'</div>' +
+				'<div class="{class:label}">' +
+					'<div class="{class:title}" title="{data:title}">' +
+						'<a class="echo-clickable" href="{data:url}" target="_blank">{data:title}</a>' +
+					'</div>' +
+					'<div class="{class:description}">{data:description}</div>' +
+				'</div>' +
+				'<a class="{class:sourceIcon}" target="_blank"></a>' +
+			'</div>' +
+
 		'</div>' +
+		'<div class="echo-primaryFont {class:closeButton}">&times;</div>' +
 	'</div>';
 
 card.templates.video =
 	'<div class="{class:item}">' +
 		'<div class="{class:border}">' +
 			'<div class="{class:video}">' +
-				'<div class="{class:avatar} {class:videoAvatar}" title="{data:author_name}">' +
-					'<div></div>{data:author_name}' +
-				'</div>' +
 				'<div class="{class:videoContainer}">' +
 					'<div class="{class:videoWrapper}">' +
 						'<div class="{class:videoPlaceholder}">' +
@@ -45,11 +43,21 @@ card.templates.video =
 						'</div>' +
 					'</div>' +
 				'</div>' +
-				'<div class="{class:title} {class:videoTitle}" title="{data:title}">{data:title}</div>' +
-				'<div class="{class:description} {class:videoDescription}">{data:description}</div>' +
-				'<a class="{class:sourceIcon}" target="_blank"></a>' +
+
+				'<div class="{class:content}">' +
+					'<div class="{class:avatar}" title="{data:author_name}">' +
+						'<div></div>{data:author_name}' +
+					'</div>' +
+					'<div class="{class:label}">' +
+						'<div class="{class:title}" title="{data:title}">{data:title}</div>' +
+						'<div class="{class:description}">{data:description}</div>' +
+					'</div>' +
+					'<a class="{class:sourceIcon}" target="_blank"></a>' +
+				'</div>' +
+
 			'</div>' +
 		'</div>' +
+		'<div class="echo-primaryFont {class:closeButton}">&times;</div>' +
 	'</div>';
 
 card.templates.link =
@@ -63,14 +71,13 @@ card.templates.link =
 					'<div class="{class:title} {class:articleTitle}" title="{data:title}">' +
 						'<a href="{data:url}" target="_blank">{data:title}</a>' +
 					'</div>' +
-					'<div class="{class:articleDescriptionContainer}">' +
-						'<div class="{class:articleDescription}">{data:description}</div>' +
-					'</div>' +
+					'<div class="{class:articleDescription}">{data:description}</div>' +
 				'</div>' +
 				'<div class="echo-clear"></div>' +
 				'<a class="{class:sourceIcon}" target="_blank"></a>' +
 			'</div>' +
 		'</div>' +
+		'<div class="echo-primaryFont {class:closeButton}">&times;</div>' +
 	'</div>';
 
 card.templates.main = function() {
@@ -113,7 +120,17 @@ card.config = {
 	},
 	"displaySourceIcon": true,
 	"displayAuthor": true,
-	"maximumMediaWidth": undefined
+	"maxMediaWidth": undefined
+};
+
+card.renderers.closeButton = function(element) {
+	var self = this;
+	if (!$.isFunction(this.config.get("onRemove"))) {
+		return element.hide();
+	}
+	return element.show().one("click", function() {
+		self.config.get("onRemove")(self.get("data"));
+	});
 };
 
 card.renderers.sourceIcon = function(element) {
@@ -163,15 +180,21 @@ card.renderers.sourceIcon = function(element) {
 };
 
 card.renderers.avatar = function(element) {
-	// we have to do it because filter must work in IE8 only
-	// in other cases we will have square avatar in IE 9
-	var isIE8 = document.all && document.querySelector && !document.addEventListener;
-	if (isIE8) {
-		element.children()[0].style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.config.get("defaultAvatar") + "', sizingMethod='scale')";
+	if (this.displayAuthor()) {
+		Echo.Utils.placeAvatar({
+			"target": element.children()[0],
+			"avatar": this.config.get("defaultAvatar")
+		});
+		return element;
+	} else {
+		return element.hide();
 	}
-	return this.displayAuthor()
-		? element
-		: element.hide();
+};
+
+card.renderers.label = function(element) {
+	return !this.get("data.title") && !this.get("data.description")
+		? element.hide()
+		: element;
 };
 
 card.renderers.title = function(element) {
@@ -205,8 +228,8 @@ card.renderers.videoPlaceholder = function(element) {
 
 card.renderers.videoWrapper = function(element) {
 	var width = this.get("data.width");
-	if (typeof this.config.get("maximumMediaWidth") === "number" && this.config.get("maximumMediaWidth") < width) {
-		width =  this.config.get("maximumMediaWidth");
+	if (typeof this.config.get("maxMediaWidth") === "number" && this.config.get("maxMediaWidth") < width) {
+		width = this.config.get("maxMediaWidth");
 	}
 	return element.css("width", width);
 };
@@ -216,7 +239,8 @@ card.renderers.videoWrapper = function(element) {
  */
 card.renderers.photoThumbnail = function(element) {
 	var self = this;
-	var thumbnail = this.get("data.type") === "link"
+	var isArticle = this.get("data.type") === "link";
+	var thumbnail = isArticle
 		? this.get("data.thumbnail_url")
 		: this.get("data.url");
 	// we are to create empty img tag because of IE.
@@ -224,8 +248,8 @@ card.renderers.photoThumbnail = function(element) {
 	// error event all the time.
 	var img = $("<img />");
 	img.attr("class", element.attr("class"));
-	if (this.config.get("maximumMediaWidth")) {
-		img.css("max-width", this.config.get("maximumMediaWidth"));
+	if (this.config.get("maxMediaWidth")) {
+		img.css("max-width", this.config.get("maxMediaWidth"));
 	}
 	if (element.attr("title")) {
 		img.attr("title", element.attr("title"));
@@ -235,9 +259,13 @@ card.renderers.photoThumbnail = function(element) {
 			"topic": "onMediaLoad"
 		});
 	}).error(function(e) {
-		img.replaceWith(self.substitute({
-			"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
-		}));
+		if (isArticle) {
+			self.view.get("photo").hide();
+		} else {
+			img.replaceWith(self.substitute({
+				"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
+			}));
+		}
 	}).attr("src", thumbnail);
 
 	return element.replaceWith(img);
@@ -283,21 +311,11 @@ card.renderers.photoContainer = function(element) {
 };
 
 card.renderers.photoLabelContainer = function(element) {
-	// calculate photoLabel max-height
-	var photoLabelHeight = 20 // photoLabelContainer padding
-		+ 2*16; // photoDescription line-height * lines count
-
-	if (this.get("data.title")) {
-		photoLabelHeight += 16 // photoTitle width
-			+ 5; // photoTitle margin
-	}
-	this.view.get("photoLabel").css("max-height", photoLabelHeight);
-
 	if (!this.get("data.description") && !this.get("data.title")) {
 		element.hide();
 	} else {
 		this.view.get("photoContainer").css({
-			"min-height": 55 + (this.displayAuthor() ? 55 : 0) + photoLabelHeight, // first number is added for default item avatar
+			"min-height": 55, // first number is added for default item avatar
 			"min-width": 200
 		});
 	}
@@ -312,28 +330,6 @@ card.renderers.article = function(element) {
 		element.addClass(this.cssPrefix + "withoutPhoto");
 	}
 	return element;
-};
-
-card.methods._onViewportChange = function(action, handler) {
-	if (action === "subscribe") {
-		this.events.subscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewScroll",
-			"handler": handler
-		});
-		this.events.subscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewResize",
-			"handler": handler
-		});
-	} else if (action === "unsubscribe") {
-		this.events.unsubscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewScroll",
-			"handler": handler
-		});
-		this.events.unsubscribe({
-			"topic": "Echo.Apps.Conversations.onAppViewResize",
-			"handler": handler
-		});
-	}
 };
 
 card.methods.displayAuthor = function() {
@@ -354,37 +350,31 @@ card.methods.getRenderType = function() {
 		: defaultType;
 };
 
-var transition = function(value) {
-	return $.map(["transition", "-o-transition", "-ms-transition", "-moz-transition", "-webkit-transition"], function(propertyName) {
-		return propertyName +': ' + value;
-	}).join(";");
-};
-
 card.css =
-	'.{class:title} { font-weight: bold; margin: 5px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:item} { text-align: left; font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; }' +
+	'.{class:item} { text-align: left; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; position: relative; }' +
 	'.{class:border} { white-space: normal; word-break: break-word; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; }' +
-	'.{class:item} .{class:sourceIcon} > img { width: 18px; height: 18px; }' +
-	'.echo-sdk-ui .{class:avatar} > div { width: 28px; height: 28px; background-size:cover; display:inline-block; background-position:center; border-radius: 50%; margin-right: 6px; }' +
+	'.{class:item} .{class:sourceIcon} > img { width: 18px; height: 18px; margin: 10px 0 10px 16px; }' +
+	'.{class:avatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; width: 36px; height: 36px; display:inline-block; margin-right: 6px; }' +
+	'.{class:avatar} { margin: 15px 16px 0 16px; font-size: 17px; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
 	'.{class:description} { overflow: hidden; }' +
+
+	'.echo-sdk-ui .{class:label} a:link, ' +
+		'.echo-sdk-ui .{class:label} a:visited, ' +
+		'.echo-sdk-ui .{class:label} a:hover, ' +
+		'.echo-sdk-ui .{class:label} a:active { color: #42474A; }' +
+
+	'.{class:label} { padding: 15px 0 10px 0; }' +
+	'.{class:title} { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 16px; line-height: 22px; margin: 0 16px; }' +
+	'.{class:description} { line-height: 21px; font-size: 15px; margin: 5px 16px 0 16px; }' +
+
+	// close button
+	'.{class:closeButton} { line-height: 1; opacity: 0.8; filter: alpha(opacity=80); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #000; text-shadow: 0 0 1px #FFF; }' +
+	'.{class:closeButton}:hover { opacity: 1; filter: alpha(opacity=100); }' +
 
 	// photo
 	'.{class:photo} .{class:noMediaAvailable} { position: relative; min-height: 145px; padding: 75px 10px 0 10px; background: #000; color: #FFF; min-width: 260px; text-align: center; }' +
-	'.{class:photoAvatarWrapper} { position: absolute; width: 100%; }' +
-	'.{class:photoAvatar} { color: #FFF; white-space: nowrap; padding: 12px; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:photoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
 	'.{class:photo} { position: relative; left: 0; top: 0; zoom: 1; }' +
-	'.{class:photo} + .{class:sourceIcon} > img { padding: 10px; }' +
-	'.{class:photoLabel} { position: absolute; bottom: 0; color: #FFF; width: 100%; background-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0.5); }' +
 	'.{class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; }' +
-
-	'.echo-sdk-ui .{class:photoLabel} a:link, .echo-sdk-ui .{class:photoLabel} a:visited, .echo-sdk-ui .{class:photoLabel} a:hover, .echo-sdk-ui .{class:photoLabel} a:active { color: #fff; }' +
-	'.{class:photoLabelContainer} { padding: 10px; }' +
-	'.{class:photoTitle} { margin: 0 0 5px 0; }' +
-
-	'.{class:photoLabel} { overflow: hidden; }' +
-	'.{class:photo}:hover .{class:photoLabel} { max-height: 60% !important; }' +
-	'.{class:photoLabel} { ' + transition('max-height ease 300ms') + '; }' +
 
 	// play button
 	'.{class:playButton} { cursor: pointer; position: absolute; top: 0; left: 0; bottom: 0; right: 0; z-index: 10; }' +
@@ -393,12 +383,6 @@ card.css =
 	'.{class:playButton}:hover { background-color: #3498DB; }' +
 
 	// video
-	'.{class:video} { padding: 10px; }' +
-	'.{class:video} .{class:sourceIcon} > img { padding: 10px 0 0 0; }' +
-	'.{class:videoAvatar} { margin-bottom: 8px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
-	'.{class:videoTitle} { margin: 10px 0 0 0; }' +
-	'.{class:videoAvatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; }' +
-	'.{class:videoDescription} { margin: 5px 0 0 0; }' +
 	'.{class:videoWrapper} { background: #000; max-width: 100%; margin: 0 auto; }' +
 	'.{class:videoContainer} { background: #000; }' +
 	'.{class:videoPlaceholder} img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }' +
@@ -408,12 +392,12 @@ card.css =
 	'.{class:videoPlaceholder} > object { position: absolute; top: 0; left: 0; width: 100%;100 height: 100%; }' +
 
 	// article
-	'.{class:article} { padding: 10px; min-width: 200px; }' +
-	'.{class:article} .{class:sourceIcon} > img { padding: 10px 0 0 0; }' +
+	'.{class:article} { padding: 10px 16px; min-width: 200px; }' +
+	'.{class:article} .{class:sourceIcon} > img { margin: 10px 0 0 0; }' +
 	'.{class:article} .{class:articleTitle} > a { color: #42474A; font-weight: bold; }' +
 	'.{class:article} .{class:articleTitle} > a:hover { color: #42474A; }' +
-	'.{class:articleTitle} { margin-left: 10px; margin-top: 0px; line-height: 16px; }' +
-	'.{class:articleDescription} { margin-left: 10px; font-size: 13px; line-height: 16px; }' +
+	'.{class:articleTitle} { margin: 0 0 0 10px; font-size: 16px; line-height: 22px; }' +
+	'.{class:articleDescription} { overflow: hidden; margin: 5px 0 0 10px; line-height: 21px; font-size: 15px; }' +
 	'.{class:articleThumbnail} { width: 30%; float: left; max-width: 120px; max-height: 120px; text-align:center; overflow:hidden; }' +
 	'.{class:articleThumbnail} img { width: auto; height: auto; max-height:120px; max-width:120px; }' +
 	'.{class:articleTemplate} { width: 70%; float: left; }' +

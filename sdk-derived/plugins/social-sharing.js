@@ -1,12 +1,12 @@
 (function($) {
 "use strict";
 
-var plugin = Echo.Plugin.manifest("CardUISocialSharing", "Echo.StreamServer.Controls.Stream.Item");
+var plugin = Echo.Plugin.manifest("SocialSharing", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
-	this.component.addButtonSpec("CardUISocialSharing", this._assembleButton("Share"));
+	this.component.addButtonSpec("SocialSharing", this._assembleButton("Share"));
 };
 
 plugin.labels = {

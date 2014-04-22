@@ -4,6 +4,7 @@
 	"description": "Echo Conversations reference app",
 	"app_version": "{%=packageVersions.stable%}",
 	"cloudapp_protocol_version": "1.0.0",
+	"icon": "{%=baseURLs.prod%}/images/icon.png",
 	"developer": {
 		"id": "echo",
 		"name": "Echo",

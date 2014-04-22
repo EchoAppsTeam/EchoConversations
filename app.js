@@ -6,6 +6,7 @@ if (Echo.App.isDefined("Echo.Apps.Conversations")) return;
 var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 
 conversations.config = {
+	"refreshOnUserInvalidate": false,
 	"targetURL": "",
 	"bozoFilter": false,
 	"viewportChangeTimeout": 50,
@@ -19,17 +20,27 @@ conversations.config = {
 		"displaySharingOnPost": true,
 		"contentTypes": {
 			"comments": {
-				"visible": true,
-				"prompt": "What's on your mind?",
+				"renderer": "CommentCard",
+				"enabled": true,
 				"resolveURLs": true,
 				"attachments": {
 					"visible": false,
-					"sources": ""
+					"sources": "COMPUTER, IMAGE_SEARCH, INSTAGRAM, PICASA, FLICKR, FACEBOOK, DROPBOX, URL, WEBCAM"
 				}
+			},
+			"photos": {
+				"renderer": "PhotoCard",
+				"enabled": true,
+				"sources": "COMPUTER, IMAGE_SEARCH, INSTAGRAM, PICASA, FLICKR, FACEBOOK, DROPBOX, URL, WEBCAM"
+			},
+			"links": {
+				"renderer": "LinkCard",
+				"enabled": true,
+				"blockedDomains": []
 			}
 		},
 		"confirmation": {
-			"enable": true,
+			"enabled": true,
 			"message": "Thanks, your post has been submitted for review",
 			"timeout": 5000,
 			"hidingTimeout": 300
@@ -40,20 +51,34 @@ conversations.config = {
 		"visible": true,
 		"displaySharingOnPost": true,
 		"displayCompactForm": true,
+		"compact": {
+			"layout": "inline",
+			"prompt": "What's on your mind?"
+		},
 		"contentTypes": {
 			"comments": {
-				"visible": true,
+				"renderer": "CommentCard",
+				"enabled": true,
 				"prompt": "What's on your mind?",
 				"resolveURLs": true,
 				"attachments": {
 					"visible": false,
-					"sources": ""
+					"sources": "COMPUTER, IMAGE_SEARCH, INSTAGRAM, PICASA, FLICKR, FACEBOOK, DROPBOX, URL, WEBCAM"
 				}
-
+			},
+			"photos": {
+				"renderer": "PhotoCard",
+				"enabled": true,
+				"sources": "COMPUTER, IMAGE_SEARCH, INSTAGRAM, PICASA, FLICKR, FACEBOOK, DROPBOX, URL, WEBCAM"
+			},
+			"links": {
+				"renderer": "LinkCard",
+				"enabled": true,
+				"blockedDomains": []
 			}
 		},
 		"confirmation": {
-			"enable": true,
+			"enabled": true,
 			"message": "Thanks, your post has been submitted for review",
 			"timeout": 5000
 		},
@@ -64,7 +89,8 @@ conversations.config = {
 		"label": "Top Posts",
 		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",
-		"collapsedContentHeight": 110, // px
+		"maxMediaWidth": undefined,
+		"maxItemBodyHeight": 110, // px
 		"initialItemsPerPage": 5,
 		"initialSortOrder": "reverseChronological",
 		"includeTopContributors": true,
@@ -104,14 +130,37 @@ conversations.config = {
 		"events": {
 			"onPostCountUpdate": null
 		},
-		"plugins": []
+		"plugins": [],
+		"contentTypes": {
+			"comments": {
+				"renderer": "CommentCard",
+				"enabled": true
+			},
+			"photos": {
+				"renderer": "PhotoCard",
+				"enabled": true
+			},
+			"links": {
+				"name": "LinkCard",
+				"enabled": true
+			},
+			"articles": {
+				"renderer": "ArticleCard",
+				"enabled": true
+			},
+			"videos": {
+				"renderer": "VideoCard",
+				"enabled": true
+			}
+		}
 	},
 	"allPosts": {
 		"visible": true,
 		"label": "All Posts",
 		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",
-		"collapsedContentHeight": 110, // px
+		"maxMediaWidth": undefined,
+		"maxItemBodyHeight": 110, // px
 		"initialItemsPerPage": 15,
 		"initialSortOrder": "reverseChronological",
 		"displaySourceIcons": true,
@@ -156,7 +205,29 @@ conversations.config = {
 		"events": {
 			"onPostCountUpdate": null
 		},
-		"plugins": []
+		"plugins": [],
+		"contentTypes": {
+			"comments": {
+				"renderer": "CommentCard",
+				"enabled": true
+			},
+			"photos": {
+				"renderer": "PhotoCard",
+				"enabled": true
+			},
+			"links": {
+				"renderer": "LinkCard",
+				"enabled": true
+			},
+			"articles": {
+				"renderer": "ArticleCard",
+				"enabled": true
+			},
+			"videos": {
+				"renderer": "VideoCard",
+				"enabled": true
+			}
+		}
 	},
 	"moderationQueue": {
 		"label": "Moderation Queue",
@@ -190,7 +261,10 @@ conversations.config = {
 			}
 		},
 		"FilePicker": {
-			"apiKey": "AFLWUBllDRwWZl7sQO1V1z"
+			"apiKey": undefined
+		},
+		"embedly": {
+			"apiKey": undefined
 		}
 	},
 	"topMarkers": {
@@ -198,10 +272,9 @@ conversations.config = {
 		"user": "Conversations.TopContributor"
 	},
 	"presentation": {
-		"minimumWidth": 320,
-		"maximumHeight": undefined,
-		"maximumWidth": undefined,
-		"maximumMediaWidth": undefined
+		"minWidth": 320,
+		"maxHeight": undefined,
+		"maxWidth": undefined
 	}
 };
 
@@ -259,19 +332,31 @@ conversations.config.normalizer = {
 
 conversations.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js",
-	"control": "Echo.StreamServer.Controls.Stream"
+	"control": "Echo.StreamServer.API"
+}, {
+	"url": "{%= baseURLs.dev %}/streamserver.pack.js",
+	"control": "Echo.StreamServer.Controls.CardComposer"
+}, {
+	"url": "{%= baseURLs.prod %}/third-party/jquery.placeholder.js",
+	"loaded": function() { return !!$.placeholder; }
 }, {
 	"loaded": function() { return !!Echo.GUI; },
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.js"
 }, {
 	"url": "{config:cdnBaseURL.sdk}/gui.pack.css"
-}, {
-	"url": "{%= baseURLs.prod %}/third-party/jquery.embedly.js",
-	"loaded": function() { return !!$.fn.embedly; }
 }];
 
 conversations.events = {
-	"Echo.StreamServer.Controls.Stream.onActivitiesCountChange": function(_, data) {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() {
+			// re-render allPosts to show moderationQueue if it is enabled.
+			if (this._moderationQueueEnabled()) {
+				this.view.render({"name": "allPosts"});
+			}
+		}
+	},
+	"Echo.StreamServer.Controls.CardCollection.onActivitiesCountChange": function(_, data) {
 		var allPosts = this.getComponent("allPosts");
 		// display activities for 'allPosts' section only.
 		if (allPosts && allPosts.config.get("context") === data.context) {
@@ -279,7 +364,7 @@ conversations.events = {
 			this.view.render({"name": "itemsWaiting"});
 		}
 	},
-	"Echo.StreamServer.Controls.Counter.onUpdate": function(_, data) {
+	"Echo.StreamServer.Controls.PostCounter.onUpdate": function(_, data) {
 		var app = this;
 		$.each(["allPosts", "topPosts", "moderationQueue"], function(k, componentName) {
 			var component = app.getComponent(componentName + "Counter");
@@ -430,20 +515,13 @@ conversations.renderers.itemsWaiting = function(element) {
 
 conversations.renderers.container = function(element) {
 	var presentation = this.config.get("presentation");
-	var styles = {};
-	if (presentation.minimumWidth) {
-		styles["min-width"] = presentation.minimumWidth;
-	}
-	if (presentation.maximumWidth) {
-		styles["max-width"] = presentation.maximumWidth;
-	}
-	if (presentation.maximumHeight) {
-		styles["max-height"] = presentation.maximumHeight;
-		styles["overflow-y"] = "auto";
-	}
-	element.css(styles);
+	element.css({
+		"max-width": presentation.maxWidth,
+		"min-width": presentation.minWidth,
+		"max-height": presentation.maxHeight,
+		"overflow-y": presentation.maxHeight ? "auto" : "none"
+	});
 	return element;
-
 };
 
 conversations.renderers.content = function(element) {
@@ -457,9 +535,9 @@ conversations.renderers.content = function(element) {
 };
 
 conversations.renderers.postComposer = function(element) {
-	var config = this.config.get("postComposer");
-
-	if (!this._isComposerVisible("postComposer")) {
+	var postComposer = $.extend(true, {}, this.config.get("postComposer"));
+	var contentTypePlugins = this._getContentTypePlugins("postComposer");
+	if (!postComposer.visible || !contentTypePlugins.length) {
 		return element;
 	}
 
@@ -467,10 +545,13 @@ conversations.renderers.postComposer = function(element) {
 	var enableBundledIdentity = this.config.get("auth.enableBundledIdentity");
 	var ssConfig = this.config.get("dependencies.StreamServer");
 
+	var plugins = postComposer.plugins;
+	delete postComposer.plugins;
+
 	this.initComponent({
 		"id": "postComposer",
-		"component": "Echo.StreamServer.Controls.Submit",
-		"config": $.extend(true, {
+		"component": "Echo.StreamServer.Controls.CardComposer",
+		"config": $.extend(true, postComposer, {
 			"appkey": ssConfig.appkey,
 			"apiBaseURL": ssConfig.apiBaseURL,
 			"submissionProxyURL": ssConfig.submissionProxyURL,
@@ -479,39 +560,19 @@ conversations.renderers.postComposer = function(element) {
 			"targetURL": targetURL,
 			"infoMessages": {"enabled": false},
 			"markers": this._getSubmitMarkers(),
-			"data": {
-				"object": {
-					"content": Echo.Utils.get(Echo.Variables, targetURL, "")
-				}
+			"confirmation": {
+				"enabled": this._isModerationRequired() && postComposer.confirmation.enabled
 			},
-			"ready": function() {
-				this.view.get("text").on("change", function() {
-					Echo.Utils.set(Echo.Variables, targetURL, $(this).val());
-				});
-			}
-		}, this.config.get("postComposer"), {
+			"auth": this.config.get("auth"),
+			"submitPermissions": this._getSubmitPermissions(),
+			"dependencies": this.config.get("dependencies"),
 			"plugins": this._mergeSpecsByName([{
-				"name": "URLResolver",
-				"enabled": this.config.get("postComposer.contentTypes.comments.resolveURLs"),
-				"filePicker": {
-					"key": this.config.get("dependencies.FilePicker.apiKey"),
-				"visible": this.config.get("postComposer.contentTypes.comments.attachments.visible"),
-				"sources": this.config.get("postComposer.contentTypes.comments.attachments.sources")
-				}
-			}, {
 				"name": "JanrainBackplaneHandler",
 				"appId": this.config.get("dependencies.Janrain.appId"),
 				"enabled": enableBundledIdentity,
 				"authWidgetConfig": this.config.get("auth.authWidgetConfig"),
 				"sharingWidgetConfig": this.config.get("auth.sharingWidgetConfig")
-			}, $.extend(true, this.config.get("postComposer"), {
-				"name": "CardUIShim",
-				"submitPermissions": this._getSubmitPermissions(),
-				"confirmation": {
-					"enable": this._isModerationRequired() && this.config.get("postComposer.confirmation.enable")
-				},
-				"auth": this.config.get("auth")
-			})], config.plugins)
+			}].concat(contentTypePlugins), plugins)
 		})
 	});
 	return element;
@@ -545,7 +606,7 @@ conversations.renderers.topPosts = function(element) {
 	if (this.config.get("topPosts.visible")) {
 		this.initComponent({
 			"id": "topPosts",
-			"component": "Echo.StreamServer.Controls.Stream",
+			"component": "Echo.StreamServer.Controls.CardCollection",
 			"config": this._assembleStreamConfig("topPosts", {
 				"onItemAdd": function() {
 					self.view.render({"name": "topPostsContainer"});
@@ -606,7 +667,7 @@ conversations.renderers._allPosts = function(element, extra) {
 	});
 	var component = this.initComponent({
 		"id": "allPosts",
-		"component": "Echo.StreamServer.Controls.Stream",
+		"component": "Echo.StreamServer.Controls.CardCollection",
 		"config": this._assembleStreamConfig("allPosts", {
 			"target": $("<div>")
 		})
@@ -664,7 +725,7 @@ conversations.renderers._tabs = function(element, extra) {
 			}));
 			var component = self.initComponent({
 				"id": tab.name,
-				"component": "Echo.StreamServer.Controls.Stream",
+				"component": "Echo.StreamServer.Controls.CardCollection",
 				"config": self._assembleStreamConfig(tab.name, {
 					"target": $("<div>")
 				})
@@ -765,13 +826,13 @@ conversations.renderers._streamTitle = function(element, extra) {
 	if (config.displayCounter) {
 		this.initComponent({
 			"id": extra.id + "Counter",
-			"component": "Echo.StreamServer.Controls.Counter",
+			"component": "Echo.StreamServer.Controls.PostCounter",
 			"config": {
 				"target": view.get("streamCounter"),
 				"infoMessages": {
 					"layout": "compact"
 				},
-				"plugins": [{"name": "CounterCardUI"}],
+				"plugins": [{"name": "CountVisualization"}],
 				"query": this._assembleCounterQuery(extra.id),
 				"data": this.get("data." + extra.id + "-count")
 			}
@@ -814,16 +875,6 @@ conversations.methods._viewportChange = function() {
 	}, this.config.get("viewportChangeTimeout"));
 };
 
-conversations.methods._moveStreamingStateCursor = function(event) {
-	var cursor = this.view.get("streamingStateCursor");
-	if (cursor) {
-		cursor.css({
-			"left": event.clientX,
-			"top": event.clientY
-		});
-	}
-};
-
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 	// StreamServer config
 	var ssConfig = this.config.get("dependencies.StreamServer");
@@ -847,6 +898,10 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"emptyStream": config.noPostsMessage
 		},
 		"item": {
+			"limits": {
+				"maxBodyHeight": config.maxItemBodyHeight,
+				"maxMediaWidth": config.maxMediaWidth
+			},
 			"reTag": false,
 			"markAsRead": config.markItemsAsReadOn,
 			"viaLabel": {
@@ -875,18 +930,13 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 		"authWidgetConfig": auth.authWidgetConfig,
 		"sharingWidgetConfig": auth.sharingWidgetConfig
 	}, {
-		"name": "CardUIShim",
-		"topPost": {
-			"visible": config.displayTopPostHighlight,
-			"marker": this.config.get("topMarkers.item")
-		},
-		"collapsedContentHeight": this.config.get(componentID + ".collapsedContentHeight"),
-		"displayTopPostHighlight": config.displayTopPostHighlight,
-		"initialIntentsDisplayMode": this.config.get(componentID + ".initialIntentsDisplayMode")
+		"name": "TopPostIndicator",
+		"enabled": config.displayTopPostHighlight,
+		"marker": this.config.get("topMarkers.item")
 	}, {
-		"name": "TweetDisplayCardUI"
+		"name": "TweetDisplay"
 	}, {
-		"name": "ItemEventsProxy",
+		"name": "CardEventsProxy",
 		"onAdd": function() {
 			var counter = self.getComponent(componentID + "Counter");
 			counter && counter.request.liveUpdates.start(true);
@@ -898,16 +948,13 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 			overrides.onItemDelete && overrides.onItemDelete();
 		}
 	}, {
-		"name": "ItemsRollingWindow",
+		"name": "CardsRollingWindow",
 		"moreButton": true
-	}, {
-		"name": "URLResolver",
-		"presentation": this.config.get("presentation")
 	}], this._getConditionalStreamPluginList(componentID), [{
-		"name": "ModerationCardUI",
+		"name": "Moderation",
 		"extraActions": moderationExtraActions,
 		"topMarkers": this.config.get("topMarkers")
-	}]);
+	}], this._getContentTypePlugins(componentID));
 
 	return this._mergeSpecsByName(plugins, config.plugins);
 };
@@ -915,66 +962,52 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	var auth = this.config.get("auth");
 	var config = this.config.get(componentID);
+	var replyContentTypePlugins = this._getContentTypePlugins("replyComposer");
+
+	var replyComposer = $.extend(true, {}, this.config.get("replyComposer"));
+	var composerPlugins = replyComposer.plugins;
+	delete replyComposer.plugins;
 
 	var plugins = [{
 		"intentID": "Like",
-		"name": "LikeCardUI",
+		"name": "Like",
+		"item": {
+			"avatar": true,
+			"text": false
+		},
 		"displayStyle": config.likesDisplayStyle
 	}, {
 		"intentID": "CommunityFlag",
-		"name": "CommunityFlagCardUI"
-	}, $.extend(true, {
-		"requestMethod": "POST"
-	}, this.config.get("replyComposer"), {
+		"name": "CommunityFlag",
+		"showUserList": false
+	}, $.extend(true, replyComposer, {
 		"intentID": "Reply",
-		"name": "ReplyCardUI",
-		"enabled": this._isComposerVisible("replyComposer"),
-		"actionString": this.config.get("replyComposer.contentTypes.comments.prompt"),
-		"pauseTimeout": +this._isModerationRequired() && this.config.get("replyComposer.confirmation.timeout"),
+		"name": "Reply",
+		"enabled": replyComposer.visible && replyContentTypePlugins.length,
 		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
-		// TODO: pass markers through data
-		"extraMarkers": this._getSubmitMarkers(["topPost"]),
+		"pauseTimeout": +(this._isModerationRequired() && replyComposer.confirmation.timeout),
+		"requestMethod": "POST",
+		"auth": this.config.get("auth"),
+		"confirmation": {
+			"enabled": this._isModerationRequired() && replyComposer.confirmation.enabled
+		},
+		"submitPermissions": this._getSubmitPermissions(),
 		"nestedPlugins": this._mergeSpecsByName([{
-			"name": "URLResolver",
-			"enabled": this.config.get("replyComposer.contentTypes.comments.resolveURLs"),
-			"filePicker": {
-				"key": this.config.get("dependencies.FilePicker.apiKey"),
-				"visible": this.config.get("replyComposer.contentTypes.comments.attachments.visible"),
-				"sources": this.config.get("replyComposer.contentTypes.comments.attachments.sources")
-			}
-		}, {
 			"name": "JanrainBackplaneHandler",
 			"appId": this.config.get("dependencies.Janrain.appId"),
 			"enabled": auth.enableBundledIdentity,
 			"authWidgetConfig": auth.authWidgetConfig,
 			"sharingWidgetConfig": auth.sharingWidgetConfig
-		}, $.extend(true, this.config.get("replyComposer"), {
-			"name": "CardUIShim",
-			"auth": this.config.get("auth"),
-			"confirmation": {
-				"enable": this._isModerationRequired() && this.config.get("replyComposer.confirmation.enable")
-			},
-			"submitPermissions": this._getSubmitPermissions()
-		})], this.config.get("replyComposer.plugins"))
+		}].concat(replyContentTypePlugins), composerPlugins)
 	}), {
 		"intentID": "Sharing",
-		"name": "CardUISocialSharing"
+		"name": "SocialSharing"
 	}, {
 		"intentID": "Edit",
 		"name": "Edit",
-		"icon": "icon-pencil", // TODO: get rid of it when new buttons protocol will be implemented
-		"requestMethod": "POST",
-		"nestedPlugins": [{
-			"name": "URLResolver",
-			// we enable resolving through separate parameter
-			// because it should works for submit and item as well
-			"resolveURLs": this._getResolverSettingForEditPlugin(),
-			"filePicker": {
-				"key": this.config.get("dependencies.FilePicker.apiKey"),
-				"visible": this.config.get("postComposer.contentTypes.comments.attachments.visible"),
-				"sources": this.config.get("postComposer.contentTypes.comments.attachments.sources")
-			}
-		}]
+		"rootNestedPlugins": this._getContentTypePlugins("postComposer"),
+		"childNestedPlugins": replyContentTypePlugins,
+		"requestMethod": "POST"
 	}];
 
 	return $.grep(plugins, function(plugin) {
@@ -982,27 +1015,13 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	});
 };
 
-conversations.methods._getResolverSettingForEditPlugin = function() {
-	var postComposer = this.config.get("postComposer.contentTypes.comments.resolveURLs");
-	var replyComposer = this.config.get("replyComposer.contentTypes.comments.resolveURLs");
-	var setting;
-	if (postComposer && replyComposer) {
-		setting = "all";
-	} else if (postComposer) {
-		setting = "only-roots";
-	} else if (replyComposer) {
-		setting = "only-children";
-	} else {
-		setting = "disabled";
-	}
-	return setting;
-};
-
-conversations.methods._isComposerVisible = function(composerID) {
-	var config = this.config.get(composerID);
-	return config.visible && !!$.map(config.contentTypes, function(type) {
-		return type.visible ? type : undefined;
-	}).length;
+conversations.methods._getContentTypePlugins = function(componentID) {
+	//TODO: we should somehow determine order of content type plugins
+	return $.map(this.config.get(componentID + ".contentTypes"), function(value) {
+		if (!value.enabled && !!value.renderer) return;
+		value.name = value.renderer;
+		return value;
+	});
 };
 
 conversations.methods._getSubmitPermissions = function() {
@@ -1280,7 +1299,7 @@ conversations.css =
 	'.{class:streamCounter} { font-size: 14px; }' +
 
 	// streaming state
-	'.{class:streamingStateContainer} { text-align: left; margin-bottom: 5px; font-family: "Helvetica Neue", arial, sans-serif; }' +
+	'.{class:streamingStateContainer} { text-align: left; margin-bottom: 5px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }' +
 	'.{class:streamingState} { padding-left: 15px; float: right; font-size: 13px; color: #c6c6c6; }' +
 	'.{class:streamingState-live} { background: url({config:cdnBaseURL.sdk-assets}/images/control_play.png) no-repeat left 3px; }' +
 	'.{class:streamingState-paused} { background: url({config:cdnBaseURL.sdk-assets}/images/control_pause.png) no-repeat left 3px; }' +
@@ -1289,7 +1308,7 @@ conversations.css =
 	// streamSorter dropdown
 	'.{class:streamSorter} { font-size: 13px; }' +
 	'.echo-sdk-ui .{class:streamSorter}:focus { outline: none; }' +
-	'.{class:streamSorter} > ul > li > a { background: url("{%= baseURLs.prod %}/images/marker.png") no-repeat right center; padding-right: 20px; }' +
+	'.{class:streamSorter} > ul > li > a { background: url("{%= baseURLs.prod %}/sdk-derived/images/marker.png") no-repeat right center; padding-right: 20px; }' +
 	'.{class:streamSorter} ul.nav { margin-bottom: 0px; font-size: 13px; }' +
 	'.{class:streamSorter} ul.nav > li > a { text-decoration: none; color: #C6C6C6; line-height: 18px; }' +
 	'.{class:streamSorter} .dropdown-menu { float: right; left: auto; right: 0; }' +
@@ -1317,15 +1336,14 @@ conversations.css =
 	'.echo-sdk-ui .nav.{class:tabs} .dropdown-menu { border-radius: 6px; }' +
 
 	// common
-	'.{class:container} .echo-control-message { font-family: "Helvetica Neue", arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px; }' +
+	'.{class:container} .echo-control-message { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{class:container} { position:relative; }' +
 	'.{class:resizeFrame} { position:absolute; z-index:-1; border:0; padding:0; }' +
-	'.{class:container} { min-height: 200px; }' +
 	'.{class:container} li > a, ' +
 	'.{class:container} .echo-primaryFont,' +
 	'.{class:container} .echo-secondaryFont,' +
 	'.{class:container} .echo-linkColor ' +
-		'{ font-family: "Helvetica Neue", arial, sans-serif; }' +
+		'{ font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }' +
 	'.{class:postComposer} { margin-bottom: 10px; }' +
 	'.{class:topPosts} > div { margin-bottom: 25px; }' +
 	// set box-sizing property for all nested elements to default (content-box)

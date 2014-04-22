@@ -1,8 +1,8 @@
 {
 	"version": 2,
 	"manifest": {
-		"id": "echo-conversations",
-		"name": "Conversations"
+		"id": "echo-conversations-{%=packageVersions.latest%}",
+		"name": "Conversations {%=packageVersions.latest%}.0"
 	},
 	"baseURLs": {
 		"dev": "//cdn.echoenabled.com/apps/echo/conversations/v{%=packageVersions.stable%}/dev",

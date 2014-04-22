@@ -4,16 +4,16 @@
 var $ = jQuery;
 
 /**
- * @class Echo.StreamServer.Controls.Stream.Item.Plugins.ModerationCardUI
+ * @class Echo.StreamServer.Controls.Card.Plugins.Moderation
  */
-var plugin = Echo.Plugin.manifest("ModerationCardUI", "Echo.StreamServer.Controls.Stream.Item");
+var plugin = Echo.Plugin.manifest("Moderation", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
 	var item = this.component;
 	this.set("itemStatus", item.get("data.object.status"));
-	item.addButtonSpec("ModerationCardUI", this._assembleModerateButton());
+	item.addButtonSpec("Moderation", this._assembleModerateButton());
 };
 
 plugin.config = {
@@ -73,13 +73,20 @@ plugin.labels = {
 };
 
 plugin.events = {
-	"Echo.StreamServer.Controls.Stream.Item.onRerender": function() {
+	"Echo.UserSession.onInvalidate": {
+		"context": "global",
+		"handler": function() {
+			this._updateUserStatus();
+			this._updateItemStatus();
+		}
+	},
+	"Echo.StreamServer.Controls.Card.onRerender": function() {
 		var item = this.component;
 		if (item.user.is("admin")) {
-			var element = item.view.get("container");
+			var element = item.view.get("content");
 			var indicator = item.view.get("indicator");
-			var itemStatus = this.get("itemStatus") || "Untouched";
-			var newStatus = item.get("data.object.status") || "Untouched";
+			var itemStatus = this.get("itemStatus", "Untouched");
+			var newStatus = item.get("data.object.status", "Untouched");
 
 			if (itemStatus !== newStatus) {
 				var transition = "background-color " + this.config.get("statusAnimationTimeout") + "ms linear";
@@ -101,7 +108,7 @@ plugin.events = {
 			}
 		}
 	},
-	"Echo.StreamServer.Controls.Stream.Plugins.ModerationCardUI.onUserUpdate": function(topic, args) {
+	"Echo.StreamServer.Controls.CardCollection.Plugins.Moderation.onUserUpdate": function(topic, args) {
 		var target = this.component;
 		var source = args.item;
 		if (target.get("data.actor.id") !== source.data.actor.id) return;
@@ -118,16 +125,11 @@ plugin.templates.buttonLabels = {
 };
 
 plugin.component.renderers.avatar = function(element) {
-	var item = this.component;
-
-	if (item.user.is("admin")) {
-		var status = item.get("data.actor.status") || "Untouched";
-		element.addClass(this.cssPrefix + "actorStatus-" + status);
-	}
+	this._updateUserStatus();
 	return this.parentRenderer("avatar", arguments);
 };
 
-plugin.component.renderers.container = function(element) {
+plugin.component.renderers.content = function(element) {
 	var item = this.component;
 
 	if (item.user.is("admin")) {
@@ -135,6 +137,11 @@ plugin.component.renderers.container = function(element) {
 		element.addClass(this.cssPrefix + "status-" + status);
 	}
 
+	return this.parentRenderer("content", arguments);
+};
+
+plugin.component.renderers.container = function(element) {
+	this._updateItemStatus();
 	return this.parentRenderer("container", arguments);
 };
 
@@ -147,6 +154,40 @@ plugin.statuses = [
 	"ModeratorFlagged",
 	"SystemFlagged"
 ];
+
+plugin.methods._updateUserStatus = function() {
+	var item = this.component;
+	var self = this;
+	var avatar = item.view.get("avatar");
+
+	if (avatar) {
+		avatar.removeClass($.map(plugin.statuses, function(status) {
+			return self.cssPrefix + "actorStatus-" + status;
+		}).join(" "));
+
+		if (item.user.is("admin")) {
+			var status = item.get("data.actor.status", "Untouched");
+			avatar.addClass(this.cssPrefix + "actorStatus-" + status);
+		}
+	}
+};
+
+plugin.methods._updateItemStatus = function() {
+	var item = this.component;
+	var self = this;
+	var container = item.view.get("container");
+
+	if (container) {
+		container.removeClass($.map(plugin.statuses, function(status) {
+			return self.cssPrefix + "status-" + status;
+		}).join(" "));
+
+		if (item.user.is("admin")) {
+			var status = this.get("itemStatus", "Untouched");
+			container.addClass(this.cssPrefix + "status-" + status);
+		}
+	}
+};
 
 plugin.button2status = {
 	"Spam": "ModeratorFlagged",
@@ -626,8 +667,8 @@ plugin.css =
 		"ModeratorDeleted": "#bf383a"
 	}, function(color, status) {
 		return [
-			'.{plugin.class} .{class:avatar}.{plugin.class:actorStatus-' + status + '} > div { border: 2px solid ' + color + '; width: 20px; height: 20px; }',
-			'.{plugin.class} .{class:depth-0} .{class:avatar}.{plugin.class:actorStatus-' + status + '} div { height: 32px; width: 32px; border-radius: 50%;}'
+			'.{plugin.class} .{class:avatar}.{plugin.class:actorStatus-' + status + '}  { border: 2px solid ' + color + '; width: 20px; height: 20px; }',
+			'.{plugin.class} .{class:depth-0} .{class:avatar}.{plugin.class:actorStatus-' + status + '} { height: 32px; width: 32px; border-radius: 50%;}'
 		].join("");
 	})).join("");
 
@@ -638,17 +679,19 @@ Echo.Plugin.create(plugin);
 (function() {
 "use strict";
 
-var plugin = Echo.Plugin.manifest("ModerationCardUI", "Echo.StreamServer.Controls.Stream");
+var plugin = Echo.Plugin.manifest("Moderation", "Echo.StreamServer.Controls.CardCollection");
 
 plugin.events = {
-	"Echo.StreamServer.Controls.Stream.Item.Plugins.ModerationCardUI.onUserUpdate": function(topic, args) {
+	"Echo.StreamServer.Controls.Card.Plugins.Moderation.onUserUpdate": function(topic, args) {
 		this.events.publish({
 			"topic": "onUserUpdate",
 			"data": args,
 			"global": false
 		});
+		return {"stop": ["bubble"]};
 	}
 };
 
 Echo.Plugin.create(plugin);
+
 })(Echo.jQuery);

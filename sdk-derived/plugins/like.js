@@ -4,11 +4,11 @@
 var $ = jQuery;
 
 /**
- * @class Echo.StreamServer.Controls.Stream.Item.Plugins.Like
+ * @class Echo.StreamServer.Controls.Card.Plugins.Like
  * Adds extra Like/Unlike buttons to each item in the Echo Stream
  * control for authenticated users.
  *
- * 	new Echo.StreamServer.Controls.Stream({
+ * 	new Echo.StreamServer.Controls.CardCollection({
  * 		"target": document.getElementById("echo-stream"),
  * 		"appkey": "echo.jssdk.demo.aboutecho.com",
  * 		"plugins": [{
@@ -24,24 +24,25 @@ var $ = jQuery;
  * @package streamserver/plugins.pack.js
  * @package streamserver.pack.js
  */
-var plugin = Echo.Plugin.manifest("LikeCardUI", "Echo.StreamServer.Controls.Stream.Item");
+var plugin = Echo.Plugin.manifest("Like", "Echo.StreamServer.Controls.Card");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.init = function() {
 	this.extendTemplate("insertAsFirstChild", "footer", plugin.templates.main);
-	this.component.addButtonSpec("LikeCardUI", this._assembleButton("Like"));
-	this.component.addButtonSpec("LikeCardUI", this._assembleButton("Unlike"));
+	this.component.addButtonSpec("Like", this._assembleButton("Like"));
+	this.component.addButtonSpec("Like", this._assembleButton("Unlike"));
 };
 
 plugin.config = {
 	/**
-	 * @cfg {Boolean} asyncFacePileRendering
-	 * This parameter is used to enable FacePile control rendering in async mode.
+	 * @cfg {Boolean} asyncFaceCollectionRendering
+	 * This parameter is used to enable FaceCollection control rendering in async mode.
 	 */
-	"asyncFacePileRendering": false,
+	"asyncFaceCollectionRendering": false,
 	"likesPerPage": 5,
-	"displayStyle": "facepile"
+	"displayStyle": "facepile",
+	"staticInitialCount": true
 };
 
 plugin.labels = {
@@ -72,18 +73,19 @@ plugin.labels = {
 };
 
 plugin.dependencies = [{
-	"control": "Echo.StreamServer.Controls.FacePile",
+	"control": "Echo.StreamServer.Controls.FaceCollection",
 	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js"
 }];
 
 plugin.events = {
-	"Echo.StreamServer.Controls.FacePile.Item.Plugins.LikeCardUI.onUnlike": function(topic, args) {
+	"Echo.StreamServer.Controls.Face.Plugins.Like.onUnlike": function(topic, args) {
 		this._sendActivity("Unlike", this.component, args.actor);
 		return {"stop": ["bubble"]};
 	},
 	"Echo.UserSession.onInvalidate": {
 		"context": "global",
 		"handler": function() {
+			this.view.render({"name": "likedBy"});
 			if (this.deferredActivity) {
 				this.deferredActivity();
 				delete this.deferredActivity;
@@ -105,29 +107,23 @@ plugin.templates.main =
  * @echo_renderer
  */
 plugin.renderers.likedBy = function(element) {
-	var plugin = this;
 	var item = this.component;
 	if (!item.get("data.object.likes").length) {
 		return element.hide();
 	}
 
-	var youLike = false;
-	var userId = item.user.get("identityUrl");
-	var users = item.get("data.object.likes");
-	$.each(users, function(i, like) {
-		if (like.actor.id === userId) {
-			youLike = true;
-			return false; // break
-		}
-	});
+	var visibleUsersCount = this.get("collection") && !this.config.get("staticInitialCount")
+		? this.get("collection").getVisibleUsersCount()
+		: this.config.get("likesPerPage");
 
-	var config = plugin.config.assemble({
+	var users = item.get("data.object.likes");
+	var config = this.config.assemble({
 		"target": element.get(0),
 		"data": {
 			"itemsPerPage": this.config.get("likesPerPage"),
 			"entries": users
 		},
-		"initialUsersCount": this.config.get("likesPerPage"),
+		"initialUsersCount": visibleUsersCount,
 		"totalUsersCount": item.get("data.object.accumulators.likesCount"),
 		"item": {
 			"avatar": true,
@@ -135,27 +131,23 @@ plugin.renderers.likedBy = function(element) {
 		}
 	});
 	config.plugins.push({
-		"name": "LikeCardUI",
+		"name": "Like",
 		"displayStyle": this.config.get("displayStyle")
 	});
 
 	if (item.user.is("admin")) {
-		element.addClass(plugin.cssPrefix + "highlight");
+		element.addClass(this.cssPrefix + "highlight");
 	}
-	if (this.config.get("asyncFacePileRendering")) {
-		setTimeout($.proxy(this._initFacePile, this, config), 0);
+	if (this.config.get("asyncFaceCollectionRendering")) {
+		setTimeout($.proxy(this._initFaceCollection, this, config), 0);
 	} else {
-		this._initFacePile(config);
+		this._initFaceCollection(config);
 	}
 	return element.show();
 };
 
-plugin.methods._getLikesCount = function() {
-	return this.component.get("data.object.accumulators.likesCount");
-};
-
-plugin.methods._initFacePile = function(config) {
-	this.set("facePile", new Echo.StreamServer.Controls.FacePile(config));
+plugin.methods._initFaceCollection = function(config) {
+	this.set("collection", new Echo.StreamServer.Controls.FaceCollection(config));
 };
 
 plugin.methods._sendRequest = function(data, callback, errorCallback) {
@@ -186,11 +178,11 @@ plugin.methods._sendActivity = function(name, item, actor) {
 		"target-query": item.config.get("parent.query")
 	}, function(response) {
 		/**
-		 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.Like.onLikeComplete
+		 * @echo_event Echo.StreamServer.Controls.Card.Plugins.Like.onLikeComplete
 		 * Triggered when the Like operation is finished.
 		 */
 		/**
-		 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.Like.onUnlikeComplete
+		 * @echo_event Echo.StreamServer.Controls.Card.Plugins.Like.onUnlikeComplete
 		 * Triggered when the reverse Like operation is finished.
 		 */
 		plugin._publishEventComplete({
@@ -201,11 +193,11 @@ plugin.methods._sendActivity = function(name, item, actor) {
 		plugin.requestDataRefresh();
 	}, function(response) {
 		/**
-		 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.Like.onLikeError
+		 * @echo_event Echo.StreamServer.Controls.Card.Plugins.Like.onLikeError
 		 * Triggered when the Like operation failed.
 		 */
 		/**
-		 * @echo_event Echo.StreamServer.Controls.Stream.Item.Plugins.Like.onUnlikeError
+		 * @echo_event Echo.StreamServer.Controls.Card.Plugins.Like.onUnlikeError
 		 * Triggered when the reverse Like operation failed.
 		 */
 		plugin._publishEventComplete({
@@ -231,17 +223,17 @@ plugin.methods._publishEventComplete = function(args) {
 };
 
 plugin.methods._requestLoginPrompt = function() {
-        Backplane.response([{
-                // IMPORTANT: we use ID of the last received message
-                // from the server-side to avoid same messages re-processing
-                // because of the "since" parameter cleanup...
-                "id": Backplane.since,
-                "channel_name": Backplane.getChannelName(),
-                "message": {
-                        "type": "identity/login/request",
-                        "payload": this.component.user.data || {}
-                }
-        }]);
+	Backplane.response([{
+		// IMPORTANT: we use ID of the last received message
+		// from the server-side to avoid same messages re-processing
+		// because of the "since" parameter cleanup...
+		"id": Backplane.since,
+		"channel_name": Backplane.getChannelName(),
+		"message": {
+			"type": "identity/login/request",
+			"payload": this.component.user.data || {}
+		}
+	}]);
 };
 
 plugin.methods._assembleButton = function(name) {
@@ -250,11 +242,12 @@ plugin.methods._assembleButton = function(name) {
 		var item = this;
 
 		var buttonHandler = function() {
-			var buttonNode = item.get("buttons." + self.name + "." + name + ".element");
-			buttonNode.off("click");
-			$("." + item.cssPrefix + "buttonCaption", buttonNode)
+			var view = item.get("buttons." + self.name + "." + name + ".view");
+			view.get("buttonLabel")
+				.off("click")
 				.empty()
 				.append(self.labels.get(name.toLowerCase() + "Processing"));
+
 			self._sendActivity(name, item);
 		};
 
@@ -285,12 +278,7 @@ plugin.methods._assembleButton = function(name) {
 
 plugin.css =
 	'.{plugin.class:likesArea} { float: right; }' +
-	'.{plugin.class:likedBy} { float: left; height: 20px; margin-right: 3px; line-height: 10px; }' +
-	'.{plugin.class:likedBy} .echo-streamserver-controls-facepile-container { line-height: 12px; vertical-align: top; }' +
-	'.{plugin.class} .echo-streamserver-controls-facepile-item-container { position: relative; }' +
-	'.{plugin.class} .echo-streamserver-controls-facepile-item-avatar { border-radius: 50%; width: 22px; height: 22px; }' +
-	'.{plugin.class} .echo-streamserver-controls-facepile-item-avatar img { border-radius: 50%; height: 22px; width: 22px; }' +
-	'.{plugin.class} .echo-streamserver-controls-facepile-and { display: none; }';
+	'.{plugin.class:likedBy} { float: left; margin-right: 3px; }';
 
 Echo.Plugin.create(plugin);
 
@@ -299,7 +287,7 @@ Echo.Plugin.create(plugin);
 (function(jQuery) {
 "use strict";
 
-var plugin = Echo.Plugin.manifest("LikeCardUI", "Echo.StreamServer.Controls.FacePile");
+var plugin = Echo.Plugin.manifest("Like", "Echo.StreamServer.Controls.FaceCollection");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -347,6 +335,7 @@ plugin.component.renderers.actors = function() {
 };
 
 plugin.css =
+	'.{plugin.class} .{class:and} { display: none; }' +
 	'.{plugin.class} .{class:more} { float: right; font-size: 12px; margin-top: 5px;  white-space: nowrap; }';
 
 Echo.Plugin.create(plugin);
@@ -357,13 +346,13 @@ Echo.Plugin.create(plugin);
 "use strict";
 
 /**
- * @class Echo.StreamServer.Controls.FacePile.Item.Plugins.Like
- * Adds extra controls to items in the Echo FacePile control.
+ * @class Echo.StreamServer.Controls.Face.Plugins.Like
+ * Adds extra controls to items in the Echo FaceCollection control.
  *
  * @extends Echo.Plugin
  * @private
  */
-var plugin = Echo.Plugin.manifest("LikeCardUI", "Echo.StreamServer.Controls.FacePile.Item");
+var plugin = Echo.Plugin.manifest("Like", "Echo.StreamServer.Controls.Face");
 
 if (Echo.Plugin.isDefined(plugin)) return;
 
@@ -412,7 +401,7 @@ plugin.renderers.adminUnlike = function(element) {
 	}
 	return element.one("click", function() {
 		/**
-		 * @echo_event Echo.StreamServer.Controls.FacePile.Item.Plugins.Like.onUnlike
+		 * @echo_event Echo.StreamServer.Controls.Face.Plugins.Like.onUnlike
 		 * Triggered when the item is "unliked" by admin on behalf of a user.
 		 */
 		plugin.events.publish({
@@ -441,7 +430,8 @@ plugin.component.renderers.avatar = function() {
 
 plugin.css =
 	'.{plugin.class:pale} { opacity: 0.2; }' +
-	'.{plugin.class:adminUnlike} { cursor: pointer; position: absolute; top: 3px; left: 4px; opacity: 0.8; }';
+	'.{plugin.class} .{class:container} { position: relative; }' +
+	'.{plugin.class:adminUnlike} { cursor: pointer; position: absolute; top: -2px; left: 4px; opacity: 0.8; }';
 
 Echo.Plugin.create(plugin);
 

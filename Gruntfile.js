@@ -17,13 +17,14 @@ module.exports = function(grunt) {
 	var sources = {
 		"js": [
 			"app.js",
-			"controls/*.js",
+			"sdk-derived/**/*.js",
 			"plugins/*.js",
 			"dashboard.js",
 			"dashboard/*.js"
 		],
 		"images": [
-			"images/**"
+			"images/**",
+			"sdk-derived/images/**"
 		],
 		"demo": [
 			"demo.html",
@@ -130,14 +131,22 @@ module.exports = function(grunt) {
 			"dashboard": {
 				"src": [
 					"<%= dirs.build %>/dashboard.js",
-					"<%= dirs.build%>/dashboard/*.js"
+					"<%= dirs.build %>/dashboard/*.js"
 				],
 				"dest": "<%= dirs.build %>/dashboard.js"
+			},
+			"streamserver.pack": {
+				"src": [
+					"<%= dirs.build %>/sdk-derived/url-resolver.js",
+					"<%= dirs.build %>/sdk-derived/utils.js",
+					"<%= dirs.build %>/sdk-derived/controls/*.js",
+					"<%= dirs.build %>/sdk-derived/plugins/**/*.js"
+				],
+				"dest": "<%= dirs.build %>/streamserver.pack.js"
 			},
 			"app": {
 				"src": [
 					"<%= dirs.build %>/app.js",
-					"<%= dirs.build %>/controls/*.js",
 					"<%= dirs.build %>/plugins/*.js"
 				],
 				"dest": "<%= dirs.build %>/app.js"
@@ -161,7 +170,7 @@ module.exports = function(grunt) {
 				"jshintrc": ".jshintrc"
 			},
 			"grunt": ["Gruntfile.js", "grunt/**/*.js"],
-			"sources": ["<%= sources.js %>"]
+			"source": ["<%= sources.js %>"]
 		},
 		"release": {
 			"options": {
@@ -222,7 +231,7 @@ module.exports = function(grunt) {
 	var parts = grunt.config("pkg.version").split(".");
 	grunt.config("pkg.versions", {
 		"stable": parts.join("."),
-		"latest": parts[0] + "." + parts[1]
+		"latest": parts[0]
 	});
 
 	function assembleEnvConfig() {

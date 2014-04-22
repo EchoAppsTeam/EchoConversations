@@ -16,12 +16,32 @@ dashboard.mappings = {
 	"dependencies.janrainapp": {
 		"key": "dependencies.Janrain.appId"
 	},
-	"replyComposer.contentTypes.comments.confirmationMessage": {
+	"postComposer.confirmationMessage": {
+		"key": "postComposer.confirmation.message"
+	},
+	"replyComposer.confirmationMessage": {
 		"key": "replyComposer.confirmation.message"
 	},
-	"postComposer.contentTypes.comments.confirmationMessage": {
-		"key": "postComposer.confirmation.message"
+	"postComposer.contentTypes.comments.prompt": {
+		"key": "postComposer.contentTypes.comments.labels.prompt"
+	},
+	"replyComposer.contentTypes.comments.prompt": {
+		"key": "replyComposer.contentTypes.comments.labels.prompt"
 	}
+};
+
+var sourcesValidator = function(value) {
+	var availableSources = ["BOX", "COMPUTER", "DROPBOX", "EVERNOTE", "FACEBOOK", "FLICKR", "FTP", "GITHUB", "GOOGLE_DRIVE", "SKYDRIVE", "PICASA", "WEBDAV", "GMAIL", "IMAGE_SEARCH", "INSTAGRAM", "URL", "VIDEO", "WEBCAM"];
+	var sources = $.map(value.split(","), function(source) { return source ? $.trim(source) : undefined; });
+	var unknownSources = $.grep(sources, function(source) {
+		return !~$.inArray(source, availableSources);
+	});
+	return unknownSources.length === 0
+		? {"valid": true}
+		: {
+			"valid:": false,
+			"message": "Unknown sources: " + unknownSources.join(", ")
+		};
 };
 
 dashboard.vars = {
@@ -60,6 +80,16 @@ dashboard.vars = {
 		"config": {
 			"title": "Initial Items Per Page",
 			"desc": "Specifies the initial number of posts to show when the stream loads"
+		}
+	}, {
+		"component": "Input",
+		"name": "maxMediaWidth",
+		"type": "number",
+		"config": {
+			"title": "Maximum Media Width",
+			"desc": "Specify a maximum media content width (in pixels) which should be defined when an item is being displayed.",
+			"options": [],
+			"data": {"sample": 500}
 		}
 	}, {
 		"component": "Select",
@@ -268,6 +298,15 @@ dashboard.vars = {
 			"desc": "If enabled, users will be given the option to share their Posts on submit"
 		}
 	}, {
+		"component": "Input",
+		"name": "confirmationMessage",
+		"type": "string",
+		"config": {
+			"title": "Confirmation message",
+			"desc": "Specifies the confirmation message text displayed after successful submission if pre-moderation mode is enabled",
+			"data": {"sample": "Thanks, your post has been submitted for review"}
+		}
+	}, {
 		"component": "Group",
 		"name": "contentTypes",
 		"type": "object",
@@ -283,7 +322,7 @@ dashboard.vars = {
 			},
 			"items": [{
 				"component": "Checkbox",
-				"name": "visible",
+				"name": "enabled",
 				"type": "boolean",
 				"default": true,
 				"config": {
@@ -298,15 +337,6 @@ dashboard.vars = {
 					"title": "Prompt",
 					"desc": "Specifies the ghost text displayed in the Comment Prompt",
 					"data": {"sample": "What's on your mind?"}
-				}
-			}, {
-				"component": "Input",
-				"name": "confirmationMessage",
-				"type": "string",
-				"config": {
-					"title": "Confirmation message",
-					"desc": "Specifies the confirmation message text displayed after successful submission if pre-moderation mode is enabled",
-					"data": {"sample": "Thanks, your post has been submitted for review"}
 				}
 			}, {
 				"component": "Checkbox",
@@ -341,17 +371,71 @@ dashboard.vars = {
 					"config": {
 						"title": "Uploading sources",
 						"desc": "Here can be specified list of attachment sources, check filepicker.io documentation for full information",
+						"validators": [sourcesValidator],
 						"data": {
 							"sample": "COMPUTER, INSTAGRAM, FACEBOOK, FLICKR, DROPBOX, PICASA, EVERNOTE, FTP, GITHUB, BOX, GOOGLE_DRIVE, SKYDRIVE, WEBDAV, GMAIL, IMAGE_SEARCH, URL, VIDEO, WEBCAM"
 						}
 					}
-				}, {//TODO: make it using templates and renderer
+				}, {
 					"component": "TextField",
 					"name": "sourcesHelp",
-						"config": {
-							"data": { "value": "<a href=\"//developers.inkfilepicker.com/docs/web/#pick\" target=\"_blank\">Documentation</a>"}
-						}
-                }]
+					"config": {
+						"data": {"value": "<a href=\"//developers.inkfilepicker.com/docs/web/#pick\" target=\"_blank\">Documentation</a>"}
+					}
+				}]
+			}]
+		}, {
+			"component": "Group",
+			"name": "photos",
+			"type": "object",
+			"config": {
+				"title": "Photos"
+			},
+			"items": [{
+				"component": "Checkbox",
+				"name": "enabled",
+				"type": "boolean",
+				"default": true,
+				"config": {
+					"title": "Visible",
+					"desc": "If enabled, users can submit Photos"
+				}
+			}, {
+				"component": "Input",
+				"name": "sources",
+				"type": "string",
+				"default": "",
+				"config": {
+					"title": "Uploading sources",
+					"desc": "Here can be specified list of attachment sources, check filepicker.io documentation for full information",
+					"validators": [sourcesValidator],
+					"data": {
+						"sample": "COMPUTER, INSTAGRAM, FACEBOOK, FLICKR, DROPBOX, PICASA, EVERNOTE, FTP, GITHUB, BOX, GOOGLE_DRIVE, SKYDRIVE, WEBDAV, GMAIL, IMAGE_SEARCH, URL, VIDEO, WEBCAM"
+					}
+				}
+			}, {
+				"component": "TextField",
+				"name": "sourcesHelp",
+				"config": {
+					"data": {"value": "<a href=\"//developers.inkfilepicker.com/docs/web/#pick\" target=\"_blank\">Documentation</a>"}
+				}
+			}]
+		}, {
+			"component": "Group",
+			"name": "links",
+			"type": "object",
+			"config": {
+				"title": "Links"
+			},
+			"items": [{
+				"component": "Checkbox",
+				"name": "enabled",
+				"type": "boolean",
+				"default": true,
+				"config": {
+					"title": "Visible",
+					"desc": "If enabled, users can submit Links"
+				}
 			}]
 		}]
 	}],
@@ -415,43 +499,30 @@ dashboard.config = {
 		},
 		"items": [{
 			"component": "Input",
-			"name": "minimumWidth",
+			"name": "minWidth",
 			"type": "number",
 			"config": {
-				"title": "Minimum width",
+				"title": "Minimum Width",
 				"desc": "Specify a minimum width (in pixels) of an App container.",
-				"options": [],
 				"data": {"sample": 320}
 			}
 		}, {
 			"component": "Input",
-			"name": "maximumHeight",
+			"name": "maxHeight",
 			"type": "number",
 			"config": {
-				"title": "Maximum height",
+				"title": "Maximum Height",
 				"desc": "Specify a maximum height (in pixels) of an App container. If an App context exceeds the defined max height, a vertical scrollbar appears.",
-				"options": [],
 				"data": {"sample": 700}
 			}
 		}, {
 			"component": "Input",
-			"name": "maximumWidth",
+			"name": "maxWidth",
 			"type": "number",
 			"config": {
-				"title": "Maximum width",
+				"title": "Maximum Width",
 				"desc": "Specify a maximum width (in pixels) of an App container.",
-				"options": [],
 				"data": {"sample": 700}
-			}
-		}, {
-			"component": "Input",
-			"name": "maximumMediaWidth",
-			"type": "number",
-			"config": {
-				"title": "Maximum media width",
-				"desc": "Specify a maximum media content width (in pixels) which should be defined when an item is being displayed.",
-				"options": [],
-				"data": {"sample": 500}
 			}
 		}]
 	}, {
@@ -581,11 +652,22 @@ dashboard.config = {
 				"component": "Input",
 				"name": "apiKey",
 				"type": "string",
-				"default": "AFLWUBllDRwWZl7sQO1V1z",
 				"config": {
 					"title": "FilePicker API key",
 					"desc": "Specifies the Filepicker api key for this instance",
 					"options": []
+				}
+			}]
+		}, {
+			"component": "Fieldset",
+			"name": "embedly",
+			"type": "object",
+			"items": [{
+				"component": "Input",
+				"name": "apiKey",
+				"type": "string",
+				"config": {
+					"title": "Embed.ly API Key"
 				}
 			}]
 		}]
@@ -616,10 +698,10 @@ dashboard.config.normalizer = {
 					var items = assembleBaseECL.call(this);
 
 					items[3]["default"] = 5; // override initialItemsPerPage value
-					items[17]["items"][0]["default"] = true;
+					items[18]["items"][0]["default"] = true;
 					items.pop();
 
-					items.splice(5, 0, {
+					items.splice(6, 0, {
 						"component": "Checkbox",
 						"name": "includeTopContributors",
 						"type": "boolean",
@@ -635,8 +717,8 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
-					items[17]["items"].push(component.get("premoderationECL"));
-					items.splice(11, 0, {
+					items[18]["items"].push(component.get("premoderationECL"));
+					items.splice(12, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
 						"type": "boolean",
@@ -693,6 +775,12 @@ dashboard.methods.declareInitialConfig = function() {
 			},
 			"StreamServer": {
 				"appkey": keys.length ? keys[0].key : undefined
+			},
+			"FilePicker": {
+				"apiKey": "AFLWUBllDRwWZl7sQO1V1z"
+			},
+			"embedly": {
+				"apiKey": "5945901611864679a8761b0fcaa56f87"
 			}
 		}
 	};

@@ -5,7 +5,7 @@
 		"name": ""
 	},
 	"baseURLs": {
-		"dev":"",
-		"prod":""
+		"dev": "",
+		"prod": ""
 	}
 }
