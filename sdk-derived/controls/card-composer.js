@@ -1483,6 +1483,7 @@ composer.css =
 	'.echo-sdk-ui .{class:inline} .nav-tabs,' +
 		'.{class:inline} .{class:formWrapper},' +
 		'.{class:inline}.{class:anonymous} .{class:header},' +
+		'.{class:inline}.{class:forcedLogin} .{class:header},' +
 		'.{class:inline} .echo-streamserver-controls-auth-container { display: none; }' +
 	'.{class:inline} .{class:compactFieldWrapper} { margin-left: 38px; }' +
 	'.{class:inline}.{class:anonymous} .{class:compactFieldWrapper} { margin-left: 0px; }' +
