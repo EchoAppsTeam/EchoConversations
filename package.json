@@ -1,7 +1,6 @@
 {
   "name": "echo-conversations",
-  "description": "Echo Conversations reference app",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "author": {
     "name": "Echo",
     "url": "http://aboutecho.com"
