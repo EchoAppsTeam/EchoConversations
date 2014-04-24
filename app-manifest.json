@@ -17,7 +17,12 @@
 		"title": "Instances",
 		"script": "{%= baseURLs.prod %}/dashboard.js",
 		"component": "Echo.Apps.Conversations.Dashboard",
-		"type": "instances"
+		"type": "instances",
+		"config": {
+			"instanceManager": {
+				"instance": {"useLoadingIcon": true}
+			}
+		}
 	}, {
 		"id": "docs",
 		"type": "external",
