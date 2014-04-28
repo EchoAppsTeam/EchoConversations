@@ -314,7 +314,7 @@ plugin.methods.setData = function(data) {
 plugin.methods._getMediaContent = function() {
 	var media = this.component.formData.media[0];
 	if (!media) return "";
-	media.title = this.composer.find(".echo-photo-composer-title").val();
+	media.description = this.composer.find(".echo-photo-composer-title").val();
 	return this.component.substitute({
 		"template": this._mediaTemplate(),
 		"data": $.extend(true, {}, media, {
