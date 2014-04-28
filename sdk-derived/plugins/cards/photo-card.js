@@ -98,7 +98,11 @@ plugin.renderers.photoThumbnail = function(element) {
 	if (element.attr("title")) {
 		img.attr("title", element.attr("title"));
 	}
-	img.error(function(e) {
+	img.load(function(e) {
+		self.events.publish({
+			"topic": "onMediaLoad"
+		});
+	}).error(function(e) {
 		if (isArticle) {
 			self.view.get("photo").hide();
 		} else {
