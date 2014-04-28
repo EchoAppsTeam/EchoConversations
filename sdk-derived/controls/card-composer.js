@@ -94,7 +94,7 @@ composer.init = function() {
 		if (self.user.is("logged")) return true;
 		var isGuestAllowed = self.config.get("submitPermissions") === "allowGuest";
 		if (!isGuestAllowed) {
-			self.set("_deferredActivity", $.proxy(self.posting.action, self));
+			self.set("deferredActivity", $.proxy(self.posting.action, self));
 			self._requestLoginPrompt();
 			return false;
 		}
@@ -351,6 +351,7 @@ composer.vars = {
 	"currentComposer": undefined,
 	"composers": [],
 	"validators": [],
+	"deferredActivity": null,
 	"previousComposerId": undefined
 };
 
@@ -425,6 +426,10 @@ composer.events = {
 			this.view.render({"name": "tagsContainer"});
 			this._updateUserStatus();
 			this._initCurrentComposer();
+			if (this.deferredActivity) {
+				this.deferredActivity();
+				this.deferredActivity = null;
+			}
 		}
 	},
 	"Echo.StreamServer.Controls.CardComposer.onAutoSharingToggle": {

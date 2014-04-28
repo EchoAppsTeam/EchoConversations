@@ -34,6 +34,10 @@ plugin.init = function() {
 	this.component.addButtonSpec("Like", this._assembleButton("Unlike"));
 };
 
+plugin.vars = {
+	"deferredActivity": null
+};
+
 plugin.config = {
 	/**
 	 * @cfg {Boolean} asyncFaceCollectionRendering
@@ -88,7 +92,7 @@ plugin.events = {
 			this.view.render({"name": "likedBy"});
 			if (this.deferredActivity) {
 				this.deferredActivity();
-				delete this.deferredActivity;
+				this.deferredActivity = null;
 			}
 		}
 	}
