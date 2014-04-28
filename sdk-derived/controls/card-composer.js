@@ -1454,9 +1454,7 @@ composer.css =
 	'.echo-cardcomposer-delimiter { height: 0px; border-top: 1px dashed #d8d8d8; }' +
 	'.echo-cardcomposer-field-wrapper { margin: 7px 11px; border: 1px solid transparent; box-sizing: border-box !important/* XXX: because of conversations*/; }' +
 
-	'.{class:error} { border: 1px solid red; }' +
-	'.{class:error} input, .{class:error} textarea { background: no-repeat center right url({config:cdnBaseURL.sdk-assets}/images/warning.gif); }' +
-
+	'.{class:error} { color: #444444; font: 14px Arial; line-height: 150%; padding-left: 85px; background: no-repeat url({config:cdnBaseURL.sdk-assets}/images/info70.png); }' +
 	'.{class:resolving} { background: no-repeat bottom center url({%= baseURLs.prod %}/sdk-derived/images/resolving.gif); }' +
 	'.{class:media} .echo-streamserver-controls-mediacontainer-multiple { border: 1px solid #DEDEDE; border-top-style: dashed; border-bottom: 0px; background-color: #F1F1F1; }' +
 	'.{class:media} .echo-streamserver-controls-mediacontainer-single .echo-streamserver-controls-nestedcard-border { border-bottom: 0; }' +
