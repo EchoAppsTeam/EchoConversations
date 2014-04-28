@@ -654,10 +654,10 @@ plugin.css =
 	'  { background-color: transparent; }' +
 
 	// item statuses
-	'.{plugin.class} .{plugin.class:status-Untouched} .{class:indicator} { background-color: #3498db; }' +
-	'.{plugin.class} .{plugin.class:status-ModeratorApproved} .{class:indicator} { background-color: #15c177; }' +
-	'.{plugin.class} .{plugin.class:status-ModeratorDeleted} .{class:indicator} { background-color: #bf383a; }' +
-	'.{plugin.class} .{plugin.class:status-SystemFlagged} .{class:indicator}, .{plugin.class:status-CommunityFlagged} .{class:indicator}, .{plugin.class:status-ModeratorFlagged} .{class:indicator} { background-color: #ff9e00; }' +
+	'.{plugin.class:status-Untouched} .{class:indicator} { background-color: #3498db; }' +
+	'.{plugin.class:status-ModeratorApproved} .{class:indicator} { background-color: #15c177; }' +
+	'.{plugin.class:status-ModeratorDeleted} .{class:indicator} { background-color: #bf383a; }' +
+	'.{plugin.class:status-SystemFlagged} .{class:indicator}, .{plugin.class:status-CommunityFlagged} .{class:indicator}, .{plugin.class:status-ModeratorFlagged} .{class:indicator} { background-color: #ff9e00; }' +
 
 	// actor statuses
 	($.map({
@@ -688,6 +688,7 @@ plugin.events = {
 			"data": args,
 			"global": false
 		});
+		return {"stop": ["bubble"]};
 	}
 };
 

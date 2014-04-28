@@ -163,6 +163,10 @@ plugin.labels = {
 	/**
 	 * @echo_label
 	 */
+	"back": "Back",
+	/**
+	 * @echo_label
+	 */
 	"cantEditUnknownType": "Unfortunately this item cannot be edited due to its unknown type"
 };
 
@@ -276,10 +280,10 @@ plugin.renderers.editedDate = function(element) {
  */
 plugin.renderers.cancelButton = function(element) {
 	var plugin = this;
-	if (plugin.component.view.get("container").hasClass(this.cssPrefix + "noneditable")) {
-		element.addClass("btn");
+	if (this.component.view.get("container").hasClass(this.cssPrefix + "noneditable")) {
+		element.addClass("btn").html(this.labels.get("back"));
 	} else {
-		element.removeClass("btn");
+		element.removeClass("btn").html(this.labels.get("cancel"));
 	}
 	return element.click(function() {
 		plugin.events.publish({"topic": "onEditError"});
@@ -347,12 +351,10 @@ plugin.css =
 	'.{plugin.class} .{class:nameContainer}, .{plugin.class} .{class:controls}, .{plugin.class} .{class:composers} { background-color: #fff; }' +
 	'.{plugin.class:avatar-wrapper} { float: left; margin-right: 5px; }' +
 	'.{plugin.class} .{class:tabs} { display: none; }' +
-	'.{plugin.class} .{class:formWrapper} { border-top: 1px solid #d8d8d8; }' +
 	'.{plugin.class:avatar} { width: 48px; height: 48px; display: inline-block; }' +
 	'.{plugin.class:header} { line-height: 48px; margin-bottom: 3px; }' +
 	'.echo-streamserver-controls-card-children .{plugin.class:header}, .echo-streamserver-controls-card-childrenByCurrentActorLive .{plugin.class:header} { line-height: 24px; }' +
-	'.echo-streamserver-controls-card-children .{plugin.class:avatar}, .echo-streamserver-controls-card-childrenByCurrentActorLive .{plugin.class:avatar} { width: 24px; height: 24px; }' +
-	'';
+	'.echo-streamserver-controls-card-children .{plugin.class:avatar}, .echo-streamserver-controls-card-childrenByCurrentActorLive .{plugin.class:avatar} { width: 24px; height: 24px; }';
 
 Echo.Plugin.create(plugin);
 

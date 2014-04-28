@@ -1,8 +1,8 @@
 {
 	"version": 2,
 	"manifest": {
-		"id": "echo-conversations-14-dev",
-		"name": "Conversations 1.4 (Dev)"
+		"id": "echo-conversations-{%=packageVersions.latest%}-dev",
+		"name": "Conversations {%=packageVersions.latest%}.0 (Dev)"
 	},
 	"baseURLs": {
 		"dev": "//echoplatform.com/sandbox/staging/apps/echo/conversations/v{%=packageVersions.stable%}/dev",

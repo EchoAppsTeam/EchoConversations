@@ -1203,6 +1203,9 @@ card.methods.registerVisualizer = function(config) {
  */
 card.methods.parseContent = function(visualizer) {
 	visualizer = visualizer || this.visualizer;
+
+	if (!visualizer) return;
+
 	if (visualizer.parseContent) {
 		visualizer.parseContent();
 		return;
@@ -1544,16 +1547,16 @@ card.methods._initSmileysConfig = function() {
 	}
 	var esc = function(v) { return v.replace(/([\W])/g, "\\$1"); };
 	var escapedCodes = [];
-	$.each(_smileys.hash, function(code) {
+	$.each(_smileys.hash, function(code, smiley) {
 		var escaped = esc(code);
 		escapedCodes.push(escaped);
 		_smileys.codes.push(code);
 		_smileys.regexps[code] = new RegExp(escaped, "g");
+		smiley.tag = self.substitute({
+			"template": '<img class="{class:smiley-icon}" src="{config:cdnBaseURL.sdk-assets}/images/smileys/emoticon_' + smiley.file + '" title="' + smiley.title + '" alt="' + smiley.title + '">'
+		});
 	});
 	_smileys.regexps.test = new RegExp(escapedCodes.join("|"));
-	_smileys.tag = function(smiley) {
-		return self.substitute({"template": '<img class="{class:smiley-icon}" src="{config:cdnBaseURL.sdk-assets}/images/smileys/emoticon_' + smiley.file + '" title="' + smiley.title + '" alt="' + smiley.title + '">'});
-	};
 	return _smileys;
 };
 
@@ -1605,7 +1608,7 @@ card.methods._assembleButtons = function() {
 		});
 	});
 	// keep correct order of plugins and buttons
-	self.buttonsOrder = buttonsOrder.concat(self.buttonsOrder);
+	this.buttonsOrder = buttonsOrder.concat(this.buttonsOrder);
 };
 
 card.methods._sortButtons = function() {
@@ -1773,7 +1776,10 @@ card.methods._sortButtons = function() {
 			var smileys = this._initSmileysConfig();
 			if (text.match(smileys.regexps.test)) {
 				$.each(smileys.codes, function(i, code) {
-					text = text.replace(smileys.regexps[code], smileys.tag(smileys.hash[code]));
+					text = text.replace(
+						smileys.regexps[code],
+						smileys.hash[code].tag
+					);
 				});
 			}
 		}
@@ -1954,7 +1960,7 @@ card.css =
 	// indicator
 	'.{class:content} { position: relative; }' +
 	'.{class:indicator} { position: absolute; left: 0px; top: 0px; bottom: 0px; width: 4px; background-color: transparent; z-index: 10; }' +
-	'.{class:new} .{class:indicator} { background-color: #f5ba47; }' +
+	'.{class:container} .{class:new} .{class:indicator} { background-color: #f5ba47; }' +
 
 	cardDepthRules.join("\n");
 

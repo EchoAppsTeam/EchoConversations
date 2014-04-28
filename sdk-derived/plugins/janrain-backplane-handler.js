@@ -25,15 +25,32 @@ var createPlugin = function(component) {
 
 		global.initialized = true;
 
+		var isChromeOnIOS = Echo.Utils.isMobileDevice() &&
+			/iPhone|iPad/i.test(navigator.userAgent) &&
+			/CriOS/i.test(navigator.userAgent);
+
 		Backplane.subscribe(function(message) {
 			// if login is requested
 			if (message.type === "identity/login/request") {
 				global.modal && global.modal.destroy();
-				global.modal = plugin._openAuthDialog();
+				global.win && global.win.close();
+				var config = plugin.config.get("authWidgetConfig");
+				var configStr = Echo.Utils.objectToJSON(config);
+				var url = plugin.component.config.get("cdnBaseURL.sdk") +
+					"/third-party/janrain/auth.html?appId=" + plugin.config.get("appId") +
+					"&signinConfig=" + encodeURIComponent(configStr) +
+					"&bpChannel=" + encodeURIComponent(Backplane.getChannelID());
+				if (!isChromeOnIOS) {
+					global.modal = plugin._openAuthDialog(url, config);
+				} else {
+					global.win = window.open(url);
+					Backplane.expectMessages("identity/ack");
+				}
 			}
 			// when login/logout is complete
 			if (message.type === "identity/ack") {
 				global.modal && global.modal.destroy();
+				global.win && global.win.close();
 			}
 			// if sharing is requested
 			if (message.type === "content/share/request") {
@@ -42,13 +59,7 @@ var createPlugin = function(component) {
 		});
 	};
 
-	plugin.methods._openAuthDialog = function() {
-		var plugin = this, config = plugin.config.get("authWidgetConfig");
-		var configStr = Echo.Utils.objectToJSON(config);
-		var url = this.component.config.get("cdnBaseURL.sdk") +
-				"/third-party/janrain/auth.html?appId=" + plugin.config.get("appId") +
-				"&signinConfig=" + encodeURIComponent(configStr) +
-				"&bpChannel=" + encodeURIComponent(Backplane.getChannelID());
+	plugin.methods._openAuthDialog = function(url, config) {
 		var modal = new Echo.GUI.Modal({
 			"data": {"title": config.title || ""},
 			"href": url,

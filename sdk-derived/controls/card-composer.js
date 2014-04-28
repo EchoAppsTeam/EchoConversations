@@ -115,15 +115,20 @@ composer.init = function() {
 	});
 
 	this.collapsed = this.config.get("initialMode") === "collapsed";
-	this._extractInfoFromExternalData();
+	this._identifyCurrentComposer();
 	this.render();
 	this.ready();
 };
 
 composer.destroy = function() {
+	var self = this;
 	this.tabs && this.tabs.destroy();
 	this.mediaContainer && this.mediaContainer.destroy();
 	this.toggleModeHandler && $(document).off("mouseup", this.toggleModeHandler);
+	this.view.get("postButton").off("click");
+	$.each(this.posting.subscriptions, function(id) {
+		self.events.unsubscribe({"handlerId": id});
+	});
 };
 
 composer.config = {
@@ -318,7 +323,7 @@ composer.config = {
 	"initialMode": "expanded", // expanded || collapsed
 	"compact": {
 		"layout": "inline", // small || smallest || inline
-		"prompt": "Contribute here"
+		"prompt": "What's on your mind?"
 	},
 	"collapseOn": {
 		"documentClick": false,
@@ -343,6 +348,7 @@ composer.vars = {
 		"text": "",
 		"media": []
 	},
+	"currentComposer": undefined,
 	"composers": [],
 	"validators": [],
 	"previousComposerId": undefined
@@ -414,9 +420,11 @@ composer.events = {
 		"context": "global",
 		"handler": function() {
 			this.view.render({"name": "nameContainer"});
+			this.view.render({"name": "name"});
 			this.view.render({"name": "markersContainer"});
 			this.view.render({"name": "tagsContainer"});
 			this._updateUserStatus();
+			this._initCurrentComposer();
 		}
 	},
 	"Echo.StreamServer.Controls.CardComposer.onAutoSharingToggle": {
@@ -532,14 +540,13 @@ composer.renderers.tabs = function(element) {
 	// TODO: support URL in icons
 	var self = this;
 	element.empty();
-	if (!this.composers.length) {
-		this.log({"message": "No composer plugins are found"});
-		return element;
-	}
+
+	if (!this.currentComposer) return element;
+
 	this.tabs = new Echo.GUI.Tabs({
 		"target": element,
 		"classPrefix": this.cssPrefix + "tabs-",
-		"selected": this.currentComposer && this.currentComposer.index,
+		"selected": this.currentComposer.index,
 		"entries": $.map(this.composers, function(tab) {
 			tab.panel = $("<div>");
 			return {
@@ -559,6 +566,8 @@ composer.renderers.tabs = function(element) {
 			self._initCurrentComposer();
 		}
 	});
+
+	return element;
 };
 
 /**
@@ -674,10 +683,17 @@ composer.renderers.auth = function(element) {
  */
 composer.renderers.nameContainer = function(element) {
 	var status = this._userStatus();
-	if (status === "logged" || status === "forcedLogin") {
-		element.remove();
-	}
-	return element;
+	return element[(status === "logged" || status === "forcedLogin") ? "hide" : "show"]();
+};
+
+/**
+ * @echo_renderer
+ */
+composer.renderers.name = function(element) {
+	var status = this._userStatus();
+	return (status === "logged" || status === "forcedLogin")
+		? element.removeAttr("required")
+		: element.attr("required", true);
 };
 
 /**
@@ -765,7 +781,7 @@ composer.renderers.postButton = function(element) {
 		}
 	});
 	this.posting.action = this.posting.action || function() {
-		if (self.postButtonState === "disabled") return;
+		if (states[self.postButtonState].disabled) return;
 		if (self._isPostValid()) {
 			self.post();
 		}
@@ -1078,39 +1094,44 @@ composer.methods._initCurrentComposer = function() {
 	}, 0);
 };
 
-composer.methods._extractInfoFromExternalData = function() {
+composer.methods._identifyCurrentComposer = function() {
 	var self = this;
-	this.formData = {
-		"text": "",
-		"media": []
-	};
 	var data = this.config.get("data");
-	if (!data || $.isEmptyObject(data)) return;
 
-	Echo.Utils.safelyExecute(function() {
-		var content = $("<div>").append(self.config.get("data.object.content"));
-		//self.set("content", self.config.get("data.object.content"));
-		self.formData.text = $(".echo-item-text", content).html();
-		if (/*self.get("content") !== item.get("data.object.content") || */!self.formData.media.length) {
-			self.formData.media = $("div[oembed], div[data-oembed]", content).map(function() {
-				return $.parseJSON($(this).attr("oembed") || $(this).attr("data-oembed"));
-			}).get();
+	if (!data || $.isEmptyObject(data)) {
+		this.currentComposer = this.composers[0];
+		return;
+	}
+
+	var content = $("<div>").append(this.config.get("data.object.content"));
+	var composerId = content.find(".echo-item-files").data("composer");
+	var attachments = content.find("div[data-oembed]");
+
+	var oembed = attachments.map(function() {
+		var oembed = $(this).data("oembed");
+		return Echo.Utils.oEmbedValidate(oembed) ? oembed : null;
+	});
+
+	this.formData = {
+		"text": content.find(".echo-item-text").html(),
+		"media": oembed.get()
+	};
+
+	content.remove();
+
+	var types = this.config.get("data.object.objectTypes", []);
+	$.each(this.composers, function(i, data) {
+		if (data.id === composerId) {
+			self.currentComposer = data;
+			return false;
 		}
-		var composer = $(".echo-item-files", content).data("composer");
-		var types = self.config.get("data.object.objectTypes", []);
-		$.each(self.composers, function(i, data) {
-			if (data.id === composer) {
-				self.currentComposer = data;
-				return false;
-			}
-			var matches = $.grep(types, function(type) {
-				return data.objectType === type;
-			});
-			if (matches.length) {
-				self.currentComposer = data;
-				return false;
-			}
+		var matches = $.grep(types, function(type) {
+			return data.objectType === type;
 		});
+		if (matches.length) {
+			self.currentComposer = data;
+			return false;
+		}
 	});
 };
 
@@ -1409,7 +1430,7 @@ composer.css =
 	'.{class:container} { padding: 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; }' +
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"] { width: 100%; border: 0; padding: 0px; outline: 0; box-shadow: none; margin-bottom: 0px; }' +
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"]:focus { outline: 0; box-shadow: none; }' +
-	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 0px 1px; }' +
+	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 1px 1px 0 1px; }' +
 	'.{class:controls} { margin: 0px; padding: 5px; border: 1px solid #d8d8d8; background-color: transparent; }' +
 	'.{class:confirmation} { margin-bottom: 10px; display: none; }' +
 	'.{class:clipButton} { display: none; margin: 5px; float: left; cursor: pointer; }' +
@@ -1448,15 +1469,15 @@ composer.css =
 	'.echo-sdk-ui .{class:inline} .nav-tabs,' +
 		'.{class:inline} .{class:formWrapper},' +
 		'.{class:inline}.{class:anonymous} .{class:header},' +
+		'.{class:inline}.{class:forcedLogin} .{class:header},' +
 		'.{class:inline} .echo-streamserver-controls-auth-container { display: none; }' +
 	'.{class:inline} .{class:compactFieldWrapper} { margin-left: 38px; }' +
-	'.{class:inline}.{class:anonymous} .{class:compactFieldWrapper} { margin-left: 0px; }' +
-	'.{class:inline}.{class:container}:not(.{class:anonymous}) { padding-left: 12px; }' +
+	'.{class:inline}.{class:anonymous} .{class:compactFieldWrapper},' +
+		'.{class:inline}.{class:forcedLogin} .{class:compactFieldWrapper} { margin-left: 0px; }' +
+	'.{class:inline}.{class:container}.{class:logged} { padding-left: 12px; }' +
 	'.{class:inline} .{class:header} { float: left; margin: 0px; }' +
 	'.{class:inline} .echo-streamserver-controls-auth-avatarContainer,' +
 		'.{class:inline} .echo-streamserver-controls-auth-avatar { width: 28px; height: 28px; }' +
-	'.echo-sdk-ui .{class:small} .nav-tabs,' +
-		'.echo-sdk-ui .{class:smallest} .nav-tabs { border-bottom-width: 0px; }' +
 
 	// tabs
 	'.{class:tabs} .{class:icon} { margin-right: 2px; }' +
@@ -1468,7 +1489,7 @@ composer.css =
 		'.echo-sdk-ui .{class:tabs} .nav > li.active > a:hover,' +
 		'.echo-sdk-ui .{class:tabs} .nav > li.active > a:focus,' +
 		'.echo-sdk-ui .{class:tabs} .nav > li.active > a:active { border: 0px; border-bottom: 4px solid #d8d8d8; color: #3c3c3c; background-color: transparent; opacity: 1; }' +
-	'';
+	'.echo-sdk-ui .{class:tabs} .nav-tabs { border-bottom-width: 0; }';
 
 Echo.App.create(composer);
 
