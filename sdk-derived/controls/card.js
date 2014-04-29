@@ -1278,7 +1278,7 @@ card.methods.addButtonSpec = function(plugin, spec) {
 };
 
 card.methods._pageLayoutChange = function() {
-	this._calcButtonLayout();
+	this._calcButtonsLayout();
 	this._checkItemContentHeight();
 };
 
@@ -1299,7 +1299,7 @@ card.methods._haveButtonsCollisions = function() {
 	return result;
 };
 
-card.methods._calcButtonLayout = function() {
+card.methods._calcButtonsLayout = function() {
 	var container = this.view.get("buttonContainer");
 	if (container) {
 		var layout = this.config.get("initialIntentsDisplayMode");
