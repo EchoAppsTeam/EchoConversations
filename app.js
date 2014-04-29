@@ -906,7 +906,8 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"markAsRead": config.markItemsAsReadOn,
 			"viaLabel": {
 				"icon": config.displaySourceIcons
-			}
+			},
+			"initialIntentsDisplayMode": config.initialIntentsDisplayMode
 		},
 		"data": this.get("data." + componentID + "-search"),
 		"query": this._assembleSearchQuery(componentID)

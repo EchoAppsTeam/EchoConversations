@@ -81,6 +81,9 @@ card.events = {
 	"Echo.StreamServer.Controls.Card.onRender": function() {
 		this._pageLayoutChange();
 	},
+	"Echo.StreamServer.Controls.Card.onRerender": function() {
+		this._pageLayoutChange();
+	},
 	"Echo.Apps.Conversations.onAppResize": function() {
 		this._pageLayoutChange();
 	},
@@ -235,7 +238,8 @@ card.config = {
 	"dependencies": {},
 	"fadeTimeout": 5000, // 5 seconds
 	"mediaWidth": 340,
-	"manualRendering": false
+	"manualRendering": false,
+	"initialIntentsDisplayMode": "inline" // inline, compact, dropdown
 };
 
 card.config.normalizer = {
@@ -285,10 +289,33 @@ card.vars = {
 	"buttonsOrder": [],
 	"buttonSpecs": {},
 	"buttons": {},
-	"buttonsLayout": "inline",
 	"content": undefined,
 	"visualizers": [],
-	"visualizer": undefined
+	"visualizer": undefined,
+	"buttonsLayouts": {
+		"inline": function() {
+			this.view.get("buttonContainer")
+				.removeClass(this.cssPrefix + "compactLayout")
+				.removeClass(this.cssPrefix + "dropdownLayout");
+			this.view.get("buttons")
+				.removeClass("dropdown-menu");
+		},
+		"compact": function() {
+			this.view.get("buttonContainer")
+				.addClass(this.cssPrefix + "compactLayout")
+				.removeClass(this.cssPrefix + "dropdownLayout");
+			this.view.get("buttons")
+				.removeClass("dropdown-menu");
+		},
+		"dropdown": function() {
+			this.view.get("buttonContainer")
+				.removeClass(this.cssPrefix + "compactLayout")
+				.addClass(this.cssPrefix + "dropdownLayout");
+			this.view.get("buttons")
+				.addClass("dropdown-menu");
+		}
+	},
+	"buttonsLayoutsOrder": ["inline", "compact", "dropdown"]
 };
 
 card.labels = {
@@ -400,9 +427,13 @@ card.templates.mainHeader =
 						'<div class="{class:metadata}"></div>' +
 						'<div class="{class:footer} echo-secondaryColor echo-secondaryFont">' +
 							'<img class="{class:sourceIcon} echo-clickable">' +
-							'<div class="{class:from}"></div>' +
-							'<div class="{class:via}"></div>' +
-							'<div class="{class:buttons}"></div>' +
+							'<div class="{class:buttonContainer}">' +
+								'<a class="dropdown-toggle {class:button}" data-toggle="dropdown" href="#">' +
+									'<i class="{class:buttonIcon} icon-list"></i>' +
+									'<span class="echo-primaryFont {class:buttonLabel}">{label:actions}</span>' +
+								'</a>' +
+								'<ul class="{class:buttons}"></ul>' +
+							'</div>' +
 							'<div class="echo-clear"></div>' +
 						'</div>' +
 					'</div>' +
@@ -440,24 +471,10 @@ card.templates.childrenBottom =
 	'<div class="{class:children}"></div>';
 
 card.templates.button =
-	'<a class="{class:button} {class:button}-{data:name}">' +
-		'<i class="{class:buttonIcon} {data:icon}"></i>' +
-		'<span class="echo-primaryFont {class:buttonLabel}">{data:label}</span>' +
-	'</a>';
-
-card.templates.dropdownButtons =
-	'<div class="dropdown">' +
-		'<a class="dropdown-toggle {class:button}" data-toggle="dropdown" href="#">' +
-			'<i class="{class:buttonIcon} icon-list"></i>' +
-			'<span class="echo-primaryFont {class:buttonLabel}">{label:actions}</span>' +
-		'</a>' +
-	'</div>';
-
-card.templates.compactButtons =
-	'<a title="{data:label}" class="{class:button} {class:compactButton} {class:button}-{data:name}">' +
-		'<i class="{class:buttonIcon} {data:icon}"></i>' +
-		'<span class="echo-primaryFont {class:buttonLabel}"></span>' +
-	'</a>';
+		'<a title="{data:label}" class="{class:button} {class:button}-{data:name}">' +
+			'<i class="{class:buttonIcon} {data:icon}"></i>' +
+			'<span class="echo-primaryFont {class:buttonLabel}">{data:label}</span>' +
+		'</a>';
 
 card.methods.template = function() {
 	return this.templates.mainHeader +
@@ -644,14 +661,94 @@ card.renderers.childrenByCurrentActorLive = function(element, config) {
  * @echo_renderer
  */
 card.renderers.buttons = function(element) {
+	var self = this;
 	this._assembleButtons();
 	this._sortButtons();
 	element.empty();
-	this.view.render({
-		"name": "_" + this.get("buttonsLayout") + "Buttons",
-		"target": element
+
+	var buttons = $.map(this.buttonsOrder, function(name) {
+		return self.get("buttons." + name);
 	});
+
+	$.map(buttons, function(button) {
+		if (!button || !Echo.Utils.invoke(button.visible)) {
+			return;
+		}
+		self.view.render({
+			"name": "_button",
+			"target": element,
+			"extra": button
+		});
+	});
+
 	return element;
+};
+
+card.renderers._button = function(element, extra) {
+	var view = this.view.fork();
+	var template = extra.template || card.templates.button;
+
+	var data = {
+		"label": extra.label || "",
+		"name": extra.name,
+		"icon": extra.icon || (!extra.inner && "icon-comment")
+	};
+
+	var button = $("<li>").append(view.render({
+		"template": template,
+		"data": data
+	}));
+
+	var clickables = $(".echo-clickable", button);
+	if (!extra.clickable) return element.append(button);
+
+	if (extra.entries) {
+		var entries = $.map(extra.entries, function(entry) {
+			if (!Echo.Utils.invoke(entry.visible)) return null;
+
+			var item = $('<a role="button" class="echo-clickable" />').on("click", function() {
+				entry.callback && entry.callback.call(this, entry);
+			}).append(entry.label);
+			return $("<li>").append(item);
+		});
+		var menu = $('<ul class="dropdown-menu" role="menu">').append(entries);
+		button.addClass("dropdown-header").find("a").after(menu);
+
+		var footer = this.view.get("footer");
+		extra.callback = function(ev) {
+			var buttonOffset = footer.width() - button.position().left;
+			var minOffset = 10; // this is minimum offset for dropdown
+			var dropdownMenu = button.find(".dropdown-menu");
+			var dropdownWidth = dropdownMenu.outerWidth();
+			if (dropdownWidth > buttonOffset) {
+				var shifting = Math.min(buttonOffset - dropdownWidth - minOffset, 0);
+				dropdownMenu.css({"left": shifting + "px"});
+			}
+			button.find("a").dropdown("toggle");
+			ev.preventDefault();
+		};
+	}
+
+	if (!clickables.length) {
+		clickables = button;
+		button.addClass("echo-clickable");
+	}
+	clickables[extra.once ? "one" : "on"]({
+		"click": function(event) {
+			event.stopPropagation();
+			if (extra.callback) extra.callback(event);
+		}
+	});
+
+	var _data = this.get("buttons." + extra.plugin + "." + extra.name);
+	_data.view = view;
+	_data.element = button;
+	_data.clickableElements = clickables;
+	if (Echo.Utils.isMobileDevice()) {
+		clickables.addClass("echo-linkColor");
+	}
+
+	return element.append(button);
 };
 
 /**
@@ -720,13 +817,13 @@ card.renderers.sourceIcon = function(element) {
 		"href": this.get("data.source.uri", this.get("data.object.permalink"))
 	};
 	var config = {"openInNewWindow": this.config.get("parent.openLinksInNewWindow")};
-	element.hide()
+
+	return element
+		.wrap(Echo.Utils.hyperlink(data, config))
 		.attr("src", Echo.Utils.htmlize(url))
-		.one("error", function() { element.hide(); })
-		.one("load", function() {
-			element.show().wrap(Echo.Utils.hyperlink(data, config));
+		.one("error", function() {
+			element.hide();
 		});
-	return element;
 };
 
 /**
@@ -987,187 +1084,6 @@ card.renderers._viaText = function(element, extra) {
 	return element.html("&nbsp;" + this.labels.get(extra.label + "Label") + "&nbsp;").append(a);
 };
 
-card.renderers._inlineButtons = function(element) {
-	var self = this;
-	var buttons = $.map(this.buttonsOrder, function(name) {
-		return self.get("buttons." + name);
-	});
-	$.map(buttons, function(button) {
-		if (!button || !Echo.Utils.invoke(button.visible)) {
-			return;
-		}
-		self.view.render({
-			"name": "_button",
-			"target": element,
-			"extra": button
-		});
-	});
-};
-
-card.renderers._compactButtons = function(element) {
-	var self = this;
-	var buttons = $.map(this.buttonsOrder, function(name) {
-		return self.get("buttons." + name);
-	});
-	$.map(buttons, function(button) {
-		if (!button || !Echo.Utils.invoke(button.visible)) {
-			return;
-		}
-		button.template = card.templates.compactButtons;
-		self.view.render({
-			"name": "_button",
-			"target": element,
-			"extra": button
-		});
-	});
-};
-
-card.renderers._dropdownButtons = function(element) {
-	var self = this;
-	var elem = $(this.substitute({
-		"template": card.templates.dropdownButtons
-	}));
-
-	var buttons = $.map(this.buttonsOrder, function(name) { return self.get("buttons." + name); });
-
-	var closeDropdown = function(callback) {
-		return function() {
-			elem.find(".dropdown-toggle").dropdown("toggle");
-			callback && callback();
-		};
-	};
-	var footer = this.view.get("footer");
-	var dropdownCallback = function(ev) {
-		var buttonOffset = footer.width() - $(this).position().left;
-		var minOffset = 10; // this is minimum offset for dropdown
-		var dropdownMenu = $(this).find(".dropdown-menu");
-		var dropdownWidth = dropdownMenu.outerWidth();
-		if (dropdownWidth > buttonOffset) {
-			var shifting = Math.min(buttonOffset - dropdownWidth - minOffset, 0);
-			dropdownMenu.css({"left": shifting + "px"});
-		}
-		elem.find(".dropdown-toggle").dropdown("toggle");
-		ev.preventDefault();
-	};
-	elem.click(dropdownCallback);
-
-	(function assembleCards(container, buttons, inner) {
-		var menu = $('<ul class="dropdown-menu" role="menu">');
-		$.map(buttons, function(button) {
-			if (!button || !Echo.Utils.invoke(button.visible)) {
-				return;
-			}
-			var menuItem = $("<li>");
-			if (button.entries && button.entries.length) {
-				button.icon = "none";
-			}
-			self.view.render({
-				"name": "_button",
-				"target": menuItem,
-				"extra": $.extend({}, button, {
-					"inner": inner,
-					"clickable": !(button.entries && button.entries.length),
-					"callback": closeDropdown(button.callback)
-				})
-			});
-			menu.append(menuItem);
-			if (button.entries && button.entries.length) {
-				menuItem.addClass("dropdown-header");
-				$.map(button.entries, function(nestedButton) {
-					nestedButton.plugin = button.plugin;
-					nestedButton.name = button.name;
-					nestedButton.icon = "none";
-					var subItem = $("<li>");
-					self.view.render({
-						"name": "_button",
-						"target": subItem,
-						"extra": $.extend({}, nestedButton, {
-							"inner": inner,
-							"clickable": true,
-							"callback": closeDropdown(nestedButton.callback)
-						})
-					});
-					menu.append(subItem);
-				});
-			}
-		});
-		container.append(menu);
-	})(elem, buttons);
-
-	return element.append(elem);
-};
-
-card.renderers._button = function(element, extra) {
-	var view = this.view.fork();
-	var template = extra.template || card.templates.button;
-
-	var data = {
-		"label": extra.label || "",
-		"name": extra.name,
-		"icon": extra.icon || (!extra.inner && "icon-comment")
-	};
-
-	var button = view.render({
-		"template": template,
-		"data": data
-	});
-
-	if (extra.inner) {
-		button.addClass("echo-clickable");
-	}
-	var clickables = $(".echo-clickable", button);
-	if (!extra.clickable) return element.append(button);
-	if (extra.entries) {
-		var entries = $.map(extra.entries, function(entry) {
-			return Echo.Utils.invoke(entry.visible)
-				? {"title": entry.label, "handler": entry.callback}
-				: null;
-		});
-		new Echo.GUI.Dropdown({
-			"target": button.find("span"),
-			"extraClass": this.cssPrefix + "dropdownButton",
-			"entries": $.map(entries, function(entry) { return $.extend({"handler": entry.callback}, entry); }),
-			"title": this.get("buttonsLayout") !== "compact" ? extra.label : ""
-		});
-		var footer = this.view.get("footer");
-		extra.callback = function(ev) {
-			var buttonOffset = footer.width() - button.position().left;
-			var minOffset = 10; // this is minimum offset for dropdown
-			var dropdownMenu = button.find(".dropdown-menu");
-			var dropdownWidth = dropdownMenu.outerWidth();
-			if (dropdownWidth > buttonOffset) {
-				var shifting = Math.min(buttonOffset - dropdownWidth - minOffset, 0);
-				dropdownMenu.css({"left": shifting + "px"});
-			}
-			button.find(".dropdown-toggle").dropdown("toggle");
-			ev.preventDefault();
-		};
-	} else if (this.get("buttonsLayout") === "compact") {
-		button.children("span").first().css("display", "none");
-	}
-
-	if (!clickables.length) {
-		clickables = button;
-		button.addClass("echo-clickable");
-	}
-	clickables[extra.once ? "one" : "on"]({
-		"click": function(event) {
-			event.stopPropagation();
-			if (extra.callback) extra.callback(event);
-		}
-	});
-
-	if (!extra.inner) {
-		var _data = this.get("buttons." + extra.plugin + "." + extra.name);
-		_data.view = view;
-		_data.clickableElements = clickables;
-		if (Echo.Utils.isMobileDevice()) {
-			clickables.addClass("echo-linkColor");
-		}
-	}
-	return element.append(button);
-};
-
 /**
  * Allows to register custom card visualizer
  *
@@ -1362,54 +1278,52 @@ card.methods.addButtonSpec = function(plugin, spec) {
 };
 
 card.methods._pageLayoutChange = function() {
-	var footer = this.view.get("footer");
-	var buttons = this.view.get("buttons");
-	var buttonsStates = [
-		"inline",
-		"compact",
-		"dropdown"
-	];
-	if (!this.get("buttonsStates")) {
-		this.set("buttonsStates", buttonsStates);
-	}
-	var configuredButtonsState = this.config.get("initialIntentsDisplayMode") ||  buttonsStates[0];
-
-	var currentState = this.get("buttonsLayout");
-	if (!currentState) {
-		currentState = configuredButtonsState;
-		this.set("buttonsLayout", currentState);
-	}
-	if (!footer || !buttons || !footer.is(":visible")) {
-		this._checkItemContentHeight();
-		return;
-	}
-	var footerWidth = footer.width();
-	var buttonsWidth = buttons.width();
-
-	var prevFreeSpace = this.get("prevFreeSpace") || 0;
-	var freeSpace = footerWidth - footer.children().eq(0).width() - footer.children().eq(1).width();
-	if (prevFreeSpace !== freeSpace || footerWidth < buttonsWidth) {
-		this.set("prevFreeSpace", freeSpace);
-		var index = $.inArray(currentState, buttonsStates);
-		if (freeSpace < buttonsWidth) {
-			if (buttonsStates[index + 1]) {
-				currentState = buttonsStates[index + 1];
-			}
-			this.set("buttonsLayout", currentState);
-			this.view.render({"name": "buttons"});
-		} else if (freeSpace > (2 * buttonsWidth)) {
-			var indexOfConfiguredState = $.inArray(configuredButtonsState, buttonsStates);
-			if (indexOfConfiguredState < index && buttonsStates[index - 1]) {
-				currentState = buttonsStates[index - 1];
-			} else {
-				currentState = configuredButtonsState;
-			}
-			this.set("buttonsLayout", currentState);
-			this.view.render({"name": "buttons"});
-		}
-	}
-
+	this._calcButtonLayout();
 	this._checkItemContentHeight();
+};
+
+card.methods._haveButtonsCollisions = function() {
+	var container = this.view.get("buttonContainer");
+	var blocks = this.view.get("footer").children(":not(div.echo-clear)").not(container);
+	var containerBounds = container[0].getBoundingClientRect();
+
+	var result = false;
+	blocks.each(function() {
+		var blockBouds = this.getBoundingClientRect();
+		result = !(containerBounds.left >= blockBouds.right || containerBounds.right <= blockBouds.left);
+		if (result) {
+			return false;
+		}
+	});
+
+	return result;
+};
+
+card.methods._calcButtonLayout = function() {
+	var container = this.view.get("buttonContainer");
+	if (container) {
+		var layout = this.config.get("initialIntentsDisplayMode");
+
+		var index = $.inArray(layout, this.buttonsLayoutsOrder);
+		if (index === -1) {
+			index = 0;
+		}
+
+		// prevent firing onresize event while we are doing some calculation
+		container.css({
+			"visibility": "hidden",
+			"overflow": "hidden"
+		});
+
+		do {
+			this.buttonsLayouts[this.buttonsLayoutsOrder[index++]].call(this);
+		} while (index < this.buttonsLayoutsOrder.length && this._haveButtonsCollisions());
+
+		container.css({
+			"visibility": "",
+			"overflow": ""
+		});
+	}
 };
 
 card.methods._checkItemContentHeight = function() {
@@ -1839,6 +1753,7 @@ card.css =
 	'.{class:children} .{class:avatar-wrapper}, .{class:childrenByCurrentActorLive} .{class:avatar-wrapper} { margin-top: 10px; }' +
 	'.{class:wrapper} { float: left; width: 100%; }' +
 	'.{class:subwrapper} { position: relative; }' +
+	'.{class:footer} { height: 23px; }' +
 
 	'.{class:children} .{class:data}, .{class:childrenByCurrentActorLive} .{class:data} { margin-left: 34px; }' +
 	'.{class:children} .{class:footer}, .{class:childrenByCurrentActorLive} .{class:footer} { margin-left: 34px; }' +
@@ -1857,7 +1772,6 @@ card.css =
 	'.{class:re} a:link, .{class:re} a:visited, .{class:re} a:active { text-decoration: none; }' +
 	'.{class:re} a:hover { text-decoration: underline; }' +
 	'.{class:body} { padding-top: 4px; }' +
-	'.{class:buttons} a.{class:button} { color: #C6C6C6; }' +
 	'.{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #476CB8; text-decoration: none; }' +
 	'.echo-sdk-ui .{class:sourceIcon} { height: 16px; width: 16px; }' +
 	'.{class:sourceIconLink} { float: left; display: block; line-height: 20px; margin-right: 10px; }' +
@@ -1886,7 +1800,20 @@ card.css =
 	'.{class:children} .{class:avatar}, .{class:childrenByCurrentActorLive} .{class:avatar} { width: 28px; height: 28px; }' +
 
 	'.{class:container} { background: #f8f8f8; }' +
-	'.{class:buttons} { white-space: nowrap; float: left; height: 23px; }' +
+	'.{class:buttonContainer} a.{class:button} { color: #C6C6C6; }' +
+	'.{class:buttonContainer}.{class:compactLayout} > ul > li > a > span { display: none; }' +
+	'.{class:buttonContainer}.{class:dropdownLayout} { position: relative; }' +
+	'.{class:buttonContainer}.{class:dropdownLayout} > a.dropdown-toggle { display: inline; }' +
+	'.{class:buttonContainer}.{class:dropdownLayout} .{class:buttons} > li { float: none; display: block; }' +
+	'.{class:buttonContainer}.{class:dropdownLayout} .{class:button} { margin: 0; }' +
+	'.{class:buttonContainer}.{class:dropdownLayout} li.dropdown-header { padding: 3px 0px; border-top: 1px solid #E5E5E5; margin-top: 10px; }' +
+	'.{class:buttonContainer}.{class:dropdownLayout} li.dropdown-header { cursor: inherit; }' +
+	'.{class:buttonContainer}.{class:dropdownLayout} li.dropdown-header > a > span { color: #999; }' +
+	'.{class:buttonContainer}.{class:dropdownLayout} li.dropdown-header > a > i { display: none; }' +
+	'.{class:buttonContainer}.{class:dropdownLayout} li.dropdown-header > a:hover { background: none; color: #999; }' +
+	'.{class:buttonContainer} { height: 23px; display: inline-block; }' +
+	'.{class:buttonContainer} > a.dropdown-toggle { display: none; }' +
+	'.{class:dropdownLayout} .{class:buttons} ul.dropdown-menu { display: block; position: initial; border: 0; box-shadow: none; margin: 0; padding: 0; font-size: 12px; }' +
 	'.{class:metadata} { margin-bottom: 8px; }' +
 	'.{class:body} { padding-top: 0px; margin-bottom: 8px; overflow: hidden; }' +
 	'.{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
@@ -1903,15 +1830,17 @@ card.css =
 	'.{class:children} .{class:subcontainer} { padding-top: 0px; background: none; border: none; }' +
 
 	'.echo-sdk-ui .{class:buttons} a:focus { outline: none; }' +
+	'.echo-sdk-ui .{class:buttons} { list-style: none; margin: 0; position: relative; white-space: nowrap; }' +
+	'.echo-sdk-ui .{class:buttons} > li { position: relative; display: inline-block; }' +
 	'.{class:button} { margin-right: 10px; line-height: 22px; }' +
 	'.{class:buttons} .dropdown .{class:button} { margin-right: 0px; }' +
 	'.{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{class:buttonIcon}[class*=" icon-"] { margin-right: 4px; margin-top: 0px; }' +
 	'.{class:dropdownButton} ul.dropdown-menu { left: -20px; }' +
-	'.{class:buttons} ul.dropdown-menu li.dropdown-header { padding: 3px 0px; border-top: 1px solid #E5E5E5; margin-top: 10px; }' +
-	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a:hover { background: none; color: #999; }' +
-	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a > i { background: none; }' +
-	'.{class:buttons} ul.dropdown-menu li.dropdown-header > a > span { color: #999; }' +
+	'.{class:dropdownLayout} .{class:buttons} ul.dropdown-menu li.dropdown-header { padding: 3px 0px; border-top: 1px solid #E5E5E5; margin-top: 10px; }' +
+	'.{class:dropdownLayout} .{class:buttons} ul.dropdown-menu li.dropdown-header > a:hover { background: none; color: #999; }' +
+	'.{class:dropdownLayout} .{class:buttons} ul.dropdown-menu li.dropdown-header > a > i { background: none; }' +
+	'.{class:dropdownLayout} .{class:buttons} ul.dropdown-menu li.dropdown-header > a > span { color: #999; }' +
 	'.{class:buttonIcon} { opacity: 0.3; }' +
 		'.{class:buttons} a.{class:button}.echo-linkColor,' +
 		'.echo-sdk-ui .{class:button}:active,' +
