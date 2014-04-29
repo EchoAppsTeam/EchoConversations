@@ -426,7 +426,7 @@ card.templates.mainHeader =
 						'</div>' +
 						'<div class="{class:metadata}"></div>' +
 						'<div class="{class:footer} echo-secondaryColor echo-secondaryFont">' +
-							'<img class="{class:sourceIcon} echo-clickable">' +
+							'<img class="{class:sourceIcon}">' +
 							'<div class="{class:buttonContainer}">' +
 								'<a class="dropdown-toggle {class:button}" data-toggle="dropdown" href="#">' +
 									'<i class="{class:buttonIcon} icon-list"></i>' +
@@ -817,12 +817,11 @@ card.renderers.sourceIcon = function(element) {
 		"href": this.get("data.source.uri", this.get("data.object.permalink"))
 	};
 	var config = {"openInNewWindow": this.config.get("parent.openLinksInNewWindow")};
-
 	return element
 		.wrap(Echo.Utils.hyperlink(data, config))
 		.attr("src", Echo.Utils.htmlize(url))
 		.one("error", function() {
-			element.hide();
+			element.unwrap.hide();
 		});
 };
 
@@ -1774,7 +1773,7 @@ card.css =
 	'.{class:body} { padding-top: 4px; }' +
 	'.{class:buttons} a.{class:button}.echo-linkColor, .{class:buttons} a.{class:button}:hover { color: #476CB8; text-decoration: none; }' +
 	'.echo-sdk-ui .{class:sourceIcon} { height: 16px; width: 16px; }' +
-	'.{class:sourceIconLink} { float: left; display: block; line-height: 20px; margin-right: 10px; }' +
+	'.{class:sourceIconLink} { display: inline-block; margin-right: 10px; width: 16px; }' +
 	'.{class:date}, .{class:from}, .{class:via} { float: left; }' +
 	'.{class:from} a, .{class:via} a { text-decoration: none; color: #C6C6C6; }' +
 	'.{class:from} a:hover, .{class:via} a:hover { color: #476CB8; }' +
@@ -1804,7 +1803,7 @@ card.css =
 	'.{class:buttonContainer}.{class:compactLayout} > ul > li > a > span { display: none; }' +
 	'.{class:buttonContainer}.{class:dropdownLayout} { position: relative; }' +
 	'.{class:buttonContainer}.{class:dropdownLayout} > a.dropdown-toggle { display: inline; }' +
-	'.{class:buttonContainer}.{class:dropdownLayout} .{class:buttons} > li { float: none; display: block; }' +
+	'.{class:buttonContainer}.{class:dropdownLayout} .{class:buttons} > li { float: none; display: block; line-height: 16px; }' +
 	'.{class:buttonContainer}.{class:dropdownLayout} .{class:button} { margin: 0; }' +
 	'.{class:buttonContainer}.{class:dropdownLayout} li.dropdown-header { padding: 3px 0px; border-top: 1px solid #E5E5E5; margin-top: 10px; }' +
 	'.{class:buttonContainer}.{class:dropdownLayout} li.dropdown-header { cursor: inherit; }' +
