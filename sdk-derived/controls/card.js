@@ -684,73 +684,6 @@ card.renderers.buttons = function(element) {
 	return element;
 };
 
-card.renderers._button = function(element, extra) {
-	var view = this.view.fork();
-	var template = extra.template || card.templates.button;
-
-	var data = {
-		"label": extra.label || "",
-		"name": extra.name,
-		"icon": extra.icon || (!extra.inner && "icon-comment")
-	};
-
-	var button = $("<li>").append(view.render({
-		"template": template,
-		"data": data
-	}));
-
-	var clickables = $(".echo-clickable", button);
-	if (!extra.clickable) return element.append(button);
-
-	if (extra.entries) {
-		var entries = $.map(extra.entries, function(entry) {
-			if (!Echo.Utils.invoke(entry.visible)) return null;
-
-			var item = $('<a role="button" class="echo-clickable" />').on("click", function() {
-				entry.callback && entry.callback.call(this, entry);
-			}).append(entry.label);
-			return $("<li>").append(item);
-		});
-		var menu = $('<ul class="dropdown-menu" role="menu">').append(entries);
-		button.addClass("dropdown-header").find("a").after(menu);
-
-		var footer = this.view.get("footer");
-		extra.callback = function(ev) {
-			var buttonOffset = footer.width() - button.position().left;
-			var minOffset = 10; // this is minimum offset for dropdown
-			var dropdownMenu = button.find(".dropdown-menu");
-			var dropdownWidth = dropdownMenu.outerWidth();
-			if (dropdownWidth > buttonOffset) {
-				var shifting = Math.min(buttonOffset - dropdownWidth - minOffset, 0);
-				dropdownMenu.css({"left": shifting + "px"});
-			}
-			button.find("a").dropdown("toggle");
-			ev.preventDefault();
-		};
-	}
-
-	if (!clickables.length) {
-		clickables = button;
-		button.addClass("echo-clickable");
-	}
-	clickables[extra.once ? "one" : "on"]({
-		"click": function(event) {
-			event.stopPropagation();
-			if (extra.callback) extra.callback(event);
-		}
-	});
-
-	var _data = this.get("buttons." + extra.plugin + "." + extra.name);
-	_data.view = view;
-	_data.element = button;
-	_data.clickableElements = clickables;
-	if (Echo.Utils.isMobileDevice()) {
-		clickables.addClass("echo-linkColor");
-	}
-
-	return element.append(button);
-};
-
 /**
  * @echo_renderer
  */
@@ -1081,6 +1014,73 @@ card.renderers._viaText = function(element, extra) {
 		"openInNewWindow": this.config.get("parent.openLinksInNewWindow")
 	});
 	return element.html("&nbsp;" + this.labels.get(extra.label + "Label") + "&nbsp;").append(a);
+};
+
+card.renderers._button = function(element, extra) {
+	var view = this.view.fork();
+	var template = extra.template || card.templates.button;
+
+	var data = {
+		"label": extra.label || "",
+		"name": extra.name,
+		"icon": extra.icon || (!extra.inner && "icon-comment")
+	};
+
+	var button = $("<li>").append(view.render({
+		"template": template,
+		"data": data
+	}));
+
+	var clickables = $(".echo-clickable", button);
+	if (!extra.clickable) return element.append(button);
+
+	if (extra.entries) {
+		var entries = $.map(extra.entries, function(entry) {
+			if (!Echo.Utils.invoke(entry.visible)) return null;
+
+			var item = $('<a role="button" class="echo-clickable" />').on("click", function() {
+				entry.callback && entry.callback.call(this, entry);
+			}).append(entry.label);
+			return $("<li>").append(item);
+		});
+		var menu = $('<ul class="dropdown-menu" role="menu">').append(entries);
+		button.addClass("dropdown-header").find("a").after(menu);
+
+		var footer = this.view.get("footer");
+		extra.callback = function(ev) {
+			var buttonOffset = footer.width() - button.position().left;
+			var minOffset = 10; // this is minimum offset for dropdown
+			var dropdownMenu = button.find(".dropdown-menu");
+			var dropdownWidth = dropdownMenu.outerWidth();
+			if (dropdownWidth > buttonOffset) {
+				var shifting = Math.min(buttonOffset - dropdownWidth - minOffset, 0);
+				dropdownMenu.css({"left": shifting + "px"});
+			}
+			button.find("a").dropdown("toggle");
+			ev.preventDefault();
+		};
+	}
+
+	if (!clickables.length) {
+		clickables = button;
+		button.addClass("echo-clickable");
+	}
+	clickables[extra.once ? "one" : "on"]({
+		"click": function(event) {
+			event.stopPropagation();
+			if (extra.callback) extra.callback(event);
+		}
+	});
+
+	var _data = this.get("buttons." + extra.plugin + "." + extra.name);
+	_data.view = view;
+	_data.element = button;
+	_data.clickableElements = clickables;
+	if (Echo.Utils.isMobileDevice()) {
+		clickables.addClass("echo-linkColor");
+	}
+
+	return element.append(button);
 };
 
 /**
