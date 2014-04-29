@@ -162,18 +162,21 @@ plugin.labels = {
 	"month12": "Dec"
 };
 
-plugin.dependencies = [{
-	"loaded": function() { return !!window.twttr; },
-	"url": "//platform.twitter.com/widgets.js"
-}];
-
 plugin.enabled = function() {
 	return this._isTweet();
 };
 
 plugin.events = {
 	"Echo.StreamServer.Controls.Card.onRender": function(topic, args) {
-		window.twttr && window.twttr.widgets && window.twttr.widgets.load();
+		if (window.twttr) {
+			window.twttr.widgets && window.twttr.widgets.load();
+		} else {
+			Echo.Loader.download([{
+				"url": "//platform.twitter.com/widgets.js"
+			}], function() {
+				window.twttr && window.twttr.widgets && window.twttr.widgets.load();
+			});
+		}
 		$.map(this.component.buttons[this.name], function(name) {
 			if (name && name.element) {
 				name.element.unbind("click");
