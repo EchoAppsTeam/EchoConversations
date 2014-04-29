@@ -281,7 +281,7 @@ plugin.methods._assembleButton = function(name) {
 };
 
 plugin.css =
-	'.{plugin.class:likesArea} { position: absolute; right: 0; }';
+	'.{plugin.class:likesArea} { position: absolute; right: 0; z-index: 10; }';
 
 Echo.Plugin.create(plugin);
 
