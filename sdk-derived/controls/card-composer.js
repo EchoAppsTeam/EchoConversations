@@ -1225,10 +1225,10 @@ composer.methods._initFormFields = function() {
 			el.prop("echo-processed", true);
 			var hint = el.attr("placeholder");
 			if (hint) {
-				el.placeholder();
 				if (el.attr("required")) {
 					el.attr("placeholder", hint + self.labels.get("required"));
 				}
+				el.placeholder();
 			}
 		});
 
