@@ -86,8 +86,8 @@ plugin.labels = {
 };
 
 plugin.dependencies = [{
-	"control": "Echo.StreamServer.Controls.FacePile",
-	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js"
+	"control": "Echo.StreamServer.Controls.FaceCollection",
+	"url": "{%= baseURLs.prod %}/streamserver.pack.js"
 }];
 
 /**
@@ -105,8 +105,8 @@ plugin.renderers.flaggedBy = function(element) {
 		return element.hide();
 	}
 	var flagsPerPage = 5;
-	var visibleUsersCount = plugin.get("facepile")
-		? plugin.get("facepile").getVisibleUsersCount()
+	var visibleUsersCount = plugin.get("facecollection")
+		? plugin.get("facecollection").getVisibleUsersCount()
 		: flagsPerPage;
 	var config = plugin.config.assemble({
 		"target": element,
@@ -117,7 +117,7 @@ plugin.renderers.flaggedBy = function(element) {
 		"initialUsersCount": visibleUsersCount,
 		"suffixText": plugin.labels.get("flaggedThis")
 	});
-	plugin.set("facepile", new Echo.StreamServer.Controls.FacePile(config));
+	plugin.set("facecollection", new Echo.StreamServer.Controls.FaceCollection(config));
 	return element.show();
 };
 

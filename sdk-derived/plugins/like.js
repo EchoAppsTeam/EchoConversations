@@ -78,7 +78,7 @@ plugin.labels = {
 
 plugin.dependencies = [{
 	"control": "Echo.StreamServer.Controls.FaceCollection",
-	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js"
+	"url": "{%=baseURL%}/streamserver.pack.js"
 }];
 
 plugin.events = {

@@ -331,10 +331,10 @@ conversations.config.normalizer = {
 };
 
 conversations.dependencies = [{
-	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js",
+	"url": "{config:cdnBaseURL.sdk}/api.pack.js",
 	"control": "Echo.StreamServer.API"
 }, {
-	"url": "{%= baseURLs.dev %}/streamserver.pack.js",
+	"url": "{%= baseURLs.prod %}/streamserver.pack.js",
 	"control": "Echo.StreamServer.Controls.CardComposer"
 }, {
 	"url": "{%= baseURLs.prod %}/third-party/jquery.placeholder.js",

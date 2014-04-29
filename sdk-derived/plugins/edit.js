@@ -50,8 +50,8 @@ plugin.labels = {
 };
 
 plugin.dependencies = [{
-	"control": "Echo.StreamServer.Controls.Submit",
-	"url": "{config:cdnBaseURL.sdk}/streamserver.pack.js"
+	"control": "Echo.StreamServer.Controls.CardComposer",
+	"url": "{%= baseURLs.prod %}/streamserver.pack.js"
 }];
 
 plugin.methods._composerConfig = function(item, target) {
