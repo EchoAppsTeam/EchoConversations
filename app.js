@@ -466,7 +466,7 @@ conversations.renderers.resizeFrame = function(element) {
 	var self = this;
 	element.on('load', function() {
 		var timeout;
-		this.contentWindow.onresize = function() {
+		$(this.contentWindow).on("resize",function() {
 			if (timeout) {
 				clearTimeout(timeout);
 			}
@@ -475,7 +475,7 @@ conversations.renderers.resizeFrame = function(element) {
 					"topic": "onAppResize"
 				});
 			}, 50);
-		};
+		});
 	});
 	return element;
 };
