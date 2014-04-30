@@ -197,6 +197,7 @@ counter.methods._maybeUpdate = function(data) {
 				"target": this.config.get("target").get(0)
 			}
 		});
+
 		this.set("data", data);
 		this.render();
 	}
@@ -224,6 +225,7 @@ counter.methods._error = function(data, options) {
 	});
 	if (data.errorCode === "more_than") {
 		this.set("data.count", data.errorMessage + "+");
+		this.request.abort();
 		this.render();
 	} else {
 		if (typeof options.critical === "undefined" || options.critical && options.requestType === "initial") {

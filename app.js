@@ -914,7 +914,6 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 };
 
 conversations.methods._getStreamPluginList = function(componentID, overrides) {
-	var self = this;
 	var auth = this.config.get("auth");
 	var config = this.config.get(componentID);
 	var moderationExtraActions = this.config.get("topPosts.visible")
@@ -938,13 +937,9 @@ conversations.methods._getStreamPluginList = function(componentID, overrides) {
 	}, {
 		"name": "CardEventsProxy",
 		"onAdd": function() {
-			var counter = self.getComponent(componentID + "Counter");
-			counter && counter.request.liveUpdates.start(true);
 			overrides.onItemAdd && overrides.onItemAdd();
 		},
 		"onDelete": function() {
-			var counter = self.getComponent(componentID + "Counter");
-			counter && counter.request.liveUpdates.start(true);
 			overrides.onItemDelete && overrides.onItemDelete();
 		}
 	}, {
