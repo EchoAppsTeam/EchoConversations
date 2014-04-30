@@ -662,6 +662,7 @@ composer.renderers.compactField = function(element) {
 	var self = this;
 	return element.on("focus", function() {
 		self.expand();
+		self.focus();
 	});
 };
 

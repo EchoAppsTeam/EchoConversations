@@ -250,7 +250,6 @@ plugin.events = {
 	"Echo.StreamServer.Controls.CardComposer.onExpand": function() {
 		var composer = this.component;
 		composer.config.get("target").show();
-		composer.focus();
 	},
 	"Echo.StreamServer.Controls.CardComposer.onCollapse": function() {
 		var composer = this.component;
