@@ -566,9 +566,13 @@ composer.renderers.tabs = function(element) {
 			};
 		}),
 		"panels": this.view.get("composers").empty(),
+		"select": function() {
+			self.collapsed && self.expand();
+		},
 		"shown": function(tab, panel, id, index) {
 			self.currentComposer = self.composers[index];
 			self._initCurrentComposer();
+			self.focus();
 		}
 	});
 
