@@ -130,19 +130,8 @@ plugin.component.renderers.avatar = function(element) {
 };
 
 plugin.component.renderers.content = function(element) {
-	var item = this.component;
-
-	if (item.user.is("admin")) {
-		var status = this.get("itemStatus") || "Untouched";
-		element.addClass(this.cssPrefix + "status-" + status);
-	}
-
-	return this.parentRenderer("content", arguments);
-};
-
-plugin.component.renderers.container = function(element) {
 	this._updateItemStatus();
-	return this.parentRenderer("container", arguments);
+	return this.parentRenderer("content", arguments);
 };
 
 plugin.statuses = [
@@ -175,16 +164,16 @@ plugin.methods._updateUserStatus = function() {
 plugin.methods._updateItemStatus = function() {
 	var item = this.component;
 	var self = this;
-	var container = item.view.get("container");
+	var content = item.view.get("content");
 
-	if (container) {
-		container.removeClass($.map(plugin.statuses, function(status) {
+	if (content) {
+		content.removeClass($.map(plugin.statuses, function(status) {
 			return self.cssPrefix + "status-" + status;
 		}).join(" "));
 
 		if (item.user.is("admin")) {
 			var status = this.get("itemStatus", "Untouched");
-			container.addClass(this.cssPrefix + "status-" + status);
+			content.addClass(this.cssPrefix + "status-" + status);
 		}
 	}
 };
