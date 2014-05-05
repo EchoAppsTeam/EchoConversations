@@ -1280,13 +1280,29 @@ card.methods._pageLayoutChange = function() {
 
 card.methods._isButtonsContainerFits = function() {
 	var container = this.view.get("buttonsContainer");
-	var blocks = this.view.get("footer").children(":not(div.echo-clear)").not(container);
+	var footer = this.view.get("footer");
 	var containerBounds = container[0].getBoundingClientRect();
+	var footerBounds = footer[0].getBoundingClientRect();
 
+	var isInside =
+		footerBounds.left <= containerBounds.left &&
+		footerBounds.right >= containerBounds.right &&
+		footerBounds.bottom >= containerBounds.bottom &&
+		footerBounds.top <= containerBounds.top;
+
+	if (!isInside) return false;
+
+	var blocks = footer.children(":not(div.echo-clear)").not(container);
 	var noConflict = true;
 	blocks.each(function() {
 		var blockBounds = this.getBoundingClientRect();
-		noConflict = containerBounds.left >= blockBounds.right || containerBounds.right <= blockBounds.left;
+
+		noConflict =
+			containerBounds.left >= blockBounds.right ||
+			containerBounds.right <= blockBounds.left ||
+			containerBounds.bottom <= blockBounds.top ||
+			containerBounds.top >= blockBounds.bottom;
+
 		if (!noConflict) {
 			return false;
 		}
@@ -1309,19 +1325,19 @@ card.methods._calcButtonsLayout = function() {
 	}
 
 	// prevent firing onresize event while we are doing some calculation
-	container.css({
-		"visibility": "hidden",
-		"overflow": "hidden"
-	});
+	//container.css({
+		//"visibility": "hidden",
+		//"overflow": "hidden"
+	//});
 
 	do {
 		this.buttonsLayouts[this.buttonsLayoutsOrder[index++]].call(this);
 	} while (index < this.buttonsLayoutsOrder.length && !this._isButtonsContainerFits());
 
-	container.css({
-		"visibility": "",
-		"overflow": ""
-	});
+	//container.css({
+		//"visibility": "",
+		//"overflow": ""
+	//});
 };
 
 card.methods._checkItemContentHeight = function() {
@@ -1751,6 +1767,7 @@ card.css =
 	'.{class:children} .{class:avatar-wrapper}, .{class:childrenByCurrentActorLive} .{class:avatar-wrapper} { margin-top: 10px; }' +
 	'.{class:wrapper} { float: left; width: 100%; }' +
 	'.{class:subwrapper} { position: relative; }' +
+	'.{class:footer} { white-space: nowrap; }' +
 
 	'.{class:children} .{class:data}, .{class:childrenByCurrentActorLive} .{class:data} { margin-left: 34px; }' +
 	'.{class:children} .{class:footer}, .{class:childrenByCurrentActorLive} .{class:footer} { margin-left: 34px; }' +
