@@ -281,8 +281,7 @@ plugin.methods._assembleButton = function(name) {
 };
 
 plugin.css =
-	'.{plugin.class:likesArea} { float: right; }' +
-	'.{plugin.class:likedBy} { float: left; margin-right: 3px; }';
+	'.{plugin.class:likesArea} { position: absolute; right: 0; z-index: 10; }';
 
 Echo.Plugin.create(plugin);
 
@@ -340,7 +339,7 @@ plugin.component.renderers.actors = function() {
 
 plugin.css =
 	'.{plugin.class} .{class:and} { display: none; }' +
-	'.{plugin.class} .{class:more} { float: right; font-size: 12px; margin-top: 5px;  white-space: nowrap; }';
+	'.{plugin.class} .{class:more} { float: right; font-size: 12px; white-space: nowrap; }';
 
 Echo.Plugin.create(plugin);
 

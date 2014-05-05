@@ -281,7 +281,7 @@ plugin.methods._assembleButton = function(name) {
 				"href": "https://twitter.com/intent/" + name + "?in_reply_to=" + id + "&tweet_id=" + id,
 				"class": "{class:button} intentControl {class:button}-{data:name}",
 				"caption":
-					'<i class="{class:buttonIcon} icon-{data:name}"></i>' +
+					'<i class="icon-{data:name} {class:buttonIcon}"></i>' +
 					'<span class="echo-primaryFont {class:buttonCaption}">{data:label}</span>'
 			}, {
 				"openInNewWindow": true,

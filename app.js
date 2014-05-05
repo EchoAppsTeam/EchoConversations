@@ -466,7 +466,7 @@ conversations.renderers.resizeFrame = function(element) {
 	var self = this;
 	element.on('load', function() {
 		var timeout;
-		this.contentWindow.onresize = function() {
+		$(this.contentWindow).on("resize",function() {
 			if (timeout) {
 				clearTimeout(timeout);
 			}
@@ -475,7 +475,7 @@ conversations.renderers.resizeFrame = function(element) {
 					"topic": "onAppResize"
 				});
 			}, 50);
-		};
+		});
 	});
 	return element;
 };
@@ -906,7 +906,8 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"markAsRead": config.markItemsAsReadOn,
 			"viaLabel": {
 				"icon": config.displaySourceIcons
-			}
+			},
+			"initialIntentsDisplayMode": config.initialIntentsDisplayMode
 		},
 		"data": this.get("data." + componentID + "-search"),
 		"query": this._assembleSearchQuery(componentID)
