@@ -358,7 +358,7 @@ dashboard.vars = {
 					"component": "Checkbox",
 					"name": "visible",
 					"type": "boolean",
-					"default": false,
+					"default": true,
 					"config": {
 						"title": "Visible",
 						"desc": "If enabled, users can submit Comments with attachments (Resolve URLs enabled required)"

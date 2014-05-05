@@ -24,7 +24,7 @@ conversations.config = {
 				"enabled": true,
 				"resolveURLs": true,
 				"attachments": {
-					"visible": false,
+					"visible": true,
 					"sources": "COMPUTER, IMAGE_SEARCH, INSTAGRAM, PICASA, FLICKR, FACEBOOK, DROPBOX, URL, WEBCAM"
 				}
 			},
@@ -62,7 +62,7 @@ conversations.config = {
 				"prompt": "What's on your mind?",
 				"resolveURLs": true,
 				"attachments": {
-					"visible": false,
+					"visible": true,
 					"sources": "COMPUTER, IMAGE_SEARCH, INSTAGRAM, PICASA, FLICKR, FACEBOOK, DROPBOX, URL, WEBCAM"
 				}
 			},
