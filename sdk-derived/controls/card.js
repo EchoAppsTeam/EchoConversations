@@ -1464,6 +1464,7 @@ card.methods._getActiveVisualizer = function() {
 					// type and visualizer means we should move to
 					// the next type and/or next visualizer
 					if (!condition()) {
+						found = false;
 						return false;
 					}
 					found = true;
