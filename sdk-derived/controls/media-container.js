@@ -233,21 +233,21 @@ media.css =
 	'.{class:container}::-webkit-scrollbar-thumb { background: #D2D2D2; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }' +
 
 	// single > attachments panel
-	'.{class:single} > .{class:attachmentsPanel} { border: 1px solid #D8D8D8; border-bottom: 0; }' +
+	'.{class:single} > .{class:attachmentsPanel} { border: 1px solid #D8D8D8; border-bottom: 0; padding: 5px; }' +
 
 	// multiple > attachments panel
 	'.{class:container}.{class:multiple} > .{class:attachmentsPanel} { width: 90%; }' +
 	'.{class:container}.{class:multiple} > .{class:attachmentsPanel} > .{class:attachmentsPanel-wrapper} { margin: 0px 8px 0px 0px; }' +
 
 	// attachments panel
-	'.{class:container} > div.{class:attachmentsPanel} { height: 100%; max-height: 388px; cursor: pointer; background-color: #f1f1f1; text-align: center; font-size: 16px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #9f9f9f; font-weight: normal; padding: 1px 0 0 0; max-width: 100%; }' +
+	'.{class:container} > div.{class:attachmentsPanel} { max-height: 388px; cursor: pointer; background-color: #f1f1f1; text-align: center; font-size: 16px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #9f9f9f; font-weight: normal; max-width: 100%; }' +
 	'.{class:attachmentsPanel-plus} { font-size: 128px; line-height: 128px; font-weight: bold; width: 128px; height: 128px; margin: 0 auto; }' +
 	'.{class:strippedBackground} { ' +
 		gradientStyle("left top, #e3e3e3 0%, #e3e3e3 25%, #eee 25%, #eee 50%, #e3e3e3 50%, #e3e3e3 75%, #eee 75%") + '; ' +
 		'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#e3e3e3", endColorstr="#eeeeee",GradientType=0 ); ' +
 		'background-size: 70px 70px;' +
 	'}' +
-	'.{class:container} > .{class:attachmentsPanel} > .{class:attachmentsPanel-wrapper} { border: 1px solid #C4C4C4; margin: 5px; border-radius: 2px; }' +
+	'.{class:container} > .{class:attachmentsPanel} > .{class:attachmentsPanel-wrapper} { border: 1px solid #C4C4C4; border-radius: 2px; }' +
 	'.{class:attachmentsPanel-container} { padding: 10px 0 40px 0; margin: 5px; }' +
 	'.{class:attachmentsPanel-tooltip} { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; white-space: nowrap; text-overflow: ellipsis; line-height: 16px; overflow: hidden; }' +
 	'.{class:loading-animation} {background-image: url("{%= baseURLs.prod %}/sdk-derived/images/loading.gif"); background-repeat: no-repeat; background-position: 24px 39px; }';
