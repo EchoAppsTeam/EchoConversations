@@ -246,6 +246,14 @@ dashboard.vars = {
 			})
 		}
 	}, {
+		"component": "Checkbox",
+		"type": "boolean",
+		"name": "openLinksInNewWindow",
+		"default": true,
+		"config": {
+			"title": "Open links in new window"
+		}
+	}, {
 		"component": "Group",
 		"name": "moderation",
 		"type": "object",
@@ -698,7 +706,7 @@ dashboard.config.normalizer = {
 					var items = assembleBaseECL.call(this);
 
 					items[3]["default"] = 5; // override initialItemsPerPage value
-					items[18]["items"][0]["default"] = true;
+					items[19]["items"][0]["default"] = true;
 					items.pop();
 
 					items.splice(6, 0, {
@@ -717,7 +725,7 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
-					items[18]["items"].push(component.get("premoderationECL"));
+					items[19]["items"].push(component.get("premoderationECL"));
 					items.splice(12, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
@@ -755,7 +763,6 @@ dashboard.config.normalizer = {
 		});
 	}
 };
-
 
 dashboard.init = function() {
 	var parent = $.proxy(this.parent, this);
