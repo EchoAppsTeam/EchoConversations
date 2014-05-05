@@ -53,7 +53,7 @@ plugin.labels = {
 	/**
 	 * @echo_label
 	 */
-	"URL": "URL"
+	"URL": "URL (required)"
 };
 
 plugin.methods.buildComposer = function() {

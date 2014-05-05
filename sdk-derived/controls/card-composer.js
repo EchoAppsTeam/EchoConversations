@@ -409,11 +409,7 @@ composer.labels = {
 	/**
 	 * @echo_label
 	 */
-	"yourName": "Your Name",
-	/**
-	 * @echo_label
-	 */
-	"required": " (required)"
+	"yourName": "Your Name (required)"
 };
 
 composer.events = {
@@ -1228,13 +1224,7 @@ composer.methods._initFormFields = function() {
 			var el = $(this);
 			if (el.prop("echo-processed")) return;
 			el.prop("echo-processed", true);
-			var hint = el.attr("placeholder");
-			if (hint) {
-				el.placeholder();
-				if (el.attr("required")) {
-					el.attr("placeholder", hint + self.labels.get("required"));
-				}
-			}
+			if (el.attr("placeholder")) el.placeholder();
 		});
 
 	var globalFields = init(this.config.get("target"), "_global");
