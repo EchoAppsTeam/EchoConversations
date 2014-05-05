@@ -1028,9 +1028,9 @@ card.renderers._button = function(element, extra) {
 		"data": data
 	}));
 
-	var clickables = $(".echo-clickable", button);
 	if (!extra.clickable) return element.append(button);
 
+	var clickables = $(".echo-clickable", button);
 	if (extra.entries) {
 		var entries = $.map(extra.entries, function(entry) {
 			if (!Echo.Utils.invoke(entry.visible)) return null;
@@ -1278,12 +1278,13 @@ card.methods._pageLayoutChange = function() {
 	this._checkItemContentHeight();
 };
 
-card.methods._isButtonsContainerFits = function() {
+card.methods._doesButtonsContainerFit = function() {
 	var container = this.view.get("buttonsContainer");
 	var footer = this.view.get("footer");
 	var containerBounds = container[0].getBoundingClientRect();
 	var footerBounds = footer[0].getBoundingClientRect();
 
+	// check if buttons container is completely inside of footer
 	var isInside =
 		footerBounds.left <= containerBounds.left &&
 		footerBounds.right >= containerBounds.right &&
@@ -1324,20 +1325,9 @@ card.methods._calcButtonsLayout = function() {
 		index = 0;
 	}
 
-	// prevent firing onresize event while we are doing some calculation
-	//container.css({
-		//"visibility": "hidden",
-		//"overflow": "hidden"
-	//});
-
 	do {
 		this.buttonsLayouts[this.buttonsLayoutsOrder[index++]].call(this);
-	} while (index < this.buttonsLayoutsOrder.length && !this._isButtonsContainerFits());
-
-	//container.css({
-		//"visibility": "",
-		//"overflow": ""
-	//});
+	} while (index < this.buttonsLayoutsOrder.length && !this._doesButtonsContainerFit());
 };
 
 card.methods._checkItemContentHeight = function() {
@@ -1850,6 +1840,7 @@ card.css =
 	'.{class:buttons} .dropdown .{class:button} { margin-right: 0px; }' +
 	'.{class:button-delim} { display: none; }' +
 	'.echo-sdk-ui .{class:buttonIcon}[class^="icon-"] { margin-right: 4px; margin-top: 0px; }' +
+	'.echo-sdk-ui .{class:buttonIcon}[class*="icon-"] { margin-right: 4px; margin-top: 0px; }' +
 	'.{class:dropdownButton} ul.dropdown-menu { left: -20px; }' +
 	'.{class:dropdownLayout} .{class:buttons} ul.dropdown-menu li.dropdown-header { padding: 3px 0px; border-top: 1px solid #E5E5E5; margin-top: 10px; }' +
 	'.{class:dropdownLayout} .{class:buttons} ul.dropdown-menu li.dropdown-header > a:hover { background: none; color: #999; }' +
