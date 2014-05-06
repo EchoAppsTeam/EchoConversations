@@ -430,6 +430,10 @@ collection.labels = {
 	/**
 	 * @echo_label
 	 */
+	"noMoreItems": "No items at this time...",
+	/**
+	 * @echo_label
+	 */
 	"emptyStream": "No items at this time...",
 	/**
 	 * @echo_label
@@ -829,7 +833,7 @@ collection.methods._requestMoreItems = function(element) {
 						self.view.render({"name": "body"});
 						self.view.render({"name": "more"});
 					} else {
-						element.html(self.labels.get("emptyStream"))
+						element.html(self.labels.get("noMoreItems"))
 							.delay(1000)
 							.fadeOut(1000);
 					}
