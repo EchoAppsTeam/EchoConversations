@@ -660,10 +660,12 @@ composer.renderers.tags = function(element) {
  */
 composer.renderers.compactField = function(element) {
 	var self = this;
-	return element.on("focus", function() {
-		self.expand();
-		self.focus();
-	});
+	return element
+		.placeholder()
+		.on("focus", function() {
+			self.expand();
+			self.focus();
+		});
 };
 
 /**
