@@ -1226,7 +1226,13 @@ composer.methods._initFormFields = function() {
 			var el = $(this);
 			if (el.prop("echo-processed")) return;
 			el.prop("echo-processed", true);
-			if (el.attr("placeholder")) el.placeholder();
+			if (el.attr("placeholder")) {
+				// placeholder function removes the focus from element,
+				// so we should restore it after placeholder method call.
+				var isFocused = el.is(":focus");
+				el.placeholder();
+				isFocused && el.focus();
+			}
 		});
 
 	var globalFields = init(this.config.get("target"), "_global");
