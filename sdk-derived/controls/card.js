@@ -1788,10 +1788,6 @@ card.css =
 	'.{class:textToggleTruncated} { margin-left: 5px; }' +
 	'.{class:blocker-backdrop} { position: absolute; left: 0px; top: 0px; background: #FFFFFF; opacity: 0.7; z-index: 100; }' +
 	'.{class:blocker-message} { position: absolute; z-index: 200; width: 200px; height: 20px; line-height: 20px; text-align: center; background-color: #FFFF99; border: 1px solid #C6C677; opacity: 0.7; -moz-border-radius: 0.5em 0.5em 0.5em 0.5em; }' +
-	'.{class:expandChildren} { display: none; text-align: center; padding: 8px 0px; margin-bottom: 0px;  font-size: 12px;}' +
-	'.{class:expandChildren} .{class:expandChildrenLabel} { display: inline-block; padding-left: 22px; }' +
-	'.{class:expandChildren} .echo-message-icon { background: url("{config:cdnBaseURL.sdk-assets}/images/whirlpool.png") no-repeat 5px 4px; }' +
-	'.{class:expandChildren} .{class:message-loading} { background: no-repeat left top url("{config:cdnBaseURL.sdk-assets}/images/loading.gif"); }' +
 	'.echo-sdk-ui .{class:dropdownButton} { display: inline; margin-left: 0px; }' +
 	'.echo-sdk-ui .{class:dropdownButton} > .dropdown { display: inline; }' +
 	'.echo-sdk-ui .{class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
@@ -1860,12 +1856,14 @@ card.css =
 	'.{class:depth-0} .{class:date} { line-height: 40px; }' +
 	'.{class:chevron} { margin-top: 0px !important; }' +
 	'.{class:expandChildrenLabel} { margin-right: 5px; }' +
-	'.{class:expandChildren} .{class:expandChildrenLabel} { color: #D3D3D3; }' +
-	'.{class:expandChildren}:hover .{class:expandChildrenLabel} { color: #262626; }' +
+	'.{class:expandChildren} { display: none; text-align: center; padding: 8px 0px; margin-bottom: 0px; font-size: 12px; }' +
+	'.{class:expandChildren} .{class:expandChildrenLabel} { display: inline-block; padding-left: 22px; color: #D3D3D3; }' +
 	'.{class:expandChildren} .{class:chevron} { opacity: 0.3; }' +
+	'.{class:expandChildren}:hover .{class:expandChildrenLabel} { color: #262626; }' +
 	'.{class:expandChildren}:hover .{class:chevron} { opacity: 0.8; }' +
 	'.{class:expandChildren} .echo-message-icon { padding-left: 0px; background: none; }' +
 	'.{class:expandChildren} .{class:message-loading} { background: none; }' +
+	'.{class:expandChildren} .echo-control-message { padding: 0; border:none; border-radius: 0; box-shadow: none; text-align: center; font-size: 12px; line-height: 16px; }' +
 	'.echo-sdk-ui .{class:mediaAvatar} > img { width: 28px; height: 28px; border-radius: 50%; margin-right: 6px; }' +
 	'.{class:depth-0} .{class:footer} { padding: 8px 0px 10px; }' +
 	'.{class:depth-0} .{class:body} { padding-top: 0px; }' +

@@ -841,6 +841,7 @@ collection.methods._requestMoreItems = function(element) {
 			}
 		});
 	}
+
 	// FIXME: "more" requests are always initial ones
 	this.moreRequest.requestType = "initial";
 	this.moreRequest.send({
@@ -1800,7 +1801,7 @@ collection.css =
 	'.{class:more}:hover, .{class:fullStateLayout}:hover { background-color: #E4E4E4; }' +
 	'.{class:more}, .{class:fullStateLayout} { text-align: center; border: solid 1px #E4E4E4; margin-top: 10px; padding: 10px; cursor: pointer; font-weight: bold; }' +
 	'div.{class:body} > div.echo-streamserver-controls-card:last-child ul.dropdown-menu { top: auto; bottom: 100%; }' +
-	'.{class:more} .echo-app-message { padding: 0; border: none; border-radius: 0; }' +
+	'.{class:more} .echo-control-message { padding: 0; border: none; border-radius: 0; font-size: 12px; line-height: 16px; }' +
 	'.{class:more} { border: 1px solid #d8d8d8; border-bottom-width: 2px; }' +
 	'.{class:messageText} { border: 1px solid #d8d8d8; border-bottom-width: 2px; border-radius: 3px; }' +
 	'.{class:header} { padding: 5px 0px 5px 0px; margin: 0px; font-size: 14px; }' +
