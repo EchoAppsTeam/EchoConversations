@@ -37,7 +37,7 @@ plugin.templates.photo =
 	'<div class="{plugin.class:item}">' +
 		'<div class="{plugin.class:photo}">' +
 			'<div class="{plugin.class:photoContainer}">' +
-				'<img class="{plugin.class:photoThumbnail}" src="{data:object.parsedContent.oembed.url}" title="{data:object.parsedContent.oembed.title}">' +
+				'<img class="{plugin.class:photoThumbnail}" title="{data:object.parsedContent.oembed.title}">' +
 			'</div>' +
 		'</div>' +
 	'</div>';
@@ -87,31 +87,24 @@ plugin.renderers.photoThumbnail = function(element) {
 	var thumbnail = isArticle
 		? this.component.get("data.object.parsedContent.oembed.thumbnail_url")
 		: this.component.get("data.object.parsedContent.oembed.url");
-	// we are to create empty img tag because of IE.
-	// If we have an empty src attribute it triggers
-	// error event all the time.
-	var img = $("<img />");
-	img.attr("class", element.attr("class"));
+
 	if (this.component.config.get("limits.maxMediaWidth")) {
-		img.css("max-width", this.component.config.get("limits.maxMediaWidth"));
+		element.css("max-width", this.component.config.get("limits.maxMediaWidth"));
 	}
-	if (element.attr("title")) {
-		img.attr("title", element.attr("title"));
-	}
-	img.load(function(e) {
+
+	return element.one("load", function(e) {
 		self.events.publish({
 			"topic": "onMediaLoad"
 		});
-	}).error(function(e) {
+	}).one("error", function(e) {
 		if (isArticle) {
 			self.view.get("photo").hide();
 		} else {
-			img.replaceWith(self.substitute({
+			element.hide().after(self.substitute({
 				"template": '<div class="{plugin.class:noMediaAvailable}"><span>{plugin.label:noMediaAvailable}</span></div>'
 			}));
 		}
 	}).attr("src", thumbnail);
-	return element.replaceWith(img);
 };
 
 plugin.renderers.photoContainer = function(element) {

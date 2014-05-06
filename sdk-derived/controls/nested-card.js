@@ -10,7 +10,7 @@ card.templates.photo =
 		'<div class="{class:border}">' +
 			'<div class="{class:photo}">' +
 				'<div class="{class:photoContainer}">' +
-					'<img class="{class:photoThumbnail}" src="{data:thumbnail_url}" title="{data:title}"/>' +
+					'<img class="{class:photoThumbnail}" title="{data:title}"/>' +
 				'</div>' +
 			'</div>' +
 
@@ -243,32 +243,24 @@ card.renderers.photoThumbnail = function(element) {
 	var thumbnail = isArticle
 		? this.get("data.thumbnail_url")
 		: this.get("data.url");
-	// we are to create empty img tag because of IE.
-	// If we have an empty src attribute it triggers
-	// error event all the time.
-	var img = $("<img />");
-	img.attr("class", element.attr("class"));
+
 	if (this.config.get("maxMediaWidth")) {
-		img.css("max-width", this.config.get("maxMediaWidth"));
+		element.css("max-width", this.config.get("maxMediaWidth"));
 	}
-	if (element.attr("title")) {
-		img.attr("title", element.attr("title"));
-	}
-	img.load(function(e) {
+
+	return element.one("load", function(e) {
 		self.events.publish({
 			"topic": "onMediaLoad"
 		});
-	}).error(function(e) {
+	}).one("error", function(e) {
 		if (isArticle) {
 			self.view.get("photo").hide();
 		} else {
-			img.replaceWith(self.substitute({
+			element.hide().after(self.substitute({
 				"template": '<div class="{class:noMediaAvailable}"><span>{label:noMediaAvailable}</span></div>'
 			}));
 		}
 	}).attr("src", thumbnail);
-
-	return element.replaceWith(img);
 };
 
 card.renderers.photoContainer = function(element) {
