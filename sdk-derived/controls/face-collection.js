@@ -563,7 +563,7 @@ collection.methods._intersperse = function(object, separator) {
 };
 
 collection.css =
-	'.{class:container} { vertical-align: top; line-height: 22px; }' +
+	'.{class:container} { vertical-align: top; line-height: 22px; white-space: normal; }' +
 	'.{class:more} { white-space: nowrap; vertical-align: middle; }' +
 	'.{class:suffixText}, .{class:delimiter}, .{class:and} { vertical-align: middle; }' +
 	'.{class:more}.echo-linkColor a, .{class:more}.echo-linkColor a:hover { color: #476CB8; text-decoration: underline; }' +
