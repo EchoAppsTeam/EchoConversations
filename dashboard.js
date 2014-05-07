@@ -247,7 +247,7 @@ dashboard.vars = {
 		"config": {
 			"title": "Reply Nesting Levels",
 			"desc": "Specifies the depth of replies allowed in the conversation thread",
-			"options": $.map([1,2,3,4,5], function(i) {
+			"options": $.map([0,1,2,3,4,5], function(i) {
 				return {
 					"title": i + "",
 					"value": i
