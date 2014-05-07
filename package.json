@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "grunt": "~0.4.4",
-    "sphere": "~0.2.1",
+    "sphere": "~0.2.2",
     "lodash": "~2.4.1",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-copy": "~0.5.0",
