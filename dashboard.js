@@ -213,6 +213,15 @@ dashboard.vars = {
 			"desc": "Enable twitter items."
 		}
 	}, {
+		"component": "Checkbox",
+		"type": "boolean",
+		"name": "openLinksInNewWindow",
+		"default": true,
+		"config": {
+			"title": "Open links in new window",
+			"desc": "If enabled, each link will be opened in a new window."
+		}
+	}, {
 		"component": "Select",
 		"name": "likesDisplayStyle",
 		"type": "string",
@@ -244,14 +253,6 @@ dashboard.vars = {
 					"value": i
 				};
 			})
-		}
-	}, {
-		"component": "Checkbox",
-		"type": "boolean",
-		"name": "openLinksInNewWindow",
-		"default": true,
-		"config": {
-			"title": "Open links in new window"
 		}
 	}, {
 		"component": "Group",
