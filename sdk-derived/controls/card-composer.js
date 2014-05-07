@@ -524,7 +524,7 @@ composer.renderers.container = function(element) {
 		this.toggleModeHandler = function(event) {
 			if (self.collapsed || self.cardProcessing) return;
 			var target = self.config.get("target");
-			var isInTarget = target && target.find(event.target).length;
+			var isInTarget = target.is(event.target) || target.find(event.target).length;
 			if (isInTarget) return;
 			self.collapse();
 		};
