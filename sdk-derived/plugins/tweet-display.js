@@ -280,6 +280,7 @@ plugin.methods._assembleButton = function(name) {
 			"template": Echo.Utils.hyperlink({
 				"href": "https://twitter.com/intent/" + name + "?in_reply_to=" + id + "&tweet_id=" + id,
 				"class": "{class:button} intentControl {class:button}-{data:name}",
+				"title": plugin.labels.get(name),
 				"caption":
 					'<i class="icon-{data:name} {class:buttonIcon}"></i>' +
 					'<span class="echo-primaryFont {class:buttonCaption}">{data:label}</span>'
