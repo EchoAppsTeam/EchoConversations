@@ -979,7 +979,7 @@ conversations.methods._getConditionalStreamPluginList = function(componentID) {
 	}, $.extend(true, replyComposer, {
 		"intentID": "Reply",
 		"name": "Reply",
-		"enabled": replyComposer.visible && replyContentTypePlugins.length,
+		"enabled": replyComposer.visible && replyContentTypePlugins.length && config.replyNestingLevels,
 		"displayCompactForm": this.config.get("replyComposer.displayCompactForm"),
 		"pauseTimeout": +(this._isModerationRequired() && replyComposer.confirmation.timeout),
 		"requestMethod": "POST",
