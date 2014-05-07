@@ -85,7 +85,7 @@ conversations.config = {
 		"plugins": []
 	},
 	"topPosts": {
-		"visible": true,
+		"visible": false,
 		"label": "Top Posts",
 		"markItemsAsReadOn": "viewportenter", // "viewportenter" or "mouseenter"
 		"queryOverride": "",

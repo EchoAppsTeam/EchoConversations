@@ -706,6 +706,7 @@ dashboard.config.normalizer = {
 				"topPosts": function() {
 					var items = assembleBaseECL.call(this);
 
+					items[0]["default"] = false; // override visible value
 					items[3]["default"] = 5; // override initialItemsPerPage value
 					items[19]["items"][0]["default"] = true;
 					items.pop();
