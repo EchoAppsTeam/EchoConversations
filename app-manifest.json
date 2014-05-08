@@ -28,7 +28,7 @@
 		"type": "external",
 		"title": "Documentation",
 		"config": {
-			"src": "http://emb.echoplatform.com/conversations/docs/overview"
+			"src": "http://emb.echoplatform.com/comments/docs/overview/"
 		}
 	}],
 	"client_widget": {
