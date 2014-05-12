@@ -220,7 +220,7 @@ plugin.methods._hideSubmit = function(animate) {
 
 	var submit = this.get("submit");
 	if (submit) {
-		submit.set("data", undefined);
+		submit.set("data", {});
 	}
 	this.set("expanded", false);
 

@@ -403,8 +403,8 @@ submitPlugin.methods._getResolvedMedia = function() {
 submitPlugin.methods._getUniqueFormKey = function() {
 	var key = "app-";
 	var item = this.component;
-	if (item.data.unique) {
-		key += item.data.unique;
+	if (item.get("data.unique")) {
+		key += item.get("data.unique");
 	} else if (item.config.get("intentID")) {
 		key += item.config.get("intentID") + item.config.get("targetURL");
 	} else {
