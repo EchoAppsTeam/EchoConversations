@@ -92,23 +92,15 @@ dashboard.vars = {
 			"data": {"sample": 500}
 		}
 	}, {
-		"component": "Checkbox",
-		"name": "enableIntentsResponsiveness",
-		"type": "boolean",
-		"default": true,
-		"config": {
-			"title": "Enable Intents responsiveness",
-			"desc": "If enabled, Intents respect the size of a container and switch from full mode (icon + label) -> icons only -> dropdown menu with the list of Intents. Otherwise, Intents UI always remains the same at any container size."
-		}
-	}, {
 		"component": "Select",
 		"name": "initialIntentsDisplayMode",
 		"type": "string",
 		"default": "inline",
 		"config": {
 			"title": "Intents Initial Display Mode",
+			"desc": "Specifies initial display mode of item Intents (icon + label, icon only or a list of actions in a dropdown).",
 			"options": [{
-				"title": "Full",
+				"title": "Full (icon + label)",
 				"value": "inline"
 			}, {
 				"title": "Icons only",
@@ -119,26 +111,13 @@ dashboard.vars = {
 			}]
 		}
 	}, {
-		"component": "Select",
-		"name": "initialSortOrder",
-		"type": "string",
-		"default": "reverseChronological",
+		"component": "Checkbox",
+		"name": "enableIntentsResponsiveness",
+		"type": "boolean",
+		"default": true,
 		"config": {
-			"title": "Initial Sort Order",
-			"desc": "Specifies the initial ordering of posts in this stream",
-			"options": [{
-				"title": "Newest First",
-				"value": "reverseChronological"
-			}, {
-				"title": "Oldest First",
-				"value": "chronological"
-			}, {
-				"title": "Most Popular",
-				"value": "repliesDescending"
-			}, {
-				"title": "Most Likes",
-				"value": "likesDescending"
-			}]
+			"title": "Enable Intents responsiveness",
+			"desc": "If enabled, Intents respect the size of a container and switch from full mode (icon + label) -> icons only -> dropdown menu with the list of Intents. Otherwise, Intents UI always remains the same at any container size."
 		}
 	}, {
 		"component": "Checkbox",
@@ -232,6 +211,28 @@ dashboard.vars = {
 		}
 	}, {
 		"component": "Select",
+		"name": "initialSortOrder",
+		"type": "string",
+		"default": "reverseChronological",
+		"config": {
+			"title": "Initial Sort Order",
+			"desc": "Specifies the initial ordering of posts in this stream",
+			"options": [{
+				"title": "Newest First",
+				"value": "reverseChronological"
+			}, {
+				"title": "Oldest First",
+				"value": "chronological"
+			}, {
+				"title": "Most Popular",
+				"value": "repliesDescending"
+			}, {
+				"title": "Most Likes",
+				"value": "likesDescending"
+			}]
+		}
+	}, {
+		"component": "Select",
 		"name": "likesDisplayStyle",
 		"type": "string",
 		"default": "facepile",
@@ -258,7 +259,7 @@ dashboard.vars = {
 			"desc": "Specifies the depth of replies allowed in the conversation thread",
 			"options": $.map([0,1,2,3,4,5], function(i) {
 				return {
-					"title": i + "",
+					"title": i + (i === 0 ? " (no replies)" : ""),
 					"value": i
 				};
 			})
@@ -737,7 +738,7 @@ dashboard.config.normalizer = {
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
 					items[20]["items"].push(component.get("premoderationECL"));
-					items.splice(13, 0, {
+					items.splice(12, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
 						"type": "boolean",
