@@ -907,7 +907,8 @@ conversations.methods._assembleStreamConfig = function(componentID, overrides) {
 			"viaLabel": {
 				"icon": config.displaySourceIcons
 			},
-			"initialIntentsDisplayMode": config.initialIntentsDisplayMode
+			"initialIntentsDisplayMode": config.initialIntentsDisplayMode,
+			"enableIntentsResponsiveness": config.enableIntentsResponsiveness
 		},
 		"data": this.get("data." + componentID + "-search"),
 		"query": this._assembleSearchQuery(componentID)

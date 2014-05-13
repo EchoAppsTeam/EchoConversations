@@ -92,6 +92,15 @@ dashboard.vars = {
 			"data": {"sample": 500}
 		}
 	}, {
+		"component": "Checkbox",
+		"name": "enableIntentsResponsiveness",
+		"type": "boolean",
+		"default": true,
+		"config": {
+			"title": "Enable Intents responsiveness",
+			"desc": "If enabled, Intents respect the size of a container and switch from full mode (icon + label) -> icons only -> dropdown menu with the list of Intents. Otherwise, Intents UI always remains the same at any container size."
+		}
+	}, {
 		"component": "Select",
 		"name": "initialIntentsDisplayMode",
 		"type": "string",
@@ -708,10 +717,10 @@ dashboard.config.normalizer = {
 
 					items[0]["default"] = false; // override visible value
 					items[3]["default"] = 5; // override initialItemsPerPage value
-					items[19]["items"][0]["default"] = true;
+					items[20]["items"][0]["default"] = true;
 					items.pop();
 
-					items.splice(6, 0, {
+					items.splice(7, 0, {
 						"component": "Checkbox",
 						"name": "includeTopContributors",
 						"type": "boolean",
@@ -727,8 +736,8 @@ dashboard.config.normalizer = {
 				},
 				"allPosts": function() {
 					var items = assembleBaseECL.call(this);
-					items[19]["items"].push(component.get("premoderationECL"));
-					items.splice(12, 0, {
+					items[20]["items"].push(component.get("premoderationECL"));
+					items.splice(13, 0, {
 						"component": "Checkbox",
 						"name": "displayCommunityFlagIntent",
 						"type": "boolean",

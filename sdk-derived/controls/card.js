@@ -239,7 +239,8 @@ card.config = {
 	"fadeTimeout": 5000, // 5 seconds
 	"mediaWidth": 340,
 	"manualRendering": false,
-	"initialIntentsDisplayMode": "normal" // normal, compact, dropdown
+	"initialIntentsDisplayMode": "normal", // normal, compact, dropdown
+	"enableIntentsResponsiveness": true
 };
 
 card.config.normalizer = {
@@ -1325,9 +1326,15 @@ card.methods._calcButtonsLayout = function() {
 		index = 0;
 	}
 
+	console.log("enableIntentsResponsiveness", this.config.get("enableIntentsResponsiveness"));
+
 	do {
 		this.buttonsLayouts[this.buttonsLayoutsOrder[index++]].call(this);
-	} while (index < this.buttonsLayoutsOrder.length && !this._doesButtonsContainerFit());
+	} while (
+		this.config.get("enableIntentsResponsiveness") &&
+		index < this.buttonsLayoutsOrder.length &&
+		!this._doesButtonsContainerFit()
+	);
 };
 
 card.methods._checkItemContentHeight = function() {
