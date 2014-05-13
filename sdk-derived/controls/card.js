@@ -1326,8 +1326,6 @@ card.methods._calcButtonsLayout = function() {
 		index = 0;
 	}
 
-	console.log("enableIntentsResponsiveness", this.config.get("enableIntentsResponsiveness"));
-
 	do {
 		this.buttonsLayouts[this.buttonsLayoutsOrder[index++]].call(this);
 	} while (
