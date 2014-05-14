@@ -140,11 +140,13 @@ media.methods._showAttachmentsPanel = function() {
 	// which we don`t need here.
 	// TODO: it should be replaced by animation or proper show function.
 	panel.css("display", "");
+	this.events.publish({"topic": "onAttachmentsPanelShow"});
 };
 
 media.methods._hideAttachmentsPanel = function() {
 	var panel = this.view.get("attachmentsPanel");
 	panel && panel.hide();
+	this.events.publish({"topic": "onAttachmentsPanelHide"});
 };
 
 media.methods._changePanelLayoutState = function(state) {
