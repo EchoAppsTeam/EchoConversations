@@ -888,7 +888,7 @@ card.renderers.expandChildren = function(element, extra) {
 		return element;
 	}
 	if (!this.hasMoreChildren()) {
-		element.slideUp(this.config.get("children.moreButtonSlideTimeout"));
+		element.slideUp(this.config.get("parent.children.moreButtonSlideTimeout"));
 		return element;
 	}
 	extra = extra || {};
