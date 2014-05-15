@@ -10,7 +10,11 @@ plugin.init = function() {
 	this.component.registerVisualizer({
 		"id": "video",
 		"objectTypes": {
-			"http://activitystrea.ms/schema/1.0/video": ["rootItems"]
+			"http://activitystrea.ms/schema/1.0/video": ["rootItems", function() {
+				// TODO: Add same validation for other plugins
+				var oembed = self.component.get("data.object.parsedContent.oembed");
+				return Echo.Utils.sanitizeOEmbed(oembed);
+			}]
 		},
 		"init": function() {
 			self.extendTemplate("replace", "data", plugin.templates.label);
