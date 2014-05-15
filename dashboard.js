@@ -502,14 +502,6 @@ dashboard.config = {
 			"customValueTitle": "Use this URL"
 		}
 	}, {
-		"component": "Checkbox",
-		"name": "bozoFilter",
-		"type": "boolean",
-		"config": {
-			"title": "Enable Bozo Filter",
-			"desc": "If enabled, ensures that users see their own post irrespective of the moderation state of that post"
-		}
-	}, {
 		"component": "Group",
 		"name": "presentation",
 		"type": "object",
