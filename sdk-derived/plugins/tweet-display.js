@@ -299,27 +299,33 @@ plugin.methods._isTweet = function() {
 };
 
 plugin.methods._getTweetTime = function(getFull) {
-	var item = this.component;
-	var d = new Date(item.timestamp * 1000);
+	var d = new Date(this.component.timestamp * 1000);
+	if (getFull) {
+		return this.labels.get("fullDate", {
+			"time": d.toLocaleTimeString(),
+			"date": d.toLocaleDateString()
+		});
+	}
 	var now = (new Date()).getTime();
 	var diff = Math.floor((now - d.getTime()) / 1000);
-	var result;
-	if (getFull) {
-		result = this.labels.get("fullDate", {"time": d.toLocaleTimeString(), "date": d.toLocaleDateString()});
-	} else {
-		if (diff < 60) {
-			result = this.labels.get("secondsAgo", {"seconds": diff});
-		} else if(diff < 60 * 60) {
-			result = this.labels.get("minutesAgo", {"minutes": Math.floor(diff / 60)});
-		} else if(diff < 60 * 60 * 24) {
-			result = this.labels.get("hoursAgo", {"hours": Math.floor(diff / (60 * 60))});
-		} else if (diff < 60 * 60 * 24 * 365) {
-			result = this.labels.get("monthsAgo", {"day": d.getDate(), "month": this.labels.get("month" + (d.getMonth() + 1))});
-		} else {
-			result = this.labels.get("yearsAgo", {"day": d.getDate(), "month": this.labels.get("month" + (d.getMonth() + 1)), "year": d.getFullYear()});
-		}
+	if (diff < 60) {
+		return this.labels.get("secondsAgo", {"seconds": diff});
 	}
-	return result;
+	if (diff < 60 * 60) {
+		return this.labels.get("minutesAgo", {"minutes": Math.floor(diff / 60)});
+	}
+	if (diff < 60 * 60 * 24) {
+		return this.labels.get("hoursAgo", {"hours": Math.floor(diff / (60 * 60))});
+	}
+	var data = {
+		"day": d.getDate(),
+		"month": this.labels.get("month" + (d.getMonth() + 1))
+	};
+	if (diff < 60 * 60 * 24 * 365) {
+		return this.labels.get("monthsAgo", data);
+	}
+	data.year = d.getFullYear();
+	return this.labels.get("yearsAgo", data);
 };
 
 plugin.methods._extractTwitterID = function() {
