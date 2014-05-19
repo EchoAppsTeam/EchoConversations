@@ -825,24 +825,17 @@ composer.renderers.postButtonSwitcher = function(element) {
  * @echo_renderer
  */
 composer.renderers.switchToPost = function(element) {
-	var self = this;
-	return element.off("click").on("click", function(e) {
-		self._switchAutoSharing("off");
-		e.preventDefault();
-	});
+	this._setAutoSharingHandler(element, "off");
+	return element;
 };
 
 /**
  * @echo_renderer
  */
 composer.renderers.switchToPostAndShare = function(element) {
-	var self = this;
-	return element.off("click").on("click", function(e) {
-		self._switchAutoSharing("on");
-		e.preventDefault();
-	});
+	this._setAutoSharingHandler(element, "on");
+	return element;
 };
-
 
 composer.renderers._metaFields = function(element, extra) {
 	var type = extra.type;
@@ -1269,6 +1262,14 @@ composer.methods._setPostButtonState = function(state) {
 	this.postButtonState = state;
 	this.view.render({"name": "postButton"});
 	this.view.render({"name": "postButtonSwitcher"});
+};
+
+composer.methods._setAutoSharingHandler = function(element, mode) {
+	var self = this;
+	element.off("click").on("click", function(e) {
+		self._switchAutoSharing(mode);
+		e.preventDefault();
+	});
 };
 
 composer.methods._switchAutoSharing = function(state) {
