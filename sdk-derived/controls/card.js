@@ -265,7 +265,7 @@ card.config.normalizer = {
 		entry.object.content_type = entry.object.content_type || "text";
 		entry.object.accumulators = entry.object.accumulators || {};
 		$.each(["repliesCount", "flagsCount", "likesCount"], function(i, name) {
-			entry.object.accumulators[name] = parseInt(entry.object.accumulators[name] || "0", 10);
+			entry.object.accumulators[name] = +(entry.object.accumulators[name] || 0);
 		});
 		entry.object.context = entry.object.context || [];
 		entry.object.flags = entry.object.flags || [];
@@ -1213,8 +1213,8 @@ card.methods.block = function(label) {
 			"template": '<div class="{class:blocker-message}">{data:label}</div>',
 			"data": {"label": label}
 		})).css({
-			"left": ((parseInt(width, 10) - 200)/2) + 'px',
-			"top": ((parseInt(height, 10) - 20)/2) + 'px'
+			"left": ((width - 200) / 2) + "px",
+			"top": ((height - 20) / 2) + "px"
 		})
 	};
 	content.addClass("echo-relative")
