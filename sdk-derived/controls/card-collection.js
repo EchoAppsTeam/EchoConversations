@@ -7,7 +7,7 @@ var $ = jQuery;
  * @class Echo.StreamServer.Controls.CardCollection
  * Echo Stream control which encapsulates interaction with the
  * <a href="http://echoplatform.com/streamserver/docs/rest-api/items-api/search/" target="_blank">Echo Search API</a>
- * and displays live updating search results in a standard ‘news feed’ style format.
+ * and displays live updating search results in a standard "news feed" style format.
  *
  * 	var collection = new Echo.StreamServer.Controls.CardCollection({
  * 		"target": document.getElementById("stream"),
