@@ -5,6 +5,43 @@ if (Echo.App.isDefined("Echo.Apps.Conversations")) return;
 
 var conversations = Echo.App.manifest("Echo.Apps.Conversations");
 
+var sortOrderEntries = [{
+	"title": "Newest First",
+	"value": "reverseChronological"
+}, {
+	"title": "Oldest First",
+	"value": "chronological"
+}, {
+	"title": "Most popular",
+	"value": "repliesDescending"
+}, {
+	"title": "Most likes",
+	"value": "likesDescending"
+}];
+
+var cardContentTypes = {
+	"comments": {
+		"renderer": "CommentCard",
+		"enabled": true
+	},
+	"photos": {
+		"renderer": "PhotoCard",
+		"enabled": true
+	},
+	"links": {
+		"renderer": "LinkCard",
+		"enabled": true
+	},
+	"articles": {
+		"renderer": "ArticleCard",
+		"enabled": true
+	},
+	"videos": {
+		"renderer": "VideoCard",
+		"enabled": true
+	}
+};
+
 conversations.config = {
 	"refreshOnUserInvalidate": false,
 	"targetURL": "",
@@ -110,19 +147,7 @@ conversations.config = {
 		"itemMarkers": [],
 		"itemTypes": [],
 		"openLinksInNewWindow": true,
-		"sortOrderEntries": [{
-			"title": "Newest First",
-			"value": "reverseChronological"
-		}, {
-			"title": "Oldest First",
-			"value": "chronological"
-		}, {
-			"title": "Most popular",
-			"value": "repliesDescending"
-		}, {
-			"title": "Most likes",
-			"value": "likesDescending"
-		}],
+		"sortOrderEntries": sortOrderEntries,
 		"moderation": {
 			"displayCommunityFlaggedPosts": true,
 			"displaySystemFlaggedPosts": true
@@ -131,28 +156,7 @@ conversations.config = {
 			"onPostCountUpdate": null
 		},
 		"plugins": [],
-		"contentTypes": {
-			"comments": {
-				"renderer": "CommentCard",
-				"enabled": true
-			},
-			"photos": {
-				"renderer": "PhotoCard",
-				"enabled": true
-			},
-			"links": {
-				"name": "LinkCard",
-				"enabled": true
-			},
-			"articles": {
-				"renderer": "ArticleCard",
-				"enabled": true
-			},
-			"videos": {
-				"renderer": "VideoCard",
-				"enabled": true
-			}
-		}
+		"contentTypes": cardContentTypes
 	},
 	"allPosts": {
 		"visible": true,
@@ -180,19 +184,7 @@ conversations.config = {
 		"itemMarkers": [],
 		"itemTypes": [],
 		"openLinksInNewWindow": true,
-		"sortOrderEntries": [{
-			"title": "Newest First",
-			"value": "reverseChronological"
-		}, {
-			"title": "Oldest First",
-			"value": "chronological"
-		}, {
-			"title": "Most popular",
-			"value": "repliesDescending"
-		}, {
-			"title": "Most likes",
-			"value": "likesDescending"
-		}],
+		"sortOrderEntries": sortOrderEntries,
 		"moderation": {
 			"displayCommunityFlaggedPosts": false,
 			"displaySystemFlaggedPosts": true,
@@ -206,28 +198,7 @@ conversations.config = {
 			"onPostCountUpdate": null
 		},
 		"plugins": [],
-		"contentTypes": {
-			"comments": {
-				"renderer": "CommentCard",
-				"enabled": true
-			},
-			"photos": {
-				"renderer": "PhotoCard",
-				"enabled": true
-			},
-			"links": {
-				"renderer": "LinkCard",
-				"enabled": true
-			},
-			"articles": {
-				"renderer": "ArticleCard",
-				"enabled": true
-			},
-			"videos": {
-				"renderer": "VideoCard",
-				"enabled": true
-			}
-		}
+		"contentTypes": cardContentTypes
 	},
 	"moderationQueue": {
 		"label": "Moderation Queue",
