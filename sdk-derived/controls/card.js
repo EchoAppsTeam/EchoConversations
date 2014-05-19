@@ -1018,15 +1018,13 @@ card.renderers._button = function(element, extra) {
 	var view = this.view.fork();
 	var template = extra.template || card.templates.button;
 
-	var data = {
-		"label": extra.label || "",
-		"name": extra.name,
-		"icon": extra.icon || (!extra.inner && "icon-comment")
-	};
-
 	var button = $("<li>").append(view.render({
 		"template": template,
-		"data": data
+		"data": {
+			"label": extra.label || "",
+			"name": extra.name,
+			"icon": extra.icon || (!extra.inner && "icon-comment")
+		}
 	}));
 
 	if (!extra.clickable) return element.append(button);
@@ -1070,10 +1068,10 @@ card.renderers._button = function(element, extra) {
 		}
 	});
 
-	var _data = this.get("buttons." + extra.plugin + "." + extra.name);
-	_data.view = view;
-	_data.element = button;
-	_data.clickableElements = clickables;
+	var data = this.get("buttons." + extra.plugin + "." + extra.name);
+	data.view = view;
+	data.element = button;
+	data.clickableElements = clickables;
 	if (Echo.Utils.isMobileDevice()) {
 		clickables.addClass("echo-linkColor");
 	}
@@ -1337,10 +1335,10 @@ card.methods._calcButtonsLayout = function() {
 
 card.methods._checkItemContentHeight = function() {
 	var body = this.view.get("body");
-	var text = this.view.get("text");
 	var button = this.view.get("seeMore");
 
 	if (body && button) {
+		var text = this.view.get("text");
 		var maxBodyHeight = this.config.get("limits.maxBodyHeight");
 		var lineHeight = parseInt(text.css("line-height"), 10);
 		var fontSize = parseInt(text.css("font-size"), 10);
