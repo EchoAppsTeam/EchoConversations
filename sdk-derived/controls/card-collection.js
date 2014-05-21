@@ -7,7 +7,7 @@ var $ = jQuery;
  * @class Echo.StreamServer.Controls.CardCollection
  * Echo Stream control which encapsulates interaction with the
  * <a href="http://echoplatform.com/streamserver/docs/rest-api/items-api/search/" target="_blank">Echo Search API</a>
- * and displays live updating search results in a standard ‘news feed’ style format.
+ * and displays live updating search results in a standard "news feed" style format.
  *
  * 	var collection = new Echo.StreamServer.Controls.CardCollection({
  * 		"target": document.getElementById("stream"),
@@ -16,7 +16,7 @@ var $ = jQuery;
  * 	});
  *
  * More information regarding the possible ways of the Control initialization
- * can be found in the [“How to initialize Echo components”](#!/guide/how_to_initialize_components-section-initializing-an-app) guide.
+ * can be found in the ["How to initialize Echo components"](#!/guide/how_to_initialize_components-section-initializing-an-app) guide.
  *
  * @extends Echo.Control
  *
@@ -1083,7 +1083,7 @@ collection.methods._appendRootItems = function(items, container) {
 collection.methods._constructChildrenSearchQuery = function(item) {
 	// depth for item children request
 	var depth = this.config.get("children.maxDepth") - item.get("depth") - 1;
-	var additionalItems = parseInt(this.config.get("children.additionalItemsPerPage"), 10);
+	var additionalItems = +this.config.get("children.additionalItemsPerPage");
 	var pageAfter = item.getNextPageAfter();
 	var filter = this.config.get("children.filter");
 	var filterQuery = !filter || filter === "()" ? "" : filter + " ";
@@ -1091,7 +1091,7 @@ collection.methods._constructChildrenSearchQuery = function(item) {
 		"childrenof": item.get("data.object.id"),
 		"children": depth,
 		"childrenItemsPerPage": depth
-			? parseInt(this.config.get("children.itemsPerPage"), 10)
+			? +this.config.get("children.itemsPerPage")
 			: 0,
 		"itemsPerPage": additionalItems,
 		"sortOrder": this.config.get("children.sortOrder"),
@@ -1771,7 +1771,7 @@ collection.methods.normalizeEntry = function(entry) {
 	entry.object.content_type = entry.object.content_type || "text";
 	entry.object.accumulators = entry.object.accumulators || {};
 	$.each(["repliesCount", "flagsCount", "likesCount"], function(i, name) {
-		entry.object.accumulators[name] = parseInt(entry.object.accumulators[name] || "0", 10);
+		entry.object.accumulators[name] = +(entry.object.accumulators[name] || 0);
 	});
 	entry.object.context = entry.object.context || [];
 	entry.object.flags = entry.object.flags || [];

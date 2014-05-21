@@ -265,7 +265,7 @@ card.config.normalizer = {
 		entry.object.content_type = entry.object.content_type || "text";
 		entry.object.accumulators = entry.object.accumulators || {};
 		$.each(["repliesCount", "flagsCount", "likesCount"], function(i, name) {
-			entry.object.accumulators[name] = parseInt(entry.object.accumulators[name] || "0", 10);
+			entry.object.accumulators[name] = +(entry.object.accumulators[name] || 0);
 		});
 		entry.object.context = entry.object.context || [];
 		entry.object.flags = entry.object.flags || [];
@@ -1018,15 +1018,13 @@ card.renderers._button = function(element, extra) {
 	var view = this.view.fork();
 	var template = extra.template || card.templates.button;
 
-	var data = {
-		"label": extra.label || "",
-		"name": extra.name,
-		"icon": extra.icon || (!extra.inner && "icon-comment")
-	};
-
 	var button = $("<li>").append(view.render({
 		"template": template,
-		"data": data
+		"data": {
+			"label": extra.label || "",
+			"name": extra.name,
+			"icon": extra.icon || (!extra.inner && "icon-comment")
+		}
 	}));
 
 	if (!extra.clickable) return element.append(button);
@@ -1070,10 +1068,10 @@ card.renderers._button = function(element, extra) {
 		}
 	});
 
-	var _data = this.get("buttons." + extra.plugin + "." + extra.name);
-	_data.view = view;
-	_data.element = button;
-	_data.clickableElements = clickables;
+	var data = this.get("buttons." + extra.plugin + "." + extra.name);
+	data.view = view;
+	data.element = button;
+	data.clickableElements = clickables;
 	if (Echo.Utils.isMobileDevice()) {
 		clickables.addClass("echo-linkColor");
 	}
@@ -1215,8 +1213,8 @@ card.methods.block = function(label) {
 			"template": '<div class="{class:blocker-message}">{data:label}</div>',
 			"data": {"label": label}
 		})).css({
-			"left": ((parseInt(width, 10) - 200)/2) + 'px',
-			"top": ((parseInt(height, 10) - 20)/2) + 'px'
+			"left": ((width - 200) / 2) + "px",
+			"top": ((height - 20) / 2) + "px"
 		})
 	};
 	content.addClass("echo-relative")
@@ -1337,10 +1335,10 @@ card.methods._calcButtonsLayout = function() {
 
 card.methods._checkItemContentHeight = function() {
 	var body = this.view.get("body");
-	var text = this.view.get("text");
 	var button = this.view.get("seeMore");
 
 	if (body && button) {
+		var text = this.view.get("text");
 		var maxBodyHeight = this.config.get("limits.maxBodyHeight");
 		var lineHeight = parseInt(text.css("line-height"), 10);
 		var fontSize = parseInt(text.css("font-size"), 10);

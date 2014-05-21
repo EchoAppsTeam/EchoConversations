@@ -3,7 +3,7 @@
 
 /**
  * @class Echo.StreamServer.Controls.CardCollection.Plugins.Reply
- * Adds extra “Reply” button to each item in the Echo Stream control.
+ * Adds extra "Reply" button to each item in the Echo Stream control.
  * Integrates Echo Submit Composer control and provides the ability to submit
  * replies to the posted items.
  *
@@ -16,7 +16,7 @@
  *		});
  *
  * More information regarding the plugins installation can be found
- * in the [“How to initialize Echo components”](#!/guide/how_to_initialize_components-section-initializing-plugins) guide.
+ * in the ["How to initialize Echo components"](#!/guide/how_to_initialize_components-section-initializing-plugins) guide.
  *
  * @extends Echo.Plugin
  *
@@ -184,7 +184,7 @@ Echo.Plugin.create(plugin);
  * 	});
  *
  * More information regarding the plugins installation can be found
- * in the [“How to initialize Echo components”](#!/guide/how_to_initialize_components-section-initializing-plugins) guide.
+ * in the ["How to initialize Echo components"](#!/guide/how_to_initialize_components-section-initializing-plugins) guide.
  *
  * @extends Echo.Plugin
  *
@@ -219,7 +219,7 @@ Echo.Plugin.create(plugin);
  * 	});
  *
  * More information regarding the plugins installation can be found
- * in the [“How to initialize Echo components”](#!/guide/how_to_initialize_components-section-initializing-plugins) guide.
+ * in the ["How to initialize Echo components"](#!/guide/how_to_initialize_components-section-initializing-plugins) guide.
  *
  * @extends Echo.Plugin
  *
