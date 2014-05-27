@@ -356,12 +356,13 @@ conversations.init = function() {
 		app.render();
 		app.ready();
 	});
-
-	this._viewportChangeTimeout = null;
-	// We cannot pass _viewportChange method as an event handler. In this case it will be called with wrong context.
-	this._viewportChangeHandler = function() {
-		app._viewportChange.call(app);
-	};
+	this._viewportChangeHandler = Echo.Utils.debounce(function() {
+		app.events.publish({
+			"topic": "onViewportChange",
+			"global": false,
+			"bubble": false
+		});
+	}, this.config.get("viewportChangeTimeout"));
 	if (
 		this.config.get("allPosts.markItemsAsReadOn") === "viewportenter"
 		|| this.config.get("topPosts.markItemsAsReadOn") === "viewportenter"
@@ -435,18 +436,15 @@ conversations.renderers.streamingStateContainer = function(element) {
 
 conversations.renderers.resizeFrame = function(element) {
 	var self = this;
-	element.on('load', function() {
-		var timeout;
-		$(this.contentWindow).on("resize",function() {
-			if (timeout) {
-				clearTimeout(timeout);
-			}
-			timeout = setTimeout(function() {
+	element.on("load", function() {
+		$(this.contentWindow).on(
+			"resize",
+			Echo.Utils.debounce(function() {
 				self.events.publish({
 					"topic": "onAppResize"
 				});
-			}, 50);
-		});
+			}, 50)
+		);
 	});
 	return element;
 };
@@ -830,20 +828,6 @@ conversations.methods.setStreamingState = function(state, permanent) {
 		}
 	});
 	this.view.render({"name": "streamingState"});
-};
-
-conversations.methods._viewportChange = function() {
-	var self = this;
-	if (this._viewportChangeTimeout) {
-		clearTimeout(this._viewportChangeTimeout);
-	}
-	this._viewportChangeTimeout = setTimeout(function() {
-		self.events.publish({
-			"topic": "onViewportChange",
-			"global": false,
-			"bubble": false
-		});
-	}, this.config.get("viewportChangeTimeout"));
 };
 
 conversations.methods._assembleStreamConfig = function(componentID, overrides) {
