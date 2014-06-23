@@ -956,6 +956,8 @@ collection.methods._applyLiveUpdates = function(entries, callback) {
 							"propagation": false
 						});
 						self._applySpotUpdates("add", item);
+					} else {
+						item.destroy();
 					}
 					_callback();
 				});
@@ -1264,8 +1266,11 @@ collection.methods._spotUpdates.add = function(item, options) {
 	// we should change the operation to "replace"
 	var _item = this.items[item.get("data.unique")];
 	if (_item && _item.view.rendered() && options.priority !== "high") {
-		this._applySpotUpdates("replace", item, {"priority": "highest"});
-
+		this._applySpotUpdates("replace", this._updateItem(item.get("data")), {"priority": "highest"});
+		// in case of "replace" operation we use incoming "item" object
+		// as a source of information and destroy this object after update
+		// application to cleanup the memory consumed by the object
+		item.destroy();
 		return;
 	}
 	this._applyStructureUpdates("add", item);
