@@ -393,13 +393,11 @@ dashboard.vars = {
 						"validators": [sourcesValidator],
 						"data": {
 							"sample": "COMPUTER, INSTAGRAM, FACEBOOK, FLICKR, DROPBOX, PICASA, EVERNOTE, FTP, GITHUB, BOX, GOOGLE_DRIVE, SKYDRIVE, WEBDAV, GMAIL, IMAGE_SEARCH, URL, VIDEO, WEBCAM"
+						},
+						"link": {
+							"src": "//developers.inkfilepicker.com/docs/web/#pick",
+							"title": "Click to view documentation"
 						}
-					}
-				}, {
-					"component": "TextField",
-					"name": "sourcesHelp",
-					"config": {
-						"data": {"value": "<a href=\"//developers.inkfilepicker.com/docs/web/#pick\" target=\"_blank\">Documentation</a>"}
 					}
 				}]
 			}]
@@ -430,13 +428,11 @@ dashboard.vars = {
 					"validators": [sourcesValidator],
 					"data": {
 						"sample": "COMPUTER, INSTAGRAM, FACEBOOK, FLICKR, DROPBOX, PICASA, EVERNOTE, FTP, GITHUB, BOX, GOOGLE_DRIVE, SKYDRIVE, WEBDAV, GMAIL, IMAGE_SEARCH, URL, VIDEO, WEBCAM"
+					},
+					"link": {
+						"src": "//developers.inkfilepicker.com/docs/web/#pick",
+						"title": "Click to view documentation"
 					}
-				}
-			}, {
-				"component": "TextField",
-				"name": "sourcesHelp",
-				"config": {
-					"data": {"value": "<a href=\"//developers.inkfilepicker.com/docs/web/#pick\" target=\"_blank\">Documentation</a>"}
 				}
 			}]
 		}, {
