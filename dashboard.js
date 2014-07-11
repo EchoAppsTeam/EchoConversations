@@ -311,7 +311,7 @@ dashboard.vars = {
 		"component": "Checkbox",
 		"name": "displaySharingOnPost",
 		"type": "boolean",
-		"default": "true",
+		"default": true,
 		"config": {
 			"title": "Display Sharing on Post",
 			"desc": "If enabled, users will be given the option to share their Posts on submit"
