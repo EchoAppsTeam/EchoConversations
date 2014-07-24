@@ -51,7 +51,9 @@ plugin.renderers.playButton = function(element) {
 	var self = this;
 	var oembed = this.component.get("data.object.parsedContent.oembed");
 	element.on("click", function() {
-		self.view.get("videoPlaceholder").empty().append($(oembed.html));
+		self.view.get("videoPlaceholder").empty().append(
+			Echo.Utils.sanitizeOEmbedHTML(oembed.html)
+		);
 	});
 	return element;
 };
@@ -60,7 +62,9 @@ plugin.renderers.videoPlaceholder = function(element) {
 	var oembed = this.component.get("data.object.parsedContent.oembed");
 
 	if (!oembed.thumbnail_url) {
-		element.empty().append($(oembed.html));
+		element.empty().append(
+			Echo.Utils.sanitizeOEmbedHTML(oembed.html)
+		);
 	}
 
 	return element.css("padding-bottom", oembed.height / oembed.width * 100 + "%");

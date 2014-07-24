@@ -1125,7 +1125,7 @@ card.methods.parseContent = function(visualizer) {
 	var attachments = content.find("div[data-oembed]");
 	var oembed = attachments.map(function() {
 		var oembed = $(this).data("oembed");
-		return Echo.Utils.oEmbedValidate(oembed) ? oembed : null;
+		return Echo.Utils.sanitizeOEmbed(oembed);
 	});
 	if (visualizer.multipleAttachments) {
 		oembed = oembed.get();

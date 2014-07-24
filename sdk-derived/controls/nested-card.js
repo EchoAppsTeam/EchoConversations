@@ -212,7 +212,9 @@ card.renderers.playButton = function(element) {
 	var self = this;
 	var oembed = this.get("data");
 	element.on("click", function() {
-		self.view.get("videoPlaceholder").empty().append($(oembed.html));
+		self.view.get("videoPlaceholder").empty().append(
+			Echo.Utils.sanitizeOEmbedHTML(oembed.html)
+		);
 	});
 	return element;
 };
@@ -221,7 +223,9 @@ card.renderers.videoPlaceholder = function(element) {
 	var oembed = this.get("data");
 
 	if (!oembed.thumbnail_url) {
-		element.empty().append($(oembed.html));
+		element.empty().append(
+			Echo.Utils.sanitizeOEmbedHTML(oembed.html)
+		);
 	}
 	return element.css("padding-bottom", oembed.height / oembed.width * 100 + "%");
 };

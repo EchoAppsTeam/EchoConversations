@@ -1110,7 +1110,7 @@ composer.methods._identifyCurrentComposer = function() {
 
 	var oembed = attachments.map(function() {
 		var oembed = $(this).data("oembed");
-		return Echo.Utils.oEmbedValidate(oembed) ? oembed : null;
+		return Echo.Utils.sanitizeOEmbed(oembed);
 	});
 
 	this.formData = {
