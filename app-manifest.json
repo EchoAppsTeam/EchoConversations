@@ -1,7 +1,7 @@
 {
 	"id": "{%=manifest.id%}",
 	"name": "{%=manifest.name%}",
-	"description": "Echo Comments increases user engagement and time spent on your website by enabling users to easily contribute Comments, Photos, Videos and Links to your content in real-time. Moderators can quickly and easily curate the conversation and ‘pin’ the best contributions to the top of the stream.",
+	"description": "Turn Every Article into a Real-time Conversations",
 	"app_version": "{%=packageVersions.stable%}",
 	"cloudapp_protocol_version": "1.0.0",
 	"icon": "{%=baseURLs.prod%}/images/icon.png",
