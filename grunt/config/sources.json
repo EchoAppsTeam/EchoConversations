@@ -1,0 +1,16 @@
+{
+	"js": [
+		"app.js",
+		"sdk-derived/**/*.js",
+		"plugins/*.js",
+		"dashboard.js",
+		"dashboard/*.js"
+	],
+	"images": [
+		"images/**",
+		"sdk-derived/images/**"
+	],
+	"demo": [
+		"demo/**"
+	]
+}
