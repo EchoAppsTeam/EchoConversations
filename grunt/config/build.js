@@ -15,11 +15,6 @@ module.exports = {
 				'uglify',
 				'concat',
 				'clean:plugins'
-			],
-			'final': [
-				'copy:demo',
-				'copy:images',
-				'copy:manifest'
 			]
 		}
 	}
