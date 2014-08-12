@@ -9,8 +9,5 @@
 	"images": [
 		"images/**",
 		"sdk-derived/images/**"
-	],
-	"demo": [
-		"demo/**"
 	]
 }
