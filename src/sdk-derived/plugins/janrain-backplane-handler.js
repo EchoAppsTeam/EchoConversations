@@ -20,16 +20,19 @@ var createPlugin = function(component) {
 		var plugin = this;
 		var global = Echo.Variables.JanrainHandler;
 
-		// subscribe only once!
-		if (global.initialized) return;
+		// subscribe only once, but count all subscribers to properly unsubscribe later
+		if (global.initialized) {
+			global.initialized++;
+			return;
+		}
 
-		global.initialized = true;
+		global.initialized = 1;
 
 		var isChromeOnIOS = Echo.Utils.isMobileDevice() &&
 			/iPhone|iPad/i.test(navigator.userAgent) &&
 			/CriOS/i.test(navigator.userAgent);
 
-		Backplane.subscribe(function(message) {
+		global.subscriptionId = Backplane.subscribe(function(message) {
 			// if login is requested
 			if (message.type === "identity/login/request") {
 				global.modal && global.modal.destroy();
@@ -57,6 +60,15 @@ var createPlugin = function(component) {
 				plugin._openSharingDialog(message.payload);
 			}
 		});
+	};
+
+	plugin.methods.destroy = function() {
+		var global = Echo.Variables.JanrainHandler;
+		global.initialized--;
+		if (!global.initialized) {
+			Backplane.unsubscribe(global.subscriptionId);
+			delete global.subscriptionId;
+		}
 	};
 
 	plugin.methods._openAuthDialog = function(url, config) {
