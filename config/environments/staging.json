@@ -5,7 +5,7 @@
 		"name": "Comments (Dev)"
 	},
 	"baseURLs": {
-		"dev": "//echoplatform.com/sandbox/staging/apps/echo/conversations/v{%=packageVersions.stable%}/dev",
-		"prod": "//echoplatform.com/sandbox/staging/apps/echo/conversations/v{%=packageVersions.stable%}"
+		"dev": "//echoplatform.com/sandbox/staging<%= release.options.versionPath() %>/dev",
+		"prod": "//echoplatform.com/sandbox/staging<%= release.options.versionPath() %>"
 	}
 }

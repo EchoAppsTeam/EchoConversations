@@ -5,7 +5,7 @@
 		"name": "Comments"
 	},
 	"baseURLs": {
-		"dev": "//cdn.echoenabled.com/apps/echo/conversations/v{%=packageVersions.stable%}/dev",
-		"prod": "//cdn.echoenabled.com/apps/echo/conversations/v{%=packageVersions.stable%}"
+		"dev": "//cdn.echoenabled.com<%= release.options.versionPath() %>/dev",
+		"prod": "//cdn.echoenabled.com<%= release.options.versionPath() %>"
 	}
 }
