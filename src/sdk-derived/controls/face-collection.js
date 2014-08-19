@@ -255,9 +255,9 @@ collection.templates.main =
 collection.renderers.more = function(element) {
 	var self = this;
 	if (!this._isMoreButtonVisible()) {
-		return element.hide();
+		return element.addClass(this.cssPrefix + "moreHidden");
 	}
-	element.empty().show();
+	element.empty().removeClass(this.cssPrefix + "moreHidden");
 	var count = this.get("count.total") - this.get("count.visible");
 	var caption = (count > 0 ? count + " " : "") + this.labels.get("more");
 	var linkable = !this._fromExternalData() || this.get("count.visible") < this.get("users").length;
@@ -570,6 +570,7 @@ collection.methods._intersperse = function(object, separator) {
 collection.css =
 	'.{class:container} { vertical-align: top; line-height: 22px; white-space: normal; }' +
 	'.{class:more} { white-space: nowrap; vertical-align: middle; }' +
+	'.{class:moreHidden} { display: none; }' +
 	'.{class:suffixText}, .{class:delimiter}, .{class:and} { vertical-align: middle; }' +
 	'.{class:more}.echo-linkColor a, .{class:more}.echo-linkColor a:hover { color: #476CB8; text-decoration: underline; }' +
 	'.{class:more} .echo-control-message-icon { display: inline; margin: 0px 5px; }';
