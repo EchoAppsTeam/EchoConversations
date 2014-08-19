@@ -122,6 +122,12 @@ collection.config = {
 	"totalUsersCount": undefined,
 
 	/**
+	 * @cfg {String} [maxUsersCount]
+	 * The maximum number of users to be displayed. Each new added user is going to push out the oldest one.
+	 */
+	"maxUsersCount": undefined,
+
+	/**
 	 * @cfg {String} query
 	 * Specifies the search query to generate the necessary data set.
 	 * It must be constructed according to the
@@ -138,7 +144,7 @@ collection.config = {
 
 	/**
 	 * @cfg {String} suffixText
-	 * Specifies the text being appended to the end of Face Pile user's list.
+	 * Specifies the text being appended to the end of FaceCollection user's list.
 	 */
 	"suffixText": "",
 
@@ -400,13 +406,13 @@ collection.methods._requestMoreItems = function() {
 			self.showMessage({"type": "error", "data": data});
 		},
 		"onData": function(data) {
-			self._initialResponseHandler(data);
+			self._initialResponseHandler(data, "more");
 		}
 	});
 	request.send();
 };
 
-collection.methods._initialResponseHandler = function(data) {
+collection.methods._initialResponseHandler = function(data, type) {
 	// we are going to put new live items at the end for all sort orders except reverseChronological
 	this.set("newestFirst", data.sortOrder === "reverseChronological");
 	if (data.itemsPerPage) {
@@ -433,19 +439,22 @@ collection.methods._initialResponseHandler = function(data) {
 			: this.config.get("itemsPerPage")
 		);
 	}
-	this._processResponse(data);
+	this._processResponse(data, type);
 };
 
 collection.methods._secondaryResponseHandler = function(data) {
-	this._processResponse(data, true);
+	this._processResponse(data, "live");
 };
 
-collection.methods._processResponse = function(data, isLive) {
+collection.methods._processResponse = function(data, type) {
 	var self = this, fetchMoreUsers = true;
+	var newUsers = 0;
 	var actions = $.map(data.entries, function(entry) {
 		return function(callback) {
 			if (self._isRemoveAction(entry)) {
-				self._maybeRemoveItem(entry);
+				if (self._maybeRemoveItem(entry)) {
+					newUsers--;
+				}
 				callback();
 			} else {
 				if (self._isUniqueUser(entry)) {
@@ -457,8 +466,9 @@ collection.methods._processResponse = function(data, isLive) {
 					user.itemsCount++;
 					callback();
 				} else {
+					newUsers++;
 					self._initItem(entry, function() {
-						self._updateStructure(this, isLive);
+						self._updateStructure(this, type === "live");
 						callback();
 					});
 				}
@@ -466,7 +476,13 @@ collection.methods._processResponse = function(data, isLive) {
 		};
 	});
 	Echo.Utils.parallelCall(actions, function() {
-		self._output(isLive, fetchMoreUsers);
+		if (type === "more") {
+			self.config.set(
+				"maxUsersCount",
+				self.config.get("maxUsersCount") + newUsers
+			);
+		}
+		self._output(type === "live", fetchMoreUsers);
 	});
 };
 
@@ -475,13 +491,27 @@ collection.methods._isRemoveAction = function(entry) {
 };
 
 collection.methods._output = function(isLive, fetchMoreUsers) {
-	if (this._fromExternalData()) {
-		this.set("count.total", Math.max(this.get("users").length, this.get("count.total")));
-	} else {
-		this.set("count.total", this.get("users").length);
-		this.set("count.visible", this.get("users").length);
+	var max = this.config.get("maxUsersCount");
+	var users = this.get("users");
+	if (max) {
+		if (this.get("newestFirst")) {
+			users = users.slice(0, max);
+		} else {
+			users = users.slice(-max);
+		}
+		this.set("users", users);
+		var lastUser = users[users.length - 1];
+		if (lastUser.instance.get("data.pageAfter")) {
+			this.set("nextPageAfter", lastUser.instance.get("data.pageAfter"));
+		}
 	}
-	this.set("count.visible", Math.min(this.get("count.visible"), this.get("users").length));
+	if (this._fromExternalData()) {
+		this.set("count.total", Math.max(users.length, this.get("count.total")));
+	} else {
+		this.set("count.total", users.length);
+		this.set("count.visible", users.length);
+	}
+	this.set("count.visible", Math.min(this.get("count.visible"), users.length));
 	if (!this.get("count.total")) {
 		this.set("isViewComplete", false);
 	}
@@ -507,7 +537,9 @@ collection.methods._initItem = function(entry, callback) {
 		"plugins": this.config.get("plugins"),
 		"context": this.config.get("context"),
 		"useSecureAPI": this.config.get("useSecureAPI"),
-		"data": entry.actor,
+		"data": $.extend(entry.actor, {
+			"pageAfter": entry.pageAfter
+		}),
 		"user": this.user,
 		"ready": callback
 	}, this.config.get("item"));
@@ -530,7 +562,7 @@ collection.methods._maybeRemoveItem = function(entry) {
 	var user = this.get("uniqueUsers." + entry.actor.id);
 	// if we have move than one item posted by the same user,
 	// we decrement the counter, but leave the user in the list
-	if (!user || --user.itemsCount) return;
+	if (!user || --user.itemsCount) return false;
 	var index;
 	$.each(this.get("users"), function(i, u) {
 		if (u.instance.data.id === entry.actor.id) {
@@ -540,6 +572,7 @@ collection.methods._maybeRemoveItem = function(entry) {
 	});
 	this.get("users").splice(index, 1);
 	this.remove("uniqueUsers." + entry.actor.id);
+	return true;
 };
 
 collection.methods._getMoreUsers = function() {
