@@ -407,6 +407,8 @@ collection.methods._requestMoreItems = function() {
 };
 
 collection.methods._initialResponseHandler = function(data) {
+	// we are going to put new live items at the end for all sort orders except reverseChronological
+	this.set("newestFirst", data.sortOrder === "reverseChronological");
 	if (data.itemsPerPage && data.itemsPerPage !== this.config.get("itemsPerPage")) {
 		this.config.set("itemsPerPage", +data.itemsPerPage);
 	}
@@ -453,7 +455,7 @@ collection.methods._processResponse = function(data, isLive) {
 					callback();
 				} else {
 					self._initItem(entry, function() {
-						self._updateStructure(this);
+						self._updateStructure(this, isLive);
 						callback();
 					});
 				}
@@ -509,13 +511,16 @@ collection.methods._initItem = function(entry, callback) {
 	return new Echo.StreamServer.Controls.Face(config);
 };
 
-collection.methods._updateStructure = function(item) {
+collection.methods._updateStructure = function(item, isLive) {
 	this.set("uniqueUsers." + item.get("data.id"), {
 		"itemsCount": 1,
 		"instance": item
 	});
 	var user = this.get("uniqueUsers." + item.get("data.id"));
-	this.get("users")[user.instance.isYou() ? "unshift" : "push"](user);
+	var action = isLive && this.get("newestFirst") || user.instance.isYou()
+		? "unshift"
+		: "push";
+	this.get("users")[action](user);
 };
 
 collection.methods._maybeRemoveItem = function(entry) {
