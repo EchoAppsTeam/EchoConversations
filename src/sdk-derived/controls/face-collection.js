@@ -409,8 +409,11 @@ collection.methods._requestMoreItems = function() {
 collection.methods._initialResponseHandler = function(data) {
 	// we are going to put new live items at the end for all sort orders except reverseChronological
 	this.set("newestFirst", data.sortOrder === "reverseChronological");
-	if (data.itemsPerPage && data.itemsPerPage !== this.config.get("itemsPerPage")) {
-		this.config.set("itemsPerPage", +data.itemsPerPage);
+	if (data.itemsPerPage) {
+		data.itemsPerPage = +data.itemsPerPage;
+		if (data.itemsPerPage !== this.config.get("itemsPerPage")) {
+			this.config.set("itemsPerPage", data.itemsPerPage);
+		}
 	}
 	if (this._fromExternalData()) {
 		this.set("count.total", this.config.get("totalUsersCount", 0));
