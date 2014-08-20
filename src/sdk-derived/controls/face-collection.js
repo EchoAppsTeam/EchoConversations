@@ -491,19 +491,24 @@ collection.methods._isRemoveAction = function(entry) {
 };
 
 collection.methods._output = function(isLive, fetchMoreUsers) {
+	var self = this;
 	var max = this.config.get("maxUsersCount");
 	var users = this.get("users");
+	var toRemove = [];
 	if (max) {
 		if (this.get("newestFirst")) {
-			users = users.slice(0, max);
+			toRemove = users.splice(max + 1);
 		} else {
-			users = users.slice(-max);
+			toRemove = users.splice(0, users.length - max);
 		}
 		this.set("users", users);
 		var lastUser = users[users.length - 1];
 		if (lastUser.instance.get("data.pageAfter")) {
 			this.set("nextPageAfter", lastUser.instance.get("data.pageAfter"));
 		}
+		$.each(toRemove, function(i, user) {
+			self._removeUser(user.instance.get("data.id"));
+		});
 	}
 	if (this._fromExternalData()) {
 		this.set("count.total", Math.max(users.length, this.get("count.total")));
@@ -563,16 +568,21 @@ collection.methods._maybeRemoveItem = function(entry) {
 	// if we have move than one item posted by the same user,
 	// we decrement the counter, but leave the user in the list
 	if (!user || --user.itemsCount) return false;
+	this._removeUser(entry.actor.id);
+	return true;
+};
+
+collection.methods._removeUser = function(uid) {
 	var index;
 	$.each(this.get("users"), function(i, u) {
-		if (u.instance.data.id === entry.actor.id) {
+		if (u.instance.data.id === uid) {
 			index = i;
 			return false; // break
 		}
 	});
-	this.get("users").splice(index, 1);
-	this.remove("uniqueUsers." + entry.actor.id);
-	return true;
+	var users = this.get("users").splice(index, 1);
+	users[0].instance.destroy();
+	this.remove("uniqueUsers." + uid);
 };
 
 collection.methods._getMoreUsers = function() {
