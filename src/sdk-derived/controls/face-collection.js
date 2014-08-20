@@ -568,20 +568,22 @@ collection.methods._maybeRemoveItem = function(entry) {
 	// if we have move than one item posted by the same user,
 	// we decrement the counter, but leave the user in the list
 	if (!user || --user.itemsCount) return false;
+	var index;
+	$.each(this.get("users"), function(i, u) {
+		if (u.instance.data.id === entry.actor.id) {
+			index = i;
+			return false; // break
+		}
+	});
+	this.get("users").splice(index, 1);
 	this._removeUser(entry.actor.id);
 	return true;
 };
 
 collection.methods._removeUser = function(uid) {
-	var index;
-	$.each(this.get("users"), function(i, u) {
-		if (u.instance.data.id === uid) {
-			index = i;
-			return false; // break
-		}
-	});
-	var users = this.get("users").splice(index, 1);
-	users[0].instance.destroy();
+	var user = this.get("uniqueUsers." + uid);
+	if (!user) return;
+	user.instance.destroy();
 	this.remove("uniqueUsers." + uid);
 };
 
