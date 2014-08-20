@@ -582,7 +582,6 @@ collection.methods._maybeRemoveItem = function(entry) {
 
 collection.methods._removeUser = function(uid) {
 	var user = this.get("uniqueUsers." + uid);
-	if (!user) return;
 	user.instance.destroy();
 	this.remove("uniqueUsers." + uid);
 };
