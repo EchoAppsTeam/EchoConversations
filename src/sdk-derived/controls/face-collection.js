@@ -497,7 +497,7 @@ collection.methods._output = function(isLive, fetchMoreUsers) {
 	var toRemove = [];
 	if (max) {
 		if (this.get("newestFirst")) {
-			toRemove = users.splice(max + 1);
+			toRemove = users.splice(max);
 		} else {
 			toRemove = users.splice(0, users.length - max);
 		}
