@@ -424,8 +424,8 @@ conversations.templates.tabs.contentItem =
 
 conversations.templates.defaultQuery =
 	'{data:filter}:{data:targetURL} {data:excludedSources} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
-	'itemsPerPage:{data:initialItemsPerPage} {data:markers} {data:type} ' +
-	'{data:operators} children:{data:replyNestingLevels} {data:childrenOperators}';
+	'itemsPerPage:{data:initialItemsPerPage} {data:markers} {data:type} {data:operators} -user.state:ModeratorBanned ' +
+	'children:{data:replyNestingLevels} {data:childrenOperators} -user.state:ModeratorBanned';
 
 conversations.renderers.streamingStateContainer = function(element) {
 	if (!this.config.get("streamingControl.displayStreamingStateHeader")) {
