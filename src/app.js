@@ -424,8 +424,8 @@ conversations.templates.tabs.contentItem =
 
 conversations.templates.defaultQuery =
 	'{data:filter}:{data:targetURL} {data:excludedSources} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
-	'itemsPerPage:{data:initialItemsPerPage} {data:markers} {data:type} {data:operators} -user.state:ModeratorBanned ' +
-	'children:{data:replyNestingLevels} {data:childrenOperators} -user.state:ModeratorBanned';
+	'itemsPerPage:{data:initialItemsPerPage} {data:markers} {data:type} {data:operators} {data:userState} ' +
+	'children:{data:replyNestingLevels} {data:childrenOperators} {data:userState}';
 
 conversations.renderers.streamingStateContainer = function(element) {
 	if (!this.config.get("streamingControl.displayStreamingStateHeader")) {
@@ -1019,6 +1019,7 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 					}
 					return self._operatorsToString(acc);
 				})(),
+				"userState": "-user.state:ModeratorBanned",
 				"filter": "childrenof",
 				"markers": (function() {
 					var markers = [].concat(
@@ -1050,6 +1051,7 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 			return {
 				"operators": operators,
 				"childrenOperators": operators,
+				"userState": "-user.state:ModeratorBanned",
 				"filter": "childrenof",
 				"markers": config.itemMarkers.length
 					? "markers:" + config.itemMarkers.join(",")
@@ -1057,11 +1059,13 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 			};
 		},
 		"moderationQueue": function() {
-			var operators = "state:Untouched -user.roles:moderator,administrator" +
-					(self._getPremoderationConfig()["approvedUserBypass"] ? " -user.state:ModeratorApproved" : "");
+			var operators = "state:Untouched -user.roles:moderator,administrator";
 			return {
 				"operators": operators,
 				"childrenOperators": operators,
+				"userState": self._getPremoderationConfig()["approvedUserBypass"]
+					? "-user.state:ModeratorApproved"
+					: "",
 				"filter": "scope",
 				"markers": config.itemMarkers.length
 					? "markers:" + config.itemMarkers.join(",")
