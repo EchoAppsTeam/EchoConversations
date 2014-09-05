@@ -659,7 +659,7 @@ conversations.renderers._tabs = function(element, extra) {
 		var li = $(self.substitute({
 			"template": tpls.navItem,
 			"data": {
-				"class": (tab.active ? "active" : "") + " " + (tab.extraClass || ""),
+				"class": (tab.active ? "active echo-active" : "") + " " + (tab.extraClass || ""),
 				"type": tab.type,
 				"tabId": tab.id
 			}
@@ -689,7 +689,7 @@ conversations.renderers._tabs = function(element, extra) {
 				"template": tpls.contentItem,
 				"data": {
 					"tabId": tab.id,
-					"class": tab.active ? "active": ""
+					"class": tab.active ? "active echo-active": ""
 				}
 			}));
 			var component = self.initComponent({
