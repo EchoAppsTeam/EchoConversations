@@ -87,7 +87,7 @@ media.renderers.container = function(element) {
 			"ready": function() {
 				self.cards.push(this);
 				element.append(this.config.get("target"));
-				// there is available two capacity state "single" or "multiple"
+				// there are two capacity state available, "single" or "multiple"
 				if (self.cards.length <= 2) {
 					self.changeContainerCapacity(self.cards.length);
 				}
