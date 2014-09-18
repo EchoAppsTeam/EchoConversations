@@ -223,7 +223,7 @@ conversations.config = {
 		"StreamServer": {
 			"appkey": undefined,
 			"apiBaseURL": "{%= apiBaseURLs.StreamServer.apiBaseURL %}/",
-			"submissionProxyURL": "{%= apiBaseURLs.StreamServer.apiBaseURL %}",
+			"submissionProxyURL": "{%= apiBaseURLs.StreamServer.submissionProxyURL %}",
 			"liveUpdates": {
 				"transport": "websockets",
 				"websockets": {
