@@ -187,7 +187,7 @@ conversations.config = {
 		"sortOrderEntries": sortOrderEntries,
 		"moderation": {
 			"displayCommunityFlaggedPosts": false,
-			"displaySystemFlaggedPosts": true,
+			"displaySystemFlaggedPosts": false,
 			"premoderation": {
 				"enable": false,
 				"approvedUserBypass": true,

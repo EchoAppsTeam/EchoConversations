@@ -283,7 +283,7 @@ dashboard.vars = {
 			"component": "Checkbox",
 			"name": "displaySystemFlaggedPosts",
 			"type": "boolean",
-			"default": true,
+			"default": false,
 			"config": {
 				"title": "Display System Flagged Posts"
 			}
@@ -708,6 +708,7 @@ dashboard.config.normalizer = {
 					items[0]["default"] = false; // override visible value
 					items[3]["default"] = 5; // override initialItemsPerPage value
 					items[20]["items"][0]["default"] = true;
+					items[20]["items"][1]["default"] = true;
 					items.pop();
 
 					items.splice(7, 0, {
