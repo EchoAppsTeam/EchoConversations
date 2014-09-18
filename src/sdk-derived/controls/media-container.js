@@ -68,7 +68,14 @@ media.init = function() {
 };
 
 media.renderers.container = function(element) {
+	var self = this;
 	var media = this.config.get("data", []);
+
+	$.map(this.cards, function(card) {
+		card.destroy();
+	});
+	this.cards = [];
+
 	if (media.length) {
 		if (!this.cardParentConfig) {
 			this.cardParentConfig = this.config.getAsHash();
@@ -78,19 +85,23 @@ media.renderers.container = function(element) {
 			"target": document.createDocumentFragment(),
 			"context": this.config.get("context"),
 			"ready": function() {
+				self.cards.push(this);
 				element.append(this.config.get("target"));
+				// there is available two capacity state "single" or "multiple"
+				if (self.cards.length <= 2) {
+					self.changeContainerCapacity(self.cards.length);
+				}
 			}
 		}, this.cardParentConfig.card);
 
 		config.parent = this.itemParentConfig;
 
-		this.cards = $.map(media, function(item) {
-			return new Echo.StreamServer.Controls.NestedCard($.extend({
+		$.map(media, function(item) {
+			new Echo.StreamServer.Controls.NestedCard($.extend({
 				"data": item
 			}, config));
 		});
 	}
-	this.changeContainerCapacity(media.length);
 	return element;
 };
 
@@ -201,12 +212,6 @@ media.methods._initFilePickerPanel = function() {
 				clickOptions.onError.apply(this, arguments);
 			}
 		);
-	});
-};
-
-media.destroy = function() {
-	$.each(this.cards, function(i, card) {
-		card.destroy();
 	});
 };
 

@@ -44,13 +44,13 @@ plugin.renderers.mediaContent = function(element) {
 		}
 	}));
 
-	return element.addClass(this.cssPrefix + (attachments.length > 1 ? "multiple" : "single"));
+	return element;
 };
 
 plugin.css =
-	'.{class:depth-0} .{plugin.class:mediaContent}.{plugin.class:multiple} { margin-left: -16px; margin-right: -16px; }' +
+	'.{class:depth-0} .{plugin.class:mediaContent} .echo-streamserver-controls-mediacontainer-multiple { margin-left: -16px; margin-right: -16px; }' +
 	'.{class:depth-0} .{plugin.class:mediaContent} { margin-bottom: 0px; }' +
-	'.{plugin.class:mediaContent}.{plugin.class:multiple} > div { border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
+	'.{plugin.class:mediaContent} .echo-streamserver-controls-mediacontainer-multiple { border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
 	'.{plugin.class:mediaContent} { margin-bottom: 8px; }';
 
 Echo.Plugin.create(plugin);

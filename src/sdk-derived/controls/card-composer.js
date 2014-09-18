@@ -1108,7 +1108,7 @@ composer.methods._identifyCurrentComposer = function() {
 	var composerId = content.find(".echo-item-files").data("composer");
 	var attachments = content.find("div[data-oembed]");
 
-	var oembed = attachments.map(function() {
+	var oembed = $.map(attachments, function() {
 		var oembed = $(this).data("oembed");
 		return Echo.Utils.sanitizeOEmbed(oembed);
 	});
@@ -1155,7 +1155,7 @@ composer.methods._getDefinedMediaIndex = function(oembed) {
 	};
 	$.each(this.formData.media, function(i, media) {
 		if (media.type !== oembed.type) return;
-		$.each(fieldsByType[oembed.type], function(j, field) {
+		$.each(fieldsByType[oembed.type] || {}, function(j, field) {
 			found = true;
 			if (typeof media[field] !== "undefined" &&
 				media[field] !== oembed[field]

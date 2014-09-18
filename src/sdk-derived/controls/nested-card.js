@@ -101,8 +101,12 @@ card.events = {
 card.sourceIcons = {};
 
 card.init = function() {
-	this.render();
-	this.ready();
+	if (this.typeSupported()) {
+		this.render();
+		this.ready();
+	} else {
+		this.destroy();
+	}
 };
 
 card.config = {
@@ -344,6 +348,10 @@ card.methods.getRenderType = function() {
 	return handlers[defaultType]
 		? handlers[defaultType].call(this)
 		: defaultType;
+};
+
+card.methods.typeSupported = function() {
+	return !!this.templates[this.getRenderType()];
 };
 
 card.css =
