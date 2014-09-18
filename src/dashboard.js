@@ -766,24 +766,34 @@ dashboard.config.normalizer = {
 	}
 };
 
+dashboard.modifiers = {
+	"dependencies.appkey": {
+		"endpoint": "customer/{self:user.getCustomerId}/appkeys",
+		"processor": function() {
+			return this.getAppkey.apply(this, arguments);
+		}
+	},
+	"dependencies.janrainapp": {
+		"endpoint": "customer/{self:user.getCustomerId}/janrainapps",
+		"processor": function() {
+			return this.getJanrainApp.apply(this, arguments);
+		}
+	}
+};
+
 dashboard.init = function() {
-	var parent = $.proxy(this.parent, this);
-	this._requestData(function() {
-		parent();
-	});
+	this.parent();
 };
 
 dashboard.methods.declareInitialConfig = function() {
 	if (~$.inArray("dependencies", this.config.get("disableSettings"))) return {};
-	var keys = this.get("appkeys", []);
-	var apps = this.get("janrainapps", []);
 	return {
 		"dependencies": {
 			"Janrain": {
-				"appId": apps.length ? apps[0].name : undefined
+				"appId": this.getDefaultJanrainApp()
 			},
 			"StreamServer": {
-				"appkey": keys.length ? keys[0].key : undefined
+				"appkey": this.getDefaultAppKey()
 			},
 			"FilePicker": {
 				"apiKey": "AFLWUBllDRwWZl7sQO1V1z"
@@ -796,39 +806,6 @@ dashboard.methods.declareInitialConfig = function() {
 };
 
 dashboard.methods.initConfigurator = function() {
-	function findKey(key, ecl) {
-		var found;
-		$.each(ecl, function(k, item) {
-			if (item.name === key) {
-				found = item;
-				return false;
-			} else if (item.type === "object") {
-				found = findKey(key, item.items);
-				if (found) return false;
-			}
-		});
-		return found;
-	}
-
-	var ecl = this.config.get("ecl");
-
-	// populate appkey selectbox
-	var appkey = findKey("appkey", ecl);
-	appkey.config.options = $.map(this.get("appkeys", []), function(appkey) {
-		return {
-			"title": appkey.key,
-			"value": appkey.key
-		};
-	});
-
-	// populate janrainapp selectbox
-	var janrainapp = findKey("janrainapp", ecl);
-	janrainapp.config.options = $.map(this.get("janrainapps", []), function(app) {
-		return {
-			"title": app.name,
-			"value": app.name
-		};
-	});
 	// remove items specified in the config.disableSettings
 	var disableSettings = this.config.get("disableSettings");
 	(function traverse(items, path) {
@@ -839,34 +816,8 @@ dashboard.methods.initConfigurator = function() {
 			}
 			if (item.items) traverse(item.items, itemPath);
 		});
-	})(ecl);
+	})(this.config.get("ecl"));
 	this.parent.apply(this, arguments);
-};
-
-dashboard.methods._requestData = function(callback) {
-	var self = this;
-	var customerId = this.config.get("data.customer.id");
-	var deferreds = [];
-	var request = this.config.get("request");
-
-	var requests = [{
-		"name": "appkeys",
-		"endpoint": "customer/" + customerId + "/appkeys"
-	}, {
-		"name": "janrainapps",
-		"endpoint": "customer/" + customerId + "/janrainapps"
-	}];
-	$.map(requests, function(req) {
-		var deferredId = deferreds.push($.Deferred()) - 1;
-		request({
-			"endpoint": req.endpoint,
-			"success": function(response) {
-				self.set(req.name, response);
-				deferreds[deferredId].resolve();
-			}
-		});
-	});
-	$.when.apply($, deferreds).done(callback);
 };
 
 Echo.AppServer.Dashboard.create(dashboard);
