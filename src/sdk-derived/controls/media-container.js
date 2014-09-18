@@ -6,7 +6,7 @@ var media = Echo.App.manifest("Echo.StreamServer.Controls.MediaContainer");
 if (Echo.App.isDefined(media)) return;
 
 media.dependencies = [{
-	"url": "{%= baseURLs.prod %}/sdk-derived/controls/nested-card.js",
+	"url": "{%= appBaseURLs.prod %}/sdk-derived/controls/nested-card.js",
 	"loaded": function() { return !!Echo.StreamServer.Controls.NestedCard; }
 }];
 
@@ -252,7 +252,7 @@ media.css =
 	'.{class:container} > .{class:attachmentsPanel} > .{class:attachmentsPanel-wrapper} { border: 1px solid #C4C4C4; border-radius: 2px; }' +
 	'.{class:attachmentsPanel-container} { padding: 10px 0 40px 0; margin: 5px; }' +
 	'.{class:attachmentsPanel-tooltip} { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; white-space: nowrap; text-overflow: ellipsis; line-height: 16px; overflow: hidden; }' +
-	'.{class:loading-animation} {background-image: url("{%= baseURLs.prod %}/sdk-derived/images/loading.gif"); background-repeat: no-repeat; background-position: 24px 39px; }';
+	'.{class:loading-animation} {background-image: url("{%= appBaseURLs.prod %}/sdk-derived/images/loading.gif"); background-repeat: no-repeat; background-position: 24px 39px; }';
 
 
 Echo.App.create(media);

@@ -4,7 +4,7 @@
 	"description": "Turn Every Article into a Real-time Conversations",
 	"app_version": "{%=packageVersions.stable%}",
 	"cloudapp_protocol_version": "1.0.0",
-	"icon": "{%=baseURLs.prod%}/images/icon.png",
+	"icon": "{%= appBaseURLs.prod %}/images/icon.png",
 	"developer": {
 		"id": "echo",
 		"name": "Echo",
@@ -15,7 +15,7 @@
 	"dashboards": [{
 		"id": "instances",
 		"title": "Instances",
-		"script": "{%= baseURLs.prod %}/dashboard.js",
+		"script": "{%= appBaseURLs.prod %}/dashboard.js",
 		"component": "Echo.Apps.Conversations.Dashboard",
 		"type": "instances",
 		"config": {
@@ -34,8 +34,8 @@
 	"client_widget": {
 		"component": "Echo.Apps.Conversations",
 		"scripts": {
-			"dev": "{%= baseURLs.dev %}/app.js",
-			"prod": "{%= baseURLs.prod %}/app.js"
+			"dev": "{%= appBaseURLs.dev %}/app.js",
+			"prod": "{%= appBaseURLs.prod %}/app.js"
 		}
 	}
 }

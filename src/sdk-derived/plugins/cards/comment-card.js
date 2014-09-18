@@ -7,7 +7,7 @@ if (Echo.Plugin.isDefined(plugin)) return;
 
 plugin.dependencies = [{
 	"loaded": function() { return !!Echo.StreamServer.Controls.MediaContainer; },
-	"url": "{%= baseURLs.prod %}/sdk-derived/controls/media-container.js"
+	"url": "{%= appBaseURLs.prod %}/sdk-derived/controls/media-container.js"
 }];
 
 plugin.init = function() {

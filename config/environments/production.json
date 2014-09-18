@@ -1,11 +1,18 @@
 {
-	"version": 2,
+	"version": 3,
 	"manifest": {
 		"id": "echo-conversations-{%=packageVersions.latest%}",
 		"name": "Comments"
 	},
-	"baseURLs": {
+	"appBaseURLs": {
 		"dev": "//cdn.echoenabled.com<%= release.options.versionPath() %>/dev",
 		"prod": "//cdn.echoenabled.com<%= release.options.versionPath() %>"
+	},
+	"apiBaseURLs": {
+		"StreamServer": {
+			"apiBaseURL": "//api.echoenabled.com/v1",
+			"submissionProxyURL": "https://apps.echoenabled.com/v2/esp/activity",
+			"websockets": "//live.echoenabled.com/v1"
+		}
 	}
 }

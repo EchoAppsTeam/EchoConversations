@@ -87,7 +87,7 @@ plugin.labels = {
 
 plugin.dependencies = [{
 	"control": "Echo.StreamServer.Controls.FaceCollection",
-	"url": "{%= baseURLs.prod %}/streamserver.pack.js"
+	"url": "{%= appBaseURLs.prod %}/streamserver.pack.js"
 }];
 
 /**

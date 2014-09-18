@@ -222,12 +222,12 @@ conversations.config = {
 		},
 		"StreamServer": {
 			"appkey": undefined,
-			"apiBaseURL": "//api.echoenabled.com/v1/",
-			"submissionProxyURL": "https://apps.echoenabled.com/v2/esp/activity",
+			"apiBaseURL": "{%= apiBaseURLs.StreamServer.apiBaseURL %}/",
+			"submissionProxyURL": "{%= apiBaseURLs.StreamServer.apiBaseURL %}",
 			"liveUpdates": {
 				"transport": "websockets",
 				"websockets": {
-					"URL": "//live.echoenabled.com/v1/"
+					"URL": "{%= apiBaseURLs.StreamServer.websockets %}/"
 				}
 			}
 		},
@@ -305,10 +305,10 @@ conversations.dependencies = [{
 	"url": "{config:cdnBaseURL.sdk}/api.pack.js",
 	"control": "Echo.StreamServer.API"
 }, {
-	"url": "{%= baseURLs.prod %}/streamserver.pack.js",
+	"url": "{%= appBaseURLs.prod %}/streamserver.pack.js",
 	"control": "Echo.StreamServer.Controls.CardComposer"
 }, {
-	"url": "{%= baseURLs.prod %}/third-party/jquery.placeholder.js",
+	"url": "{%= appBaseURLs.prod %}/third-party/jquery.placeholder.js",
 	"loaded": function() { return !!$.placeholder; }
 }, {
 	"loaded": function() { return !!Echo.GUI; },
@@ -1264,7 +1264,7 @@ conversations.css =
 	// streamSorter dropdown
 	'.{class:streamSorter} { font-size: 13px; }' +
 	'.echo-sdk-ui .{class:streamSorter}:focus { outline: none; }' +
-	'.{class:streamSorter} > ul > li > a { background: url("{%= baseURLs.prod %}/sdk-derived/images/marker.png") no-repeat right center; padding-right: 20px; }' +
+	'.{class:streamSorter} > ul > li > a { background: url("{%= appBaseURLs.prod %}/sdk-derived/images/marker.png") no-repeat right center; padding-right: 20px; }' +
 	'.{class:streamSorter} ul.nav { margin-bottom: 0px; font-size: 13px; }' +
 	'.{class:streamSorter} ul.nav > li > a { text-decoration: none; color: #C6C6C6; line-height: 18px; }' +
 	'.{class:streamSorter} .dropdown-menu { float: right; left: auto; right: 0; }' +

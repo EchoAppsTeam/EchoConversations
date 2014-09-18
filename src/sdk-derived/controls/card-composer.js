@@ -356,10 +356,10 @@ composer.vars = {
 };
 
 composer.dependencies = [{
-	"url": "{%= baseURLs.prod %}/sdk-derived/controls/media-container.js",
+	"url": "{%= appBaseURLs.prod %}/sdk-derived/controls/media-container.js",
 	"loaded": function() { return !!Echo.StreamServer.Controls.MediaContainer; }
 }, {
-	"url": "{%= baseURLs.prod %}/third-party/jquery.placeholder.js",
+	"url": "{%= appBaseURLs.prod %}/third-party/jquery.placeholder.js",
 	"loaded": function() { return !!$.placeholder; }
 }, {
 	"loaded": function() { return !!Echo.GUI; },
@@ -489,7 +489,7 @@ composer.templates.main =
 					'</ul>' +
 				'</div>' +
 				'<div class="{class:clipButton}">' +
-					'<img class="{class:attachPic}" src="{%= baseURLs.prod %}/sdk-derived/images/attach.png">' +
+					'<img class="{class:attachPic}" src="{%= appBaseURLs.prod %}/sdk-derived/images/attach.png">' +
 				'</div>' +
 				'<div class="echo-clear"></div>' +
 			'</div>' +
@@ -1464,7 +1464,7 @@ composer.css =
 	'.echo-cardcomposer-field-wrapper { margin: 7px 11px; border: 1px solid transparent; box-sizing: border-box !important/* XXX: because of conversations*/; }' +
 
 	'.{class:error} { color: #444444; font: 14px Arial; line-height: 150%; padding-left: 85px; background: no-repeat url({config:cdnBaseURL.sdk-assets}/images/info70.png); }' +
-	'.{class:resolving} { background: no-repeat bottom center url({%= baseURLs.prod %}/sdk-derived/images/resolving.gif); }' +
+	'.{class:resolving} { background: no-repeat bottom center url({%= appBaseURLs.prod %}/sdk-derived/images/resolving.gif); }' +
 	'.{class:media} .echo-streamserver-controls-mediacontainer-multiple { border: 1px solid #DEDEDE; border-top-style: dashed; border-bottom: 0px; background-color: #F1F1F1; }' +
 	'.{class:media} .echo-streamserver-controls-mediacontainer-single .echo-streamserver-controls-nestedcard-border { border-bottom: 0; }' +
 
