@@ -95,11 +95,9 @@ media.renderers.container = function(element) {
 				"data": item
 			}, config));
 
-			if (card.isAvailable) {
-				self.cards.push(card);
-			} else {
-				card.destroy();
-			}
+			card.isSupported()
+				? self.cards.push(card)
+				: card.destroy();
 		});
 	}
 	this.changeContainerCapacity(this.cards.length);
