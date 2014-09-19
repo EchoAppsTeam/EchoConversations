@@ -86,7 +86,7 @@ plugin.css =
 	'.{class:depth-0} .{plugin.class:item} { margin: -15px -16px 15px -16px; }' +
 	'.{plugin.class:label} { text-align: left; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; max-width: 100%; vertical-align: top; padding: 15px 0 10px 0; }' +
 	'.{plugin.class:title} { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 18px; line-height: 22px; }' +
-	'.{plugin.class:description} { line-height: 21px; font-size: 15px; }' +
+	'.{plugin.class:description} { line-height: 21px; font-size: 15px; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }' +
 	'.{plugin.class:label} > div:nth-child(2) { margin: 5px 0 0 0; }' +
 
 	// play button

@@ -167,10 +167,10 @@ plugin.css =
 	'.{plugin.class:photoContainer} { display: block; overflow: hidden; text-align: center; background-color: #000; }' +
 
 	'.echo-sdk-ui .{plugin.class:photoLabel} a:link, .echo-sdk-ui .{plugin.class:photoLabel} a:visited, .echo-sdk-ui .{plugin.class:photoLabel} a:hover, .echo-sdk-ui .{plugin.class:photoLabel} a:active { color: #000000; }' +
-	'.{plugin.class:photoLabelContainer} { padding: 15px 0 10px 0; }' +
+	'.{plugin.class:photoLabelContainer} { padding: 8px 0 5px 0; }' +
 	'.{plugin.class:photoLabelContainer} > div:nth-child(2) { margin: 5px 0 0 0; }' +
 	'.{plugin.class:title} { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 18px; line-height: 22px; }' +
-	'.{plugin.class:description} { line-height: 21px; font-size: 15px; }' +
+	'.{plugin.class:description} { line-height: 21px; font-size: 15px; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }' +
 
 	'.{class:depth-0}.{plugin.class:enabled} .{class:body} { margin-bottom: 0px; overflow: visible; }' +
 	'.{class:depth-0}.{plugin.class:enabled} .{class:data} { padding-top: 0px; }';

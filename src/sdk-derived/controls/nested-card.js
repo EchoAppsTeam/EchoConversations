@@ -354,7 +354,7 @@ card.methods.isSupported = function() {
 
 card.css =
 	'.{class:item} { text-align: left; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; display: inline-block; max-width: 100%; vertical-align: top; position: relative; }' +
-	'.{class:border} { white-space: normal; word-break: break-word; background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; }' +
+	'.{class:border} { white-space: normal; word-break: break-word; background-color: #FFFFFF; border: 1px solid #D2D2D2; }' +
 	'.{class:item} .{class:sourceIcon} > img { width: 18px; height: 18px; margin: 10px 0 10px 16px; }' +
 	'.{class:avatar} > div { background-image: url("{config:defaultAvatar}"); vertical-align: middle; width: 36px; height: 36px; display:inline-block; margin-right: 6px; }' +
 	'.{class:avatar} { margin: 15px 16px 0 16px; font-size: 17px; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
@@ -367,7 +367,7 @@ card.css =
 
 	'.{class:label} { padding: 15px 0 10px 0; }' +
 	'.{class:title} { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 16px; line-height: 22px; margin: 0 16px; }' +
-	'.{class:description} { line-height: 21px; font-size: 15px; margin: 5px 16px 0 16px; }' +
+	'.{class:description} { line-height: 21px; font-size: 15px; margin: 5px 16px 0 16px; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }' +
 
 	// close button
 	'.{class:closeButton} { line-height: 1; opacity: 0.8; filter: alpha(opacity=80); font-size: 30px; font-weight: bold; position: absolute; top: 4px; right: 8px; cursor: pointer; color: #000; text-shadow: 0 0 1px #FFF; }' +

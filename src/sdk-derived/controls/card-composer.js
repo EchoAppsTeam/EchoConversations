@@ -1436,7 +1436,7 @@ composer.css =
 	'.{class:metadataLabel} { float: left; width: 50px; margin-right: -50px; text-align: right; line-height: 22px; }' +
 	'.{class:metadataWrapper} { float: left; width: 100%; }' +
 	'.{class:metadataSubwrapper} { margin-left: 55px; padding: 2px 2px 2px 3px; background-color: #fff; }' +
-	'.{class:container} { padding: 20px; border: 1px solid #d8d8d8; border-bottom-width: 2px; }' +
+	'.{class:container} { padding: 20px; border: 1px solid #d8d8d8; }' +
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"] { width: 100%; border: 0; padding: 0px; outline: 0; box-shadow: none; margin-bottom: 0px; }' +
 	'.{class:container} .{class:metadataSubwrapper} input[type="text"]:focus { outline: 0; box-shadow: none; }' +
 	'.{class:composers} { margin: 0px; border: 1px solid #dedede; border-width: 1px 1px 0 1px; }' +

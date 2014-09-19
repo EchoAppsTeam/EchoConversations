@@ -1819,8 +1819,8 @@ card.css =
 	'.{class:buttonsContainer}.{class:dropdownLayout} li.dropdown-header > a:hover { background: none; color: #999; }' +
 	'.{class:dropdownLayout} .{class:buttons} ul.dropdown-menu { display: block; position: initial; border: 0; box-shadow: none; margin: 0; padding: 0; font-size: 12px; }' +
 	'.{class:metadata} { margin-bottom: 8px; }' +
-	'.{class:body} { padding-top: 0px; margin-bottom: 8px; overflow: hidden; }' +
-	'.{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; }' +
+	'.{class:body} { padding-top: 0px; margin-bottom: 5px; overflow: hidden; }' +
+	'.{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }' +
 	'.{class:authorName} { float: left; color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; max-width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; }' +
 	'.{class:authorName}:after { content: ""; display: normalinline; padding-right: 5px; }' +
 
@@ -1882,8 +1882,8 @@ card.css =
 
 	'.{class:data} { padding: 7px 0px 0px 0px; }' +
 	'.{class:container} .{class:depth-0} { padding: 15px 16px 0px 16px; }' +
-	'.{class} { background-color: #FFFFFF; border: 1px solid #D2D2D2; border-bottom-width: 2px; margin: 0px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
-	'.{class} { margin: 0px 0px 10px 0px; padding: 0px; border: 1px solid #d8d8d8; border-bottom-width: 2px; background: #ffffff; }' +
+	'.{class} { background-color: #FFFFFF; border: 1px solid #D2D2D2; margin: 0px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 13px; line-height: 16px; }' +
+	'.{class} { margin: 0px 0px 10px 0px; padding: 0px; border: 1px solid #d8d8d8; background: #ffffff; }' +
 
 	// see more
 	'.{class:seeMore}:before { content: ""; display: block; height: 3px; box-shadow: 0 -3px 3px rgba(0, 0, 0, 0.08); position: relative; top: 0px; }' +
