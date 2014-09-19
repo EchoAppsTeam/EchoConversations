@@ -71,10 +71,9 @@ media.renderers.container = function(element) {
 	var self = this;
 	var media = this.config.get("data", []);
 
-	$.map(this.cards, function(card) {
-		card.destroy();
-	});
-	this.cards = [];
+	while (this.cards.length) {
+		this.cards.pop().destroy();
+	}
 
 	if (media.length) {
 		if (!this.cardParentConfig) {
@@ -85,23 +84,25 @@ media.renderers.container = function(element) {
 			"target": document.createDocumentFragment(),
 			"context": this.config.get("context"),
 			"ready": function() {
-				self.cards.push(this);
 				element.append(this.config.get("target"));
-				// there are two capacity state available, "single" or "multiple"
-				if (self.cards.length <= 2) {
-					self.changeContainerCapacity(self.cards.length);
-				}
 			}
 		}, this.cardParentConfig.card);
 
 		config.parent = this.itemParentConfig;
 
-		$.map(media, function(item) {
-			new Echo.StreamServer.Controls.NestedCard($.extend({
+		$.each(media, function(i, item) {
+			var card = new Echo.StreamServer.Controls.NestedCard($.extend({
 				"data": item
 			}, config));
+
+			if (card.isAvailable) {
+				self.cards.push(card);
+			} else {
+				card.destroy();
+			}
 		});
 	}
+	this.changeContainerCapacity(this.cards.length);
 	return element;
 };
 

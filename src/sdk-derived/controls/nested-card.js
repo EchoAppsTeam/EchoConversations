@@ -98,14 +98,18 @@ card.events = {
 	}
 };
 
+card.vars = {
+	"isAvailable": true
+};
+
 card.sourceIcons = {};
 
 card.init = function() {
-	if (this.typeSupported()) {
+	if (this.isTypeSupported()) {
 		this.render();
 		this.ready();
 	} else {
-		this.destroy();
+		this.isAvailable = false;
 	}
 };
 
@@ -350,7 +354,7 @@ card.methods.getRenderType = function() {
 		: defaultType;
 };
 
-card.methods.typeSupported = function() {
+card.methods.isTypeSupported = function() {
 	return !!this.templates[this.getRenderType()];
 };
 
