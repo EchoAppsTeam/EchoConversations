@@ -1821,6 +1821,7 @@ card.css =
 	'.{class:metadata} { margin-bottom: 8px; }' +
 	'.{class:body} { padding-top: 0px; margin-bottom: 5px; overflow: hidden; }' +
 	'.{class:body} .{class:text} { color: #42474A; font-size: 15px; line-height: 21px; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }' +
+	'.{class:body} .{class:text} .echo-item-text { margin-top: 5px; }' +
 	'.{class:authorName} { float: left; color: #595959; font-weight: normal; font-size: 14px; line-height: 16px; max-width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; word-wrap: normal; }' +
 	'.{class:authorName}:after { content: ""; display: normalinline; padding-right: 5px; }' +
 

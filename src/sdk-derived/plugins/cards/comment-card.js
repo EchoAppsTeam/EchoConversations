@@ -48,7 +48,6 @@ plugin.renderers.mediaContent = function(element) {
 };
 
 plugin.css =
-	'.{class:depth-0} .echo-item-text { margin-top: 5px; }' +
 	'.{class:depth-0} .{plugin.class:mediaContent} .echo-streamserver-controls-mediacontainer-multiple { margin-left: -16px; margin-right: -16px; }' +
 	'.{class:depth-0} .{plugin.class:mediaContent} { margin-bottom: 0px; }' +
 	'.{plugin.class:mediaContent} .echo-streamserver-controls-mediacontainer-multiple { border-top: 1px solid #D2D2D2; border-bottom: 1px solid #D2D2D2; background-color: #F1F1F1; }' +
