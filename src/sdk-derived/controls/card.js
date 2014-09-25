@@ -1794,7 +1794,7 @@ card.css =
 	'.echo-sdk-ui .{class:dropdownButton} { display: inline; margin-left: 0px; }' +
 	'.echo-sdk-ui .{class:dropdownButton} > .dropdown { display: inline; }' +
 	'.echo-sdk-ui .{class:dropdownButton} > .dropdown a { color: inherit; text-decoration: inherit; }' +
-	'.{class:subcontainer} { background: #ffffff; border-bottom: 1px solid #e5e5e5; }' +
+	'.{class:subcontainer} { background: #fff; }' +
 	'.{class:content} { background: #ffffff; position: relative; }' +
 
 	'.echo-trinaryBackgroundColor { background-color: #f8f8f8; }' +
