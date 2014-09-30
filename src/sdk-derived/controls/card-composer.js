@@ -1108,7 +1108,7 @@ composer.methods._identifyCurrentComposer = function() {
 	var composerId = content.find(".echo-item-files").data("composer");
 	var attachments = content.find("div[data-oembed]");
 
-	var oembed = $.map(attachments, function() {
+	var oembed = attachments.map(function() {
 		var oembed = $(this).data("oembed");
 		return Echo.Utils.sanitizeOEmbed(oembed);
 	});
