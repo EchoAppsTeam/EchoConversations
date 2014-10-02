@@ -441,9 +441,7 @@ composer.events = {
  */
 composer.templates.main =
 	'<div class="{class:container}">' +
-		'<div class="alert alert-success echo-primaryFont {class:confirmation}">' +
-			'{config:confirmation.message}' +
-		'</div>' +
+		'<div class="alert alert-success echo-primaryFont {class:confirmation}"></div>' +
 		'<div class="{class:header}">' +
 			'<div class="{class:auth}"></div>' +
 			'<div class="{class:nameContainer} {class:border}">' +
@@ -532,6 +530,14 @@ composer.renderers.container = function(element) {
 	}
 
 	return element;
+};
+
+/**
+ * @echo_renderer
+ */
+composer.renderers.confirmation = function(element) {
+	var message = this.config.get("confirmation.message");
+	return element.text(Echo.Utils.sanitize(message, "plainText"));
 };
 
 /**

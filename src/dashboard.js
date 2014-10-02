@@ -44,6 +44,16 @@ var sourcesValidator = function(value) {
 		};
 };
 
+var plainTextValidator = function(value) {
+	var same = value === Echo.Utils.sanitize(value, "plainText");
+	return same
+		? {"valid": true}
+		: {
+			"valid": false,
+			"message": "Only plain text allowed"
+		};
+};
+
 dashboard.vars = {
 	"baseStreamECL": [{
 		"component": "Checkbox",
@@ -323,6 +333,7 @@ dashboard.vars = {
 		"config": {
 			"title": "Confirmation message",
 			"desc": "Specifies the confirmation message text displayed after successful submission if pre-moderation mode is enabled",
+			"validators": [plainTextValidator],
 			"data": {"sample": "Thanks, your post has been submitted for review"}
 		}
 	}, {
