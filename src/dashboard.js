@@ -50,7 +50,7 @@ var plainTextValidator = function(value) {
 		? {"valid": true}
 		: {
 			"valid": false,
-			"message": "Only plain text allowed"
+			"message": "Only plain text is allowed"
 		};
 };
 
