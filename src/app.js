@@ -1022,12 +1022,14 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 				"userState": "-user.state:ModeratorBanned",
 				"filter": "childrenof",
 				"markers": (function() {
-					var markers = [].concat(
-						config.itemMarkers,
-						self.config.get("topMarkers.item")
-					);
-					return markers.length
-						? "markers:" + markers.join(",") : "";
+					var markers = $.map(
+						[self.config.get("topMarkers.item"), config.itemMarkers],
+						function(marker) {
+							if (!marker || !marker.length) return null;
+							return "markers:" + ($.type(marker) === "array" ? marker.join(",") : marker);
+						}
+					).join(" AND ");
+					return "(" + markers + ")";
 				})()
 			};
 		},
