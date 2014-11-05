@@ -1065,9 +1065,9 @@ conversations.methods._getQueryArgsBuilder = function(componentID) {
 			return {
 				"operators": operators,
 				"childrenOperators": operators,
-				"userState": self._getPremoderationConfig()["approvedUserBypass"]
-					? "-user.state:ModeratorApproved"
-					: "",
+				"userState": "-user.state:ModeratorBanned" + (self._getPremoderationConfig()["approvedUserBypass"]
+					? ",ModeratorApproved"
+					: ""),
 				"filter": "scope",
 				"markers": config.itemMarkers.length
 					? "markers:" + config.itemMarkers.join(",")
