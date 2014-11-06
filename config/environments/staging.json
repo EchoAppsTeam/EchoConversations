@@ -2,16 +2,16 @@
 	"version": 3,
 	"manifest": {
 		"id": "echo-conversations-{%=packageVersions.latest%}-dev",
-		"name": "Comments (Dev)"
+		"name": "Comments (Staging)"
 	},
 	"appBaseURLs": {
-		"dev": "//echoplatform.com/sandbox/staging<%= release.options.versionPath() %>/dev",
-		"prod": "//echoplatform.com/sandbox/staging<%= release.options.versionPath() %>"
+		"dev": "//cdn.echoplatform.com<%= release.options.versionPath() %>/dev",
+		"prod": "//cdn.echoplatform.com<%= release.options.versionPath() %>"
 	},
 	"apiBaseURLs": {
 		"StreamServer": {
 			"apiBaseURL": "//api.dss.ul.js-kit.com/v1",
-			"submissionProxyURL": "https://apps.dss.ul.js-kit.com/v2/esp/activity",
+			"submissionProxyURL": "http://apps.dss.ul.js-kit.com/v2/esp/activity",
 			"websockets": "//live.dss.ul.js-kit.com/v1"
 		}
 	}
