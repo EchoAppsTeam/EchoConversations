@@ -680,6 +680,10 @@ conversations.renderers._tabs = function(element, extra) {
 						"extra": {"id": tab.name}
 					});
 				}
+				self.events.publish({
+					"topic": "onTabShown",
+					"data": tab
+				});
 			});
 		}
 		nav.append(li);
