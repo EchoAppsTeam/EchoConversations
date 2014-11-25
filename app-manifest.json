@@ -17,12 +17,7 @@
 		"title": "Instances",
 		"script": "{%= appBaseURLs.prod %}/dashboard.js",
 		"component": "Echo.Apps.Conversations.Dashboard",
-		"type": "instances",
-		"config": {
-			"instanceManager": {
-				"instance": {"useLoadingIcon": true}
-			}
-		}
+		"type": "instances"
 	}, {
 		"id": "docs",
 		"type": "external",
@@ -37,5 +32,6 @@
 			"dev": "{%= appBaseURLs.dev %}/app.js",
 			"prod": "{%= appBaseURLs.prod %}/app.js"
 		}
-	}
+	},
+	"dependencies": ["StreamServer", "Janrain", "FilePicker", "embedly"]
 }

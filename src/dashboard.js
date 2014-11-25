@@ -796,26 +796,6 @@ dashboard.init = function() {
 	this.parent();
 };
 
-dashboard.methods.declareInitialConfig = function() {
-	if (~$.inArray("dependencies", this.config.get("disableSettings"))) return {};
-	return {
-		"dependencies": {
-			"Janrain": {
-				"appId": this.getDefaultJanrainApp()
-			},
-			"StreamServer": {
-				"appkey": this.getDefaultAppKey()
-			},
-			"FilePicker": {
-				"apiKey": "AFLWUBllDRwWZl7sQO1V1z"
-			},
-			"embedly": {
-				"apiKey": "5945901611864679a8761b0fcaa56f87"
-			}
-		}
-	};
-};
-
 dashboard.methods.initConfigurator = function() {
 	// remove items specified in the config.disableSettings
 	var disableSettings = this.config.get("disableSettings");

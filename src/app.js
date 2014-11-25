@@ -1297,6 +1297,9 @@ conversations.css =
 	'.echo-sdk-ui .{class:tabs} ul.nav { margin-bottom: 0px; }' +
 	'.echo-sdk-ui .nav.{class:tabs} .dropdown-menu { border-radius: 6px; }' +
 
+	// post composer
+	'.{class:postComposer}, .{class:container} .echo-control-message { background-color: #ffffff; border: 0 none; }' +
+
 	// common
 	'.{class:container} .echo-control-message { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #42474A; font-size: 15px; line-height: 21px; }' +
 	'.{class:container} { position:relative; }' +
