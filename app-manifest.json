@@ -1,6 +1,6 @@
 {
-	"id": "{%=manifest.id%}",
-	"name": "{%=manifest.name%}",
+	"id": "echo-conversations-{%=packageVersions.latest%}",
+	"name": "Comments",
 	"description": "Turn Every Article into a Real-time Conversations",
 	"app_version": "{%=packageVersions.stable%}",
 	"cloudapp_protocol_version": "1.0.0",
