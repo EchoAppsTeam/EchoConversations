@@ -423,7 +423,7 @@ conversations.templates.tabs.contentItem =
 	'<div class="tab-pane {data:class}" id="{data:tabId}"></div>';
 
 conversations.templates.defaultQuery =
-	'{data:filter}:{data:targetURL} {data:excludedSources} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
+	'{data:filter}:\'{data:targetURL}\' {data:excludedSources} sortOrder:{data:initialSortOrder} safeHTML:permissive ' +
 	'itemsPerPage:{data:initialItemsPerPage} {data:markers} {data:type} {data:operators} {data:userState} ' +
 	'children:{data:replyNestingLevels} {data:childrenOperators} {data:userState}';
 
