@@ -808,7 +808,7 @@ dashboard.methods.initConfigurator = function() {
 			if (item.items) traverse(item.items, itemPath);
 		});
 	})(this.config.get("ecl"));
-	this.parent.apply(this, arguments);
+	return this.parent.apply(this, arguments);
 };
 
 Echo.AppServer.Dashboard.create(dashboard);
