@@ -1,5 +1,9 @@
 #EchoConversations CHANGELOG:
 
+##v2.0.15 - February 12, 2015
+
+* initConfigurator method now return deferred object
+
 ##v2.0.14 - January 29, 2015
 
 * Enclose application targetURL parameter with quotes while
