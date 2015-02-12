@@ -2,7 +2,7 @@
 
 ##v2.0.15 - February 12, 2015
 
-* initConfigurator method now return deferred object
+* initConfigurator method now returns deferred object
 
 ##v2.0.14 - January 29, 2015
 
